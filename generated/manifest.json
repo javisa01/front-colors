@@ -1,0 +1,22 @@
+[
+  {
+    "id": "cocacola",
+    "colors": 1
+  },
+  {
+    "id": "google",
+    "colors": 4
+  },
+  {
+    "id": "javascript",
+    "colors": 1
+  },
+  {
+    "id": "react",
+    "colors": 1
+  },
+  {
+    "id": "spotify",
+    "colors": 1
+  }
+]

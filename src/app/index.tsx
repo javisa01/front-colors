@@ -1,7 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import type { ReactElement } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Pressable,
   ScrollView,
@@ -21,42 +21,21 @@ import Animated, {
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-interface GameMode {
-  id: string;
-  title: string;
-  description: string;
+import { t, type TranslationKey } from "@/i18n";
+import type { GameMode } from "@/types/challenge";
+import { getHighScore } from "@/utils/storage";
+
+interface GameModeCard {
+  id: GameMode;
   emoji: string;
   colors: [string, string];
-  href: "/game" | null;
 }
 
-const GAME_MODES: GameMode[] = [
-  {
-    id: "quick",
-    title: "Juego rápido",
-    description: "Adivina el color de cada reto y supera todos los niveles.",
-    emoji: "⚡",
-    colors: ["#3B82F6", "#2563EB"],
-    href: "/game",
-  },
-  {
-    id: "timed",
-    title: "Contrarreloj",
-    description:
-      "Muy pronto: acierta el máximo de colores antes de que acabe el tiempo.",
-    emoji: "⏱️",
-    colors: ["#7C3AED", "#5B21B6"],
-    href: null,
-  },
-  {
-    id: "daily",
-    title: "Reto diario",
-    description:
-      "Muy pronto: un color nuevo cada día para poner a prueba tu ojo.",
-    emoji: "📅",
-    colors: ["#0EA5E9", "#0369A1"],
-    href: null,
-  },
+const GAME_MODES: GameModeCard[] = [
+  { id: "quick", emoji: "⚡", colors: ["#3B82F6", "#2563EB"] },
+  { id: "timed", emoji: "⏱️", colors: ["#7C3AED", "#5B21B6"] },
+  { id: "daily", emoji: "📅", colors: ["#0EA5E9", "#0369A1"] },
+  { id: "multicolor", emoji: "🌈", colors: ["#EC4899", "#BE185D"] },
 ];
 
 export default function HomeScreen(): ReactElement {
@@ -64,6 +43,27 @@ export default function HomeScreen(): ReactElement {
   const router = useRouter();
 
   const isTablet = width >= 768;
+
+  const [bestScores, setBestScores] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    let active = true;
+
+    (async () => {
+      const entries = await Promise.all(
+        GAME_MODES.map(
+          async (mode) => [mode.id, await getHighScore(mode.id)] as const,
+        ),
+      );
+      if (active) {
+        setBestScores(Object.fromEntries(entries));
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const glow = useSharedValue(0);
   const float = useSharedValue(0);
@@ -147,16 +147,11 @@ export default function HomeScreen(): ReactElement {
               style={styles.header}
             >
               <Animated.View style={[styles.badge, badgeStyle]}>
-                <Text style={styles.badgeText}>🎨 Color Quest</Text>
+                <Text style={styles.badgeText}>{t("home.badge")}</Text>
               </Animated.View>
 
-              <Text style={styles.title}>
-                Pon a prueba{"\n"}tu ojo para el color
-              </Text>
-              <Text style={styles.subtitle}>
-                Elige un modo de juego y demuestra cuánto te acercas al color
-                perfecto.
-              </Text>
+              <Text style={styles.title}>{t("home.title")}</Text>
+              <Text style={styles.subtitle}>{t("home.subtitle")}</Text>
             </Animated.View>
 
             <View
@@ -166,7 +161,7 @@ export default function HomeScreen(): ReactElement {
               ]}
             >
               {GAME_MODES.map((mode, index) => {
-                const isAvailable = mode.href != null;
+                const best = bestScores[mode.id] ?? 0;
 
                 return (
                   <Animated.View
@@ -178,20 +173,20 @@ export default function HomeScreen(): ReactElement {
                     ]}
                   >
                     <Pressable
-                      onPress={() => {
-                        if (mode.href != null) {
-                          router.push(mode.href);
-                        }
-                      }}
-                      disabled={!isAvailable}
+                      onPress={() =>
+                        router.push({
+                          pathname: "/game",
+                          params: { mode: mode.id },
+                        })
+                      }
                       style={({ pressed }) => [
                         styles.modeCard,
-                        !isAvailable && styles.modeCardDisabled,
-                        pressed && isAvailable && styles.modeCardPressed,
+                        pressed && styles.modeCardPressed,
                       ]}
                       accessibilityRole="button"
-                      accessibilityLabel={mode.title}
-                      accessibilityState={{ disabled: !isAvailable }}
+                      accessibilityLabel={t(
+                        `mode.${mode.id}.title` as TranslationKey,
+                      )}
                     >
                       <View style={styles.modeRow}>
                         <LinearGradient
@@ -205,21 +200,23 @@ export default function HomeScreen(): ReactElement {
 
                         <View style={styles.modeTextGroup}>
                           <View style={styles.modeTitleRow}>
-                            <Text style={styles.modeTitle}>{mode.title}</Text>
-                            {!isAvailable ? (
-                              <View style={styles.soonPill}>
-                                <Text style={styles.soonPillText}>Pronto</Text>
+                            <Text style={styles.modeTitle}>
+                              {t(`mode.${mode.id}.title` as TranslationKey)}
+                            </Text>
+                            {best > 0 ? (
+                              <View style={styles.bestPill}>
+                                <Text style={styles.bestPillText}>
+                                  {t("home.best", { score: best })}
+                                </Text>
                               </View>
                             ) : null}
                           </View>
                           <Text style={styles.modeDescription}>
-                            {mode.description}
+                            {t(`mode.${mode.id}.description` as TranslationKey)}
                           </Text>
                         </View>
 
-                        {isAvailable ? (
-                          <Text style={styles.modeArrow}>›</Text>
-                        ) : null}
+                        <Text style={styles.modeArrow}>›</Text>
                       </View>
                     </Pressable>
                   </Animated.View>
@@ -231,7 +228,7 @@ export default function HomeScreen(): ReactElement {
               entering={FadeInDown.delay(520).duration(520)}
               style={styles.footerHint}
             >
-              Más modos de juego en camino.
+              {t("home.footer")}
             </Animated.Text>
           </View>
         </ScrollView>
@@ -398,6 +395,22 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: "700",
     fontFamily: "System",
+  },
+  bestPill: {
+    marginLeft: 10,
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 999,
+    backgroundColor: "#1E293B",
+    borderWidth: 1,
+    borderColor: "#3B82F6",
+  },
+  bestPillText: {
+    color: "#93C5FD",
+    fontSize: 11,
+    fontWeight: "800",
+    fontFamily: "System",
+    fontVariant: ["tabular-nums"],
   },
   modeDescription: {
     marginTop: 4,

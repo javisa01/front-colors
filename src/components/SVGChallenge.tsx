@@ -17,6 +17,9 @@ interface SVGChallengeProps {
   editableColor: string;
   size: number;
   animationToken: number;
+  // Which color of the logo the player is currently editing. Defaults to the
+  // challenge's own `editableColorIndex`; multicolor mode overrides it per step.
+  editableColorIndex?: number;
 }
 
 function ensureViewBox(svgXml: string): string {
@@ -74,6 +77,7 @@ function SVGChallenge({
   editableColor,
   size,
   animationToken,
+  editableColorIndex,
 }: SVGChallengeProps): React.JSX.Element {
   const pulse = useSharedValue(0);
 
@@ -99,7 +103,8 @@ function SVGChallenge({
   });
 
   const svgMarkup = useMemo(() => {
-    const editable = challenge.colors?.[challenge.editableColorIndex ?? 0];
+    const activeIndex = editableColorIndex ?? challenge.editableColorIndex ?? 0;
+    const editable = challenge.colors?.[activeIndex];
     // The color drawn in the SVG (`svgColor`) can differ from the color the
     // player must guess (`hex`). We replace the one actually present in the SVG.
     const sourceColor = editable?.svgColor ?? editable?.hex;
@@ -109,7 +114,7 @@ function SVGChallenge({
     }
 
     return replaceColorInSvg(challenge.svgXml, sourceColor, editableColor);
-  }, [challenge, editableColor]);
+  }, [challenge, editableColor, editableColorIndex]);
 
   // Pick a card background that keeps the artwork readable: dark logos (e.g.
   // Amazon or Starbucks) would blend into the default dark card, so we switch to

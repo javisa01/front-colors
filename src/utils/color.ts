@@ -13,6 +13,15 @@ export function hexToHSV(hex: string): HSVColor {
   return { h, s, v };
 }
 
+// CIELAB representation of an HSV color. Used by the perceptual color-distance
+// scoring (CIEDE2000), which lives in `colorScore.ts`. Lab keeps the math in a
+// space that matches how the human eye judges color differences far better than
+// raw HSV does.
+export function hsvToLab(hsv: HSVColor): [number, number, number] {
+  const [l, a, b] = convert.hsv.lab([hsv.h, hsv.s, hsv.v]);
+  return [l, a, b];
+}
+
 export function hsvToHex(h: number, s: number, v: number): string {
   const [r, g, b] = convert.hsv.rgb([h, s, v]);
   return `#${[r, g, b]

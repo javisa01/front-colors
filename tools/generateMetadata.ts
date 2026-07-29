@@ -25,6 +25,18 @@ function toSafeIdentifier(value: string): string {
   return sanitized.match(/^\d/) ? `_${sanitized}` : sanitized;
 }
 
+function collectHexColors(value: string, colors: Set<string>) {
+  const matches = value.match(/#[0-9a-fA-F]{6}\b/g);
+
+  if (!matches) {
+    return;
+  }
+
+  for (const match of matches) {
+    colors.add(match.toUpperCase());
+  }
+}
+
 function visit(node: unknown, colors: Set<string>) {
   if (Array.isArray(node)) {
     node.forEach((child) => visit(child, colors));
@@ -37,11 +49,13 @@ function visit(node: unknown, colors: Set<string>) {
 
   const current = node as Record<string, unknown>;
 
-  if (typeof current.fill === "string") {
-    const fill = current.fill.trim();
+  // Colors can live in attributes (fill/stroke) or inline styles
+  // (style="fill:#...;stroke:#..."), so inspect all of them.
+  for (const key of ["fill", "stroke", "style"]) {
+    const value = current[key];
 
-    if (/^#[0-9a-fA-F]{6}$/.test(fill)) {
-      colors.add(fill.toUpperCase());
+    if (typeof value === "string") {
+      collectHexColors(value, colors);
     }
   }
 

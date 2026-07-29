@@ -1,16 +1,16 @@
 import { memo, useEffect, useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, {
-    Easing,
-    useAnimatedStyle,
-    useSharedValue,
-    withSequence,
-    withTiming,
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
 } from "react-native-reanimated";
 import { SvgXml } from "react-native-svg";
 
 import type { ChallengeMetadata } from "@/types/challenge";
-import { normalizeHex } from "@/utils/color";
+import { getChallengeBackgroundTheme, normalizeHex } from "@/utils/color";
 
 interface SVGChallengeProps {
   challenge: ChallengeMetadata;
@@ -19,13 +19,34 @@ interface SVGChallengeProps {
   animationToken: number;
 }
 
+function ensureViewBox(svgXml: string): string {
+  if (/\bviewBox\s*=/i.test(svgXml)) {
+    return svgXml;
+  }
+
+  const width = svgXml.match(/<svg[^>]*?\bwidth="([\d.]+)/i)?.[1];
+  const height = svgXml.match(/<svg[^>]*?\bheight="([\d.]+)/i)?.[1];
+
+  if (!width || !height) {
+    return svgXml;
+  }
+
+  return svgXml.replace(/<svg\b/i, `<svg viewBox="0 0 ${width} ${height}"`);
+}
+
 function sanitizeSvgXml(svgXml: string): string {
-  return svgXml
+  const cleaned = svgXml
     .replace(/^<\?xml[^>]*\?>/i, "")
     .replace(/<!DOCTYPE[^>]*>/gi, "")
     .replace(/<!ENTITY[^>]*>/gi, "")
     .replace(/\s+xmlns:xlink="[^"]*"/gi, "")
     .trim();
+
+  return ensureViewBox(cleaned);
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function replaceColorInSvg(
@@ -36,16 +57,16 @@ function replaceColorInSvg(
   const normalizedOriginal = normalizeHex(originalColor).toLowerCase();
   const normalizedReplacement = normalizeHex(replacementColor).toLowerCase();
 
-  return sanitizeSvgXml(svgXml).replace(
-    /\b(fill|stroke)=(["'])(.*?)\2/gi,
-    (match, attribute, quote, value) => {
-      if (value.trim().toLowerCase() === normalizedOriginal) {
-        return `${attribute}=${quote}${normalizedReplacement}${quote}`;
-      }
-
-      return match;
-    },
+  // Replace every occurrence of the source color literal, whether it appears
+  // as an attribute (fill="#..."/stroke="#...") or inside an inline style
+  // (style="fill:#...;stroke:#..."). The negative lookahead avoids matching a
+  // longer hex value (e.g. an 8-digit color with alpha).
+  const colorRegex = new RegExp(
+    `${escapeRegExp(normalizedOriginal)}(?![0-9a-fA-F])`,
+    "gi",
   );
+
+  return sanitizeSvgXml(svgXml).replace(colorRegex, normalizedReplacement);
 }
 
 function SVGChallenge({
@@ -78,22 +99,38 @@ function SVGChallenge({
   });
 
   const svgMarkup = useMemo(() => {
-    const targetColor =
-      challenge.colors?.[challenge.editableColorIndex ?? 0]?.hex;
+    const editable = challenge.colors?.[challenge.editableColorIndex ?? 0];
+    // The color drawn in the SVG (`svgColor`) can differ from the color the
+    // player must guess (`hex`). We replace the one actually present in the SVG.
+    const sourceColor = editable?.svgColor ?? editable?.hex;
 
-    if (!targetColor) {
+    if (!sourceColor) {
       return "";
     }
 
-    return replaceColorInSvg(challenge.svgXml, targetColor, editableColor);
+    return replaceColorInSvg(challenge.svgXml, sourceColor, editableColor);
   }, [challenge, editableColor]);
+
+  // Pick a card background that keeps the artwork readable: dark logos (e.g.
+  // Amazon or Starbucks) would blend into the default dark card, so we switch to
+  // a light one. This is based on the challenge's true colors, not the color the
+  // player is currently predicting, so the background stays stable while playing.
+  const backgroundTheme = useMemo(
+    () => getChallengeBackgroundTheme(challenge),
+    [challenge],
+  );
 
   return (
     <View style={styles.container}>
       <Animated.View
         style={[
           styles.svgWrapper,
-          { width: size, height: size },
+          {
+            width: size,
+            height: size,
+            backgroundColor: backgroundTheme.background,
+            borderColor: backgroundTheme.border,
+          },
           animatedStyle,
         ]}
       >
@@ -121,9 +158,7 @@ const styles = StyleSheet.create({
     maxWidth: "100%",
     borderRadius: 28,
     overflow: "hidden",
-    backgroundColor: "#111113",
     borderWidth: 1,
-    borderColor: "#27272A",
     alignItems: "center",
     justifyContent: "center",
   },

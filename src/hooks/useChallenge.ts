@@ -125,9 +125,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type {
-    ChallengeManifestEntry,
-    ChallengeMetadata,
-    HSVColor,
+  ChallengeManifestEntry,
+  ChallengeMetadata,
+  HSVColor,
 } from "@/types/challenge";
 import { hexToHSV, normalizeHex } from "@/utils/color";
 import challengeCatalog from "../../generated/challenges.json";
@@ -173,7 +173,7 @@ export function useChallenge(): UseChallengeResult {
   const challenges = useMemo(() => {
     const catalogEntries = challengeCatalog as ChallengeMetadata[];
 
-    return catalogEntries
+    const available = catalogEntries
       .filter(
         (item) =>
           item?.id && Array.isArray(item?.colors) && item.colors.length > 0,
@@ -182,6 +182,20 @@ export function useChallenge(): UseChallengeResult {
         id: item.id,
         colors: item.colors.length,
       })) as ChallengeManifestEntry[];
+
+    // TODO: Selección aleatoria de 5 retos de entre todos los disponibles.
+    // Para revertir a una selección fija (elegir manualmente qué logos
+    // aparecen), elimina el barajado de abajo y devuelve `available`
+    // directamente, o fíltralo por los ids deseados, por ejemplo:
+    //   return available.filter((c) => ["amazon", "kfc", "barbie"].includes(c.id));
+    const RANDOM_COUNT = 5;
+    const shuffled = [...available];
+    for (let i = shuffled.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    return shuffled.slice(0, RANDOM_COUNT);
   }, []);
 
   const totalChallenges = challenges.length;

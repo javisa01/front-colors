@@ -1,5 +1,29 @@
 [
   {
+    "id": "amazon",
+    "colors": 1
+  },
+  {
+    "id": "barbie",
+    "colors": 1
+  },
+  {
+    "id": "kfc",
+    "colors": 1
+  },
+  {
+    "id": "mcdonalds",
+    "colors": 1
+  },
+  {
+    "id": "spongebob",
+    "colors": 26
+  },
+  {
+    "id": "starbucks",
+    "colors": 1
+  },
+  {
     "id": "cocacola",
     "colors": 1
   },

@@ -18,6 +18,9 @@ export default function RootLayout() {
             }}
           >
             <Stack.Screen name="index" />
+            <Stack.Screen name="offline" />
+            <Stack.Screen name="party-setup" />
+            <Stack.Screen name="party" />
             <Stack.Screen name="game" />
           </Stack>
         </View>

@@ -103,7 +103,7 @@ function DailyDoneScreen({ result }: { result: DailyResult }): ReactElement {
             </Text>
 
             <Pressable
-              onPress={() => router.replace("/")}
+              onPress={() => router.replace("/offline")}
               style={({ pressed }) => [
                 styles.restartButton,
                 pressed && styles.buttonPressed,
@@ -378,7 +378,7 @@ function GamePlay({ mode, seed, resume }: GamePlayProps): ReactElement {
     }
 
     void clearProgress();
-    router.replace("/");
+    router.replace("/offline");
   }, [router]);
 
   const handleRetry = useCallback((): void => {

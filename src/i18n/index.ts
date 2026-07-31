@@ -20,6 +20,83 @@ const es = {
   "common.retry": "Reintentar",
   "common.share": "Compartir",
   "common.loading": "Cargando juego...",
+  "common.continue": "Continuar",
+
+  "landing.badge": "🎨 Color Quest",
+  "landing.title": "Elige cómo\nquieres jugar",
+  "landing.subtitle":
+    "Practica en solitario o reúne a tus amigos alrededor de un mismo móvil.",
+  "landing.online.title": "Online",
+  "landing.online.description":
+    "Compite contra otros jugadores en tiempo real.",
+  "landing.online.locked": "Necesita conexión · en desarrollo",
+  "landing.offline.title": "Offline",
+  "landing.offline.description":
+    "Modo práctica y partidas en grupo en este dispositivo.",
+  "landing.soon": "Pronto",
+  "landing.footer": "El modo online llegará con la próxima actualización.",
+
+  "offline.badge": "🎮 Modo offline",
+  "offline.title": "Práctica y grupo",
+  "offline.subtitle": "Juega tú solo o pásate el móvil entre varias personas.",
+  "offline.solo.section": "Un jugador",
+  "offline.solo.hint": "Modos de práctica en solitario.",
+  "offline.group.section": "En grupo · mismo móvil",
+  "offline.group.hint": "Hasta 99 jugadores por turnos.",
+
+  "party.mode.battle.title": "Batalla de adivinar",
+  "party.mode.battle.description":
+    "5 imágenes por turnos. Gana quien más se acerque.",
+  "party.mode.battle-timed.title": "Batalla contrarreloj",
+  "party.mode.battle-timed.description":
+    "Un minuto por jugador para sumar los máximos aciertos.",
+  "party.mode.coop.title": "Colaborativo",
+  "party.mode.coop.description":
+    "Sumad vuestras puntuaciones para una nota común.",
+  "party.mode.coop-timed.title": "Colaborativo contrarreloj",
+  "party.mode.coop-timed.description":
+    "Un minuto por jugador; sumad todo lo posible en equipo.",
+
+  "party.setup.title": "Configura la partida",
+  "party.setup.playersLabel": "Número de jugadores",
+  "party.setup.playersHint": "Entre {{min}} y {{max}} jugadores.",
+  "party.setup.namesLabel": "Nombres (opcional)",
+  "party.setup.namesHint": "Déjalo en blanco para usar «Jugador N».",
+  "party.setup.battleInfo": "{{count}} imágenes iguales para todos.",
+  "party.setup.coopInfo": "{{count}} imágenes por jugador.",
+  "party.setup.timedInfo": "{{seconds}} s por jugador.",
+  "party.setup.start": "Empezar partida",
+
+  "party.playerN": "Jugador {{n}}",
+
+  "party.handoff.title": "Turno de {{name}}",
+  "party.handoff.subtitle": "Pasa el móvil a este jugador.",
+  "party.handoff.image": "Imagen {{current}} de {{total}}",
+  "party.handoff.timed": "Tienes {{seconds}} segundos.",
+  "party.handoff.start": "Estoy listo",
+
+  "party.play.image": "Imagen {{current}} de {{total}}",
+  "party.play.solved": "Aciertos: {{count}}",
+  "party.play.check": "Comprobar",
+
+  "party.guess.title": "¡Guardado!",
+  "party.guess.hidden": "Pasa el móvil sin mirar el color correcto.",
+
+  "party.round.title": "Resultado de la imagen",
+  "party.round.correct": "Color correcto",
+  "party.round.you": "{{name}}",
+
+  "party.final.title": "Clasificación final",
+  "party.final.coopTitle": "Resultado del equipo",
+  "party.final.winner": "🏆 Gana {{name}}",
+  "party.final.tie": "🤝 ¡Empate!",
+  "party.final.points": "{{score}} pts",
+  "party.final.rounds": "{{count}} aciertos",
+  "party.final.teamScore": "{{score}} / {{max}} pts",
+  "party.final.teamAverage": "Media del equipo: {{average}}%",
+  "party.final.contributions": "Aportaciones",
+  "party.final.replay": "Jugar otra vez",
+  "party.final.home": "Volver a modos",
 
   "home.badge": "🎨 Color Quest",
   "home.title": "Pon a prueba\ntu ojo para el color",

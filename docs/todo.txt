@@ -1,0 +1,10 @@
+Cambiar los tiempos de los modos contrareloj versus y colaborativo:
+- Modo colab menos tiempo en funcion de las personas y empezar en 30-20s
+- Modo versus limitar a 30 segundos o 20
+
+Hacer estructura para solo tener que importar audios
+
+Cambiar algun texto o formato del texto por ejemplo en donde pone UN JUGADOR
+
+TRADUCCION
+

@@ -1,7 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import type { ReactElement } from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   Pressable,
   ScrollView,
@@ -21,49 +21,13 @@ import Animated, {
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { t, type TranslationKey } from "@/i18n";
-import type { GameMode } from "@/types/challenge";
-import { getHighScore } from "@/utils/storage";
+import { t } from "@/i18n";
 
-interface GameModeCard {
-  id: GameMode;
-  emoji: string;
-  colors: [string, string];
-}
-
-const GAME_MODES: GameModeCard[] = [
-  { id: "quick", emoji: "⚡", colors: ["#3B82F6", "#2563EB"] },
-  { id: "timed", emoji: "⏱️", colors: ["#7C3AED", "#5B21B6"] },
-  { id: "daily", emoji: "📅", colors: ["#0EA5E9", "#0369A1"] },
-  { id: "multicolor", emoji: "🌈", colors: ["#EC4899", "#BE185D"] },
-];
-
-export default function HomeScreen(): ReactElement {
+export default function LandingScreen(): ReactElement {
   const { width } = useWindowDimensions();
   const router = useRouter();
 
   const isTablet = width >= 768;
-
-  const [bestScores, setBestScores] = useState<Record<string, number>>({});
-
-  useEffect(() => {
-    let active = true;
-
-    (async () => {
-      const entries = await Promise.all(
-        GAME_MODES.map(
-          async (mode) => [mode.id, await getHighScore(mode.id)] as const,
-        ),
-      );
-      if (active) {
-        setBestScores(Object.fromEntries(entries));
-      }
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, []);
 
   const glow = useSharedValue(0);
   const float = useSharedValue(0);
@@ -126,7 +90,7 @@ export default function HomeScreen(): ReactElement {
           style={[styles.orb, styles.orbTwo, orbTwoStyle]}
         >
           <LinearGradient
-            colors={["#7C3AED", "#5B21B6"]}
+            colors={["#EC4899", "#BE185D"]}
             style={styles.orbFill}
           />
         </Animated.View>
@@ -135,10 +99,7 @@ export default function HomeScreen(): ReactElement {
           style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
           bounces={false}
-          alwaysBounceVertical={false}
-          alwaysBounceHorizontal={false}
           overScrollMode="never"
         >
           <View style={styles.shell}>
@@ -147,11 +108,11 @@ export default function HomeScreen(): ReactElement {
               style={styles.header}
             >
               <Animated.View style={[styles.badge, badgeStyle]}>
-                <Text style={styles.badgeText}>{t("home.badge")}</Text>
+                <Text style={styles.badgeText}>{t("landing.badge")}</Text>
               </Animated.View>
 
-              <Text style={styles.title}>{t("home.title")}</Text>
-              <Text style={styles.subtitle}>{t("home.subtitle")}</Text>
+              <Text style={styles.title}>{t("landing.title")}</Text>
+              <Text style={styles.subtitle}>{t("landing.subtitle")}</Text>
             </Animated.View>
 
             <View
@@ -160,75 +121,92 @@ export default function HomeScreen(): ReactElement {
                 isTablet ? styles.modesTablet : styles.modesPhone,
               ]}
             >
-              {GAME_MODES.map((mode, index) => {
-                const best = bestScores[mode.id] ?? 0;
-
-                return (
-                  <Animated.View
-                    key={mode.id}
-                    entering={FadeInDown.delay(120 + index * 110).duration(520)}
-                    style={[
-                      styles.modeWrapper,
-                      isTablet && styles.modeWrapperTablet,
-                    ]}
-                  >
-                    <Pressable
-                      onPress={() =>
-                        router.push({
-                          pathname: "/game",
-                          params: { mode: mode.id },
-                        })
-                      }
-                      style={({ pressed }) => [
-                        styles.modeCard,
-                        pressed && styles.modeCardPressed,
-                      ]}
-                      accessibilityRole="button"
-                      accessibilityLabel={t(
-                        `mode.${mode.id}.title` as TranslationKey,
-                      )}
+              <Animated.View
+                entering={FadeInDown.delay(120).duration(520)}
+                style={[styles.modeWrapper, isTablet && styles.modeWrapperTablet]}
+              >
+                <Pressable
+                  onPress={() => router.push("/offline")}
+                  style={({ pressed }) => [
+                    styles.modeCard,
+                    pressed && styles.modeCardPressed,
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("landing.offline.title")}
+                >
+                  <View style={styles.modeRow}>
+                    <LinearGradient
+                      colors={["#10B981", "#047857"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.modeIcon}
                     >
-                      <View style={styles.modeRow}>
-                        <LinearGradient
-                          colors={mode.colors}
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 1, y: 1 }}
-                          style={styles.modeIcon}
-                        >
-                          <Text style={styles.modeEmoji}>{mode.emoji}</Text>
-                        </LinearGradient>
+                      <Text style={styles.modeEmoji}>📶</Text>
+                    </LinearGradient>
 
-                        <View style={styles.modeTextGroup}>
-                          <View style={styles.modeTitleRow}>
-                            <Text style={styles.modeTitle}>
-                              {t(`mode.${mode.id}.title` as TranslationKey)}
-                            </Text>
-                            {best > 0 ? (
-                              <View style={styles.bestPill}>
-                                <Text style={styles.bestPillText}>
-                                  {t("home.best", { score: best })}
-                                </Text>
-                              </View>
-                            ) : null}
-                          </View>
-                          <Text style={styles.modeDescription}>
-                            {t(`mode.${mode.id}.description` as TranslationKey)}
+                    <View style={styles.modeTextGroup}>
+                      <Text style={styles.modeTitle}>
+                        {t("landing.offline.title")}
+                      </Text>
+                      <Text style={styles.modeDescription}>
+                        {t("landing.offline.description")}
+                      </Text>
+                    </View>
+
+                    <Text style={styles.modeArrow}>›</Text>
+                  </View>
+                </Pressable>
+              </Animated.View>
+
+              <Animated.View
+                entering={FadeInDown.delay(230).duration(520)}
+                style={[styles.modeWrapper, isTablet && styles.modeWrapperTablet]}
+              >
+                <View
+                  style={[styles.modeCard, styles.modeCardDisabled]}
+                  accessible
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: true }}
+                  accessibilityLabel={t("landing.online.title")}
+                >
+                  <View style={styles.modeRow}>
+                    <LinearGradient
+                      colors={["#52525B", "#3F3F46"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.modeIcon}
+                    >
+                      <Text style={styles.modeEmoji}>🌐</Text>
+                    </LinearGradient>
+
+                    <View style={styles.modeTextGroup}>
+                      <View style={styles.modeTitleRow}>
+                        <Text style={styles.modeTitle}>
+                          {t("landing.online.title")}
+                        </Text>
+                        <View style={styles.soonPill}>
+                          <Text style={styles.soonPillText}>
+                            {t("landing.soon")}
                           </Text>
                         </View>
-
-                        <Text style={styles.modeArrow}>›</Text>
                       </View>
-                    </Pressable>
-                  </Animated.View>
-                );
-              })}
+                      <Text style={styles.modeDescription}>
+                        {t("landing.online.description")}
+                      </Text>
+                      <Text style={styles.lockedHint}>
+                        🔒 {t("landing.online.locked")}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </Animated.View>
             </View>
 
             <Animated.Text
-              entering={FadeInDown.delay(520).duration(520)}
+              entering={FadeInDown.delay(340).duration(520)}
               style={styles.footerHint}
             >
-              {t("home.footer")}
+              {t("landing.footer")}
             </Animated.Text>
           </View>
         </ScrollView>
@@ -348,7 +326,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   modeCardDisabled: {
-    opacity: 0.6,
+    opacity: 0.7,
   },
   modeCardPressed: {
     opacity: 0.92,
@@ -396,27 +374,18 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontFamily: "System",
   },
-  bestPill: {
-    marginLeft: 10,
-    paddingVertical: 3,
-    paddingHorizontal: 8,
-    borderRadius: 999,
-    backgroundColor: "#1E293B",
-    borderWidth: 1,
-    borderColor: "#3B82F6",
-  },
-  bestPillText: {
-    color: "#93C5FD",
-    fontSize: 11,
-    fontWeight: "800",
-    fontFamily: "System",
-    fontVariant: ["tabular-nums"],
-  },
   modeDescription: {
     marginTop: 4,
     color: "#A1A1AA",
     fontSize: 13,
     lineHeight: 19,
+    fontFamily: "System",
+  },
+  lockedHint: {
+    marginTop: 8,
+    color: "#71717A",
+    fontSize: 12,
+    fontWeight: "600",
     fontFamily: "System",
   },
   modeArrow: {

@@ -50,3 +50,41 @@ export interface ChallengeStep {
   colorPosition: number;
   colorCount: number;
 }
+
+/**
+ * Offline multiplayer ("party") modes, all played by passing a single phone
+ * between players.
+ * - `battle`: 5 shared images, everyone guesses each one in turns, per-image
+ *   and overall ranking.
+ * - `battle-timed`: one minute per player on the same deck, most points wins.
+ * - `coop`: each player guesses a few images; all percentages are added into a
+ *   single shared team score.
+ * - `coop-timed`: one minute per player, everything summed into a team score.
+ */
+export type PartyMode = "battle" | "battle-timed" | "coop" | "coop-timed";
+
+export interface PartyPlayer {
+  id: number;
+  name: string;
+}
+
+/**
+ * Everything a party run needs. Built once in the setup screen and handed to
+ * the gameplay screen so the images are fixed for the whole match.
+ */
+export interface PartyConfig {
+  mode: PartyMode;
+  cooperative: boolean;
+  timed: boolean;
+  players: PartyPlayer[];
+  // Coop (non-timed): how many images each player guesses.
+  imagesPerPlayer: number;
+  // Timed modes: seconds each player gets on their turn.
+  turnSeconds: number;
+  // Battle (non-timed): the same images everyone guesses, in order.
+  sharedSteps: ChallengeStep[];
+  // Timed modes: shared deck each player cycles through during their turn.
+  deck: ChallengeStep[];
+  // Coop (non-timed): the images assigned to each player.
+  perPlayerSteps: ChallengeStep[][];
+}

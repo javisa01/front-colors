@@ -31,6 +31,7 @@ import {
   type HSVDelta,
 } from "@/utils/colorScore";
 import { feedbackForScore } from "@/utils/haptics";
+import { playScoreSound } from "@/utils/sound";
 import {
   clearProgress,
   getDailyResult,
@@ -321,6 +322,7 @@ function GamePlay({ mode, seed, resume }: GamePlayProps): ReactElement {
     setDelta(getHSVDelta(selectedHSV, targetColor.hsv));
     setAnimationToken((value) => value + 1);
     feedbackForScore(nextScore);
+    playScoreSound(nextScore);
 
     if (isTimed) {
       setStreak((prev) => {

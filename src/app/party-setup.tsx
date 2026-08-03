@@ -24,7 +24,7 @@ import {
   MAX_PLAYERS,
   MIN_PLAYERS,
   setPartyConfig,
-  TURN_SECONDS,
+  turnSecondsFor,
 } from "@/utils/party";
 
 const VALID_MODES: PartyMode[] = [
@@ -66,7 +66,9 @@ export default function PartySetupScreen(): ReactElement {
 
   const infoText = useMemo(() => {
     if (timed) {
-      return t("party.setup.timedInfo", { seconds: TURN_SECONDS });
+      return t("party.setup.timedInfo", {
+        seconds: turnSecondsFor(mode, count),
+      });
     }
     if (cooperative) {
       return t("party.setup.coopInfo", {
@@ -74,7 +76,7 @@ export default function PartySetupScreen(): ReactElement {
       });
     }
     return t("party.setup.battleInfo", { count: BATTLE_IMAGES });
-  }, [cooperative, count, timed]);
+  }, [cooperative, count, mode, timed]);
 
   const handleStart = useCallback(() => {
     const players: PartyPlayer[] = Array.from({ length: count }, (_, index) => {
@@ -115,7 +117,7 @@ export default function PartySetupScreen(): ReactElement {
               accessibilityRole="button"
               accessibilityLabel={t("common.back")}
             >
-              <Text style={styles.backLinkText}>← Atrás</Text>
+              <Text style={styles.backLinkText}>{t("common.backShort")}</Text>
             </Pressable>
 
             <Text style={styles.kicker}>

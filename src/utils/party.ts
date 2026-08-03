@@ -13,10 +13,15 @@ export const MAX_PLAYERS = 99;
 // Battle serves five shared images to every player.
 export const BATTLE_IMAGES = 5;
 
-// Seconds each player gets on their turn in the timed modes. Turns are played
-// one after another on the same phone, so a fixed per-player budget works for
-// any number of players.
-export const TURN_SECONDS = 60;
+// Seconds each player gets on their turn in the competitive timed mode
+// (versus). Kept short and fixed so a run stays snappy for any player count.
+export const BATTLE_TURN_SECONDS = 20;
+
+// Cooperative timed mode: the per-player budget shrinks as the group grows so a
+// big table doesn't drag on. It starts at 30 s for small groups and bottoms out
+// at 20 s once there are lots of players.
+export const COOP_TURN_SECONDS_MAX = 30;
+export const COOP_TURN_SECONDS_MIN = 20;
 
 // Timed modes cycle through a generous deck; if a player is fast enough to reach
 // the end it simply wraps around.
@@ -119,6 +124,28 @@ export function isTimedMode(mode: PartyMode): boolean {
   return mode === "battle-timed" || mode === "coop-timed";
 }
 
+// Seconds each player gets on their turn in a timed mode. Versus (battle-timed)
+// is a fixed short sprint; cooperative scales down with the number of players.
+export function coopTurnSeconds(players: number): number {
+  if (players <= 4) {
+    return COOP_TURN_SECONDS_MAX; // 30 s
+  }
+  if (players <= 8) {
+    return 25;
+  }
+  return COOP_TURN_SECONDS_MIN; // 20 s
+}
+
+export function turnSecondsFor(mode: PartyMode, players: number): number {
+  if (mode === "battle-timed") {
+    return BATTLE_TURN_SECONDS;
+  }
+  if (mode === "coop-timed") {
+    return coopTurnSeconds(players);
+  }
+  return 0;
+}
+
 export function buildPartyConfig(
   mode: PartyMode,
   players: PartyPlayer[],
@@ -146,7 +173,7 @@ export function buildPartyConfig(
     timed,
     players,
     imagesPerPlayer,
-    turnSeconds: timed ? TURN_SECONDS : 0,
+    turnSeconds: timed ? turnSecondsFor(mode, players.length) : 0,
     sharedSteps,
     deck,
     perPlayerSteps,

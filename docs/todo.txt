@@ -1,10 +1,10 @@
-Cambiar los tiempos de los modos contrareloj versus y colaborativo:
-- Modo colab menos tiempo en funcion de las personas y empezar en 30-20s
-- Modo versus limitar a 30 segundos o 20
+# Hecho ✓
+# - Tiempos: versus 20 s fijos; colaborativo 30/25/20 s según nº de jugadores.
+# - Estructura de audio: solo hay que soltar ficheros en assets/audio/ y
+#   registrarlos en assets/audio/index.ts (ver README). Reproducción ya
+#   conectada en src/utils/sound.ts (game.tsx y party.tsx).
+# - Texto "Un jugador" -> "Solitario".
+# - i18n con 3 idiomas (es/en/fr) en src/i18n/index.ts; detección automática.
 
-Hacer estructura para solo tener que importar audios
-
-Cambiar algun texto o formato del texto por ejemplo en donde pone UN JUGADOR
-
-TRADUCCION
+# Pendiente / ideas:
 

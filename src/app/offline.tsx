@@ -98,7 +98,7 @@ export default function OfflineScreen(): ReactElement {
                 accessibilityRole="button"
                 accessibilityLabel={t("common.back")}
               >
-                <Text style={styles.backLinkText}>← Atrás</Text>
+                <Text style={styles.backLinkText}>{t("common.backShort")}</Text>
               </Pressable>
 
               <View style={styles.badge}>

@@ -21,6 +21,7 @@ import { hexToHSV, normalizeHex } from "@/utils/color";
 import { calculateColorScore, getRunMessage } from "@/utils/colorScore";
 import { feedbackForScore } from "@/utils/haptics";
 import { buildPartyConfig, getPartyConfig } from "@/utils/party";
+import { playScoreSound, playSound } from "@/utils/sound";
 
 const INITIAL_COLOR = "#878787";
 const INITIAL_HSV: HSVColor = hexToHSV(INITIAL_COLOR);
@@ -86,6 +87,14 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
   const [selectedColor, setSelectedColor] = useState(INITIAL_COLOR);
   const [selectedHSV, setSelectedHSV] = useState<HSVColor>(INITIAL_HSV);
 
+  // Celebrate the end of the run with a sound (no-op until an audio file is
+  // registered in `assets/audio`).
+  useEffect(() => {
+    if (phase === "final") {
+      playSound("gameOver");
+    }
+  }, [phase]);
+
   const currentPlayer = config.players[playerIndex];
   const stepKey = `${playerIndex}-${slot}-${guesses.length}`;
   const [lastStepKey, setLastStepKey] = useState(stepKey);
@@ -114,6 +123,7 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
     }
     const score = calculateColorScore(selectedHSV, currentStep.target.hsv);
     feedbackForScore(score);
+    playScoreSound(score);
     submitGuess(score, currentStep.target.hex, selectedColor);
   };
 
@@ -502,7 +512,7 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
                 accessibilityRole="button"
                 accessibilityLabel={t("party.final.home")}
               >
-                <Text style={styles.backLinkText}>← Salir</Text>
+                <Text style={styles.backLinkText}>{t("common.exit")}</Text>
               </Pressable>
               <Text style={styles.kicker}>{modeTitle}</Text>
             </View>

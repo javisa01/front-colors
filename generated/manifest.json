@@ -8,24 +8,12 @@
     "colors": 1
   },
   {
-    "id": "kfc",
-    "colors": 1
-  },
-  {
-    "id": "mcdonalds",
-    "colors": 1
-  },
-  {
-    "id": "spongebob",
-    "colors": 26
-  },
-  {
-    "id": "starbucks",
-    "colors": 1
-  },
-  {
     "id": "cocacola",
     "colors": 1
+  },
+  {
+    "id": "ebay",
+    "colors": 4
   },
   {
     "id": "google",
@@ -36,11 +24,43 @@
     "colors": 1
   },
   {
+    "id": "kfc",
+    "colors": 1
+  },
+  {
+    "id": "mcdonalds",
+    "colors": 2
+  },
+  {
+    "id": "pepsi",
+    "colors": 3
+  },
+  {
     "id": "react",
     "colors": 1
   },
   {
+    "id": "snapchat",
+    "colors": 3
+  },
+  {
+    "id": "spongebob",
+    "colors": 26
+  },
+  {
     "id": "spotify",
+    "colors": 1
+  },
+  {
+    "id": "starbucks",
+    "colors": 1
+  },
+  {
+    "id": "tesla",
+    "colors": 1
+  },
+  {
+    "id": "twitter",
     "colors": 1
   }
 ]

@@ -8,3 +8,9 @@
 
 # Pendiente / ideas:
 
+- Añadir mas logos para el juego.
+- Revisar y mejorar script que prepara los svgs para el juego (crea el metadata y añade los logos a los challenges):
+  · Script no siempre detecta colores del svg
+  · Algunos svg tienen mas de un color --> Añadir para multicolor challenges
+  · Si script no genera bien el metadata, se tiene que añadir a mano --> Esto provoca mucha perdida de tiempo manual, ya que hay que revisar cada imagen individualmente
+

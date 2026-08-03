@@ -165,6 +165,19 @@ const es = {
   "daily.score": "Tu resultado de hoy: {{score}}%",
 
   "finished.emoji": "🏁",
+
+  "score.perfect": "🎉 ¡Perfecto!",
+  "score.close": "¡Muy cerca!",
+  "score.good": "Buen intento",
+  "score.tryAgain": "Sigue probando",
+
+  "run.artist": "🏆 ¡Ojo de artista!",
+  "run.great": "🎯 ¡Gran puntería!",
+  "run.good": "👍 Buen trabajo",
+  "run.practice": "💪 Sigue practicando",
+
+  "validate.correct": "🎉 ¡Correcto!",
+  "validate.tryAgain": "❌ Sigue probando.",
 } as const;
 
 export type TranslationKey = keyof typeof es;
@@ -315,6 +328,19 @@ const en: Record<TranslationKey, string> = {
   "daily.score": "Your result today: {{score}}%",
 
   "finished.emoji": "🏁",
+
+  "score.perfect": "🎉 Perfect!",
+  "score.close": "Very close!",
+  "score.good": "Good try",
+  "score.tryAgain": "Keep trying",
+
+  "run.artist": "🏆 Artist's eye!",
+  "run.great": "🎯 Great aim!",
+  "run.good": "👍 Good job",
+  "run.practice": "💪 Keep practising",
+
+  "validate.correct": "🎉 Correct!",
+  "validate.tryAgain": "❌ Keep trying.",
 };
 
 const fr: Record<TranslationKey, string> = {
@@ -466,6 +492,19 @@ const fr: Record<TranslationKey, string> = {
   "daily.score": "Ton résultat d'aujourd'hui : {{score}}%",
 
   "finished.emoji": "🏁",
+
+  "score.perfect": "🎉 Parfait !",
+  "score.close": "Très proche !",
+  "score.good": "Bon essai",
+  "score.tryAgain": "Continue d'essayer",
+
+  "run.artist": "🏆 Œil d'artiste !",
+  "run.great": "🎯 Super visée !",
+  "run.good": "👍 Bon travail",
+  "run.practice": "💪 Continue de t'entraîner",
+
+  "validate.correct": "🎉 Correct !",
+  "validate.tryAgain": "❌ Continue d'essayer.",
 };
 
 const resources: Record<string, Partial<Record<TranslationKey, string>>> = {

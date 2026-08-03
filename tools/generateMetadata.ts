@@ -44,6 +44,12 @@ const OUTPUT_DIR = path.join(process.cwd(), "generated");
 // staying far below the gap between distinct brand colors.
 const DUPLICATE_RGB_DISTANCE = 16;
 
+// Near-black and near-white colors are almost always backgrounds/outlines, not
+// brand colors. Excluding them prevents logos like Snapchat (yellow + black +
+// white) from being tagged as multicolor when only the yellow matters.
+const BLACK_V_THRESHOLD = 12; // HSV value ≤ 12 → near-black
+const WHITE_SV_THRESHOLD_S = 10; // HSV saturation ≤ 10 AND value > 90 → near-white
+
 const parser = new XMLParser({
   ignoreAttributes: false,
   attributeNamePrefix: "",
@@ -402,7 +408,14 @@ function processSVG(file: string): ProcessResult {
   const collected = new Map<string, CollectedColor>();
   visit(parsed, classes, collected);
 
-  const colorList = [...collected.values()];
+  // Drop near-black and near-white colors — they're backgrounds/outlines, not
+  // meaningful brand colors, and would inflate the count for multicolor mode.
+  const colorList = [...collected.values()].filter((color) => {
+    const [, s, v] = convert.rgb.hsv(color.rgb);
+    if (v <= BLACK_V_THRESHOLD) return false;
+    if (s <= WHITE_SV_THRESHOLD_S && v > 90) return false;
+    return true;
+  });
   const editableColorIndex = pickPrimaryIndex(colorList);
   const colors: OutputColor[] = colorList.map(toOutputColor);
 

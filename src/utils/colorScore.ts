@@ -1,3 +1,4 @@
+import { t } from "@/i18n";
 import type { HSVColor } from "@/types/challenge";
 import { hsvToLab } from "@/utils/color";
 
@@ -173,19 +174,10 @@ export function getHSVDelta(selected: HSVColor, target: HSVColor): HSVDelta {
 }
 
 export function getScoreMessage(score: number): string {
-  if (score >= 100) {
-    return "🎉 ¡Perfecto!";
-  }
-
-  if (score >= 90) {
-    return "¡Muy cerca!";
-  }
-
-  if (score >= 70) {
-    return "Buen intento";
-  }
-
-  return "Sigue probando";
+  if (score >= 100) return t("score.perfect");
+  if (score >= 90) return t("score.close");
+  if (score >= 70) return t("score.good");
+  return t("score.tryAgain");
 }
 
 /**
@@ -233,14 +225,8 @@ export function summarizeRun(scores: readonly number[]): RunSummary {
 }
 
 export function getRunMessage(average: number): string {
-  if (average >= 90) {
-    return "🏆 ¡Ojo de artista!";
-  }
-  if (average >= 75) {
-    return "🎯 ¡Gran puntería!";
-  }
-  if (average >= 55) {
-    return "👍 Buen trabajo";
-  }
-  return "💪 Sigue practicando";
+  if (average >= 90) return t("run.artist");
+  if (average >= 75) return t("run.great");
+  if (average >= 55) return t("run.good");
+  return t("run.practice");
 }

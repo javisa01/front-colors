@@ -6,11 +6,17 @@
 # - Texto "Un jugador" -> "Solitario".
 # - i18n con 3 idiomas (es/en/fr) en src/i18n/index.ts; detección automática.
 
-# Pendiente / ideas:
 
-- Añadir mas logos para el juego.
 - Revisar y mejorar script que prepara los svgs para el juego (crea el metadata y añade los logos a los challenges):
   · Script no siempre detecta colores del svg
   · Algunos svg tienen mas de un color --> Añadir para multicolor challenges
   · Si script no genera bien el metadata, se tiene que añadir a mano --> Esto provoca mucha perdida de tiempo manual, ya que hay que revisar cada imagen individualmente
 
+
+
+
+# Pendiente / ideas:
+
+- Añadir en el script que obvie los colores negros y blancos, para que no los meta en el manifest (ya que se setean para retos multicolor)
+- Revisar textos colorScore.ts u otros
+- Añadir mas logos para el juego.

@@ -1,3 +1,4 @@
+import { t } from "@/i18n";
 import type { ChallengeColor, HSVColor } from "@/types/challenge";
 import { isWithinTolerance } from "@/utils/color";
 
@@ -17,6 +18,6 @@ export function validateChallenge(
 
   return {
     isCorrect,
-    message: isCorrect ? "🎉 ¡Correcto!" : "❌ Sigue probando.",
+    message: isCorrect ? t("validate.correct") : t("validate.tryAgain"),
   };
 }

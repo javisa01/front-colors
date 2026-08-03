@@ -12,6 +12,8 @@ const KEYS = {
   bestStreak: (mode: GameMode) => `${PREFIX}beststreak:${mode}`,
   progress: `${PREFIX}progress`,
   dailyResult: `${PREFIX}daily`,
+  musicVolume: `${PREFIX}musicVolume`,
+  sfxVolume: `${PREFIX}sfxVolume`,
 } as const;
 
 async function readJSON<T>(key: string): Promise<T | null> {
@@ -133,4 +135,26 @@ export async function getDailyResult(): Promise<DailyResult | null> {
 
 export async function setDailyResult(result: DailyResult): Promise<void> {
   await writeJSON(KEYS.dailyResult, result);
+}
+
+// ---------------------------------------------------------------------------
+// Volume settings
+// ---------------------------------------------------------------------------
+
+export async function getMusicVolume(): Promise<number> {
+  const v = await readJSON<number>(KEYS.musicVolume);
+  return typeof v === "number" && Number.isFinite(v) ? v : 0.5;
+}
+
+export async function setMusicVolume(volume: number): Promise<void> {
+  await writeJSON(KEYS.musicVolume, volume);
+}
+
+export async function getSfxVolume(): Promise<number> {
+  const v = await readJSON<number>(KEYS.sfxVolume);
+  return typeof v === "number" && Number.isFinite(v) ? v : 1;
+}
+
+export async function setSfxVolume(volume: number): Promise<void> {
+  await writeJSON(KEYS.sfxVolume, volume);
 }

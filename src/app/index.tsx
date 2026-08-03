@@ -1,7 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import type { ReactElement } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Pressable,
   ScrollView,
@@ -21,13 +21,16 @@ import Animated, {
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { SettingsModal } from "@/components/SettingsModal";
 import { t } from "@/i18n";
+import { playTick } from "@/utils/sound";
 
 export default function LandingScreen(): ReactElement {
   const { width } = useWindowDimensions();
   const router = useRouter();
 
   const isTablet = width >= 768;
+  const [settingsVisible, setSettingsVisible] = useState(false);
 
   const glow = useSharedValue(0);
   const float = useSharedValue(0);
@@ -75,6 +78,19 @@ export default function LandingScreen(): ReactElement {
         colors={["#09090B", "#0A0A0D", "#09090B"]}
         style={styles.background}
       >
+        <Pressable
+          onPress={() => {
+            playTick();
+            setSettingsVisible(true);
+          }}
+          style={styles.gear}
+          hitSlop={12}
+          accessibilityRole="button"
+          accessibilityLabel={t("settings.title")}
+        >
+          <Text style={styles.gearText}>⚙️</Text>
+        </Pressable>
+
         <Animated.View
           pointerEvents="none"
           style={[styles.orb, styles.orbOne, orbOneStyle]}
@@ -123,10 +139,16 @@ export default function LandingScreen(): ReactElement {
             >
               <Animated.View
                 entering={FadeInDown.delay(120).duration(520)}
-                style={[styles.modeWrapper, isTablet && styles.modeWrapperTablet]}
+                style={[
+                  styles.modeWrapper,
+                  isTablet && styles.modeWrapperTablet,
+                ]}
               >
                 <Pressable
-                  onPress={() => router.push("/offline")}
+                  onPress={() => {
+                    playTick();
+                    router.push("/offline");
+                  }}
                   style={({ pressed }) => [
                     styles.modeCard,
                     pressed && styles.modeCardPressed,
@@ -160,7 +182,10 @@ export default function LandingScreen(): ReactElement {
 
               <Animated.View
                 entering={FadeInDown.delay(230).duration(520)}
-                style={[styles.modeWrapper, isTablet && styles.modeWrapperTablet]}
+                style={[
+                  styles.modeWrapper,
+                  isTablet && styles.modeWrapperTablet,
+                ]}
               >
                 <View
                   style={[styles.modeCard, styles.modeCardDisabled]}
@@ -210,6 +235,10 @@ export default function LandingScreen(): ReactElement {
             </Animated.Text>
           </View>
         </ScrollView>
+        <SettingsModal
+          isVisible={settingsVisible}
+          onClose={() => setSettingsVisible(false)}
+        />
       </LinearGradient>
     </SafeAreaView>
   );
@@ -223,6 +252,23 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
     overflow: "hidden",
+  },
+  gear: {
+    position: "absolute",
+    top: 12,
+    right: 16,
+    zIndex: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#18181B",
+    borderWidth: 1,
+    borderColor: "#27272A",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  gearText: {
+    fontSize: 20,
   },
   orb: {
     position: "absolute",

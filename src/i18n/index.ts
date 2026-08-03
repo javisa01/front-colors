@@ -178,6 +178,11 @@ const es = {
 
   "validate.correct": "🎉 ¡Correcto!",
   "validate.tryAgain": "❌ Sigue probando.",
+
+  "settings.title": "Ajustes de sonido",
+  "settings.music": "Música",
+  "settings.sfx": "Efectos",
+  "settings.close": "Cerrar",
 } as const;
 
 export type TranslationKey = keyof typeof es;
@@ -341,6 +346,11 @@ const en: Record<TranslationKey, string> = {
 
   "validate.correct": "🎉 Correct!",
   "validate.tryAgain": "❌ Keep trying.",
+
+  "settings.title": "Sound settings",
+  "settings.music": "Music",
+  "settings.sfx": "Effects",
+  "settings.close": "Close",
 };
 
 const fr: Record<TranslationKey, string> = {
@@ -505,6 +515,11 @@ const fr: Record<TranslationKey, string> = {
 
   "validate.correct": "🎉 Correct !",
   "validate.tryAgain": "❌ Continue d'essayer.",
+
+  "settings.title": "Réglages du son",
+  "settings.music": "Musique",
+  "settings.sfx": "Effets",
+  "settings.close": "Fermer",
 };
 
 const resources: Record<string, Partial<Record<TranslationKey, string>>> = {

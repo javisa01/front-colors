@@ -1,10 +1,27 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { setMusicVolume, startMusic } from "@/utils/music";
+import { setSfxVolume } from "@/utils/sound";
+import {
+  getMusicVolume as loadMusicVolume,
+  getSfxVolume as loadSfxVolume,
+} from "@/utils/storage";
+
 export default function RootLayout() {
+  useEffect(() => {
+    (async () => {
+      const [mv, sv] = await Promise.all([loadMusicVolume(), loadSfxVolume()]);
+      setMusicVolume(mv);
+      setSfxVolume(sv);
+      startMusic();
+    })();
+  }, []);
+
   return (
     <GestureHandlerRootView style={styles.flex}>
       <SafeAreaProvider>

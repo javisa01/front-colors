@@ -22,8 +22,11 @@ export type SoundName = "tick" | "success" | "fail" | "gameOver";
  * docs for the full per-platform list).
  */
 export const SOUND_SOURCES: Partial<Record<SoundName, AudioSource>> = {
-  // tick: require("./tick.mp3"),
-  // success: require("./success.mp3"),
-  // fail: require("./fail.mp3"),
-  // gameOver: require("./game-over.mp3"),
+  tick: require("./tick.mp3"),
+  success: require("./success.mp3"),
+  fail: require("./fail.mp3"),
+  gameOver: require("./gameOver.mp3"),
 };
+
+/** Background music source (loops continuously). */
+export const MUSIC_SOURCE: AudioSource = require("./FL_LOFI_PODCAST.mp3");

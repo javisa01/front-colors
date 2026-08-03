@@ -176,7 +176,7 @@ export function getHSVDelta(selected: HSVColor, target: HSVColor): HSVDelta {
 export function getScoreMessage(score: number): string {
   if (score >= 100) return t("score.perfect");
   if (score >= 90) return t("score.close");
-  if (score >= 70) return t("score.good");
+  if (score >= 60) return t("score.good");
   return t("score.tryAgain");
 }
 

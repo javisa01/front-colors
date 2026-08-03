@@ -13,8 +13,10 @@ import {
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { SettingsModal } from "@/components/SettingsModal";
 import { t, type TranslationKey } from "@/i18n";
 import type { GameMode, PartyMode } from "@/types/challenge";
+import { playTick } from "@/utils/sound";
 import { getHighScore } from "@/utils/storage";
 
 interface SoloModeCard {
@@ -50,6 +52,7 @@ export default function OfflineScreen(): ReactElement {
   const isTablet = width >= 768;
 
   const [bestScores, setBestScores] = useState<Record<string, number>>({});
+  const [settingsVisible, setSettingsVisible] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -76,6 +79,19 @@ export default function OfflineScreen(): ReactElement {
         colors={["#09090B", "#0A0A0D", "#09090B"]}
         style={styles.background}
       >
+        <Pressable
+          onPress={() => {
+            playTick();
+            setSettingsVisible(true);
+          }}
+          style={styles.gear}
+          hitSlop={12}
+          accessibilityRole="button"
+          accessibilityLabel={t("settings.title")}
+        >
+          <Text style={styles.gearText}>⚙️</Text>
+        </Pressable>
+
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
@@ -89,7 +105,10 @@ export default function OfflineScreen(): ReactElement {
               style={styles.header}
             >
               <Pressable
-                onPress={() => router.replace("/")}
+                onPress={() => {
+                  playTick();
+                  router.replace("/");
+                }}
                 style={({ pressed }) => [
                   styles.backLink,
                   pressed && styles.backLinkPressed,
@@ -135,12 +154,13 @@ export default function OfflineScreen(): ReactElement {
                     ]}
                   >
                     <Pressable
-                      onPress={() =>
+                      onPress={() => {
+                        playTick();
                         router.push({
                           pathname: "/game",
                           params: { mode: mode.id },
-                        })
-                      }
+                        });
+                      }}
                       style={({ pressed }) => [
                         styles.modeCard,
                         pressed && styles.modeCardPressed,
@@ -211,12 +231,13 @@ export default function OfflineScreen(): ReactElement {
                   ]}
                 >
                   <Pressable
-                    onPress={() =>
+                    onPress={() => {
+                      playTick();
                       router.push({
                         pathname: "/party-setup",
                         params: { mode: mode.id },
-                      })
-                    }
+                      });
+                    }}
                     style={({ pressed }) => [
                       styles.modeCard,
                       pressed && styles.modeCardPressed,
@@ -255,6 +276,10 @@ export default function OfflineScreen(): ReactElement {
             </View>
           </View>
         </ScrollView>
+        <SettingsModal
+          isVisible={settingsVisible}
+          onClose={() => setSettingsVisible(false)}
+        />
       </LinearGradient>
     </SafeAreaView>
   );
@@ -268,6 +293,23 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
     overflow: "hidden",
+  },
+  gear: {
+    position: "absolute",
+    top: 12,
+    right: 16,
+    zIndex: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#18181B",
+    borderWidth: 1,
+    borderColor: "#27272A",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  gearText: {
+    fontSize: 20,
   },
   scroll: {
     flex: 1,

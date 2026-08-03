@@ -31,7 +31,7 @@ import {
   type HSVDelta,
 } from "@/utils/colorScore";
 import { feedbackForScore } from "@/utils/haptics";
-import { playScoreSound } from "@/utils/sound";
+import { playScoreSound, playTick } from "@/utils/sound";
 import {
   clearProgress,
   getDailyResult,
@@ -104,7 +104,10 @@ function DailyDoneScreen({ result }: { result: DailyResult }): ReactElement {
             </Text>
 
             <Pressable
-              onPress={() => router.replace("/offline")}
+              onPress={() => {
+                playTick();
+                router.replace("/offline");
+              }}
               style={({ pressed }) => [
                 styles.restartButton,
                 pressed && styles.buttonPressed,
@@ -372,6 +375,7 @@ function GamePlay({ mode, seed, resume }: GamePlayProps): ReactElement {
   }, [nextStep, finalizeGame]);
 
   const handleGoHome = useCallback((): void => {
+    playTick();
     setResultVisible(false);
 
     if (checkTimerRef.current) {
@@ -384,11 +388,13 @@ function GamePlay({ mode, seed, resume }: GamePlayProps): ReactElement {
   }, [router]);
 
   const handleRetry = useCallback((): void => {
+    playTick();
     void clearProgress();
     router.replace(`/game?mode=${mode}`);
   }, [mode, router]);
 
   const handleShare = useCallback(async (): Promise<void> => {
+    playTick();
     try {
       await Share.share({
         message: t("summary.shareText", {

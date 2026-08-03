@@ -54,7 +54,7 @@ export function notify(
 export function feedbackForScore(score: number): void {
   if (score >= 90) {
     notify("success");
-  } else if (score >= 70) {
+  } else if (score >= 60) {
     impact("medium");
   } else {
     impact("light");

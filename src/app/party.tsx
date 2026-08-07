@@ -18,7 +18,11 @@ import { useParty } from "@/hooks/useParty";
 import { t, type TranslationKey } from "@/i18n";
 import type { HSVColor, PartyConfig } from "@/types/challenge";
 import { hexToHSV, normalizeHex } from "@/utils/color";
-import { calculateColorScore, getRunMessage } from "@/utils/colorScore";
+import {
+  applyTimedBattlePenalty,
+  calculateColorScore,
+  getRunMessage,
+} from "@/utils/colorScore";
 import { feedbackForScore } from "@/utils/haptics";
 import { buildPartyConfig, getPartyConfig } from "@/utils/party";
 import { playScoreSound, playSound } from "@/utils/sound";
@@ -121,9 +125,10 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
     if (!currentStep) {
       return;
     }
-    const score = calculateColorScore(selectedHSV, currentStep.target.hsv);
-    feedbackForScore(score);
-    playScoreSound(score);
+    const rawScore = calculateColorScore(selectedHSV, currentStep.target.hsv);
+    feedbackForScore(rawScore);
+    playScoreSound(rawScore);
+    const score = config.timed ? applyTimedBattlePenalty(rawScore) : rawScore;
     submitGuess(score, currentStep.target.hex, selectedColor);
   };
 

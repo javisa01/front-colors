@@ -37,15 +37,74 @@ function ensureViewBox(svgXml: string): string {
   return svgXml.replace(/<svg\b/i, `<svg viewBox="0 0 ${width} ${height}"`);
 }
 
+// Expand CSS class-based fill/stroke rules to inline attributes so that
+// react-native-svg applies them reliably and color replacement works.
+function inlineCssColors(svgXml: string): string {
+  const styleMatch = svgXml.match(
+    /<style[^>]*>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/style>/i,
+  );
+  if (!styleMatch) return svgXml;
+
+  const cssText = styleMatch[1];
+  const ruleRegex = /\.([a-zA-Z_][\w-]*)\s*\{([^}]*)\}/g;
+  const classStyles: Record<string, { fill?: string; stroke?: string }> = {};
+
+  let ruleMatch: RegExpExecArray | null;
+  while ((ruleMatch = ruleRegex.exec(cssText)) !== null) {
+    const className = ruleMatch[1];
+    const body = ruleMatch[2];
+    const fillVal = body.match(/(?:^|;)\s*fill\s*:\s*([^;}\s]+)/i)?.[1];
+    const strokeVal = body.match(/(?:^|;)\s*stroke\s*:\s*([^;}\s]+)/i)?.[1];
+    if (fillVal || strokeVal) {
+      classStyles[className] = { fill: fillVal, stroke: strokeVal };
+    }
+  }
+
+  let result = svgXml;
+  for (const [className, props] of Object.entries(classStyles)) {
+    const elRegex = new RegExp(
+      `(<[a-zA-Z][^>]*\\bclass="[^"]*\\b${escapeRegExp(className)}\\b[^"]*"[^>]*?)(\\s*/?>)`,
+      "gi",
+    );
+    result = result.replace(elRegex, (_full, before, close) => {
+      let attrs = "";
+      if (
+        props.fill &&
+        !/\bfill\s*=/i.test(before) &&
+        !/\bstyle="[^"]*fill\s*:/i.test(before)
+      ) {
+        attrs += ` fill="${props.fill}"`;
+      }
+      if (
+        props.stroke &&
+        !/\bstroke\s*=/i.test(before) &&
+        !/\bstyle="[^"]*stroke\s*:/i.test(before)
+      ) {
+        attrs += ` stroke="${props.stroke}"`;
+      }
+      return `${before}${attrs}${close}`;
+    });
+  }
+
+  // Remove the now-redundant <style> block; react-native-svg does not apply
+  // CSS classes and leaving raw CSS in the tree can break its parser.
+  result = result.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "");
+
+  return result;
+}
+
 function sanitizeSvgXml(svgXml: string): string {
   const cleaned = svgXml
     .replace(/^<\?xml[^>]*\?>/i, "")
-    .replace(/<!DOCTYPE[^>]*>/gi, "")
+    // Remove full DOCTYPE declarations, including internal subsets ([...]).
+    .replace(/<!DOCTYPE[\s\S]*?(?:\]>|>)/gi, "")
     .replace(/<!ENTITY[^>]*>/gi, "")
+    .replace(/^\s*\]>\s*/gm, "")
+    .replace(/\bxlink:href\b/gi, "href")
     .replace(/\s+xmlns:xlink="[^"]*"/gi, "")
     .trim();
 
-  return ensureViewBox(cleaned);
+  return ensureViewBox(inlineCssColors(cleaned));
 }
 
 function escapeRegExp(value: string): string {
@@ -57,17 +116,19 @@ function replaceColorInSvg(
   originalColor: string,
   replacementColor: string,
 ): string {
-  const normalizedOriginal = normalizeHex(originalColor).toLowerCase();
   const normalizedReplacement = normalizeHex(replacementColor).toLowerCase();
 
-  // Replace every occurrence of the source color literal, whether it appears
-  // as an attribute (fill="#..."/stroke="#...") or inside an inline style
-  // (style="fill:#...;stroke:#..."). The negative lookahead avoids matching a
-  // longer hex value (e.g. an 8-digit color with alpha).
-  const colorRegex = new RegExp(
-    `${escapeRegExp(normalizedOriginal)}(?![0-9a-fA-F])`,
-    "gi",
-  );
+  // The source color may be a hex literal (`#0060a8`) or an `rgb()` string
+  // (`rgb(0, 96, 168)`) — the latter must be matched verbatim, not run through
+  // `normalizeHex`, which only understands hex. `rgb()` matches allow flexible
+  // whitespace so minor formatting differences don't break the replacement.
+  const isRgb = /^\s*rgba?\(/i.test(originalColor);
+  const pattern = isRgb
+    ? escapeRegExp(originalColor.trim()).replace(/\\?\s+/g, "\\s*")
+    : // Negative lookahead avoids matching a longer hex value (8-digit + alpha).
+      `${escapeRegExp(normalizeHex(originalColor).toLowerCase())}(?![0-9a-fA-F])`;
+
+  const colorRegex = new RegExp(pattern, "gi");
 
   return sanitizeSvgXml(svgXml).replace(colorRegex, normalizedReplacement);
 }

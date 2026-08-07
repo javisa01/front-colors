@@ -230,3 +230,17 @@ export function getRunMessage(average: number): string {
   if (average >= 55) return t("run.good");
   return t("run.practice");
 }
+
+/**
+ * Converts a raw accuracy score (0..100) into a timed-battle score with
+ * penalties for inaccurate guesses. Encourages quality over quantity:
+ *
+ *   score < 60  → penalty  (0% → −90 pts, 40% → −30 pts)
+ *   score ≥ 60  → reward, but capped lower than normal (60% → 0, 100% → +40 pts)
+ */
+export function applyTimedBattlePenalty(score: number): number {
+  if (score >= 60) {
+    return Math.round((score - 60) * 1.0);
+  }
+  return Math.round((score - 60) * 1.5);
+}

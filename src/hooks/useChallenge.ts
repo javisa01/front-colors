@@ -13,6 +13,11 @@ import challengeCatalog from "../../generated/challenges.json";
 const INITIAL_COLOR = "#878787";
 const INITIAL_HSV: HSVColor = hexToHSV(INITIAL_COLOR);
 
+// DEV: Set this to an array of logo IDs to force only those logos to appear in
+// any game mode. Leave as null (or empty) for normal random behavior.
+// Example: ["spotify", "google", "2xko"]
+const DEV_ONLY_LOGOS: string[] | null = ["outlook", "pokemon", "sega"];
+
 // How many challenges each mode serves up. Multicolor is driven by the number
 // of colors per logo instead of a fixed challenge count.
 const COUNT_BY_MODE: Record<GameMode, number> = {
@@ -51,9 +56,13 @@ export interface UseChallengeResult {
 }
 
 function getCatalog(): ChallengeMetadata[] {
-  return (challengeCatalog as ChallengeMetadata[]).filter(
+  const all = (challengeCatalog as ChallengeMetadata[]).filter(
     (item) => item?.id && Array.isArray(item?.colors) && item.colors.length > 0,
   );
+  if (DEV_ONLY_LOGOS && DEV_ONLY_LOGOS.length > 0) {
+    return all.filter((item) => DEV_ONLY_LOGOS.includes(item.id));
+  }
+  return all;
 }
 
 function loadChallengeMetadata(challengeId: string): ChallengeMetadata | null {

@@ -1,14 +1,74 @@
 [
   {
+    "id": "2xko",
+    "colors": 1
+  },
+  {
+    "id": "7eleven",
+    "colors": 3
+  },
+  {
+    "id": "access",
+    "colors": 1
+  },
+  {
     "id": "amazon",
     "colors": 1
+  },
+  {
+    "id": "atari",
+    "colors": 4
   },
   {
     "id": "barbie",
     "colors": 1
   },
   {
+    "id": "bmw",
+    "colors": 2
+  },
+  {
+    "id": "burger_king",
+    "colors": 3
+  },
+  {
+    "id": "canon",
+    "colors": 1
+  },
+  {
+    "id": "capcom",
+    "colors": 2
+  },
+  {
+    "id": "chrome",
+    "colors": 1
+  },
+  {
+    "id": "chupa_chups",
+    "colors": 3
+  },
+  {
     "id": "cocacola",
+    "colors": 1
+  },
+  {
+    "id": "dc",
+    "colors": 1
+  },
+  {
+    "id": "dell",
+    "colors": 1
+  },
+  {
+    "id": "dhl",
+    "colors": 2
+  },
+  {
+    "id": "dominos",
+    "colors": 2
+  },
+  {
+    "id": "duolingo",
     "colors": 1
   },
   {
@@ -16,8 +76,36 @@
     "colors": 4
   },
   {
+    "id": "excel",
+    "colors": 1
+  },
+  {
+    "id": "facebook",
+    "colors": 1
+  },
+  {
+    "id": "fanta",
+    "colors": 4
+  },
+  {
+    "id": "fedex",
+    "colors": 2
+  },
+  {
+    "id": "ford",
+    "colors": 1
+  },
+  {
     "id": "google",
     "colors": 4
+  },
+  {
+    "id": "heineken",
+    "colors": 2
+  },
+  {
+    "id": "internet_explorer",
+    "colors": 1
   },
   {
     "id": "javascript",
@@ -28,19 +116,99 @@
     "colors": 1
   },
   {
+    "id": "lego",
+    "colors": 2
+  },
+  {
+    "id": "lg",
+    "colors": 2
+  },
+  {
+    "id": "lol",
+    "colors": 1
+  },
+  {
+    "id": "marvel",
+    "colors": 1
+  },
+  {
+    "id": "mastercard",
+    "colors": 3
+  },
+  {
     "id": "mcdonalds",
     "colors": 2
+  },
+  {
+    "id": "microsoft",
+    "colors": 5
+  },
+  {
+    "id": "nasa",
+    "colors": 2
+  },
+  {
+    "id": "olimpiadas",
+    "colors": 4
+  },
+  {
+    "id": "onenote",
+    "colors": 1
+  },
+  {
+    "id": "outlook",
+    "colors": 1
   },
   {
     "id": "pepsi",
     "colors": 2
   },
   {
+    "id": "pinterest",
+    "colors": 1
+  },
+  {
+    "id": "pizza_hut",
+    "colors": 1
+  },
+  {
+    "id": "playstation",
+    "colors": 4
+  },
+  {
+    "id": "pokemon",
+    "colors": 1
+  },
+  {
+    "id": "powerpoint",
+    "colors": 1
+  },
+  {
     "id": "react",
     "colors": 1
   },
   {
+    "id": "riot",
+    "colors": 1
+  },
+  {
+    "id": "rockstar",
+    "colors": 1
+  },
+  {
+    "id": "rolex",
+    "colors": 2
+  },
+  {
+    "id": "sega",
+    "colors": 1
+  },
+  {
     "id": "snapchat",
+    "colors": 1
+  },
+  {
+    "id": "soundclound",
     "colors": 1
   },
   {
@@ -56,11 +224,51 @@
     "colors": 1
   },
   {
+    "id": "superman",
+    "colors": 2
+  },
+  {
+    "id": "switch",
+    "colors": 1
+  },
+  {
     "id": "tesla",
     "colors": 1
   },
   {
+    "id": "toysRus",
+    "colors": 4
+  },
+  {
     "id": "twitter",
+    "colors": 1
+  },
+  {
+    "id": "ups",
+    "colors": 2
+  },
+  {
+    "id": "valorant",
+    "colors": 1
+  },
+  {
+    "id": "wb",
+    "colors": 2
+  },
+  {
+    "id": "word",
+    "colors": 1
+  },
+  {
+    "id": "xbox",
+    "colors": 1
+  },
+  {
+    "id": "yahoo",
+    "colors": 1
+  },
+  {
+    "id": "youtube",
     "colors": 1
   }
 ]

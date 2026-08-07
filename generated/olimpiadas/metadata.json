@@ -1,0 +1,40 @@
+{
+  "id": "olimpiadas",
+  "svg": "olimpiadas.svg",
+  "svgXml": "<?xml version=\"1.0\"?>\r\n<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"158\" width=\"342\">\r\n<g stroke-width=\"9.5\" stroke=\"#000\" fill=\"none\">\r\n<circle cx=\"54\" cy=\"54\" r=\"49.25\" stroke=\"#0078D0\"/>\r\n<circle cx=\"171\" cy=\"54\" r=\"49.25\"/>\r\n<circle cx=\"288\" cy=\"54\" r=\"49.25\" stroke=\"#F0282D\"/>\r\n<circle cx=\"112.5\" cy=\"104\" r=\"49.25\" stroke=\"#FFB114\"/>\r\n<circle cx=\"229.5\" cy=\"104\" r=\"49.25\" stroke=\"#00a651\"/>\r\n<path d=\"M93.4,24.45A49.25,49.25 0 0 1 93.4,83.55\" stroke=\"#0078D0\"/>\r\n<path d=\"M210.4,24.45A49.25,49.25 0 0 1 210.4,83.55M171,103.25A49.25,49.25 0 0 1 141.45,93.4\"/>\r\n<path d=\"M288,103.25A49.25,49.25 0 0 1 258.45,93.4\" stroke=\"#F0282D\"/></g></svg>",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#0078D0",
+      "hsv": {
+        "h": 205,
+        "s": 100,
+        "v": 82
+      }
+    },
+    {
+      "hex": "#F0282D",
+      "hsv": {
+        "h": 358,
+        "s": 83,
+        "v": 94
+      }
+    },
+    {
+      "hex": "#FFB114",
+      "hsv": {
+        "h": 40,
+        "s": 92,
+        "v": 100
+      }
+    },
+    {
+      "hex": "#00A651",
+      "hsv": {
+        "h": 149,
+        "s": 100,
+        "v": 65
+      }
+    }
+  ]
+}

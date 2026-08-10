@@ -102,6 +102,9 @@ function sanitizeSvgXml(svgXml: string): string {
     .replace(/^\s*\]>\s*/gm, "")
     .replace(/\bxlink:href\b/gi, "href")
     .replace(/\s+xmlns:xlink="[^"]*"/gi, "")
+    // Drop authored alignment (e.g. "xMinYMin meet") so every logo falls back to
+    // the default xMidYMid meet and stays centered inside the square card.
+    .replace(/\s+preserveAspectRatio="[^"]*"/gi, "")
     .trim();
 
   return ensureViewBox(inlineCssColors(cleaned));
@@ -118,15 +121,19 @@ function replaceColorInSvg(
 ): string {
   const normalizedReplacement = normalizeHex(replacementColor).toLowerCase();
 
-  // The source color may be a hex literal (`#0060a8`) or an `rgb()` string
-  // (`rgb(0, 96, 168)`) — the latter must be matched verbatim, not run through
-  // `normalizeHex`, which only understands hex. `rgb()` matches allow flexible
-  // whitespace so minor formatting differences don't break the replacement.
-  const isRgb = /^\s*rgba?\(/i.test(originalColor);
+  // The source color may be a hex literal (`#0060a8`), an `rgb()` string
+  // (`rgb(0, 96, 168)`) or a CSS named color (`red`). Each needs a different
+  // match: rgb() must be matched verbatim (flexible whitespace), hex avoids
+  // matching a longer 8-digit value, and named colors are matched as whole
+  // words so `red` doesn't swallow part of another token.
+  const source = originalColor.trim();
+  const isRgb = /^rgba?\(/i.test(source);
+  const isHex = /^#?[0-9a-fA-F]{3,8}$/.test(source);
   const pattern = isRgb
-    ? escapeRegExp(originalColor.trim()).replace(/\\?\s+/g, "\\s*")
-    : // Negative lookahead avoids matching a longer hex value (8-digit + alpha).
-      `${escapeRegExp(normalizeHex(originalColor).toLowerCase())}(?![0-9a-fA-F])`;
+    ? escapeRegExp(source).replace(/\\?\s+/g, "\\s*")
+    : isHex
+      ? `${escapeRegExp(normalizeHex(source).toLowerCase())}(?![0-9a-fA-F])`
+      : `\\b${escapeRegExp(source.toLowerCase())}\\b`;
 
   const colorRegex = new RegExp(pattern, "gi");
 

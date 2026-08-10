@@ -16,7 +16,7 @@ const INITIAL_HSV: HSVColor = hexToHSV(INITIAL_COLOR);
 // DEV: Set this to an array of logo IDs to force only those logos to appear in
 // any game mode. Leave as null (or empty) for normal random behavior.
 // Example: ["spotify", "google", "2xko"]
-const DEV_ONLY_LOGOS: string[] | null = ["outlook", "pokemon", "sega"];
+const DEV_ONLY_LOGOS: string[] | null = null;
 
 // How many challenges each mode serves up. Multicolor is driven by the number
 // of colors per logo instead of a fixed challenge count.
@@ -31,7 +31,7 @@ const COUNT_BY_MODE: Record<GameMode, number> = {
 // with dozens of colors would be exhausting, so we cap the range to keep a run
 // playable.
 const MULTICOLOR_MIN_COLORS = 3;
-const MULTICOLOR_MAX_COLORS = 6;
+const MULTICOLOR_MAX_COLORS = 5;
 
 export interface UseChallengeOptions {
   mode: GameMode;

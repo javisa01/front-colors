@@ -187,16 +187,21 @@ export default function LandingScreen(): ReactElement {
                   isTablet && styles.modeWrapperTablet,
                 ]}
               >
-                <View
-                  style={[styles.modeCard, styles.modeCardDisabled]}
-                  accessible
+                <Pressable
+                  onPress={() => {
+                    playTick();
+                    router.push("/online");
+                  }}
+                  style={({ pressed }) => [
+                    styles.modeCard,
+                    pressed && styles.modeCardPressed,
+                  ]}
                   accessibilityRole="button"
-                  accessibilityState={{ disabled: true }}
                   accessibilityLabel={t("landing.online.title")}
                 >
                   <View style={styles.modeRow}>
                     <LinearGradient
-                      colors={["#52525B", "#3F3F46"]}
+                      colors={["#3B82F6", "#2563EB"]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 1 }}
                       style={styles.modeIcon}
@@ -205,25 +210,20 @@ export default function LandingScreen(): ReactElement {
                     </LinearGradient>
 
                     <View style={styles.modeTextGroup}>
-                      <View style={styles.modeTitleRow}>
-                        <Text style={styles.modeTitle}>
-                          {t("landing.online.title")}
-                        </Text>
-                        <View style={styles.soonPill}>
-                          <Text style={styles.soonPillText}>
-                            {t("landing.soon")}
-                          </Text>
-                        </View>
-                      </View>
+                      <Text style={styles.modeTitle}>
+                        {t("landing.online.title")}
+                      </Text>
                       <Text style={styles.modeDescription}>
                         {t("landing.online.description")}
                       </Text>
                       <Text style={styles.lockedHint}>
-                        🔒 {t("landing.online.locked")}
+                        🌍 {t("landing.online.locked")}
                       </Text>
                     </View>
+
+                    <Text style={styles.modeArrow}>›</Text>
                   </View>
-                </View>
+                </Pressable>
               </Animated.View>
             </View>
 
@@ -371,9 +371,6 @@ const styles = StyleSheet.create({
     },
     elevation: 6,
   },
-  modeCardDisabled: {
-    opacity: 0.7,
-  },
   modeCardPressed: {
     opacity: 0.92,
     transform: [{ scale: 0.99 }],
@@ -397,27 +394,10 @@ const styles = StyleSheet.create({
   modeTextGroup: {
     flex: 1,
   },
-  modeTitleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
   modeTitle: {
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "800",
-    fontFamily: "System",
-  },
-  soonPill: {
-    marginLeft: 10,
-    paddingVertical: 3,
-    paddingHorizontal: 8,
-    borderRadius: 999,
-    backgroundColor: "#27272A",
-  },
-  soonPillText: {
-    color: "#A1A1AA",
-    fontSize: 11,
-    fontWeight: "700",
     fontFamily: "System",
   },
   modeDescription: {

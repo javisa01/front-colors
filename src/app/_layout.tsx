@@ -12,6 +12,14 @@ import {
   getSfxVolume as loadSfxVolume,
 } from "@/utils/storage";
 
+/**
+ * Layout raíz: deliberadamente SIN Clerk.
+ *
+ * `ClerkProvider` se monta en `app/online/_layout.tsx`, no aquí, por la misma
+ * razón que `SessionProvider`: el modo offline no debe tocar la red ni leer
+ * credenciales. Montarlo en la raíz haría que abrir la app para jugar sin
+ * conexión arrancase el cliente de Clerk.
+ */
 export default function RootLayout() {
   useEffect(() => {
     (async () => {
@@ -36,6 +44,7 @@ export default function RootLayout() {
           >
             <Stack.Screen name="index" />
             <Stack.Screen name="offline" />
+            <Stack.Screen name="online" />
             <Stack.Screen name="party-setup" />
             <Stack.Screen name="party" />
             <Stack.Screen name="game" />

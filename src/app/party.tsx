@@ -1,34 +1,45 @@
-import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
+import { useRouter, type Href } from "expo-router";
 import type { ReactElement } from "react";
-import { useEffect, useMemo, useState } from "react";
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
 
-import HSVPicker from "@/components/HSVPicker";
+import { ColorWheel, type ColorWheelHandle } from "@/components/ColorWheel";
 import SVGChallenge from "@/components/SVGChallenge";
+import { Button } from "@/design/Button";
+import { Pill, StatPill, scoreTone } from "@/design/Feedback";
+import { Icon } from "@/design/Icon";
+import {
+  Card,
+  Divider,
+  Screen,
+  SectionHeader,
+  useIsTablet,
+} from "@/design/Layout";
+import { Color, Duration, Radius, Space, Type } from "@/design/tokens";
+import { INITIAL_HSV } from "@/hooks/useChallenge";
 import { useParty } from "@/hooks/useParty";
 import { t, type TranslationKey } from "@/i18n";
 import type { HSVColor, PartyConfig } from "@/types/challenge";
-import { hexToHSV, normalizeHex } from "@/utils/color";
+import { hsvToHex } from "@/utils/color";
 import {
-  applyTimedBattlePenalty,
   calculateColorScore,
+  countHits,
   getRunMessage,
+  scoreTimedGuess,
 } from "@/utils/colorScore";
 import { feedbackForScore } from "@/utils/haptics";
 import { buildPartyConfig, getPartyConfig } from "@/utils/party";
-import { playScoreSound, playSound } from "@/utils/sound";
+import { playGameOver, playScoreSound } from "@/utils/sound";
 
-const INITIAL_COLOR = "#878787";
-const INITIAL_HSV: HSVColor = hexToHSV(INITIAL_COLOR);
+/**
+ * Partida en grupo sobre un mismo móvil.
+ *
+ * Las cinco fases comparten el armazón `Screen` de la aplicación en lugar del
+ * degradado y los botones azules que esta pantalla se pintaba a sí misma: el
+ * turno de juego se ve exactamente igual que el modo en solitario, que es lo
+ * mínimo que se espera cuando son el mismo juego.
+ */
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
@@ -43,7 +54,10 @@ export default function PartyScreen(): ReactElement | null {
 
   useEffect(() => {
     if (!config) {
-      router.replace("/offline");
+      // Se llega aquí al recargar o entrar por enlace directo, sin config en
+      // memoria. `dismissTo` retrocede hasta `/offline` si está en la pila y la
+      // sustituye si no, así que sirve para los dos casos.
+      router.dismissTo("/offline");
     }
   }, [config, router]);
 
@@ -55,7 +69,7 @@ export default function PartyScreen(): ReactElement | null {
     <PartyGame
       key={runId}
       config={config}
-      onExit={() => router.replace("/offline")}
+      onExit={() => router.dismissTo("/offline")}
       onReplay={() => {
         setConfig(buildPartyConfig(config.mode, config.players));
         setRunId((value) => value + 1);
@@ -72,65 +86,115 @@ interface PartyGameProps {
 
 function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
   const { width, height } = useWindowDimensions();
-  const isTablet = width >= 768;
+  const isTablet = useIsTablet();
 
   const {
     phase,
     playerIndex,
     slot,
     timeLeft,
-    lastScore,
+    lastAccuracy,
     currentStep,
     guesses,
-    turnSolved,
+    turnHits,
+    turnStreak,
     beginTurn,
     submitGuess,
     proceed,
   } = useParty(config);
 
-  const [selectedColor, setSelectedColor] = useState(INITIAL_COLOR);
+  // Igual que en `game.tsx`: el HSV es la fuente de verdad y el hexadecimal se
+  // deriva de él. Ver `components/ColorWheel.tsx` para el porqué.
   const [selectedHSV, setSelectedHSV] = useState<HSVColor>(INITIAL_HSV);
+  const selectedColor = useMemo(
+    () => hsvToHex(selectedHSV.h, selectedHSV.s, selectedHSV.v),
+    [selectedHSV],
+  );
+  const wheelRef = useRef<ColorWheelHandle>(null);
 
-  // Celebrate the end of the run with a sound (no-op until an audio file is
-  // registered in `assets/audio`).
   useEffect(() => {
     if (phase === "final") {
-      playSound("gameOver");
+      playGameOver();
     }
   }, [phase]);
+
+  /**
+   * Reserva de la flecha de volver, no su destino habitual.
+   *
+   * La flecha retrocede por el historial, así que desde una partida lleva a
+   * `/party-setup`, un solo salto, igual que el botón «atrás» del sistema. Este
+   * `/offline` solo entra en juego si se llega a `/party` sin historial, y ahí
+   * tampoco hay configuración en memoria: la guarda de arriba manda al menú de
+   * todas formas.
+   */
+  const backHref: Href = "/offline";
 
   const currentPlayer = config.players[playerIndex];
   const stepKey = `${playerIndex}-${slot}-${guesses.length}`;
   const [lastStepKey, setLastStepKey] = useState(stepKey);
 
-  // Reset the picker each time a new color must be guessed. Adjusting state
-  // during render (instead of an effect) avoids an extra paint of the old color.
+  // Reinicia la selección cuando toca adivinar un color nuevo. Ajustar el
+  // estado durante el render (en lugar de en un efecto) evita un repintado
+  // extra con el color anterior.
   if (stepKey !== lastStepKey) {
     setLastStepKey(stepKey);
-    setSelectedColor(INITIAL_COLOR);
     setSelectedHSV(INITIAL_HSV);
   }
 
-  const challengeSize = useMemo(
-    () => clamp(Math.min(width, height) * (isTablet ? 0.34 : 0.44), 160, 300),
-    [height, isTablet, width],
-  );
+  // La rueda es no controlada, así que reposicionarla es un efecto secundario y
+  // no puede hacerse durante el render como el estado de arriba.
+  useEffect(() => {
+    wheelRef.current?.setColor(INITIAL_HSV);
+  }, [stepKey]);
 
-  const handleColorChange = (color: string, hsv: HSVColor): void => {
-    setSelectedColor(normalizeHex(color));
+  const isCompactHeight = height < 760;
+
+  const challengeSize = useMemo(() => {
+    const shortest = Math.min(width, height);
+    const base = isTablet
+      ? shortest * 0.32
+      : isCompactHeight
+        ? shortest * 0.38
+        : shortest * 0.44;
+    return clamp(base, isTablet ? 200 : 148, isTablet ? 300 : 230);
+  }, [height, isCompactHeight, isTablet, width]);
+
+  // Mismo criterio que en `game.tsx`: la rueda se dimensiona por el ancho libre
+  // real, descontando márgenes, deslizador de brillo y el hueco entre ambos.
+  const wheelSize = useMemo(() => {
+    const column = isTablet ? width / 2 : width;
+    const available = column - Space.xl * 2 - 30 - Space.lg;
+    return clamp(available, 180, isCompactHeight ? 240 : 280);
+  }, [isCompactHeight, isTablet, width]);
+
+  /**
+   * Ambos van memoizados a propósito. `ColorWheel` construye sus gestos con un
+   * `useMemo` que depende de estos manejadores: con una función nueva en cada
+   * render, los dos gestos de la rueda se reconstruían en cada pasada de React
+   * —y durante un arrastre hay muchas—. `game.tsx` ya lo hacía así.
+   */
+  const handleColorChange = useCallback((hsv: HSVColor): void => {
     setSelectedHSV(hsv);
-  };
+  }, []);
 
-  const handleCheck = (): void => {
+  const handleCheck = useCallback((): void => {
     if (!currentStep) {
       return;
     }
-    const rawScore = calculateColorScore(selectedHSV, currentStep.target.hsv);
-    feedbackForScore(rawScore);
-    playScoreSound(rawScore);
-    const score = config.timed ? applyTimedBattlePenalty(rawScore) : rawScore;
-    submitGuess(score, currentStep.target.hex, selectedColor);
-  };
+    const accuracy = calculateColorScore(selectedHSV, currentStep.target.hsv);
+    feedbackForScore(accuracy);
+    playScoreSound(accuracy);
+
+    // La precisión viaja junto a los puntos, no en su lugar. En contrarreloj los
+    // puntos salen penalizados y ya no se puede saber por ellos si el intento
+    // fue bueno: un 55 % y un 65 % valen −8 y +5, pero solo uno es acierto.
+    submitGuess({
+      accuracy,
+      score: config.timed ? scoreTimedGuess(accuracy) : accuracy,
+      targetHex: currentStep.target.hex,
+      guessHex: selectedColor,
+    });
+  }, [config.timed, currentStep, selectedColor, selectedHSV, submitGuess]);
 
   // ---- Derived results -------------------------------------------------
 
@@ -142,6 +206,10 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
           player,
           index,
           score: own.reduce((sum, guess) => sum + guess.score, 0),
+          // Aciertos, no intentos: el rótulo del marcador final dice «aciertos»
+          // y hasta ahora enseñaba el número de veces que el jugador había
+          // pulsado comprobar, acertase o no.
+          hits: countHits(own.map((guess) => guess.accuracy)),
           rounds: own.length,
         };
       }),
@@ -173,631 +241,499 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
     config.cooperative && !config.timed
       ? config.players.length * config.imagesPerPlayer * 100
       : guesses.length * 100;
-  const teamAverage =
-    guesses.length > 0 ? Math.round(teamTotal / guesses.length) : 0;
 
-  // ---- Render helpers --------------------------------------------------
+  /**
+   * La media del equipo es de **precisión**, no de puntos.
+   *
+   * Se calculaba sobre `score`, y en colaborativo contrarreloj esos puntos van
+   * penalizados: un equipo mediocre daba «Media del equipo: −12 %», y ese mismo
+   * número alimentaba a `getRunMessage`, que espera una escala de 0 a 100.
+   */
+  const teamAverage = useMemo(() => {
+    if (guesses.length === 0) {
+      return 0;
+    }
+    const total = guesses.reduce((sum, guess) => sum + guess.accuracy, 0);
+    return Math.round(total / guesses.length);
+  }, [guesses]);
 
   const modeTitle = t(`party.mode.${config.mode}.title` as TranslationKey);
 
-  const renderHandoff = (): ReactElement => (
-    <View style={styles.centerCard}>
-      <Text style={styles.handoffEmoji}>👋</Text>
-      <Text style={styles.handoffTitle}>
-        {t("party.handoff.title", { name: currentPlayer.name })}
-      </Text>
-      <Text style={styles.handoffSubtitle}>{t("party.handoff.subtitle")}</Text>
+  // ---- Fases ------------------------------------------------------------
 
-      {config.mode === "battle" ? (
-        <Text style={styles.handoffMeta}>
-          {t("party.handoff.image", {
-            current: slot + 1,
-            total: config.sharedSteps.length,
-          })}
-        </Text>
-      ) : null}
-      {config.timed ? (
-        <Text style={styles.handoffMeta}>
-          {t("party.handoff.timed", { seconds: config.turnSeconds })}
-        </Text>
-      ) : null}
-
-      <Pressable
-        onPress={beginTurn}
-        style={({ pressed }) => [
-          styles.primaryButton,
-          pressed && styles.buttonPressed,
-        ]}
-        accessibilityRole="button"
-        accessibilityLabel={t("party.handoff.start")}
+  if (phase === "handoff") {
+    return (
+      <Screen
+        backTo={backHref}
+        eyebrow={modeTitle}
+        title={t("party.handoff.title", { name: currentPlayer.name })}
+        subtitle={t("party.handoff.subtitle")}
       >
-        <LinearGradient
-          colors={["#3B82F6", "#2563EB"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.buttonGradient}
-        >
-          <Text style={styles.buttonText}>{t("party.handoff.start")}</Text>
-        </LinearGradient>
-      </Pressable>
-    </View>
-  );
-
-  const renderPlaying = (): ReactElement => (
-    <View style={styles.content}>
-      <View style={styles.statusRow}>
-        <View style={styles.statusPill}>
-          <Text style={styles.statusPillLabel}>{currentPlayer.name}</Text>
-        </View>
-        {config.timed ? (
-          <>
-            <View style={styles.statusPill}>
-              <Text style={styles.statusPillLabel}>{t("timer.label")}</Text>
-              <Text style={styles.statusPillValue}>
-                {t("timer.seconds", { seconds: timeLeft })}
-              </Text>
-            </View>
-            <View style={styles.statusPill}>
-              <Text style={styles.statusPillLabel}>
-                {t("party.play.solved", { count: turnSolved })}
-              </Text>
-            </View>
-          </>
-        ) : config.mode === "battle" ? (
-          <View style={styles.statusPill}>
-            <Text style={styles.statusPillValue}>
-              {t("party.play.image", {
-                current: slot + 1,
-                total: config.sharedSteps.length,
-              })}
-            </Text>
+        <Card>
+          <View style={styles.handoffMark}>
+            <Icon name="users" size={24} color={Color.text.secondary} />
           </View>
-        ) : (
-          <View style={styles.statusPill}>
-            <Text style={styles.statusPillValue}>
-              {t("party.play.image", {
-                current: slot + 1,
-                total: config.imagesPerPlayer,
-              })}
-            </Text>
-          </View>
-        )}
-      </View>
 
-      {currentStep ? (
-        <>
-          <View style={styles.challengeCard}>
-            <SVGChallenge
-              challenge={currentStep.challenge}
-              editableColor={selectedColor}
-              editableColorIndex={currentStep.colorIndex}
-              size={challengeSize}
-              animationToken={guesses.length}
+          <View style={styles.handoffMeta}>
+            {config.mode === "battle" ? (
+              <Pill
+                label={t("party.handoff.image", {
+                  current: slot + 1,
+                  total: config.sharedSteps.length,
+                })}
+              />
+            ) : null}
+            {config.timed ? (
+              <Pill
+                icon="timer"
+                tone="warning"
+                label={t("party.handoff.timed", {
+                  seconds: config.turnSeconds,
+                })}
+              />
+            ) : null}
+          </View>
+
+          <Button
+            label={t("party.handoff.start")}
+            icon="play"
+            onPress={beginTurn}
+            style={styles.cardAction}
+          />
+        </Card>
+      </Screen>
+    );
+  }
+
+  if (phase === "playing") {
+    return (
+      <Screen
+        backTo={backHref}
+        headerAction={
+          <View style={styles.statusRow}>
+            {config.timed ? (
+              // Mismo par que el contrarreloj en solitario: tiempo y racha. Los
+              // aciertos bajan a la fila del jugador; tres galones en la barra
+              // superior no caben en un móvil estrecho.
+              <>
+                <StatPill
+                  label={t("timer.label")}
+                  value={t("timer.seconds", { seconds: timeLeft })}
+                  tone={timeLeft <= 10 ? "danger" : "neutral"}
+                />
+                <StatPill
+                  label={t("streak.label")}
+                  value={t("streak.value", { count: turnStreak })}
+                  tone={turnStreak > 0 ? "success" : "neutral"}
+                />
+              </>
+            ) : (
+              <Pill
+                label={t("party.play.image", {
+                  current: slot + 1,
+                  total:
+                    config.mode === "battle"
+                      ? config.sharedSteps.length
+                      : config.imagesPerPlayer,
+                })}
+              />
+            )}
+          </View>
+        }
+        contentStyle={styles.playShell}
+      >
+        <View style={styles.turnRow}>
+          <Pill icon="user" label={currentPlayer.name} tone="accent" />
+          {config.timed ? (
+            <Pill
+              label={t("party.play.solved", { count: turnHits })}
+              tone={turnHits > 0 ? "success" : "neutral"}
             />
-          </View>
+          ) : null}
+        </View>
 
-          <HSVPicker color={selectedColor} onColorChange={handleColorChange} />
-
-          <Pressable
-            onPress={handleCheck}
-            style={({ pressed }) => [
-              styles.primaryButton,
-              pressed && styles.buttonPressed,
-            ]}
-            accessibilityRole="button"
-            accessibilityLabel={t("party.play.check")}
-          >
-            <LinearGradient
-              colors={["#3B82F6", "#2563EB"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.buttonGradient}
+        {currentStep ? (
+          <>
+            <View
+              style={[
+                styles.board,
+                isCompactHeight && styles.boardCompact,
+                isTablet && styles.boardTablet,
+              ]}
             >
-              <Text style={styles.buttonText}>{t("party.play.check")}</Text>
-            </LinearGradient>
-          </Pressable>
-        </>
-      ) : null}
-    </View>
-  );
+              <View style={styles.column}>
+                <SVGChallenge
+                  challenge={currentStep.challenge}
+                  editableColor={selectedColor}
+                  editableColorIndex={currentStep.colorIndex}
+                  size={challengeSize}
+                  animationToken={guesses.length}
+                />
+              </View>
 
-  const renderGuessResult = (): ReactElement => (
-    <View style={styles.centerCard}>
-      <Text style={styles.kicker}>{currentPlayer.name}</Text>
-      <Text style={styles.bigScore}>{lastScore}%</Text>
-      <Text style={styles.handoffTitle}>{t("party.guess.title")}</Text>
-      <Text style={styles.handoffSubtitle}>{t("party.guess.hidden")}</Text>
+              <View style={styles.column}>
+                <ColorWheel
+                  ref={wheelRef}
+                  initialColor={selectedHSV}
+                  onChange={handleColorChange}
+                  onChangeComplete={handleColorChange}
+                  size={wheelSize}
+                />
+              </View>
+            </View>
 
-      <Pressable
-        onPress={proceed}
-        style={({ pressed }) => [
-          styles.primaryButton,
-          pressed && styles.buttonPressed,
-        ]}
-        accessibilityRole="button"
-        accessibilityLabel={t("common.continue")}
+            <Button
+              label={t("party.play.check")}
+              onPress={handleCheck}
+              style={styles.checkButton}
+            />
+          </>
+        ) : null}
+      </Screen>
+    );
+  }
+
+  if (phase === "guessResult") {
+    return (
+      <Screen
+        backTo={backHref}
+        eyebrow={currentPlayer.name}
+        title={t("party.guess.title")}
+        subtitle={t("party.guess.hidden")}
       >
-        <LinearGradient
-          colors={["#3B82F6", "#2563EB"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.buttonGradient}
-        >
-          <Text style={styles.buttonText}>{t("common.continue")}</Text>
-        </LinearGradient>
-      </Pressable>
-    </View>
-  );
+        <Card>
+          <Animated.View
+            entering={FadeIn.duration(Duration.base)}
+            style={styles.scoreBlock}
+          >
+            <Text style={Type.label}>{t("result.kicker")}</Text>
+            {/* La cifra lleva un «%» detrás, así que es la precisión lo que
+                tiene que salir aquí, nunca los puntos ya penalizados. */}
+            <Text style={[Type.metricHero, { color: scoreTone(lastAccuracy) }]}>
+              {lastAccuracy}%
+            </Text>
+          </Animated.View>
 
-  const renderRoundResult = (): ReactElement => (
-    <View style={styles.centerCard}>
-      <Text style={styles.kicker}>
-        {t("party.play.image", {
+          <Button
+            label={t("common.continue")}
+            onPress={proceed}
+            style={styles.cardAction}
+          />
+        </Card>
+      </Screen>
+    );
+  }
+
+  if (phase === "roundResult") {
+    return (
+      <Screen
+        backTo={backHref}
+        eyebrow={t("party.play.image", {
           current: slot + 1,
           total: config.sharedSteps.length,
         })}
-      </Text>
-      <Text style={styles.handoffTitle}>{t("party.round.title")}</Text>
-
-      {currentStep ? (
-        <View style={styles.correctBlock}>
-          <View
-            style={[
-              styles.correctSwatch,
-              { backgroundColor: currentStep.target.hex },
-            ]}
-          />
-          <Text style={styles.correctLabel}>
-            {t("party.round.correct")} · {currentStep.target.hex}
-          </Text>
-        </View>
-      ) : null}
-
-      <View style={styles.rankList}>
-        {roundGuesses.map((guess, index) => (
-          <View
-            key={`${guess.player}-${index}`}
-            style={[styles.rankRow, index === 0 && styles.rankRowWinner]}
-          >
-            <Text style={styles.rankPos}>{index + 1}º</Text>
-            <View
-              style={[styles.rankSwatch, { backgroundColor: guess.guessHex }]}
-            />
-            <Text style={styles.rankName} numberOfLines={1}>
-              {index === 0
-                ? t("party.round.you", { name: guess.name })
-                : guess.name}
-            </Text>
-            <Text style={styles.rankScore}>{guess.score}%</Text>
-          </View>
-        ))}
-      </View>
-
-      <Pressable
-        onPress={proceed}
-        style={({ pressed }) => [
-          styles.primaryButton,
-          pressed && styles.buttonPressed,
-        ]}
-        accessibilityRole="button"
-        accessibilityLabel={t("common.next")}
+        title={t("party.round.title")}
       >
-        <LinearGradient
-          colors={["#3B82F6", "#2563EB"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.buttonGradient}
-        >
-          <Text style={styles.buttonText}>{t("common.next")}</Text>
-        </LinearGradient>
-      </Pressable>
-    </View>
-  );
+        <Card style={styles.block}>
+          {currentStep ? (
+            <>
+              <View style={styles.correctBlock}>
+                <View
+                  style={[
+                    styles.correctSwatch,
+                    { backgroundColor: currentStep.target.hex },
+                  ]}
+                  accessibilityRole="image"
+                  accessibilityLabel={`${t("party.round.correct")}: ${
+                    currentStep.target.hex
+                  }`}
+                />
+                <View>
+                  <Text style={Type.label}>{t("party.round.correct")}</Text>
+                  <Text style={[Type.metricSmall, styles.correctHex]}>
+                    {currentStep.target.hex}
+                  </Text>
+                </View>
+              </View>
 
-  const renderFinal = (): ReactElement => {
-    const isTie = ranking.length > 1 && ranking[0].score === ranking[1].score;
+              <Divider style={styles.divider} />
+            </>
+          ) : null}
 
-    return (
-      <View style={styles.centerCard}>
-        <Text style={styles.finishedEmoji}>🏁</Text>
-        <Text style={styles.handoffTitle}>
-          {config.cooperative
-            ? t("party.final.coopTitle")
-            : t("party.final.title")}
-        </Text>
-
-        {config.cooperative ? (
-          <>
-            <Text style={styles.bigScore}>
-              {config.timed
-                ? t("party.final.points", { score: teamTotal })
-                : t("party.final.teamScore", {
-                    score: teamTotal,
-                    max: teamMax,
-                  })}
-            </Text>
-            <Text style={styles.handoffSubtitle}>
-              {t("party.final.teamAverage", { average: teamAverage })}
-            </Text>
-            <Text style={styles.teamMessage}>{getRunMessage(teamAverage)}</Text>
-            <Text style={styles.contribHeading}>
-              {t("party.final.contributions")}
-            </Text>
-          </>
-        ) : (
-          <Text style={styles.winnerLine}>
-            {isTie
-              ? t("party.final.tie")
-              : t("party.final.winner", { name: ranking[0]?.player.name })}
-          </Text>
-        )}
-
-        <View style={styles.rankList}>
-          {ranking.map((entry, index) => (
-            <View
-              key={entry.index}
-              style={[
-                styles.rankRow,
-                index === 0 && !config.cooperative && styles.rankRowWinner,
-              ]}
-            >
-              <Text style={styles.rankPos}>{index + 1}º</Text>
-              <Text style={styles.rankName} numberOfLines={1}>
-                {entry.player.name}
-              </Text>
-              <Text style={styles.rankScore}>
-                {config.timed || config.cooperative
-                  ? `${entry.score} · ${t("party.final.rounds", {
-                      count: entry.rounds,
-                    })}`
-                  : t("party.final.points", { score: entry.score })}
-              </Text>
-            </View>
+          {roundGuesses.map((guess, index) => (
+            <RankRow
+              key={`${guess.player}-${index}`}
+              position={index + 1}
+              name={guess.name}
+              swatch={guess.guessHex}
+              value={`${guess.accuracy}%`}
+              valueTone={scoreTone(guess.accuracy)}
+              highlight={index === 0}
+              last={index === roundGuesses.length - 1}
+            />
           ))}
-        </View>
+        </Card>
 
-        <Pressable
-          onPress={onReplay}
-          style={({ pressed }) => [
-            styles.primaryButton,
-            pressed && styles.buttonPressed,
-          ]}
-          accessibilityRole="button"
-          accessibilityLabel={t("party.final.replay")}
-        >
-          <LinearGradient
-            colors={["#3B82F6", "#2563EB"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.buttonGradient}
-          >
-            <Text style={styles.buttonText}>{t("party.final.replay")}</Text>
-          </LinearGradient>
-        </Pressable>
-
-        <Pressable
-          onPress={onExit}
-          style={({ pressed }) => [
-            styles.secondaryButton,
-            pressed && styles.buttonPressed,
-          ]}
-          accessibilityRole="button"
-          accessibilityLabel={t("party.final.home")}
-        >
-          <Text style={styles.secondaryButtonText}>
-            {t("party.final.home")}
-          </Text>
-        </Pressable>
-      </View>
+        <Button label={t("common.next")} onPress={proceed} />
+      </Screen>
     );
-  };
+  }
+
+  // ---- Final ------------------------------------------------------------
+
+  const isTie = ranking.length > 1 && ranking[0].score === ranking[1].score;
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <LinearGradient
-        colors={["#09090B", "#0A0A0D", "#09090B"]}
-        style={styles.background}
-      >
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View style={styles.shell}>
-            <View style={styles.header}>
-              <Pressable
-                onPress={onExit}
-                style={({ pressed }) => [
-                  styles.backLink,
-                  pressed && styles.backLinkPressed,
-                ]}
-                hitSlop={12}
-                accessibilityRole="button"
-                accessibilityLabel={t("party.final.home")}
-              >
-                <Text style={styles.backLinkText}>{t("common.exit")}</Text>
-              </Pressable>
-              <Text style={styles.kicker}>{modeTitle}</Text>
+    <Screen
+      eyebrow={modeTitle}
+      title={
+        config.cooperative
+          ? t("party.final.coopTitle")
+          : t("party.final.title")
+      }
+      subtitle={
+        config.cooperative
+          ? t(getRunMessage(teamAverage))
+          : isTie
+            ? t("party.final.tie")
+            : t("party.final.winner", { name: ranking[0]?.player.name })
+      }
+    >
+      {config.cooperative ? (
+        <>
+          <Card style={styles.block}>
+            <View style={styles.scoreBlock}>
+              <Text style={Type.metricHero}>
+                {config.timed
+                  ? t("party.final.points", { score: teamTotal })
+                  : t("party.final.teamScore", {
+                      score: teamTotal,
+                      max: teamMax,
+                    })}
+              </Text>
+              <Text style={Type.body}>
+                {t("party.final.teamAverage", { average: teamAverage })}
+              </Text>
             </View>
+          </Card>
 
-            {phase === "handoff"
-              ? renderHandoff()
-              : phase === "playing"
-                ? renderPlaying()
-                : phase === "guessResult"
-                  ? renderGuessResult()
-                  : phase === "roundResult"
-                    ? renderRoundResult()
-                    : renderFinal()}
-          </View>
-        </ScrollView>
-      </LinearGradient>
-    </SafeAreaView>
+          {/* La lista de abajo deja de ser una clasificación cuando se juega en
+              equipo: es el reparto de quién ha puesto cuánto. */}
+          <SectionHeader title={t("party.final.contributions")} />
+        </>
+      ) : null}
+
+      <Card style={styles.block}>
+        {ranking.map((entry, index) => (
+          <RankRow
+            key={entry.index}
+            position={index + 1}
+            name={entry.player.name}
+            value={
+              config.timed || config.cooperative
+                ? `${entry.score} · ${t("party.final.rounds", {
+                    count: entry.hits,
+                  })}`
+                : t("party.final.points", { score: entry.score })
+            }
+            highlight={index === 0 && !config.cooperative && !isTie}
+            last={index === ranking.length - 1}
+          />
+        ))}
+      </Card>
+
+      <View style={styles.finalActions}>
+        <Button
+          label={t("party.final.replay")}
+          icon="retry"
+          onPress={onReplay}
+        />
+        <Button
+          label={t("party.final.home")}
+          icon="home"
+          variant="ghost"
+          onPress={onExit}
+        />
+      </View>
+    </Screen>
+  );
+}
+
+/**
+ * Fila de clasificación.
+ *
+ * La usan el resultado de una ronda y el marcador final, así que el puesto, el
+ * nombre y la cifra caen siempre en la misma rejilla. Antes eran dos bloques
+ * distintos con los mismos estilos copiados.
+ */
+function RankRow({
+  position,
+  name,
+  swatch,
+  value,
+  valueTone,
+  highlight,
+  last,
+}: {
+  position: number;
+  name: string;
+  /** Color que propuso el jugador, cuando la fila es de una ronda. */
+  swatch?: string;
+  value: string;
+  valueTone?: string;
+  highlight: boolean;
+  last: boolean;
+}): ReactElement {
+  return (
+    <View style={[styles.rankRow, last && styles.rankRowLast]}>
+      <View
+        style={styles.rankPosition}
+        accessible
+        accessibilityLabel={t("a11y.rank", { position })}
+      >
+        {highlight ? (
+          <Icon name="trophy" size={16} color={Color.warning.default} />
+        ) : (
+          <Text style={Type.metricSmall}>{position}</Text>
+        )}
+      </View>
+
+      {swatch != null ? (
+        <View style={[styles.rankSwatch, { backgroundColor: swatch }]} />
+      ) : null}
+
+      <Text style={[Type.bodyStrong, styles.rankName]} numberOfLines={1}>
+        {name}
+      </Text>
+
+      <Text style={[Type.metricSmall, valueTone != null && { color: valueTone }]}>
+        {value}
+      </Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#09090B",
+  block: {
+    marginBottom: Space.lg,
   },
-  background: {
-    flex: 1,
-  },
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  shell: {
-    flexGrow: 1,
-    width: "100%",
-    maxWidth: 640,
+  handoffMark: {
     alignSelf: "center",
-    paddingHorizontal: 22,
-    paddingTop: 16,
-    paddingBottom: 32,
+    width: 48,
+    height: 48,
+    borderRadius: Radius.md,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: Color.surface.sunken,
+    borderWidth: 1,
+    borderColor: Color.border.subtle,
   },
-  header: {
-    marginBottom: 12,
+  handoffMeta: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: Space.sm,
+    marginTop: Space.lg,
   },
-  backLink: {
-    alignSelf: "flex-start",
-    paddingVertical: 6,
-    marginBottom: 6,
+  cardAction: {
+    marginTop: Space.xl,
   },
-  backLinkPressed: {
-    opacity: 0.6,
-  },
-  backLinkText: {
-    color: "#A1A1AA",
-    fontSize: 15,
-    fontWeight: "700",
-    fontFamily: "System",
-  },
-  kicker: {
-    color: "#3B82F6",
-    fontSize: 13,
-    fontWeight: "800",
-    letterSpacing: 1,
-    textTransform: "uppercase",
-    fontFamily: "System",
-  },
-  content: {
-    flex: 1,
-    width: "100%",
+  playShell: {
+    justifyContent: "space-between",
+    paddingBottom: Space.xl,
   },
   statusRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginBottom: 14,
+    gap: Space.sm,
   },
-  statusPill: {
+  turnRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 999,
-    backgroundColor: "#18181B",
-    borderWidth: 1,
-    borderColor: "#27272A",
+    justifyContent: "space-between",
+    gap: Space.sm,
+    marginBottom: Space.sm,
   },
-  statusPillLabel: {
-    color: "#A1A1AA",
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily: "System",
-  },
-  statusPillValue: {
-    color: "#FFFFFF",
-    fontSize: 13,
-    fontWeight: "800",
-    fontFamily: "System",
-    fontVariant: ["tabular-nums"],
-  },
-  challengeCard: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 16,
-    marginBottom: 14,
-    borderRadius: 24,
-    backgroundColor: "#18181B",
-    borderWidth: 1,
-    borderColor: "#27272A",
-  },
-  centerCard: {
+  board: {
+    // Ver `game.tsx`: `flexGrow` en lugar de `flex: 1` para que el tablero
+    // conserve su altura real cuando la pantalla se queda corta y sea la
+    // pantalla la que se desplace.
     flexGrow: 1,
     alignItems: "center",
+    justifyContent: "space-evenly",
+    // Mismo suelo de separación que en `game.tsx`: el turno de una partida en
+    // grupo y el modo en solitario tienen que respirar igual.
+    paddingTop: Space.xxl,
+    gap: Space.xxl,
+  },
+  /** En pantalla baja, la mitad de aire: ver `game.tsx`. */
+  boardCompact: {
+    paddingTop: Space.lg,
+    gap: Space.lg,
+  },
+  boardTablet: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  column: {
+    alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 24,
   },
-  handoffEmoji: {
-    fontSize: 48,
-    marginBottom: 12,
+  checkButton: {
+    marginTop: Space.lg,
   },
-  finishedEmoji: {
-    fontSize: 44,
-    marginBottom: 10,
-  },
-  handoffTitle: {
-    color: "#FFFFFF",
-    fontSize: 26,
-    fontWeight: "800",
-    textAlign: "center",
-    fontFamily: "System",
-  },
-  handoffSubtitle: {
-    marginTop: 8,
-    color: "#A1A1AA",
-    fontSize: 15,
-    lineHeight: 22,
-    textAlign: "center",
-    fontFamily: "System",
-    maxWidth: 360,
-  },
-  handoffMeta: {
-    marginTop: 10,
-    color: "#71717A",
-    fontSize: 14,
-    fontWeight: "600",
-    fontFamily: "System",
-  },
-  bigScore: {
-    marginTop: 10,
-    color: "#FFFFFF",
-    fontSize: 52,
-    fontWeight: "800",
-    fontFamily: "System",
-    fontVariant: ["tabular-nums"],
-  },
-  teamMessage: {
-    marginTop: 10,
-    color: "#93C5FD",
-    fontSize: 16,
-    fontWeight: "700",
-    textAlign: "center",
-    fontFamily: "System",
-  },
-  winnerLine: {
-    marginTop: 10,
-    color: "#FBBF24",
-    fontSize: 20,
-    fontWeight: "800",
-    textAlign: "center",
-    fontFamily: "System",
-  },
-  contribHeading: {
-    marginTop: 20,
-    alignSelf: "flex-start",
-    color: "#A1A1AA",
-    fontSize: 12,
-    fontWeight: "800",
-    letterSpacing: 1,
-    textTransform: "uppercase",
-    fontFamily: "System",
+  scoreBlock: {
+    alignItems: "center",
+    gap: Space.xs,
   },
   correctBlock: {
+    flexDirection: "row",
     alignItems: "center",
-    marginTop: 16,
-    marginBottom: 8,
+    gap: Space.lg,
   },
   correctSwatch: {
-    width: 64,
-    height: 64,
-    borderRadius: 18,
-    borderWidth: 2,
-    borderColor: "#27272A",
+    width: 56,
+    height: 56,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    // Un aro claro translúcido: un borde opaco desaparece sobre los colores
+    // claros y la muestra parece flotar.
+    borderColor: "rgba(255,255,255,0.16)",
   },
-  correctLabel: {
-    marginTop: 8,
-    color: "#E4E4E7",
-    fontSize: 14,
-    fontWeight: "700",
-    fontFamily: "System",
+  correctHex: {
+    marginTop: Space.xxs,
+    color: Color.text.primary,
   },
-  rankList: {
-    width: "100%",
-    marginTop: 12,
-    marginBottom: 20,
-    gap: 8,
+  divider: {
+    marginVertical: Space.lg,
   },
   rankRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderRadius: 16,
-    backgroundColor: "#18181B",
-    borderWidth: 1,
-    borderColor: "#27272A",
+    gap: Space.md,
+    paddingVertical: Space.md,
+    borderBottomWidth: 1,
+    borderBottomColor: Color.border.subtle,
   },
-  rankRowWinner: {
-    borderColor: "#FBBF24",
-    backgroundColor: "#1C1917",
+  rankRowLast: {
+    borderBottomWidth: 0,
+    paddingBottom: 0,
   },
-  rankPos: {
-    color: "#A1A1AA",
-    fontSize: 14,
-    fontWeight: "800",
-    width: 28,
-    fontFamily: "System",
-    fontVariant: ["tabular-nums"],
+  rankPosition: {
+    width: 22,
+    alignItems: "center",
   },
   rankSwatch: {
-    width: 26,
-    height: 26,
-    borderRadius: 8,
+    width: 24,
+    height: 24,
+    borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: "#27272A",
+    borderColor: "rgba(255,255,255,0.16)",
   },
   rankName: {
     flex: 1,
-    color: "#FFFFFF",
-    fontSize: 15,
-    fontWeight: "700",
-    fontFamily: "System",
   },
-  rankScore: {
-    color: "#93C5FD",
-    fontSize: 14,
-    fontWeight: "800",
-    fontFamily: "System",
-    fontVariant: ["tabular-nums"],
-  },
-  primaryButton: {
-    width: "100%",
-    borderRadius: 18,
-    overflow: "hidden",
-    marginTop: 8,
-  },
-  buttonGradient: {
-    paddingVertical: 18,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#FFFFFF",
-    fontSize: 17,
-    fontWeight: "800",
-    fontFamily: "System",
-  },
-  buttonPressed: {
-    opacity: 0.9,
-  },
-  secondaryButton: {
-    marginTop: 12,
-    paddingVertical: 14,
-    alignItems: "center",
-  },
-  secondaryButtonText: {
-    color: "#A1A1AA",
-    fontSize: 15,
-    fontWeight: "700",
-    fontFamily: "System",
+  finalActions: {
+    gap: Space.sm,
+    marginTop: Space.lg,
   },
 });

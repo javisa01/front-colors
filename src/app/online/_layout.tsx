@@ -5,9 +5,9 @@ import type { ReactElement, ReactNode } from "react";
 import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { ErrorBanner, Loading } from "@/components/online/Controls";
-import { OnlineScreen } from "@/components/online/Screen";
-import { OnlinePalette } from "@/components/online/theme";
+import { ErrorBanner, Loading } from "@/design/Feedback";
+import { Screen } from "@/design/Layout";
+import { Color } from "@/design/tokens";
 import { t } from "@/i18n";
 import { CLERK_PUBLISHABLE_KEY } from "@/online/clerk";
 import { SessionProvider, useSession } from "@/online/session";
@@ -29,14 +29,13 @@ export default function OnlineLayout(): ReactElement {
     // Sin clave no hay online, pero el resto del juego debe seguir abriendo:
     // por eso se avisa aquí en vez de reventar al importar el módulo.
     return (
-      <OnlineScreen
-        badge={t("online.auth.badge")}
+      <Screen
+        eyebrow={t("online.auth.badge")}
         title={t("online.auth.title")}
         backTo="/"
-        backLabel={t("common.back")}
       >
         <ErrorBanner message={t("online.auth.unavailable")} />
-      </OnlineScreen>
+      </Screen>
     );
   }
 
@@ -50,7 +49,7 @@ export default function OnlineLayout(): ReactElement {
           <Stack
             screenOptions={{
               headerShown: false,
-              contentStyle: { backgroundColor: OnlinePalette.background },
+              contentStyle: { backgroundColor: Color.surface.canvas },
               animation: "slide_from_right",
             }}
           >
@@ -121,6 +120,6 @@ const styles = StyleSheet.create({
   splash: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: OnlinePalette.background,
+    backgroundColor: Color.surface.canvas,
   },
 });

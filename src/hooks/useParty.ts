@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useReducer } from "react";
 
 import type { ChallengeStep, PartyConfig } from "@/types/challenge";
+import { countHits, trailingStreak } from "@/utils/colorScore";
 
 /**
  * Phases of a party run:
@@ -22,7 +23,25 @@ export type PartyPhase =
 export interface PartyGuess {
   player: number;
   slot: number;
+  /** Puntos que suman al marcador. En contrarreloj llevan ya la penalización. */
   score: number;
+  /**
+   * Precisión cruda, 0..100. Es la que decide si el intento es acierto.
+   *
+   * En los modos contrarreloj `score` llega penalizado —un 40 % se guarda como
+   * −30—, así que preguntarle si supera el 60 no tiene sentido. Antes solo se
+   * guardaba `score`, y por eso el marcador contaba como acierto cualquier
+   * intento enviado: no le quedaba otro dato al que preguntar.
+   */
+  accuracy: number;
+  targetHex: string;
+  guessHex: string;
+}
+
+/** Lo que la pantalla envía al comprobar un color. */
+export interface PartySubmission {
+  score: number;
+  accuracy: number;
   targetHex: string;
   guessHex: string;
 }
@@ -35,13 +54,14 @@ interface PartyState {
   // Timed modes: position in the shared deck for the current turn.
   deckPos: number;
   timeLeft: number;
-  lastScore: number;
+  /** Precisión del último intento: es lo que se enseña como «%». */
+  lastAccuracy: number;
   guesses: PartyGuess[];
 }
 
 type PartyAction =
   | { type: "BEGIN_TURN" }
-  | { type: "SUBMIT"; score: number; targetHex: string; guessHex: string }
+  | ({ type: "SUBMIT" } & PartySubmission)
   | { type: "PROCEED" }
   | { type: "TICK" };
 
@@ -52,7 +72,7 @@ function initState(config: PartyConfig): PartyState {
     slot: 0,
     deckPos: 0,
     timeLeft: config.turnSeconds,
-    lastScore: 0,
+    lastAccuracy: 0,
     guesses: [],
   };
 }
@@ -79,6 +99,7 @@ function makeReducer(config: PartyConfig) {
           player: state.playerIndex,
           slot: config.timed ? state.deckPos : state.slot,
           score: action.score,
+          accuracy: action.accuracy,
           targetHex: action.targetHex,
           guessHex: action.guessHex,
         };
@@ -90,7 +111,7 @@ function makeReducer(config: PartyConfig) {
             ...state,
             guesses,
             deckPos: state.deckPos + 1,
-            lastScore: action.score,
+            lastAccuracy: action.accuracy,
           };
         }
 
@@ -99,7 +120,7 @@ function makeReducer(config: PartyConfig) {
           return {
             ...state,
             guesses,
-            lastScore: action.score,
+            lastAccuracy: action.accuracy,
             // Last player finishes the image → reveal it; otherwise show the
             // current player their own score before handing off.
             phase: isLastPlayer ? "roundResult" : "guessResult",
@@ -110,7 +131,7 @@ function makeReducer(config: PartyConfig) {
         return {
           ...state,
           guesses,
-          lastScore: action.score,
+          lastAccuracy: action.accuracy,
           phase: "guessResult",
         };
       }
@@ -208,14 +229,16 @@ export interface UsePartyResult {
   slot: number;
   deckPos: number;
   timeLeft: number;
-  lastScore: number;
+  lastAccuracy: number;
   currentStep: ChallengeStep | null;
   guesses: PartyGuess[];
-  // Progress within the current player's turn (guesses already made this turn).
-  turnSolved: number;
+  /** Aciertos del turno: solo los intentos que pasan del umbral. */
+  turnHits: number;
+  /** Aciertos seguidos ahora mismo. Un fallo la deja a cero. */
+  turnStreak: number;
   turnScore: number;
   beginTurn: () => void;
-  submitGuess: (score: number, targetHex: string, guessHex: string) => void;
+  submitGuess: (submission: PartySubmission) => void;
   proceed: () => void;
 }
 
@@ -225,8 +248,8 @@ export function useParty(config: PartyConfig): UsePartyResult {
 
   const beginTurn = useCallback(() => dispatch({ type: "BEGIN_TURN" }), []);
   const submitGuess = useCallback(
-    (score: number, targetHex: string, guessHex: string) =>
-      dispatch({ type: "SUBMIT", score, targetHex, guessHex }),
+    (submission: PartySubmission) =>
+      dispatch({ type: "SUBMIT", ...submission }),
     [],
   );
   const proceed = useCallback(() => dispatch({ type: "PROCEED" }), []);
@@ -245,18 +268,27 @@ export function useParty(config: PartyConfig): UsePartyResult {
     [config, state],
   );
 
-  const { turnSolved, turnScore } = useMemo(() => {
-    let solved = 0;
-    let score = 0;
-    for (const guess of state.guesses) {
-      if (guess.player === state.playerIndex) {
-        solved += 1;
-        score += guess.score;
-      }
-    }
-    // For timed modes each player's turn is a fresh run, and playerIndex only
-    // moves forward, so counting this player's guesses is correct.
-    return { turnSolved: solved, turnScore: score };
+  /**
+   * Marcador del turno.
+   *
+   * `turnHits` contaba antes **todos** los intentos, así que fallar sumaba un
+   * «acierto» igual que clavar el color. Ahora se decide con la precisión cruda
+   * y el mismo umbral que usa el modo en solitario.
+   *
+   * For timed modes each player's turn is a fresh run, and playerIndex only
+   * moves forward, so counting this player's guesses is correct.
+   */
+  const { turnHits, turnStreak, turnScore } = useMemo(() => {
+    const own = state.guesses.filter(
+      (guess) => guess.player === state.playerIndex,
+    );
+    const accuracies = own.map((guess) => guess.accuracy);
+
+    return {
+      turnHits: countHits(accuracies),
+      turnStreak: trailingStreak(accuracies),
+      turnScore: own.reduce((sum, guess) => sum + guess.score, 0),
+    };
   }, [state.guesses, state.playerIndex]);
 
   return {
@@ -266,10 +298,11 @@ export function useParty(config: PartyConfig): UsePartyResult {
     slot: state.slot,
     deckPos: state.deckPos,
     timeLeft: state.timeLeft,
-    lastScore: state.lastScore,
+    lastAccuracy: state.lastAccuracy,
     currentStep,
     guesses: state.guesses,
-    turnSolved,
+    turnHits,
+    turnStreak,
     turnScore,
     beginTurn,
     submitGuess,

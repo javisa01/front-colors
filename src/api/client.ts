@@ -129,6 +129,15 @@ export class ApiClient {
       return { ok: true, data: payload as T };
     } catch (error) {
       const aborted = error instanceof Error && error.name === "AbortError";
+      // Igual que en `online/clerkErrors.ts`: aquí se pierde el error real (a
+      // qué URL, por qué). En desarrollo se deja rastro con la URL de destino,
+      // que es lo primero que hay que mirar cuando se prueba en un movil.
+      if (__DEV__) {
+        console.error(
+          `[api] ${options.method ?? "GET"} ${buildUrl(path, options.query)} falló:`,
+          error,
+        );
+      }
       return {
         ok: false,
         error: ApiError.network(

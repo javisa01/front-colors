@@ -1,24 +1,18 @@
 import { useFocusEffect } from "expo-router";
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { describeError } from "@/api/errors";
 import type { FriendEntry, FriendsOverview, UserProfile } from "@/api/types";
-import {
-  Avatar,
-  Card,
-  EmptyState,
-  ErrorBanner,
-  Field,
-  GhostButton,
-  Loading,
-  Pill,
-  SectionLabel,
-} from "@/components/online/Controls";
-import { OnlineScreen } from "@/components/online/Screen";
-import { OnlinePalette } from "@/components/online/theme";
+import { SettingsButton } from "@/components/SettingsButton";
+import { Avatar } from "@/design/Avatar";
+import { IconButton } from "@/design/Button";
+import { EmptyState, ErrorBanner, Loading, Pill } from "@/design/Feedback";
+import { Field, RowActions } from "@/design/Form";
+import { Card, Divider, Screen, SectionHeader } from "@/design/Layout";
+import { Color, Duration, Space, Type } from "@/design/tokens";
 import { t } from "@/i18n";
 import { useSession } from "@/online/session";
 
@@ -32,6 +26,14 @@ interface SearchResults {
 const MIN_QUERY = 2;
 const SEARCH_DEBOUNCE_MS = 350;
 
+/**
+ * Amigos: buscar jugadores, gestionar solicitudes y ver la lista.
+ *
+ * Las acciones de cada fila son iconos con área táctil de 44pt, no botones de
+ * texto: en una fila que ya lleva avatar, nombre y nivel, dos botones con
+ * palabras dentro empujaban el nombre hasta recortarlo en cuanto el jugador
+ * tenía más de ocho letras.
+ */
 export default function FriendsScreen(): ReactElement {
   const { api, user } = useSession();
 
@@ -172,11 +174,12 @@ export default function FriendsScreen(): ReactElement {
   const friends = overview?.friends ?? [];
 
   return (
-    <OnlineScreen
-      badge={t("online.friends.badge")}
+    <Screen
+      eyebrow={t("online.friends.badge")}
       title={t("online.friends.title")}
       subtitle={t("online.friends.subtitle")}
       backTo="/online"
+      headerAction={<SettingsButton />}
       onRefresh={refresh}
       refreshing={refreshing}
     >
@@ -189,23 +192,23 @@ export default function FriendsScreen(): ReactElement {
       ) : null}
 
       {/* --------------------------- Buscar ---------------------------- */}
-      <Card>
+      <Card style={styles.block}>
         <Field
           label={t("online.friends.searchLabel")}
           value={query}
           onChangeText={setQuery}
           placeholder={t("online.friends.searchPlaceholder")}
           hint={t("online.friends.searchHint", { min: MIN_QUERY })}
+          icon="search"
           maxLength={32}
           returnKeyType="search"
+          style={styles.searchField}
         />
 
         {searching ? (
           <View style={styles.searchStatus}>
-            <ActivityIndicator color={OnlinePalette.accent} size="small" />
-            <Text style={styles.searchStatusText}>
-              {t("online.friends.searching")}
-            </Text>
+            <ActivityIndicator color={Color.text.muted} size="small" />
+            <Text style={Type.caption}>{t("online.friends.searching")}</Text>
           </View>
         ) : null}
 
@@ -213,29 +216,29 @@ export default function FriendsScreen(): ReactElement {
 
         {visibleResults && !searching ? (
           visibleResults.length === 0 ? (
-            <Text style={styles.noResults}>
+            <Text style={[Type.caption, styles.noResults]}>
               {t("online.friends.noResults", { query: query.trim() })}
             </Text>
           ) : (
-            <View style={styles.resultList}>
-              {visibleResults.map((result) => {
+            <View>
+              <Divider style={styles.resultsDivider} />
+              {visibleResults.map((result, index) => {
                 const relation = relationOf(result.id);
 
                 return (
-                  <View key={result.id} style={styles.row}>
-                    <Avatar username={result.username} size={42} />
-                    <View style={styles.rowText}>
-                      <Text style={styles.rowName}>{result.username}</Text>
-                      <Text style={styles.rowMeta}>
-                        {t("online.level", { level: result.level })} ·{" "}
-                        {t("online.xp", { xp: result.xp })}
-                      </Text>
-                    </View>
-
+                  <PlayerRow
+                    key={result.id}
+                    username={result.username}
+                    level={result.level}
+                    xp={result.xp}
+                    index={index}
+                    last={index === visibleResults.length - 1}
+                  >
                     {relation === "none" ? (
-                      <GhostButton
-                        label={t("online.friends.add")}
-                        tone="accent"
+                      <IconButton
+                        name="userPlus"
+                        variant="surface"
+                        accessibilityLabel={t("online.friends.add")}
                         disabled={pendingId === result.id}
                         onPress={() =>
                           void act(result.id, () =>
@@ -257,7 +260,7 @@ export default function FriendsScreen(): ReactElement {
                         tone={relation === "friend" ? "success" : "neutral"}
                       />
                     )}
-                  </View>
+                  </PlayerRow>
                 );
               })}
             </View>
@@ -268,30 +271,41 @@ export default function FriendsScreen(): ReactElement {
       {/* --------------------- Solicitudes recibidas -------------------- */}
       {incoming.length > 0 ? (
         <>
-          <SectionLabel
+          <SectionHeader
             title={t("online.friends.incoming")}
             hint={t("online.friends.incomingHint")}
           />
-          <Card>
+          <Card style={styles.block}>
             {incoming.map((entry, index) => (
               <RequestRow
                 key={entry.friendshipId}
                 entry={entry}
                 index={index}
+                last={index === incoming.length - 1}
                 busy={pendingId === entry.user.id}
-                primaryLabel={t("online.friends.accept")}
-                onPrimary={() =>
-                  void act(entry.user.id, () =>
-                    api.friends.accept(entry.user.id),
-                  )
-                }
-                secondaryLabel={t("online.friends.reject")}
-                onSecondary={() =>
-                  void act(entry.user.id, () =>
-                    api.friends.reject(entry.user.id),
-                  )
-                }
-              />
+              >
+                <IconButton
+                  name="check"
+                  variant="surface"
+                  color={Color.success.text}
+                  accessibilityLabel={t("online.friends.accept")}
+                  onPress={() =>
+                    void act(entry.user.id, () =>
+                      api.friends.accept(entry.user.id),
+                    )
+                  }
+                />
+                <IconButton
+                  name="close"
+                  variant="surface"
+                  accessibilityLabel={t("online.friends.reject")}
+                  onPress={() =>
+                    void act(entry.user.id, () =>
+                      api.friends.reject(entry.user.id),
+                    )
+                  }
+                />
+              </RequestRow>
             ))}
           </Card>
         </>
@@ -300,28 +314,34 @@ export default function FriendsScreen(): ReactElement {
       {/* --------------------- Solicitudes enviadas --------------------- */}
       {outgoing.length > 0 ? (
         <>
-          <SectionLabel title={t("online.friends.outgoing")} />
-          <Card>
+          <SectionHeader title={t("online.friends.outgoing")} />
+          <Card style={styles.block}>
             {outgoing.map((entry, index) => (
               <RequestRow
                 key={entry.friendshipId}
                 entry={entry}
                 index={index}
+                last={index === outgoing.length - 1}
                 busy={pendingId === entry.user.id}
-                secondaryLabel={t("online.friends.cancel")}
-                onSecondary={() =>
-                  void act(entry.user.id, () =>
-                    api.friends.remove(entry.user.id),
-                  )
-                }
-              />
+              >
+                <IconButton
+                  name="close"
+                  variant="surface"
+                  accessibilityLabel={t("online.friends.cancel")}
+                  onPress={() =>
+                    void act(entry.user.id, () =>
+                      api.friends.remove(entry.user.id),
+                    )
+                  }
+                />
+              </RequestRow>
             ))}
           </Card>
         </>
       ) : null}
 
       {/* ---------------------------- Amigos ---------------------------- */}
-      <SectionLabel
+      <SectionHeader
         title={t("online.friends.list")}
         hint={
           friends.length > 0
@@ -335,7 +355,7 @@ export default function FriendsScreen(): ReactElement {
       ) : friends.length === 0 ? (
         <Card>
           <EmptyState
-            emoji="🫂"
+            icon="users"
             title={t("online.friends.emptyTitle")}
             hint={t("online.friends.emptyHint")}
           />
@@ -347,123 +367,141 @@ export default function FriendsScreen(): ReactElement {
               key={entry.friendshipId}
               entry={entry}
               index={index}
+              last={index === friends.length - 1}
               busy={pendingId === entry.user.id}
-              secondaryLabel={t("online.friends.remove")}
-              onSecondary={() =>
-                void act(entry.user.id, () => api.friends.remove(entry.user.id))
-              }
-            />
+            >
+              <IconButton
+                name="trash"
+                variant="surface"
+                color={Color.danger.text}
+                accessibilityLabel={t("online.friends.remove")}
+                onPress={() =>
+                  void act(entry.user.id, () => api.friends.remove(entry.user.id))
+                }
+              />
+            </RequestRow>
           ))}
         </Card>
       )}
-    </OnlineScreen>
+    </Screen>
+  );
+}
+
+/**
+ * Fila de jugador: avatar, nombre, nivel y acciones.
+ *
+ * El escalonado se limita a las doce primeras filas y usa un fundido sin
+ * desplazamiento. Con `FadeInDown` y sin tope, una lista de cuarenta amigos
+ * tardaba más de dos segundos en terminar de montarse.
+ */
+function PlayerRow({
+  username,
+  level,
+  xp,
+  index,
+  last,
+  children,
+}: {
+  username: string;
+  level: number;
+  xp: number;
+  index: number;
+  last: boolean;
+  children: ReactNode;
+}): ReactElement {
+  return (
+    <Animated.View
+      entering={FadeIn.delay(Math.min(index, 12) * 35).duration(Duration.base)}
+    >
+      <View style={[styles.row, last && styles.rowLast]}>
+        <Avatar username={username} size={40} />
+        <View style={styles.rowText}>
+          <Text style={Type.bodyStrong} numberOfLines={1}>
+            {username}
+          </Text>
+          <Text style={Type.caption}>
+            {t("online.level", { level })} · {t("online.xp", { xp })}
+          </Text>
+        </View>
+        <RowActions>{children}</RowActions>
+      </View>
+    </Animated.View>
   );
 }
 
 function RequestRow({
   entry,
   index,
+  last,
   busy,
-  primaryLabel,
-  onPrimary,
-  secondaryLabel,
-  onSecondary,
+  children,
 }: {
   entry: FriendEntry;
   index: number;
+  last: boolean;
   busy: boolean;
-  primaryLabel?: string;
-  onPrimary?: () => void;
-  secondaryLabel?: string;
-  onSecondary?: () => void;
+  children: ReactNode;
 }): ReactElement {
   return (
-    <Animated.View entering={FadeInDown.delay(index * 60).duration(380)}>
-      <View style={styles.row}>
-        <Avatar username={entry.user.username} size={42} />
-        <View style={styles.rowText}>
-          <Text style={styles.rowName}>{entry.user.username}</Text>
-          <Text style={styles.rowMeta}>
-            {t("online.level", { level: entry.user.level })} ·{" "}
-            {t("online.xp", { xp: entry.user.xp })}
-          </Text>
+    <PlayerRow
+      username={entry.user.username}
+      level={entry.user.level}
+      xp={entry.user.xp}
+      index={index}
+      last={last}
+    >
+      {busy ? (
+        // Ocupa el sitio de los botones para que la fila no cambie de alto al
+        // pasar a «en curso».
+        <View style={styles.rowBusy}>
+          <ActivityIndicator color={Color.accent.default} size="small" />
         </View>
-
-        <View style={styles.rowActions}>
-          {busy ? (
-            <ActivityIndicator color={OnlinePalette.accent} size="small" />
-          ) : (
-            <>
-              {primaryLabel && onPrimary ? (
-                <GhostButton
-                  label={primaryLabel}
-                  tone="accent"
-                  onPress={onPrimary}
-                />
-              ) : null}
-              {secondaryLabel && onSecondary ? (
-                <GhostButton
-                  label={secondaryLabel}
-                  tone="danger"
-                  onPress={onSecondary}
-                />
-              ) : null}
-            </>
-          )}
-        </View>
-      </View>
-    </Animated.View>
+      ) : (
+        children
+      )}
+    </PlayerRow>
   );
 }
 
 const styles = StyleSheet.create({
+  block: {
+    marginBottom: Space.xxl,
+  },
+  searchField: {
+    marginBottom: 0,
+  },
   searchStatus: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    paddingVertical: 8,
-  },
-  searchStatusText: {
-    color: OnlinePalette.textMuted,
-    fontSize: 13,
-    fontFamily: "System",
+    gap: Space.sm,
+    marginTop: Space.md,
   },
   noResults: {
-    paddingVertical: 10,
-    color: OnlinePalette.textFaint,
-    fontSize: 13,
-    fontFamily: "System",
+    marginTop: Space.md,
   },
-  resultList: {
-    marginTop: 4,
+  resultsDivider: {
+    marginTop: Space.lg,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    paddingVertical: 11,
+    gap: Space.md,
+    paddingVertical: Space.md,
     borderBottomWidth: 1,
-    borderBottomColor: OnlinePalette.border,
+    borderBottomColor: Color.border.subtle,
+  },
+  rowLast: {
+    borderBottomWidth: 0,
+    paddingBottom: 0,
   },
   rowText: {
     flex: 1,
+    gap: Space.xxs,
   },
-  rowName: {
-    color: OnlinePalette.text,
-    fontSize: 15,
-    fontWeight: "800",
-    fontFamily: "System",
-  },
-  rowMeta: {
-    marginTop: 3,
-    color: OnlinePalette.textFaint,
-    fontSize: 12,
-    fontFamily: "System",
-    fontVariant: ["tabular-nums"],
-  },
-  rowActions: {
-    flexDirection: "row",
+  rowBusy: {
+    width: 44,
+    height: 44,
     alignItems: "center",
-    gap: 8,
+    justifyContent: "center",
   },
 });

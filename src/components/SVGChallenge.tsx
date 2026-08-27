@@ -9,6 +9,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { SvgXml } from "react-native-svg";
 
+import { Radius, Type } from "@/design/tokens";
 import type { ChallengeMetadata } from "@/types/challenge";
 import { getChallengeBackgroundTheme, normalizeHex } from "@/utils/color";
 
@@ -93,8 +94,50 @@ function inlineCssColors(svgXml: string): string {
   return result;
 }
 
+// Namespaces that only carry editor bookkeeping: Inkscape/Sodipodi document
+// settings and the RDF licensing block. Nothing here draws anything.
+//
+// `svg` is deliberately absent: a file that declares `xmlns:svg` may also write
+// its real shapes as <svg:path>, and dropping those would erase the logo. Its
+// declaration is handled apart, only when no element actually uses the prefix.
+const EDITOR_NAMESPACES = "sodipodi|inkscape|dc|cc|rdf";
+
+/**
+ * Strip the editor metadata Inkscape leaves behind.
+ *
+ * `SvgXml` hands every attribute it does not know down to the underlying
+ * element, camelCasing the name on the way. On web that element is a DOM node,
+ * so `inkscape:label` arrives as `inkscapeLabel` and React logs one "React does
+ * not recognize the X prop on a DOM element" warning per attribute per logo —
+ * dozens of them on a single screen. They are noise rather than a broken render,
+ * but the fix is to stop shipping attributes that no renderer reads.
+ */
+function stripEditorMetadata(svgXml: string): string {
+  let result = svgXml
+    // <sodipodi:namedview .../>, <inkscape:grid .../>
+    .replace(new RegExp(`<(?:${EDITOR_NAMESPACES}):[\\w-]+[^>]*?/>`, "gi"), "")
+    // <rdf:RDF>...</rdf:RDF> and any other paired namespaced element.
+    .replace(
+      new RegExp(
+        `<(${EDITOR_NAMESPACES}):([\\w-]+)[^>]*>[\\s\\S]*?</\\1:\\2>`,
+        "gi",
+      ),
+      "",
+    )
+    .replace(/<metadata\b[^>]*>[\s\S]*?<\/metadata>/gi, "")
+    // The xmlns:* declarations, and then the attributes that used them.
+    .replace(new RegExp(`\\s+xmlns:(?:${EDITOR_NAMESPACES})="[^"]*"`, "gi"), "")
+    .replace(new RegExp(`\\s+(?:${EDITOR_NAMESPACES}):[\\w-]+="[^"]*"`, "gi"), "");
+
+  if (!/<svg:/i.test(result)) {
+    result = result.replace(/\s+xmlns:svg="[^"]*"/gi, "");
+  }
+
+  return result;
+}
+
 function sanitizeSvgXml(svgXml: string): string {
-  const cleaned = svgXml
+  const cleaned = stripEditorMetadata(svgXml)
     .replace(/^<\?xml[^>]*\?>/i, "")
     // Remove full DOCTYPE declarations, including internal subsets ([...]).
     .replace(/<!DOCTYPE[\s\S]*?(?:\]>|>)/gi, "")
@@ -229,7 +272,7 @@ const styles = StyleSheet.create({
   },
   svgWrapper: {
     maxWidth: "100%",
-    borderRadius: 28,
+    borderRadius: Radius.xl,
     overflow: "hidden",
     borderWidth: 1,
     alignItems: "center",
@@ -242,9 +285,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   fallbackText: {
-    color: "#A1A1AA",
-    fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    ...Type.caption,
     textAlign: "center",
   },
 });

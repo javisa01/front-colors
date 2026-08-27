@@ -1,6 +1,7 @@
 import convert from "color-convert";
 
 import type { ChallengeMetadata, HSVColor } from "@/types/challenge";
+import { hsvToHexWorklet } from "@/utils/colorWorklets";
 
 export function hueDistance(a: number, b: number): number {
   const diff = Math.abs(a - b);
@@ -22,12 +23,20 @@ export function hsvToLab(hsv: HSVColor): [number, number, number] {
   return [l, a, b];
 }
 
+/**
+ * HSV → hexadecimal.
+ *
+ * Delega en la implementación de `colorWorklets.ts` para que el color que pinta
+ * el selector en el hilo de UI y el que se dibuja en el logo sean el mismo byte
+ * a byte. Con dos conversiones distintas —una aquí y otra en el picker— el
+ * pulgar y el logo podían acabar en tonos ligeramente distintos, que es la
+ * clase de desajuste de un píxel que delata a una aplicación descuidada.
+ *
+ * A diferencia de `convert.hsv.rgb`, acepta H, S y V fraccionarios sin
+ * redondearlos antes de tiempo.
+ */
 export function hsvToHex(h: number, s: number, v: number): string {
-  const [r, g, b] = convert.hsv.rgb([h, s, v]);
-  return `#${[r, g, b]
-    .map((value) => value.toString(16).padStart(2, "0"))
-    .join("")
-    .toUpperCase()}`;
+  return hsvToHexWorklet(h, s, v);
 }
 
 export function normalizeHex(hex: string): string {

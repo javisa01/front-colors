@@ -1,6 +1,8 @@
 import * as Haptics from "expo-haptics";
 import { Platform } from "react-native";
 
+import { isHit } from "@/utils/colorScore";
+
 // Haptics are a native-only nicety. On web the module is a no-op, but we still
 // guard every call so a missing/older engine can never throw during play.
 
@@ -54,7 +56,7 @@ export function notify(
 export function feedbackForScore(score: number): void {
   if (score >= 90) {
     notify("success");
-  } else if (score >= 60) {
+  } else if (isHit(score)) {
     impact("medium");
   } else {
     impact("light");

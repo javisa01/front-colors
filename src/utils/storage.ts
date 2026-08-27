@@ -7,8 +7,22 @@ import type { GameMode } from "@/types/challenge";
 // way.
 const PREFIX = "colorquest:v1:";
 
+/**
+ * Sufijo de la clave del récord cuando un modo cambia de escala de puntuación.
+ *
+ * El contrarreloj puntuaba sumando la precisión cruda de ocho intentos —hasta
+ * 800—, y ahora puntúa con penalización y sin límite de imágenes, donde una
+ * buena partida ronda los cien puntos. Sin estrenar clave, el récord guardado
+ * con las reglas viejas se quedaría arriba para siempre y ninguna partida nueva
+ * podría batirlo.
+ */
+const SCORING_SCHEME: Partial<Record<GameMode, string>> = {
+  timed: ":pts",
+};
+
 const KEYS = {
-  highScore: (mode: GameMode) => `${PREFIX}highscore:${mode}`,
+  highScore: (mode: GameMode) =>
+    `${PREFIX}highscore:${mode}${SCORING_SCHEME[mode] ?? ""}`,
   bestStreak: (mode: GameMode) => `${PREFIX}beststreak:${mode}`,
   progress: `${PREFIX}progress`,
   dailyResult: `${PREFIX}daily`,

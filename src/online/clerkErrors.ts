@@ -79,9 +79,33 @@ export interface ClerkFailure {
   field?: ClerkField;
 }
 
+/**
+ * Vuelca lo que se pueda de un error desconocido. `JSON.stringify` de un
+ * `Error` da `{}`, así que hay que sacar `name`/`message`/`cause` a mano.
+ */
+function rawDetail(error: unknown): string {
+  if (error instanceof Error) {
+    const cause = error.cause === undefined ? "" : ` | cause: ${String(error.cause)}`;
+    return `${error.name}: ${error.message}${cause}`;
+  }
+  try {
+    return JSON.stringify(error);
+  } catch {
+    return String(error);
+  }
+}
+
 export function describeClerkError(error: unknown): ClerkFailure {
   if (!isCodedError(error)) {
     // Sin respuesta de Clerk: casi siempre es la red o una clave mal puesta.
+    //
+    // Esta rama descarta el error entero para quedarse con un texto genérico,
+    // y sin esto un fallo de red, una clave de otra instancia y un dominio
+    // inalcanzable son indistinguibles desde la UI. En desarrollo se vuelca
+    // antes de perderlo; en release no se registra nada.
+    if (__DEV__) {
+      console.error("[clerk] error sin código:", rawDetail(error), error);
+    }
     return { message: t("online.error.network") };
   }
 

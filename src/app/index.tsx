@@ -1,430 +1,76 @@
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import type { ReactElement } from "react";
-import { useEffect, useState } from "react";
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from "react-native";
-import Animated, {
-  Easing,
-  FadeInDown,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
-} from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { StyleSheet, Text, View } from "react-native";
 
-import { SettingsModal } from "@/components/SettingsModal";
+import { SettingsButton } from "@/components/SettingsButton";
+import { AmbientOrbs } from "@/design/Ambient";
+import { OptionRow, Screen } from "@/design/Layout";
+import { Space, Type } from "@/design/tokens";
 import { t } from "@/i18n";
-import { playTick } from "@/utils/sound";
 
+/**
+ * Portada: elegir entre jugar sin conexión o en línea.
+ *
+ * Es la única pantalla con fondo animado. Aquí el adorno se gana el sitio
+ * porque no hay nada que hacer todavía —dos opciones y punto—, y porque es lo
+ * primero que se ve al abrir la app. En cuanto empieza el juego desaparece: un
+ * fondo que respira detrás de una rueda de color sería ruido compitiendo con lo
+ * único que el jugador tiene que mirar.
+ */
 export default function LandingScreen(): ReactElement {
-  const { width } = useWindowDimensions();
   const router = useRouter();
 
-  const isTablet = width >= 768;
-  const [settingsVisible, setSettingsVisible] = useState(false);
-
-  const glow = useSharedValue(0);
-  const float = useSharedValue(0);
-
-  useEffect(() => {
-    glow.value = withRepeat(
-      withTiming(1, { duration: 2600, easing: Easing.inOut(Easing.quad) }),
-      -1,
-      true,
-    );
-
-    float.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 2200, easing: Easing.inOut(Easing.quad) }),
-        withTiming(0, { duration: 2200, easing: Easing.inOut(Easing.quad) }),
-      ),
-      -1,
-      false,
-    );
-  }, [float, glow]);
-
-  const orbOneStyle = useAnimatedStyle(() => ({
-    opacity: 0.35 + glow.value * 0.35,
-    transform: [
-      { translateY: -float.value * 18 },
-      { scale: 1 + glow.value * 0.08 },
-    ],
-  }));
-
-  const orbTwoStyle = useAnimatedStyle(() => ({
-    opacity: 0.3 + (1 - glow.value) * 0.35,
-    transform: [
-      { translateY: float.value * 22 },
-      { scale: 1 + (1 - glow.value) * 0.1 },
-    ],
-  }));
-
-  const badgeStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: -float.value * 6 }],
-  }));
-
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <LinearGradient
-        colors={["#09090B", "#0A0A0D", "#09090B"]}
-        style={styles.background}
-      >
-        <Pressable
-          onPress={() => {
-            playTick();
-            setSettingsVisible(true);
-          }}
-          style={styles.gear}
-          hitSlop={12}
-          accessibilityRole="button"
-          accessibilityLabel={t("settings.title")}
-        >
-          <Text style={styles.gearText}>⚙️</Text>
-        </Pressable>
-
-        <Animated.View
-          pointerEvents="none"
-          style={[styles.orb, styles.orbOne, orbOneStyle]}
-        >
-          <LinearGradient
-            colors={["#3B82F6", "#2563EB"]}
-            style={styles.orbFill}
-          />
-        </Animated.View>
-
-        <Animated.View
-          pointerEvents="none"
-          style={[styles.orb, styles.orbTwo, orbTwoStyle]}
-        >
-          <LinearGradient
-            colors={["#EC4899", "#BE185D"]}
-            style={styles.orbFill}
-          />
-        </Animated.View>
-
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-          overScrollMode="never"
-        >
-          <View style={styles.shell}>
-            <Animated.View
-              entering={FadeInDown.duration(500)}
-              style={styles.header}
-            >
-              <Animated.View style={[styles.badge, badgeStyle]}>
-                <Text style={styles.badgeText}>{t("landing.badge")}</Text>
-              </Animated.View>
-
-              <Text style={styles.title}>{t("landing.title")}</Text>
-              <Text style={styles.subtitle}>{t("landing.subtitle")}</Text>
-            </Animated.View>
-
-            <View
-              style={[
-                styles.modes,
-                isTablet ? styles.modesTablet : styles.modesPhone,
-              ]}
-            >
-              <Animated.View
-                entering={FadeInDown.delay(120).duration(520)}
-                style={[
-                  styles.modeWrapper,
-                  isTablet && styles.modeWrapperTablet,
-                ]}
-              >
-                <Pressable
-                  onPress={() => {
-                    playTick();
-                    router.push("/offline");
-                  }}
-                  style={({ pressed }) => [
-                    styles.modeCard,
-                    pressed && styles.modeCardPressed,
-                  ]}
-                  accessibilityRole="button"
-                  accessibilityLabel={t("landing.offline.title")}
-                >
-                  <View style={styles.modeRow}>
-                    <LinearGradient
-                      colors={["#10B981", "#047857"]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                      style={styles.modeIcon}
-                    >
-                      <Text style={styles.modeEmoji}>📶</Text>
-                    </LinearGradient>
-
-                    <View style={styles.modeTextGroup}>
-                      <Text style={styles.modeTitle}>
-                        {t("landing.offline.title")}
-                      </Text>
-                      <Text style={styles.modeDescription}>
-                        {t("landing.offline.description")}
-                      </Text>
-                    </View>
-
-                    <Text style={styles.modeArrow}>›</Text>
-                  </View>
-                </Pressable>
-              </Animated.View>
-
-              <Animated.View
-                entering={FadeInDown.delay(230).duration(520)}
-                style={[
-                  styles.modeWrapper,
-                  isTablet && styles.modeWrapperTablet,
-                ]}
-              >
-                <Pressable
-                  onPress={() => {
-                    playTick();
-                    router.push("/online");
-                  }}
-                  style={({ pressed }) => [
-                    styles.modeCard,
-                    pressed && styles.modeCardPressed,
-                  ]}
-                  accessibilityRole="button"
-                  accessibilityLabel={t("landing.online.title")}
-                >
-                  <View style={styles.modeRow}>
-                    <LinearGradient
-                      colors={["#3B82F6", "#2563EB"]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                      style={styles.modeIcon}
-                    >
-                      <Text style={styles.modeEmoji}>🌐</Text>
-                    </LinearGradient>
-
-                    <View style={styles.modeTextGroup}>
-                      <Text style={styles.modeTitle}>
-                        {t("landing.online.title")}
-                      </Text>
-                      <Text style={styles.modeDescription}>
-                        {t("landing.online.description")}
-                      </Text>
-                      <Text style={styles.lockedHint}>
-                        🌍 {t("landing.online.locked")}
-                      </Text>
-                    </View>
-
-                    <Text style={styles.modeArrow}>›</Text>
-                  </View>
-                </Pressable>
-              </Animated.View>
-            </View>
-
-            <Animated.Text
-              entering={FadeInDown.delay(340).duration(520)}
-              style={styles.footerHint}
-            >
-              {t("landing.footer")}
-            </Animated.Text>
-          </View>
-        </ScrollView>
-        <SettingsModal
-          isVisible={settingsVisible}
-          onClose={() => setSettingsVisible(false)}
+    <Screen
+      eyebrow={t("landing.badge")}
+      title={t("landing.title")}
+      subtitle={t("landing.subtitle")}
+      backdrop={<AmbientOrbs />}
+      headerAction={<SettingsButton />}
+      contentStyle={styles.content}
+    >
+      <View style={styles.options}>
+        <OptionRow
+          icon="wifiOff"
+          tone="teal"
+          title={t("landing.offline.title")}
+          description={t("landing.offline.description")}
+          onPress={() => router.push("/offline")}
+          enterDelay={40}
         />
-      </LinearGradient>
-    </SafeAreaView>
+
+        <OptionRow
+          icon="globe"
+          tone="blue"
+          title={t("landing.online.title")}
+          description={t("landing.online.description")}
+          note={t("landing.online.locked")}
+          onPress={() => router.push("/online")}
+          enterDelay={100}
+        />
+      </View>
+
+      {/*
+        La nota del pie se queda quieta: es texto para leer, y un texto que se
+        mueve mientras lo lees molesta más de lo que aporta el adorno. El fondo
+        ya se encarga de que la portada no parezca congelada.
+      */}
+      <Text style={[Type.caption, styles.footer]}>{t("landing.footer")}</Text>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#09090B",
-  },
-  background: {
-    flex: 1,
-    overflow: "hidden",
-  },
-  gear: {
-    position: "absolute",
-    top: 12,
-    right: 16,
-    zIndex: 10,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#18181B",
-    borderWidth: 1,
-    borderColor: "#27272A",
-    alignItems: "center",
+  content: {
+    // La portada tiene poco contenido, así que se centra verticalmente en lugar
+    // de quedar pegada arriba con un hueco muerto debajo.
     justifyContent: "center",
   },
-  gearText: {
-    fontSize: 20,
+  options: {
+    gap: Space.md,
   },
-  orb: {
-    position: "absolute",
-    width: 320,
-    height: 320,
-    borderRadius: 320,
-  },
-  orbFill: {
-    flex: 1,
-    borderRadius: 320,
-  },
-  orbOne: {
-    top: -120,
-    right: -110,
-  },
-  orbTwo: {
-    bottom: -140,
-    left: -120,
-  },
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  shell: {
-    flexGrow: 1,
-    width: "100%",
-    maxWidth: 720,
-    alignSelf: "center",
-    paddingHorizontal: 22,
-    paddingTop: 24,
-    paddingBottom: 32,
-    justifyContent: "center",
-  },
-  header: {
-    marginBottom: 28,
-  },
-  badge: {
-    alignSelf: "flex-start",
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 999,
-    backgroundColor: "#18181B",
-    borderWidth: 1,
-    borderColor: "#27272A",
-    marginBottom: 18,
-  },
-  badgeText: {
-    color: "#E4E4E7",
-    fontSize: 13,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-    fontFamily: "System",
-  },
-  title: {
-    color: "#FFFFFF",
-    fontSize: 38,
-    lineHeight: 44,
-    fontWeight: "800",
-    fontFamily: "System",
-  },
-  subtitle: {
-    marginTop: 12,
-    color: "#A1A1AA",
-    fontSize: 15,
-    lineHeight: 22,
-    fontFamily: "System",
-    maxWidth: 460,
-  },
-  modes: {
-    width: "100%",
-  },
-  modesPhone: {
-    flexDirection: "column",
-  },
-  modesTablet: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  modeWrapper: {
-    marginBottom: 14,
-  },
-  modeWrapperTablet: {
-    width: "48.5%",
-  },
-  modeCard: {
-    borderRadius: 24,
-    padding: 18,
-    backgroundColor: "#18181B",
-    borderWidth: 1,
-    borderColor: "#27272A",
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 18,
-    shadowOffset: {
-      width: 0,
-      height: 12,
-    },
-    elevation: 6,
-  },
-  modeCardPressed: {
-    opacity: 0.92,
-    transform: [{ scale: 0.99 }],
-    borderColor: "#3B82F6",
-  },
-  modeRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  modeIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 14,
-  },
-  modeEmoji: {
-    fontSize: 24,
-  },
-  modeTextGroup: {
-    flex: 1,
-  },
-  modeTitle: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "800",
-    fontFamily: "System",
-  },
-  modeDescription: {
-    marginTop: 4,
-    color: "#A1A1AA",
-    fontSize: 13,
-    lineHeight: 19,
-    fontFamily: "System",
-  },
-  lockedHint: {
-    marginTop: 8,
-    color: "#71717A",
-    fontSize: 12,
-    fontWeight: "600",
-    fontFamily: "System",
-  },
-  modeArrow: {
-    color: "#52525B",
-    fontSize: 28,
-    fontWeight: "300",
-    marginLeft: 10,
-  },
-  footerHint: {
-    marginTop: 12,
-    color: "#52525B",
-    fontSize: 13,
+  footer: {
+    marginTop: Space.xxl,
     textAlign: "center",
-    fontFamily: "System",
   },
 });

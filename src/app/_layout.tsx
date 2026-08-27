@@ -5,6 +5,7 @@ import { StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { Color } from "@/design/tokens";
 import { setMusicVolume, startMusic } from "@/utils/music";
 import { setSfxVolume } from "@/utils/sound";
 import {
@@ -34,11 +35,17 @@ export default function RootLayout() {
     <GestureHandlerRootView style={styles.flex}>
       <SafeAreaProvider>
         <View style={styles.shell}>
-          <StatusBar style="light" translucent backgroundColor="#09090B" />
+          {/*
+            `translucent` dejó de existir en el StatusBar de Expo 57 y estaba
+            provocando un error de TypeScript en `main`. El fondo lo pinta ya el
+            contenedor, así que la barra solo necesita declarar que sus iconos
+            van en claro.
+          */}
+          <StatusBar style="light" />
           <Stack
             screenOptions={{
               headerShown: false,
-              contentStyle: { backgroundColor: "#09090B" },
+              contentStyle: { backgroundColor: Color.surface.canvas },
               animation: "slide_from_right",
             }}
           >
@@ -61,6 +68,6 @@ const styles = StyleSheet.create({
   },
   shell: {
     flex: 1,
-    backgroundColor: "#09090B",
+    backgroundColor: Color.surface.canvas,
   },
 });

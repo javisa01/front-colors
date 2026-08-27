@@ -1,52 +1,48 @@
-import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect, useRouter } from "expo-router";
 import type { ReactElement } from "react";
 import { useCallback, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import { StyleSheet, Text, View } from "react-native";
 
 import { describeError } from "@/api/errors";
 import type { FriendsOverview, MyRanking } from "@/api/types";
-import {
-  Avatar,
-  Card,
-  ErrorBanner,
-  Pill,
-  ProgressBar,
-} from "@/components/online/Controls";
-import { OnlineScreen } from "@/components/online/Screen";
-import { OnlineGradients, OnlinePalette } from "@/components/online/theme";
+import { SettingsButton } from "@/components/SettingsButton";
+import { Avatar } from "@/design/Avatar";
+import { ErrorBanner, Pill, ProgressBar, Stat } from "@/design/Feedback";
+import type { IconName } from "@/design/Icon";
+import { Card, Divider, OptionRow, Screen } from "@/design/Layout";
+import { AmbientOrbs } from "@/design/Ambient";
+import { Color, Space, Type, type SpectrumTone } from "@/design/tokens";
 import { t, type TranslationKey } from "@/i18n";
 import { useSession } from "@/online/session";
-import { playTick } from "@/utils/sound";
+
+/**
+ * Punto de entrada del modo online: quién eres y a dónde puedes ir.
+ *
+ * Las tres entradas son la misma `OptionRow` que usan la portada y el menú
+ * offline. Antes cada una llevaba su emoji sobre un degradado propio —azul,
+ * verde, dorado—, así que la lista tenía tres colores fuertes que no
+ * significaban nada y no se parecía a ninguna otra lista de la aplicación.
+ */
 
 interface HubEntry {
   key: "profile" | "friends" | "leaderboard";
   route: "/online/profile" | "/online/friends" | "/online/leaderboard";
-  emoji: string;
-  colors: readonly [string, string];
+  icon: IconName;
+  tone: SpectrumTone;
 }
 
 const ENTRIES: HubEntry[] = [
-  {
-    key: "profile",
-    route: "/online/profile",
-    emoji: "👤",
-    colors: OnlineGradients.accent,
-  },
-  {
-    key: "friends",
-    route: "/online/friends",
-    emoji: "🤝",
-    colors: OnlineGradients.success,
-  },
+  { key: "profile", route: "/online/profile", icon: "user", tone: "violet" },
+  { key: "friends", route: "/online/friends", icon: "users", tone: "green" },
   {
     key: "leaderboard",
     route: "/online/leaderboard",
-    emoji: "🏆",
-    colors: OnlineGradients.gold,
+    icon: "trophy",
+    tone: "amber",
   },
 ];
+
+const STAGGER_MS = 45;
 
 export default function OnlineHubScreen(): ReactElement {
   const { user, api, reloadUser } = useSession();
@@ -99,12 +95,13 @@ export default function OnlineHubScreen(): ReactElement {
   };
 
   return (
-    <OnlineScreen
-      badge={t("online.hub.badge")}
+    <Screen
+      eyebrow={t("online.hub.badge")}
       title={t("online.hub.title")}
       subtitle={t("online.hub.subtitle")}
       backTo="/"
-      backLabel={t("common.back")}
+      backdrop={<AmbientOrbs />}
+      headerAction={<SettingsButton />}
       onRefresh={refresh}
       refreshing={refreshing}
     >
@@ -117,311 +114,138 @@ export default function OnlineHubScreen(): ReactElement {
       ) : null}
 
       {user ? (
-        <Animated.View entering={FadeInDown.delay(80).duration(460)}>
-          <Card>
-            <View style={styles.identityRow}>
-              <Avatar username={user.username} size={54} />
-              <View style={styles.identityText}>
-                <Text style={styles.username}>{user.username}</Text>
-                <Text style={styles.email}>{user.email}</Text>
-              </View>
-              <Pill label={t("online.level", { level: user.level })} tone="accent" />
+        <Card enterDelay={0} style={styles.identityCard}>
+          <View style={styles.identityRow}>
+            <Avatar username={user.username} size={52} />
+            <View style={styles.identityText}>
+              <Text style={Type.heading} numberOfLines={1}>
+                {user.username}
+              </Text>
+              <Text style={Type.caption} numberOfLines={1}>
+                {user.email}
+              </Text>
             </View>
+            <Pill label={t("online.level", { level: user.level })} tone="accent" />
+          </View>
 
-            <View style={styles.progressBlock}>
-              <View style={styles.progressLabels}>
-                <Text style={styles.progressLabel}>
-                  {t("online.xp", { xp: user.xp })}
-                </Text>
-                <Text style={styles.progressLabel}>
-                  {t("online.xpToNext", { xp: user.progress.xpToNextLevel })}
-                </Text>
-              </View>
-              <ProgressBar value={user.progress.progress} />
+          <View style={styles.progressBlock}>
+            <View style={styles.progressLabels}>
+              <Text style={Type.metricSmall}>
+                {t("online.xp", { xp: user.xp })}
+              </Text>
+              <Text style={Type.caption}>
+                {t("online.xpToNext", { xp: user.progress.xpToNextLevel })}
+              </Text>
             </View>
+            <ProgressBar value={user.progress.progress} />
+          </View>
 
-            <View style={styles.statsRow}>
-              <Stat
-                label={t("online.hub.globalRank")}
-                value={
-                  ranking?.global.position
-                    ? `#${ranking.global.position}`
-                    : "—"
-                }
-                hint={
-                  ranking
-                    ? t("online.hub.ofPlayers", { total: ranking.global.total })
-                    : undefined
-                }
-              />
-              <View style={styles.statDivider} />
-              <Stat
-                label={t("online.hub.friendsRank")}
-                value={
-                  ranking?.friends.position
-                    ? `#${ranking.friends.position}`
-                    : "—"
-                }
-                hint={
-                  friends
-                    ? t("online.hub.friendCount", {
-                        count: friends.friends.length,
-                      })
-                    : undefined
-                }
-              />
-            </View>
-          </Card>
-        </Animated.View>
+          <Divider style={styles.divider} />
+
+          <View style={styles.statsRow}>
+            <Stat
+              label={t("online.hub.globalRank")}
+              value={
+                ranking?.global.position ? `#${ranking.global.position}` : "—"
+              }
+              hint={
+                ranking
+                  ? t("online.hub.ofPlayers", { total: ranking.global.total })
+                  : undefined
+              }
+            />
+            <View style={styles.statDivider} />
+            <Stat
+              label={t("online.hub.friendsRank")}
+              value={
+                ranking?.friends.position ? `#${ranking.friends.position}` : "—"
+              }
+              hint={
+                friends
+                  ? t("online.hub.friendCount", {
+                      count: friends.friends.length,
+                    })
+                  : undefined
+              }
+            />
+          </View>
+        </Card>
       ) : null}
 
-      {ENTRIES.map((entry, index) => {
-        const badge = badgeFor(entry.key);
+      <View style={styles.entries}>
+        {ENTRIES.map((entry, index) => {
+          const badge = badgeFor(entry.key);
 
-        return (
-          <Animated.View
-            key={entry.key}
-            entering={FadeInDown.delay(150 + index * 80).duration(460)}
-          >
-            <Pressable
-              onPress={() => {
-                playTick();
-                router.push(entry.route);
-              }}
-              style={({ pressed }) => [
-                styles.entryCard,
-                pressed && styles.entryCardPressed,
-              ]}
-              accessibilityRole="button"
-              accessibilityLabel={t(`online.hub.${entry.key}.title` as TranslationKey)}
-            >
-              <View style={styles.entryRow}>
-                <LinearGradient
-                  colors={entry.colors}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.entryIcon}
-                >
-                  <Text style={styles.entryEmoji}>{entry.emoji}</Text>
-                </LinearGradient>
+          return (
+            <OptionRow
+              key={entry.key}
+              icon={entry.icon}
+              tone={entry.tone}
+              title={t(`online.hub.${entry.key}.title` as TranslationKey)}
+              description={t(
+                `online.hub.${entry.key}.description` as TranslationKey,
+              )}
+              badge={badge ? <Pill label={badge} tone="accent" /> : undefined}
+              onPress={() => router.push(entry.route)}
+              enterDelay={(index + 1) * STAGGER_MS}
+            />
+          );
+        })}
 
-                <View style={styles.entryTextGroup}>
-                  <View style={styles.entryTitleRow}>
-                    <Text style={styles.entryTitle}>
-                      {t(`online.hub.${entry.key}.title` as TranslationKey)}
-                    </Text>
-                    {badge ? <Pill label={badge} tone="accent" /> : null}
-                  </View>
-                  <Text style={styles.entryDescription}>
-                    {t(`online.hub.${entry.key}.description` as TranslationKey)}
-                  </Text>
-                </View>
-
-                <Text style={styles.entryArrow}>›</Text>
-              </View>
-            </Pressable>
-          </Animated.View>
-        );
-      })}
-
-      {/*
-        Las partidas en tiempo real viajan por Socket.IO, no por REST. La
-        tarjeta queda visible pero bloqueada para que se vea qué falta, igual
-        que hacía la pantalla de inicio con el propio modo online.
-      */}
-      <Animated.View entering={FadeInDown.delay(390).duration(460)}>
-        <View style={[styles.entryCard, styles.entryCardDisabled]}>
-          <View style={styles.entryRow}>
-            <LinearGradient
-              colors={["#52525B", "#3F3F46"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.entryIcon}
-            >
-              <Text style={styles.entryEmoji}>⚔️</Text>
-            </LinearGradient>
-
-            <View style={styles.entryTextGroup}>
-              <View style={styles.entryTitleRow}>
-                <Text style={styles.entryTitle}>
-                  {t("online.hub.match.title")}
-                </Text>
-                <Pill label={t("landing.soon")} />
-              </View>
-              <Text style={styles.entryDescription}>
-                {t("online.hub.match.description")}
-              </Text>
-              <Text style={styles.lockedHint}>
-                🔒 {t("online.hub.match.locked")}
-              </Text>
-            </View>
-          </View>
-        </View>
-      </Animated.View>
-    </OnlineScreen>
-  );
-}
-
-function Stat({
-  label,
-  value,
-  hint,
-}: {
-  label: string;
-  value: string;
-  hint?: string;
-}): ReactElement {
-  return (
-    <View style={styles.stat}>
-      <Text style={styles.statLabel}>{label}</Text>
-      <Text style={styles.statValue}>{value}</Text>
-      {hint ? <Text style={styles.statHint}>{hint}</Text> : null}
-    </View>
+        {/*
+          Las partidas en tiempo real viajan por Socket.IO, no por REST. La fila
+          queda visible pero desactivada para que se vea qué falta, igual que la
+          portada hacía con el propio modo online.
+        */}
+        <OptionRow
+          icon="swords"
+          title={t("online.hub.match.title")}
+          description={t("online.hub.match.description")}
+          badge={<Pill label={t("landing.soon")} />}
+          note={t("online.hub.match.locked")}
+          onPress={() => undefined}
+          disabled
+          enterDelay={(ENTRIES.length + 1) * STAGGER_MS}
+        />
+      </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  identityCard: {
+    marginBottom: Space.xxl,
+  },
   identityRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
+    gap: Space.md,
   },
   identityText: {
     flex: 1,
-  },
-  username: {
-    color: OnlinePalette.text,
-    fontSize: 20,
-    fontWeight: "800",
-    fontFamily: "System",
-  },
-  email: {
-    marginTop: 3,
-    color: OnlinePalette.textFaint,
-    fontSize: 13,
-    fontFamily: "System",
+    gap: Space.xxs,
   },
   progressBlock: {
-    marginTop: 18,
+    marginTop: Space.xl,
   },
   progressLabels: {
     flexDirection: "row",
+    alignItems: "baseline",
     justifyContent: "space-between",
-    marginBottom: 8,
+    marginBottom: Space.sm,
   },
-  progressLabel: {
-    color: OnlinePalette.textMuted,
-    fontSize: 12,
-    fontWeight: "700",
-    fontFamily: "System",
-    fontVariant: ["tabular-nums"],
+  divider: {
+    marginTop: Space.xl,
   },
   statsRow: {
     flexDirection: "row",
     alignItems: "stretch",
-    marginTop: 18,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: OnlinePalette.border,
-  },
-  stat: {
-    flex: 1,
-    alignItems: "center",
   },
   statDivider: {
     width: 1,
-    backgroundColor: OnlinePalette.border,
+    backgroundColor: Color.border.subtle,
   },
-  statLabel: {
-    color: OnlinePalette.textFaint,
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 0.8,
-    textTransform: "uppercase",
-    fontFamily: "System",
-  },
-  statValue: {
-    marginTop: 6,
-    color: OnlinePalette.text,
-    fontSize: 22,
-    fontWeight: "800",
-    fontFamily: "System",
-    fontVariant: ["tabular-nums"],
-  },
-  statHint: {
-    marginTop: 3,
-    color: OnlinePalette.textDim,
-    fontSize: 11,
-    fontFamily: "System",
-  },
-  entryCard: {
-    borderRadius: 24,
-    padding: 18,
-    backgroundColor: OnlinePalette.surface,
-    borderWidth: 1,
-    borderColor: OnlinePalette.border,
-    marginBottom: 14,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 12 },
-    elevation: 6,
-  },
-  entryCardPressed: {
-    opacity: 0.92,
-    transform: [{ scale: 0.99 }],
-    borderColor: OnlinePalette.accent,
-  },
-  entryCardDisabled: {
-    opacity: 0.7,
-  },
-  entryRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  entryIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 14,
-  },
-  entryEmoji: {
-    fontSize: 24,
-  },
-  entryTextGroup: {
-    flex: 1,
-  },
-  entryTitleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  entryTitle: {
-    color: OnlinePalette.text,
-    fontSize: 18,
-    fontWeight: "800",
-    fontFamily: "System",
-  },
-  entryDescription: {
-    marginTop: 4,
-    color: OnlinePalette.textMuted,
-    fontSize: 13,
-    lineHeight: 19,
-    fontFamily: "System",
-  },
-  lockedHint: {
-    marginTop: 8,
-    color: OnlinePalette.textFaint,
-    fontSize: 12,
-    fontWeight: "600",
-    fontFamily: "System",
-  },
-  entryArrow: {
-    color: OnlinePalette.textDim,
-    fontSize: 28,
-    fontWeight: "300",
-    marginLeft: 10,
+  entries: {
+    gap: Space.md,
   },
 });

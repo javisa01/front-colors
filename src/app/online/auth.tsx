@@ -4,34 +4,21 @@ import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 import type { ReactElement } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from "react-native";
 
-import {
-  Card,
-  ErrorBanner,
-  Field,
-  GhostButton,
-  PrimaryButton,
-} from "@/components/online/Controls";
-import { OnlineScreen } from "@/components/online/Screen";
-import { OnlinePalette } from "@/components/online/theme";
+import { Button } from "@/design/Button";
+import { ErrorBanner } from "@/design/Feedback";
+import { Field, Notice, OrDivider, SegmentedControl } from "@/design/Form";
+import { Card, Screen } from "@/design/Layout";
+import { Color, Space, Type } from "@/design/tokens";
 import { t } from "@/i18n";
 import { describeClerkError, type ClerkField } from "@/online/clerkErrors";
-import { playTick } from "@/utils/sound";
 
 /**
  * Alta y acceso de jugadores, contra Clerk.
  *
- * La UI es la misma de siempre (pestañas, `Card`, `Field`) pero por debajo ya
- * no habla con `back-colors`: `useSignIn` / `useSignUp` crean la sesión en
- * Clerk y el backend solo verá después el token. Por eso aquí no se llama a
+ * La lógica es la misma de siempre: `useSignIn` / `useSignUp` crean la sesión en
+ * Clerk y el backend solo verá después el token, así que aquí no se llama a
  * ningún endpoint propio.
  *
  * El nombre de jugador NO es el identificador de Clerk: viaja en
@@ -90,9 +77,10 @@ export default function AuthScreen(): ReactElement {
     setNotice(null);
   }, []);
 
+  // El sonido y el háptico los pone el control que se ha pulsado, no esta
+  // función: es la regla del sistema de diseño y evita el doble «tic».
   const switchStep = useCallback(
     (next: Step) => {
-      playTick();
       setStep(next);
       clearMessages();
     },
@@ -310,33 +298,27 @@ export default function AuthScreen(): ReactElement {
         : t("online.auth.register");
 
   return (
-    <OnlineScreen
-      badge={t("online.auth.badge")}
+    <Screen
+      eyebrow={t("online.auth.badge")}
       title={headings.title}
       subtitle={headings.subtitle}
       backTo="/"
-      backLabel={t("common.back")}
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         {step === "verify" ? null : (
-          <View style={styles.tabs}>
-            <TabButton
-              label={t("online.auth.login")}
-              active={step === "login"}
-              onPress={() => switchStep("login")}
-            />
-            <TabButton
-              label={t("online.auth.register")}
-              active={step === "register"}
-              onPress={() => switchStep("register")}
-            />
-          </View>
+          <SegmentedControl
+            options={[
+              { value: "login", label: t("online.auth.login") },
+              { value: "register", label: t("online.auth.register") },
+            ]}
+            value={step}
+            onChange={switchStep}
+          />
         )}
 
         {formError ? <ErrorBanner message={formError} /> : null}
-        {notice ? <Text style={styles.notice}>✅ {notice}</Text> : null}
 
         {step === "verify" ? (
           <Card>
@@ -354,23 +336,21 @@ export default function AuthScreen(): ReactElement {
               onSubmitEditing={submit}
             />
 
-            <PrimaryButton
-              label={submitLabel}
-              onPress={submit}
-              loading={busy}
-            />
+            {notice ? <Notice message={notice} /> : null}
 
-            <View style={styles.secondaryRow}>
-              <GhostButton
+            <View style={styles.actions}>
+              <Button label={submitLabel} onPress={submit} loading={busy} />
+              <Button
                 label={t("online.auth.verify.resend")}
+                variant="secondary"
+                size="md"
                 onPress={() => void resendCode()}
                 disabled={busy}
-                tone="accent"
               />
-            </View>
-            <View style={styles.secondaryRow}>
-              <GhostButton
+              <Button
                 label={t("online.auth.verify.back")}
+                variant="ghost"
+                size="md"
                 onPress={() => switchStep("register")}
                 disabled={busy}
               />
@@ -387,6 +367,7 @@ export default function AuthScreen(): ReactElement {
                   placeholder={t("online.auth.usernamePlaceholder")}
                   hint={t("online.auth.usernameHint")}
                   error={fieldErrors.username}
+                  icon="user"
                   autoComplete="username-new"
                   maxLength={24}
                 />
@@ -413,6 +394,7 @@ export default function AuthScreen(): ReactElement {
                   step === "register" ? t("online.auth.passwordHint") : undefined
                 }
                 error={fieldErrors.password}
+                icon="lock"
                 secure
                 autoComplete={
                   step === "login" ? "current-password" : "new-password"
@@ -422,7 +404,7 @@ export default function AuthScreen(): ReactElement {
                 onSubmitEditing={submit}
               />
 
-              <PrimaryButton
+              <Button
                 label={submitLabel}
                 onPress={submit}
                 loading={busy}
@@ -430,16 +412,17 @@ export default function AuthScreen(): ReactElement {
               />
             </Card>
 
-            <View style={styles.separator}>
-              <View style={styles.separatorLine} />
-              <Text style={styles.separatorText}>{t("online.auth.or")}</Text>
-              <View style={styles.separatorLine} />
-            </View>
+            <OrDivider label={t("online.auth.or")} />
 
-            <Card>
-              <SocialButton
-                label={t("online.auth.google")}
-                emoji="🔵"
+            <View style={styles.social}>
+              <Button
+                label={
+                  ssoBusy === "oauth_google"
+                    ? t("online.auth.connecting")
+                    : t("online.auth.google")
+                }
+                icon="google"
+                variant="secondary"
                 loading={ssoBusy === "oauth_google"}
                 disabled={busy || ssoBusy !== null}
                 onPress={() => void signInWith("oauth_google")}
@@ -449,216 +432,70 @@ export default function AuthScreen(): ReactElement {
                 proveedores sociales, y en Android su flujo web no aporta nada.
               */}
               {Platform.OS === "ios" ? (
-                <View style={styles.secondaryRow}>
-                  <SocialButton
-                    label={t("online.auth.apple")}
-                    emoji="🍎"
-                    loading={ssoBusy === "oauth_apple"}
-                    disabled={busy || ssoBusy !== null}
-                    onPress={() => void signInWith("oauth_apple")}
-                  />
-                </View>
+                <Button
+                  label={
+                    ssoBusy === "oauth_apple"
+                      ? t("online.auth.connecting")
+                      : t("online.auth.apple")
+                  }
+                  icon="apple"
+                  variant="secondary"
+                  loading={ssoBusy === "oauth_apple"}
+                  disabled={busy || ssoBusy !== null}
+                  onPress={() => void signInWith("oauth_apple")}
+                />
               ) : null}
-            </Card>
+            </View>
 
-            <Text style={styles.footer}>
-              {step === "login"
-                ? t("online.auth.switchToRegister")
-                : t("online.auth.switchToLogin")}{" "}
-              <Text
-                style={styles.footerLink}
+            <View style={styles.footer}>
+              <Text style={Type.caption}>
+                {step === "login"
+                  ? t("online.auth.switchToRegister")
+                  : t("online.auth.switchToLogin")}
+              </Text>
+              <Button
+                label={
+                  step === "login"
+                    ? t("online.auth.register")
+                    : t("online.auth.login")
+                }
+                variant="ghost"
+                size="md"
+                fullWidth={false}
                 onPress={() =>
                   switchStep(step === "login" ? "register" : "login")
                 }
-              >
-                {step === "login"
-                  ? t("online.auth.register")
-                  : t("online.auth.login")}
-              </Text>
-            </Text>
+              />
+            </View>
 
-            <Text style={styles.offlineNote}>{t("online.auth.offlineNote")}</Text>
+            <Text style={[Type.caption, styles.offlineNote]}>
+              {t("online.auth.offlineNote")}
+            </Text>
           </>
         )}
       </KeyboardAvoidingView>
-    </OnlineScreen>
-  );
-}
-
-function TabButton({
-  label,
-  active,
-  onPress,
-}: {
-  label: string;
-  active: boolean;
-  onPress: () => void;
-}): ReactElement {
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.tab,
-        active && styles.tabActive,
-        pressed && styles.tabPressed,
-      ]}
-      accessibilityRole="tab"
-      accessibilityState={{ selected: active }}
-      accessibilityLabel={label}
-    >
-      <Text style={[styles.tabText, active && styles.tabTextActive]}>
-        {label}
-      </Text>
-    </Pressable>
-  );
-}
-
-function SocialButton({
-  label,
-  emoji,
-  onPress,
-  loading,
-  disabled,
-}: {
-  label: string;
-  emoji: string;
-  onPress: () => void;
-  loading: boolean;
-  disabled: boolean;
-}): ReactElement {
-  return (
-    <Pressable
-      onPress={() => {
-        if (disabled) {
-          return;
-        }
-        playTick();
-        onPress();
-      }}
-      style={({ pressed }) => [
-        styles.social,
-        pressed && !disabled && styles.socialPressed,
-        disabled && styles.socialDisabled,
-      ]}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      accessibilityState={{ disabled, busy: loading }}
-    >
-      <Text style={styles.socialEmoji}>{emoji}</Text>
-      <Text style={styles.socialText}>
-        {loading ? t("online.auth.connecting") : label}
-      </Text>
-    </Pressable>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  tabs: {
-    flexDirection: "row",
-    padding: 4,
-    borderRadius: 16,
-    backgroundColor: OnlinePalette.surface,
-    borderWidth: 1,
-    borderColor: OnlinePalette.border,
-    marginBottom: 16,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 11,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-  tabActive: {
-    backgroundColor: OnlinePalette.accentSurface,
-    borderWidth: 1,
-    borderColor: OnlinePalette.accent,
-  },
-  tabPressed: {
-    opacity: 0.8,
-  },
-  tabText: {
-    color: OnlinePalette.textMuted,
-    fontSize: 14,
-    fontWeight: "700",
-    fontFamily: "System",
-  },
-  tabTextActive: {
-    color: OnlinePalette.text,
-  },
-  notice: {
-    marginBottom: 14,
-    color: "#6EE7B7",
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily: "System",
-  },
-  secondaryRow: {
-    marginTop: 10,
-  },
-  separator: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    marginBottom: 14,
-  },
-  separatorLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: OnlinePalette.border,
-  },
-  separatorText: {
-    color: OnlinePalette.textDim,
-    fontSize: 12,
-    fontWeight: "700",
-    letterSpacing: 1,
-    textTransform: "uppercase",
-    fontFamily: "System",
+  actions: {
+    gap: Space.sm,
+    marginTop: Space.sm,
   },
   social: {
+    gap: Space.sm,
+  },
+  footer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
-    paddingVertical: 14,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: OnlinePalette.border,
-    backgroundColor: OnlinePalette.background,
-    minHeight: 52,
-  },
-  socialPressed: {
-    opacity: 0.75,
-    borderColor: OnlinePalette.accent,
-  },
-  socialDisabled: {
-    opacity: 0.45,
-  },
-  socialEmoji: {
-    fontSize: 17,
-  },
-  socialText: {
-    color: OnlinePalette.textSoft,
-    fontSize: 15,
-    fontWeight: "700",
-    fontFamily: "System",
-  },
-  footer: {
-    marginTop: 6,
-    color: OnlinePalette.textFaint,
-    fontSize: 13,
-    textAlign: "center",
-    fontFamily: "System",
-  },
-  footerLink: {
-    color: OnlinePalette.accentSoft,
-    fontWeight: "800",
+    gap: Space.xs,
+    marginTop: Space.lg,
   },
   offlineNote: {
-    marginTop: 22,
-    color: OnlinePalette.textDim,
-    fontSize: 12,
-    lineHeight: 18,
+    marginTop: Space.lg,
     textAlign: "center",
-    fontFamily: "System",
+    color: Color.text.faint,
   },
 });

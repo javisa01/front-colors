@@ -1,6 +1,18 @@
-import { t } from "@/i18n";
+import type { TranslationKey } from "@/i18n";
 import type { HSVColor } from "@/types/challenge";
 import { hsvToLab } from "@/utils/color";
+
+/**
+ * Este módulo es **puro a propósito**: no importa nada de React Native ni
+ * traduce cadenas, solo devuelve claves de traducción.
+ *
+ * El ROADMAP ya describía estas funciones como «puras y aisladas, listas para
+ * compartirse» con un futuro servidor, pero en realidad importaban `@/i18n`, que
+ * arrastra `expo-localization` y con él todo React Native. Por eso
+ * `tests/colorScore.test.ts` llevaba tiempo fallando: el runner no puede parsear
+ * el Flow de `react-native/index.js`. Devolver la clave y dejar que la pantalla
+ * llame a `t()` restaura la pureza que el documento daba por hecha.
+ */
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
@@ -154,6 +166,65 @@ export function calculateColorScore(
   return clamp(Math.round(score), 0, 100);
 }
 
+// ---------------------------------------------------------------------------
+// Acierto
+// ---------------------------------------------------------------------------
+
+/**
+ * Umbral de acierto, en precisión (0..100).
+ *
+ * Es la línea que la aplicación ya trazaba en tres sitios por separado: a partir
+ * de aquí `getScoreMessage` dice «buen intento», `scoreTone` abandona el rojo y
+ * `applyTimedBattlePenalty` empieza a sumar en vez de restar. Al sacarla a una
+ * constante pasa a haber una sola, y «acierto» significa lo mismo en el marcador
+ * de la partida, en la racha y en el resumen final.
+ *
+ * Antes no era así: los modos en grupo contaban como acierto **cualquier**
+ * intento enviado, y la racha del contrarreloj en solitario usaba su propio 70.
+ */
+export const HIT_THRESHOLD = 60;
+
+/** `true` si el intento cuenta como acierto. */
+export function isHit(accuracy: number): boolean {
+  return accuracy >= HIT_THRESHOLD;
+}
+
+/** Aciertos dentro de una tanda de precisiones. */
+export function countHits(accuracies: readonly number[]): number {
+  return accuracies.reduce(
+    (count, value) => (isHit(value) ? count + 1 : count),
+    0,
+  );
+}
+
+/**
+ * Racha viva: aciertos consecutivos contados desde el último intento hacia
+ * atrás. Un fallo la corta, que es justo lo que la hace significar algo.
+ */
+export function trailingStreak(accuracies: readonly number[]): number {
+  let streak = 0;
+  for (let index = accuracies.length - 1; index >= 0; index -= 1) {
+    if (!isHit(accuracies[index])) {
+      break;
+    }
+    streak += 1;
+  }
+  return streak;
+}
+
+/** Racha más larga alcanzada en la tanda. */
+export function longestStreak(accuracies: readonly number[]): number {
+  let best = 0;
+  let current = 0;
+  for (const value of accuracies) {
+    current = isHit(value) ? current + 1 : 0;
+    if (current > best) {
+      best = current;
+    }
+  }
+  return best;
+}
+
 export interface HSVDelta {
   h: number;
   s: number;
@@ -173,11 +244,12 @@ export function getHSVDelta(selected: HSVColor, target: HSVColor): HSVDelta {
   };
 }
 
-export function getScoreMessage(score: number): string {
-  if (score >= 100) return t("score.perfect");
-  if (score >= 90) return t("score.close");
-  if (score >= 60) return t("score.good");
-  return t("score.tryAgain");
+/** Clave del titular que corresponde a una puntuación. La traduce quien pinta. */
+export function getScoreMessage(score: number): TranslationKey {
+  if (score >= 100) return "score.perfect";
+  if (score >= 90) return "score.close";
+  if (isHit(score)) return "score.good";
+  return "score.tryAgain";
 }
 
 /**
@@ -224,23 +296,56 @@ export function summarizeRun(scores: readonly number[]): RunSummary {
   };
 }
 
-export function getRunMessage(average: number): string {
-  if (average >= 90) return t("run.artist");
-  if (average >= 75) return t("run.great");
-  if (average >= 55) return t("run.good");
-  return t("run.practice");
+/** Clave del titular de cierre de partida. La traduce quien pinta. */
+export function getRunMessage(average: number): TranslationKey {
+  if (average >= 90) return "run.artist";
+  if (average >= 75) return "run.great";
+  if (average >= 55) return "run.good";
+  return "run.practice";
 }
 
+/** Lo que vale un acierto solo por serlo, antes de premiar lo afinado que fue. */
+const HIT_BONUS = 20;
+
+/** Lo máximo que resta un fallo: el castigo de una precisión del 0 %. */
+const MAX_MISS_PENALTY = 15;
+
 /**
- * Converts a raw accuracy score (0..100) into a timed-battle score with
- * penalties for inaccurate guesses. Encourages quality over quantity:
+ * Puntos de un intento en un modo contrarreloj.
  *
- *   score < 60  → penalty  (0% → −90 pts, 40% → −30 pts)
- *   score ≥ 60  → reward, but capped lower than normal (60% → 0, 100% → +40 pts)
+ * La usan los tres: batalla, colaborativo y el de en solitario. Existe porque
+ * en cuanto una partida deja de tener un número fijo de imágenes, sumar la
+ * precisión cruda premia disparar rápido —hasta un color al azar saca veinte o
+ * treinta puntos—, así que fallar mucho y deprisa ganaría a acertar despacio.
+ *
+ * La curva anterior corregía eso pero se pasaba de largo: el acierto justo
+ * valía **0** y el perfecto +40, mientras que un fallo llegaba a −90. Un solo
+ * error se comía entre dos y nueve aciertos, y por eso una partida con cuatro
+ * aciertos podía terminar por debajo de otra con dos.
+ *
+ * La regla que lo mantiene coherente es que **el acierto más flojo (+20) vale
+ * más que el fallo más grave (−15)**: convertir un fallo en acierto siempre
+ * sale a favor, y arriesgar un intento de más renta mientras se acierte cerca
+ * de la mitad de las veces.
+ *
+ *   100 % → +60    60 % → +20    40 % → −5    0 % → −15
+ *
+ * Fallar sigue restando —un intento a ciegas nunca sale gratis— pero cuesta
+ * como mucho un acierto, no cinco. Afinar sigue valiendo: un 100 % da el triple
+ * que un 60 %, así que dos intentos clavados pueden con cuatro raspados.
  */
-export function applyTimedBattlePenalty(score: number): number {
-  if (score >= 60) {
-    return Math.round((score - 60) * 1.0);
+export function scoreTimedGuess(accuracy: number): number {
+  if (isHit(accuracy)) {
+    return Math.round(HIT_BONUS + (accuracy - HIT_THRESHOLD));
   }
-  return Math.round((score - 60) * 1.5);
+
+  // Rampa lineal: nada en el umbral, el castigo entero en el 0 %. El suelo de 1
+  // evita que quedarse a un punto del acierto salga literalmente gratis.
+  const shortfall = (HIT_THRESHOLD - accuracy) / HIT_THRESHOLD;
+  return -Math.max(1, Math.round(shortfall * MAX_MISS_PENALTY));
+}
+
+/** Puntos de una tanda contrarreloj: cada intento pasa por la misma curva. */
+export function timedRunPoints(accuracies: readonly number[]): number {
+  return accuracies.reduce((sum, value) => sum + scoreTimedGuess(value), 0);
 }

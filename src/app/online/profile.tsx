@@ -3,24 +3,25 @@ import { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { ApiError, describeError } from "@/api/errors";
-import {
-  Avatar,
-  Card,
-  ErrorBanner,
-  Field,
-  GhostButton,
-  Pill,
-  PrimaryButton,
-  ProgressBar,
-  SectionLabel,
-} from "@/components/online/Controls";
-import { OnlineScreen } from "@/components/online/Screen";
-import { OnlineGradients, OnlinePalette } from "@/components/online/theme";
+import { SettingsButton } from "@/components/SettingsButton";
+import { Avatar } from "@/design/Avatar";
+import { Button } from "@/design/Button";
+import { ErrorBanner, Pill, ProgressBar } from "@/design/Feedback";
+import { Field, InfoRow, Notice } from "@/design/Form";
+import { Card, Screen, SectionHeader } from "@/design/Layout";
+import { Space, Type } from "@/design/tokens";
 import { t } from "@/i18n";
 import { useSession } from "@/online/session";
 
 const USERNAME_PATTERN = /^[A-Za-z0-9_.-]+$/;
 
+/**
+ * Ficha del jugador: identidad, progreso y salida de sesión.
+ *
+ * El bloque de cuenta alterna entre lectura y edición en el mismo sitio, sin
+ * abrir un modal: solo hay un campo editable, y sacar una capa encima para
+ * cambiar una línea es más ceremonia de la que el cambio merece.
+ */
 export default function ProfileScreen(): ReactElement {
   const { user, api, applyUser, logout } = useSession();
 
@@ -90,51 +91,58 @@ export default function ProfileScreen(): ReactElement {
 
   if (!user) {
     return (
-      <OnlineScreen title={t("online.profile.title")} backTo="/online">
+      <Screen
+        title={t("online.profile.title")}
+        backTo="/online"
+        headerAction={<SettingsButton />}
+      >
         <ErrorBanner message={t("online.error.sessionExpired")} />
-      </OnlineScreen>
+      </Screen>
     );
   }
 
   const memberSince = new Date(user.createdAt).toLocaleDateString();
 
   return (
-    <OnlineScreen
-      badge={t("online.profile.badge")}
+    <Screen
+      eyebrow={t("online.profile.badge")}
       title={t("online.profile.title")}
       subtitle={t("online.profile.subtitle")}
       backTo="/online"
+      headerAction={<SettingsButton />}
     >
       {banner ? <ErrorBanner message={banner} /> : null}
 
-      <Card>
+      <Card style={styles.block}>
         <View style={styles.identityRow}>
-          <Avatar username={user.username} size={62} />
+          <Avatar username={user.username} size={60} />
           <View style={styles.identityText}>
-            <Text style={styles.username}>{user.username}</Text>
-            <Text style={styles.email}>{user.email}</Text>
+            <Text style={Type.title} numberOfLines={1}>
+              {user.username}
+            </Text>
+            <Text style={Type.caption} numberOfLines={1}>
+              {user.email}
+            </Text>
           </View>
         </View>
 
         <View style={styles.levelRow}>
           <Pill label={t("online.level", { level: user.level })} tone="accent" />
-          <Text style={styles.xpText}>{t("online.xp", { xp: user.xp })}</Text>
+          <Text style={Type.metricSmall}>{t("online.xp", { xp: user.xp })}</Text>
         </View>
 
-        <View style={styles.progressBlock}>
-          <ProgressBar value={user.progress.progress} />
-          <Text style={styles.progressHint}>
-            {t("online.profile.nextLevel", {
-              xp: user.progress.xpToNextLevel,
-              level: user.level + 1,
-            })}
-          </Text>
-        </View>
+        <ProgressBar value={user.progress.progress} />
+        <Text style={[Type.caption, styles.progressHint]}>
+          {t("online.profile.nextLevel", {
+            xp: user.progress.xpToNextLevel,
+            level: user.level + 1,
+          })}
+        </Text>
       </Card>
 
-      <SectionLabel title={t("online.profile.account")} />
+      <SectionHeader title={t("online.profile.account")} />
 
-      <Card>
+      <Card style={styles.block}>
         {editing ? (
           <>
             <Field
@@ -143,18 +151,22 @@ export default function ProfileScreen(): ReactElement {
               onChangeText={setUsername}
               hint={t("online.auth.usernameHint")}
               error={fieldError}
+              icon="user"
               maxLength={24}
               returnKeyType="done"
               onSubmitEditing={save}
             />
-            <PrimaryButton
-              label={t("online.profile.save")}
-              onPress={save}
-              loading={busy}
-            />
-            <View style={styles.cancelRow}>
-              <GhostButton
+            <View style={styles.actions}>
+              <Button
+                label={t("online.profile.save")}
+                icon="check"
+                onPress={save}
+                loading={busy}
+              />
+              <Button
                 label={t("online.profile.cancel")}
+                variant="ghost"
+                size="md"
                 onPress={cancelEditing}
                 disabled={busy}
               />
@@ -162,143 +174,71 @@ export default function ProfileScreen(): ReactElement {
           </>
         ) : (
           <>
-            <InfoRow
-              label={t("online.auth.username")}
-              value={user.username}
-            />
+            <InfoRow label={t("online.auth.username")} value={user.username} />
             <InfoRow label={t("online.auth.email")} value={user.email} />
             <InfoRow
               label={t("online.profile.memberSince")}
               value={memberSince}
+              last
             />
 
-            {saved ? (
-              <Text style={styles.savedNote}>
-                ✅ {t("online.profile.saved")}
-              </Text>
-            ) : null}
+            {saved ? <Notice message={t("online.profile.saved")} /> : null}
 
-            <View style={styles.editRow}>
-              <GhostButton
-                label={t("online.profile.edit")}
-                onPress={startEditing}
-                tone="accent"
-              />
-            </View>
+            <Button
+              label={t("online.profile.edit")}
+              icon="edit"
+              variant="secondary"
+              size="md"
+              onPress={startEditing}
+              style={styles.editButton}
+            />
           </>
         )}
       </Card>
 
-      <SectionLabel
+      <SectionHeader
         title={t("online.profile.session")}
         hint={t("online.profile.sessionHint")}
       />
 
-      <Card>
-        <PrimaryButton
-          label={t("online.profile.logout")}
-          onPress={signOut}
-          loading={signingOut}
-          colors={OnlineGradients.danger}
-        />
-      </Card>
-    </OnlineScreen>
-  );
-}
-
-function InfoRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}): ReactElement {
-  return (
-    <View style={styles.infoRow}>
-      <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={styles.infoValue} numberOfLines={1}>
-        {value}
-      </Text>
-    </View>
+      <Button
+        label={t("online.profile.logout")}
+        icon="logOut"
+        variant="danger"
+        onPress={signOut}
+        loading={signingOut}
+      />
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  block: {
+    marginBottom: Space.xxl,
+  },
   identityRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
+    gap: Space.md,
   },
   identityText: {
     flex: 1,
-  },
-  username: {
-    color: OnlinePalette.text,
-    fontSize: 22,
-    fontWeight: "800",
-    fontFamily: "System",
-  },
-  email: {
-    marginTop: 4,
-    color: OnlinePalette.textFaint,
-    fontSize: 13,
-    fontFamily: "System",
+    gap: Space.xxs,
   },
   levelRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 18,
-  },
-  xpText: {
-    color: OnlinePalette.textMuted,
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily: "System",
-    fontVariant: ["tabular-nums"],
-  },
-  progressBlock: {
-    marginTop: 12,
+    marginTop: Space.xl,
+    marginBottom: Space.md,
   },
   progressHint: {
-    marginTop: 8,
-    color: OnlinePalette.textFaint,
-    fontSize: 12,
-    fontFamily: "System",
+    marginTop: Space.sm,
   },
-  infoRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 11,
-    borderBottomWidth: 1,
-    borderBottomColor: OnlinePalette.border,
-    gap: 16,
+  actions: {
+    gap: Space.sm,
   },
-  infoLabel: {
-    color: OnlinePalette.textFaint,
-    fontSize: 13,
-    fontFamily: "System",
-  },
-  infoValue: {
-    flexShrink: 1,
-    color: OnlinePalette.textSoft,
-    fontSize: 14,
-    fontWeight: "700",
-    fontFamily: "System",
-    textAlign: "right",
-  },
-  savedNote: {
-    marginTop: 14,
-    color: "#6EE7B7",
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily: "System",
-  },
-  editRow: {
-    marginTop: 16,
-  },
-  cancelRow: {
-    marginTop: 10,
+  editButton: {
+    marginTop: Space.lg,
   },
 });

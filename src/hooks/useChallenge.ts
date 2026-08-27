@@ -6,23 +6,42 @@ import type {
   GameMode,
   HSVColor,
 } from "@/types/challenge";
-import { hexToHSV, normalizeHex } from "@/utils/color";
+import { hexToHSV, hsvToHex } from "@/utils/color";
 import type { SavedProgress } from "@/utils/storage";
 import challengeCatalog from "../../generated/challenges.json";
 
 const INITIAL_COLOR = "#878787";
-const INITIAL_HSV: HSVColor = hexToHSV(INITIAL_COLOR);
+
+/**
+ * Color de arranque de cada paso, en HSV.
+ *
+ * El HSV es la fuente de verdad de la selección y el hexadecimal se deriva de
+ * él, nunca al revés. Guardar el hex y reconstruir el HSV a partir de él es
+ * justo lo que rompía el selector de color: la cuantización a 8 bits destruye el
+ * tono cuando la saturación es baja. Ver `components/ColorWheel.tsx`.
+ */
+export const INITIAL_HSV: HSVColor = hexToHSV(INITIAL_COLOR);
 
 // DEV: Set this to an array of logo IDs to force only those logos to appear in
 // any game mode. Leave as null (or empty) for normal random behavior.
 // Example: ["spotify", "google", "2xko"]
-const DEV_ONLY_LOGOS: string[] | null = null;
+const DEV_ONLY_LOGOS: string[] | null = null
+
+/**
+ * El contrarreloj no tiene lista: la partida la termina el cronómetro.
+ *
+ * Antes servía ocho imágenes y se acababa ahí, así que el modo premiaba llegar
+ * al final más que aprovechar el tiempo. Ahora se baraja el catálogo entero,
+ * igual que los modos contrarreloj en grupo reparten una baraja larga: en 45
+ * segundos no se acaba, y en la práctica eso es «las que te dé tiempo».
+ */
+const UNLIMITED = Number.POSITIVE_INFINITY;
 
 // How many challenges each mode serves up. Multicolor is driven by the number
 // of colors per logo instead of a fixed challenge count.
 const COUNT_BY_MODE: Record<GameMode, number> = {
   quick: 5,
-  timed: 8,
+  timed: UNLIMITED,
   daily: 3,
   multicolor: 2,
 };
@@ -46,9 +65,9 @@ export interface UseChallengeResult {
   currentStepIndex: number;
   totalSteps: number;
   challengeIds: string[];
+  /** Derivado de `selectedHSV`. Solo para pintar; nunca se vuelve a convertir. */
   selectedColor: string;
   selectedHSV: HSVColor;
-  setSelectedColor: (color: string) => void;
   setSelectedHSV: (hsv: HSVColor) => void;
   nextStep: () => boolean;
   restartGame: () => void;
@@ -189,18 +208,18 @@ export function useChallenge(options: UseChallengeOptions): UseChallengeResult {
       : 0;
 
   const [currentStepIndex, setCurrentStepIndex] = useState(initialIndex);
-  const [selectedColor, setSelectedColorState] = useState(INITIAL_COLOR);
   const [selectedHSV, setSelectedHSVState] = useState<HSVColor>(INITIAL_HSV);
 
   const currentStep = steps[currentStepIndex] ?? null;
 
-  const resetSelection = useCallback((): void => {
-    setSelectedColorState(INITIAL_COLOR);
-    setSelectedHSVState(INITIAL_HSV);
-  }, []);
+  // Un único estado, una única conversión y en un solo sentido.
+  const selectedColor = useMemo(
+    () => hsvToHex(selectedHSV.h, selectedHSV.s, selectedHSV.v),
+    [selectedHSV],
+  );
 
-  const setSelectedColor = useCallback((color: string): void => {
-    setSelectedColorState(normalizeHex(color));
+  const resetSelection = useCallback((): void => {
+    setSelectedHSVState(INITIAL_HSV);
   }, []);
 
   const setSelectedHSV = useCallback((hsv: HSVColor): void => {
@@ -231,7 +250,6 @@ export function useChallenge(options: UseChallengeOptions): UseChallengeResult {
     challengeIds,
     selectedColor,
     selectedHSV,
-    setSelectedColor,
     setSelectedHSV,
     nextStep,
     restartGame,

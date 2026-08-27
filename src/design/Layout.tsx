@@ -1,0 +1,542 @@
+import { useRouter, type Href } from "expo-router";
+import { memo, useCallback, type ReactElement, type ReactNode } from "react";
+import {
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+import { IconButton, usePressScale } from "@/design/Button";
+import { Icon, type IconName } from "@/design/Icon";
+import {
+  Color,
+  CONTENT_MAX_WIDTH,
+  Duration,
+  Elevation,
+  Radius,
+  Space,
+  TABLET_BREAKPOINT,
+  Type,
+  type SpectrumTone,
+} from "@/design/tokens";
+import { t } from "@/i18n";
+import { selectionTick } from "@/utils/haptics";
+import { playTick } from "@/utils/sound";
+
+/**
+ * Primitivas de disposición.
+ *
+ * `Screen` es el armazón de TODAS las pantallas. Antes existían dos: el que
+ * `index.tsx` y `offline.tsx` escribían a mano y `components/online/Screen.tsx`
+ * para la mitad online, cada uno con sus propios márgenes, su propio tamaño de
+ * título y su propio enlace de vuelta. Con dos armazones, las dos mitades de la
+ * app no podían dejar de divergir.
+ */
+
+// ---------------------------------------------------------------------------
+// Pantalla
+// ---------------------------------------------------------------------------
+
+interface ScreenProps {
+  /** Título principal. Uno por pantalla. */
+  title?: string;
+  subtitle?: string;
+  /** Kicker en versalitas sobre el título. */
+  eyebrow?: string;
+  /**
+   * Activa el botón de volver; sin él no se pinta cabecera de navegación.
+   *
+   * No es a dónde va la flecha —eso lo decide el historial, ver `ScreenBase`—
+   * sino el destino de reserva para cuando no hay historial al que volver:
+   * entrada por enlace directo, o una recarga en web.
+   */
+  backTo?: Href;
+  /** Acción al vuelo a la derecha de la barra superior (ajustes, contador...). */
+  headerAction?: ReactNode;
+  /**
+   * Capa decorativa detrás del contenido, dentro del lienzo. Va aquí y no
+   * envolviendo a `Screen` desde fuera porque el `SafeAreaView` pinta el fondo
+   * opaco de la aplicación y taparía cualquier cosa que quedase por detrás.
+   */
+  backdrop?: ReactNode;
+  onRefresh?: () => void;
+  refreshing?: boolean;
+  /** Desactiva el scroll cuando el contenido debe caber en una pantalla. */
+  scrollable?: boolean;
+  children: ReactNode;
+  contentStyle?: StyleProp<ViewStyle>;
+}
+
+function ScreenBase({
+  title,
+  subtitle,
+  eyebrow,
+  backTo,
+  headerAction,
+  backdrop,
+  onRefresh,
+  refreshing = false,
+  scrollable = true,
+  children,
+  contentStyle,
+}: ScreenProps): ReactElement {
+  const router = useRouter();
+  const hasHeaderBar = backTo != null || headerAction != null;
+
+  const body = (
+    <View
+      style={[
+        styles.shell,
+        // Sin barra superior no hay nada que separe el título del borde de la
+        // pantalla y el texto queda pegado arriba. Se compensa con el mismo
+        // alto que ocupa la barra, para que el título caiga a la misma altura
+        // que en las pantallas que sí la llevan y no dé un salto al navegar.
+        !hasHeaderBar && styles.shellBare,
+        contentStyle,
+      ]}
+    >
+      {hasHeaderBar ? (
+        <View style={styles.headerBar}>
+          {backTo != null ? (
+            <IconButton
+              name="back"
+              /**
+               * La flecha dispara la MISMA acción que el botón «atrás» del
+               * sistema, no una navegación a un destino propio.
+               *
+               * Antes hacía `replace(backTo)`, que sustituye la entrada actual
+               * del historial por el destino: la pila quedaba con el destino
+               * dos veces y el «atrás» del móvil o del navegador parecía no
+               * hacer nada, porque devolvía a la pantalla recién abierta.
+               *
+               * Apuntar la flecha a un destino declarado tampoco basta: aunque
+               * no ensucie la pila, un salto de dos pantallas y uno de una
+               * siguen dejando al jugador en sitios distintos. `back()` es
+               * literalmente la acción del botón nativo, así que las dos no
+               * pueden discrepar.
+               *
+               * `backTo` queda como reserva para cuando no hay historial —un
+               * enlace directo, una recarga en web—, donde `back()` no tendría
+               * a dónde ir y la flecha se quedaría muerta.
+               */
+              onPress={() =>
+                router.canGoBack() ? router.back() : router.dismissTo(backTo)
+              }
+              accessibilityLabel={t("a11y.back")}
+              // Sangrado negativo: el objetivo táctil de 44pt es mayor que el
+              // dibujo, así que sin esto el icono quedaría ópticamente metido
+              // hacia dentro respecto al título que tiene debajo.
+              style={styles.headerBarLeading}
+            />
+          ) : (
+            <View style={styles.headerBarSpacer} />
+          )}
+          {headerAction}
+        </View>
+      ) : null}
+
+      {title != null ? (
+        <View style={styles.header}>
+          {eyebrow != null ? (
+            <Text style={[Type.label, styles.eyebrow]}>{eyebrow}</Text>
+          ) : null}
+          <Text style={Type.display}>{title}</Text>
+          {subtitle != null ? (
+            <Text style={[Type.body, styles.subtitle]}>{subtitle}</Text>
+          ) : null}
+        </View>
+      ) : null}
+
+      {children}
+    </View>
+  );
+
+  return (
+    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+      {/*
+        La capa decorativa va recortada al lienzo. Los orbes se colocan
+        desbordados por las esquinas a propósito, y sin este recorte se pintan
+        fuera de los límites de la aplicación: en web se veía el trozo que
+        sobresale flotando sobre el fondo blanco de la página en cuanto el
+        scroll rebotaba.
+      */}
+      {backdrop != null ? (
+        <View style={styles.backdrop} pointerEvents="none">
+          {backdrop}
+        </View>
+      ) : null}
+
+      {scrollable ? (
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          refreshControl={
+            onRefresh != null ? (
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor={Color.text.muted}
+                colors={[Color.accent.default]}
+                progressBackgroundColor={Color.surface.raised}
+              />
+            ) : undefined
+          }
+        >
+          {body}
+        </ScrollView>
+      ) : (
+        body
+      )}
+    </SafeAreaView>
+  );
+}
+
+export const Screen = memo(ScreenBase);
+
+// ---------------------------------------------------------------------------
+// Superficies
+// ---------------------------------------------------------------------------
+
+interface CardProps {
+  children: ReactNode;
+  /** `flat` quita la sombra: para tarjetas dentro de otra superficie. */
+  variant?: "raised" | "flat";
+  /** Retardo de la animación de entrada, en ms. */
+  enterDelay?: number;
+  style?: StyleProp<ViewStyle>;
+}
+
+/**
+ * Tarjeta.
+ *
+ * La entrada es un fundido corto y sin desplazamiento. Las pantallas usaban
+ * `FadeInDown` escalonado con retardos de hasta 460 ms, así que abrir el menú de
+ * modos obligaba a mirar cómo se montaba la lista antes de poder tocarla. Un
+ * fundido de 260 ms comunica «esto acaba de aparecer» sin cobrar peaje.
+ */
+function CardBase({
+  children,
+  variant = "raised",
+  enterDelay,
+  style,
+}: CardProps): ReactElement {
+  const content = (
+    <View
+      style={[
+        styles.card,
+        variant === "raised" && Elevation.raised,
+        style,
+      ]}
+    >
+      {children}
+    </View>
+  );
+
+  if (enterDelay == null) {
+    return content;
+  }
+
+  return (
+    <Animated.View entering={FadeIn.delay(enterDelay).duration(Duration.base)}>
+      {content}
+    </Animated.View>
+  );
+}
+
+export const Card = memo(CardBase);
+
+/** Encabezado de sección: rótulo en versalitas y pista opcional. */
+function SectionHeaderBase({
+  title,
+  hint,
+}: {
+  title: string;
+  hint?: string;
+}): ReactElement {
+  return (
+    <View style={styles.sectionHeader}>
+      <Text style={Type.label}>{title}</Text>
+      {hint != null ? (
+        <Text style={[Type.caption, styles.sectionHint]}>{hint}</Text>
+      ) : null}
+    </View>
+  );
+}
+
+export const SectionHeader = memo(SectionHeaderBase);
+
+// ---------------------------------------------------------------------------
+// Fila de opción
+// ---------------------------------------------------------------------------
+
+interface OptionRowProps {
+  icon: IconName;
+  /**
+   * Tinte del icono. Identifica la fila dentro de su lista; sin él, el icono va
+   * neutro. Un mismo destino lleva siempre el mismo tono en toda la app.
+   */
+  tone?: SpectrumTone;
+  title: string;
+  description?: string;
+  /** Elemento a la derecha del título: un récord, un estado. */
+  badge?: ReactNode;
+  /** Nota bajo la descripción, en tono apagado. */
+  note?: string;
+  onPress: () => void;
+  disabled?: boolean;
+  enterDelay?: number;
+}
+
+/**
+ * Fila pulsable de selección: icono, título, descripción y galón.
+ *
+ * Estaba escrita a mano diez veces entre la portada y el menú offline, cada una
+ * con su degradado de color propio detrás del emoji. Aquí el icono va sobre una
+ * superficie neutra: en una lista, diez cuadros de colores distintos compiten
+ * entre sí y ninguno significa nada — el color solo aparece cuando la fila está
+ * pulsada, para señalar cuál se ha tocado.
+ */
+function OptionRowBase({
+  icon,
+  tone,
+  title,
+  description,
+  badge,
+  note,
+  onPress,
+  disabled = false,
+  enterDelay,
+}: OptionRowProps): ReactElement {
+  const press = usePressScale(0.985);
+
+  const handlePress = useCallback((): void => {
+    if (disabled) {
+      return;
+    }
+    selectionTick();
+    playTick();
+    onPress();
+  }, [disabled, onPress]);
+
+  const row = (
+    <Animated.View style={press.style}>
+      <Pressable
+        onPress={handlePress}
+        onPressIn={disabled ? undefined : press.onPressIn}
+        onPressOut={disabled ? undefined : press.onPressOut}
+        disabled={disabled}
+        style={({ pressed }) => [
+          styles.optionRow,
+          pressed && !disabled && styles.optionRowPressed,
+          disabled && styles.optionRowDisabled,
+        ]}
+        accessibilityRole="button"
+        accessibilityLabel={title}
+        accessibilityHint={description}
+        accessibilityState={{ disabled }}
+      >
+        <View
+          style={[
+            styles.optionIcon,
+            tone != null && {
+              backgroundColor: Color.spectrum[tone].surface,
+              borderColor: Color.spectrum[tone].border,
+            },
+          ]}
+        >
+          <Icon
+            name={icon}
+            size={20}
+            color={tone != null ? Color.spectrum[tone].icon : Color.text.primary}
+          />
+        </View>
+
+        <View style={styles.optionBody}>
+          {/*
+            La fila envuelve: cuando el título y el galón no caben juntos —un
+            récord de cinco cifras en una pantalla estrecha—, el galón baja una
+            línea en lugar de empujar al título fuera de la vista. El título no
+            encoge (`flexShrink` a cero por defecto), así que siempre gana él el
+            sitio; el `maxWidth` es lo que hace que se recorte con puntos
+            suspensivos en vez de desbordar cuando no cabe ni él solo.
+          */}
+          <View style={styles.optionTitleRow}>
+            <Text style={[Type.heading, styles.optionTitle]} numberOfLines={1}>
+              {title}
+            </Text>
+            {badge}
+          </View>
+          {description != null ? (
+            <Text style={[Type.caption, styles.optionDescription]}>
+              {description}
+            </Text>
+          ) : null}
+          {note != null ? (
+            <Text style={[Type.caption, styles.optionNote]}>{note}</Text>
+          ) : null}
+        </View>
+
+        <Icon name="chevronRight" size={18} color={Color.text.faint} />
+      </Pressable>
+    </Animated.View>
+  );
+
+  if (enterDelay == null) {
+    return row;
+  }
+
+  return (
+    <Animated.View entering={FadeIn.delay(enterDelay).duration(Duration.base)}>
+      {row}
+    </Animated.View>
+  );
+}
+
+export const OptionRow = memo(OptionRowBase);
+
+/** Línea divisoria de 1px. */
+export const Divider = memo(function Divider({
+  style,
+}: {
+  style?: StyleProp<ViewStyle>;
+}): ReactElement {
+  return <View style={[styles.divider, style]} />;
+});
+
+/** `true` en pantallas anchas. Un único punto de corte para toda la app. */
+export function useIsTablet(): boolean {
+  const { width } = useWindowDimensions();
+  return width >= TABLET_BREAKPOINT;
+}
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: Color.surface.canvas,
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFill,
+    overflow: "hidden",
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  shell: {
+    flexGrow: 1,
+    width: "100%",
+    maxWidth: CONTENT_MAX_WIDTH,
+    alignSelf: "center",
+    paddingHorizontal: Space.xl,
+    paddingBottom: Space.xxxl,
+  },
+  shellBare: {
+    // El mismo alto que `headerBar`: es lo que hace que el título esté a la
+    // misma altura lleve barra o no.
+    paddingTop: Space.huge,
+  },
+  headerBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    minHeight: Space.huge,
+  },
+  headerBarLeading: {
+    marginLeft: -Space.md,
+  },
+  headerBarSpacer: {
+    width: 1,
+  },
+  header: {
+    marginBottom: Space.xxl,
+  },
+  eyebrow: {
+    marginBottom: Space.sm,
+    // El único texto acentuado de la app. Es una sola línea en versalitas, así
+    // que el color se nota sin pelearse con el título que tiene debajo, y como
+    // aparece en la cabecera de todas las pantallas, es lo que hace que la
+    // interfaz no se lea como puro blanco y negro. Los encabezados de sección
+    // siguen en gris a propósito: si también fuesen de color, dejaría de
+    // señalar nada.
+    color: Color.accent.text,
+  },
+  subtitle: {
+    marginTop: Space.sm,
+    maxWidth: 460,
+  },
+  card: {
+    borderRadius: Radius.lg,
+    padding: Space.lg,
+    backgroundColor: Color.surface.raised,
+    borderWidth: 1,
+    borderColor: Color.border.default,
+  },
+  sectionHeader: {
+    marginBottom: Space.md,
+  },
+  sectionHint: {
+    marginTop: Space.xs,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: Color.border.subtle,
+  },
+  optionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Space.md,
+    padding: Space.lg,
+    borderRadius: Radius.lg,
+    backgroundColor: Color.surface.raised,
+    borderWidth: 1,
+    borderColor: Color.border.default,
+  },
+  optionRowPressed: {
+    backgroundColor: Color.surface.interactive,
+    borderColor: Color.accent.border,
+  },
+  optionRowDisabled: {
+    opacity: 0.45,
+  },
+  optionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: Radius.md,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: Color.surface.sunken,
+    borderWidth: 1,
+    borderColor: Color.border.subtle,
+  },
+  optionBody: {
+    flex: 1,
+  },
+  optionTitleRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: Space.sm,
+  },
+  optionTitle: {
+    maxWidth: "100%",
+  },
+  optionDescription: {
+    marginTop: Space.xxs,
+  },
+  optionNote: {
+    marginTop: Space.sm,
+    color: Color.text.faint,
+  },
+});

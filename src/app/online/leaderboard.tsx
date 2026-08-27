@@ -1,29 +1,34 @@
 import type { ReactElement } from "react";
 import { useCallback, useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import { StyleSheet, Text, View } from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { describeError } from "@/api/errors";
 import type { LeaderboardEntry, LeaderboardResponse } from "@/api/types";
-import {
-  Avatar,
-  Card,
-  EmptyState,
-  ErrorBanner,
-  GhostButton,
-  Loading,
-  SectionLabel,
-} from "@/components/online/Controls";
-import { OnlineScreen } from "@/components/online/Screen";
-import { OnlinePalette, podiumEmoji } from "@/components/online/theme";
+import { SettingsButton } from "@/components/SettingsButton";
+import { Avatar } from "@/design/Avatar";
+import { Button } from "@/design/Button";
+import { EmptyState, ErrorBanner, Loading } from "@/design/Feedback";
+import { SegmentedControl } from "@/design/Form";
+import { Icon } from "@/design/Icon";
+import { Card, Screen, SectionHeader } from "@/design/Layout";
+import { Color, Duration, Radius, Space, Type } from "@/design/tokens";
 import { t } from "@/i18n";
 import { useSession } from "@/online/session";
-import { playTick } from "@/utils/sound";
 
 type Scope = "global" | "friends";
 
 const PAGE_SIZE = 20;
 
+/**
+ * Ranking mundial y de amigos.
+ *
+ * El podio ya no se marca con medallas de emoji —🥇🥈🥉 los dibuja el sistema
+ * operativo, así que se veían distintos en cada teléfono y no se podían alinear
+ * con las cifras de debajo—. El primer puesto lleva copa; el segundo y el
+ * tercero, su número en el tono claro del texto en lugar del apagado. La
+ * jerarquía se lee igual y todo cae en la misma rejilla.
+ */
 export default function LeaderboardScreen(): ReactElement {
   const { api, user } = useSession();
 
@@ -118,7 +123,6 @@ export default function LeaderboardScreen(): ReactElement {
   }, [page, loadingMore, fetchPage, scope]);
 
   const switchScope = useCallback((next: Scope) => {
-    playTick();
     setScope(next);
     setEntries(null);
     setPage(null);
@@ -126,26 +130,23 @@ export default function LeaderboardScreen(): ReactElement {
   }, []);
 
   return (
-    <OnlineScreen
-      badge={t("online.leaderboard.badge")}
+    <Screen
+      eyebrow={t("online.leaderboard.badge")}
       title={t("online.leaderboard.title")}
       subtitle={t("online.leaderboard.subtitle")}
       backTo="/online"
+      headerAction={<SettingsButton />}
       onRefresh={refresh}
       refreshing={refreshing}
     >
-      <View style={styles.tabs}>
-        <ScopeTab
-          label={t("online.leaderboard.global")}
-          active={scope === "global"}
-          onPress={() => switchScope("global")}
-        />
-        <ScopeTab
-          label={t("online.leaderboard.friends")}
-          active={scope === "friends"}
-          onPress={() => switchScope("friends")}
-        />
-      </View>
+      <SegmentedControl
+        options={[
+          { value: "global", label: t("online.leaderboard.global") },
+          { value: "friends", label: t("online.leaderboard.friends") },
+        ]}
+        value={scope}
+        onChange={switchScope}
+      />
 
       {error ? (
         <ErrorBanner
@@ -156,15 +157,13 @@ export default function LeaderboardScreen(): ReactElement {
       ) : null}
 
       {page ? (
-        <SectionLabel
+        <SectionHeader
           title={
             scope === "global"
               ? t("online.leaderboard.global")
               : t("online.leaderboard.friends")
           }
-          hint={t("online.leaderboard.total", {
-            total: page.pagination.total,
-          })}
+          hint={t("online.leaderboard.total", { total: page.pagination.total })}
         />
       ) : null}
 
@@ -173,7 +172,7 @@ export default function LeaderboardScreen(): ReactElement {
       ) : !entries || entries.length === 0 ? (
         <Card>
           <EmptyState
-            emoji={scope === "global" ? "🏆" : "🫂"}
+            icon={scope === "global" ? "trophy" : "users"}
             title={
               scope === "global"
                 ? t("online.leaderboard.emptyGlobal")
@@ -193,186 +192,144 @@ export default function LeaderboardScreen(): ReactElement {
               key={entry.userId}
               entry={entry}
               index={index}
+              last={index === entries.length - 1}
               isMe={entry.userId === user?.id}
             />
           ))}
 
           {page?.pagination.hasMore ? (
-            <View style={styles.moreRow}>
-              <GhostButton
-                label={
-                  loadingMore
-                    ? t("online.leaderboard.loadingMore")
-                    : t("online.leaderboard.loadMore")
-                }
-                onPress={() => void loadMore()}
-                disabled={loadingMore}
-              />
-            </View>
+            <Button
+              label={
+                loadingMore
+                  ? t("online.leaderboard.loadingMore")
+                  : t("online.leaderboard.loadMore")
+              }
+              variant="secondary"
+              size="md"
+              onPress={() => void loadMore()}
+              loading={loadingMore}
+              style={styles.more}
+            />
           ) : null}
         </Card>
       )}
-    </OnlineScreen>
-  );
-}
-
-function ScopeTab({
-  label,
-  active,
-  onPress,
-}: {
-  label: string;
-  active: boolean;
-  onPress: () => void;
-}): ReactElement {
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.tab,
-        active && styles.tabActive,
-        pressed && styles.tabPressed,
-      ]}
-      accessibilityRole="tab"
-      accessibilityState={{ selected: active }}
-      accessibilityLabel={label}
-    >
-      <Text style={[styles.tabText, active && styles.tabTextActive]}>
-        {label}
-      </Text>
-    </Pressable>
+    </Screen>
   );
 }
 
 function Row({
   entry,
   index,
+  last,
   isMe,
 }: {
   entry: LeaderboardEntry;
   index: number;
+  last: boolean;
   isMe: boolean;
 }): ReactElement {
-  const medal = podiumEmoji(entry.position);
+  const leader = entry.position === 1;
+  const podium = entry.position <= 3;
 
   return (
     <Animated.View
-      entering={FadeInDown.delay(Math.min(index, 12) * 45).duration(360)}
+      entering={FadeIn.delay(Math.min(index, 12) * 35).duration(Duration.base)}
     >
-      <View style={[styles.row, isMe && styles.rowMe]}>
-        <View style={styles.position}>
-          {medal ? (
-            <Text style={styles.medal}>{medal}</Text>
+      <View
+        style={[
+          styles.row,
+          last && styles.rowLast,
+          // La fila propia se marca con relleno y borde de acento: es el único
+          // sitio de la lista donde el jugador se busca a sí mismo.
+          isMe && styles.rowMe,
+        ]}
+      >
+        <View
+          style={styles.position}
+          // La copa del primer puesto no lleva texto: sin esto, quien use un
+          // lector de pantalla se quedaría sin saber en qué posición va.
+          accessible
+          accessibilityLabel={t("a11y.rank", { position: entry.position })}
+        >
+          {leader ? (
+            <Icon name="trophy" size={18} color={Color.warning.default} />
           ) : (
-            <Text style={styles.positionText}>{entry.position}</Text>
+            <Text
+              style={[Type.metricSmall, podium && styles.positionPodium]}
+            >
+              {entry.position}
+            </Text>
           )}
         </View>
 
         <Avatar username={entry.username} size={40} />
 
         <View style={styles.rowText}>
-          <Text style={[styles.rowName, isMe && styles.rowNameMe]}>
+          <Text
+            style={[Type.bodyStrong, isMe && styles.nameMe]}
+            numberOfLines={1}
+          >
             {entry.username}
             {isMe ? ` · ${t("online.leaderboard.you")}` : ""}
           </Text>
-          <Text style={styles.rowMeta}>
+          <Text style={Type.caption}>
             {t("online.level", { level: entry.level })}
           </Text>
         </View>
 
-        <Text style={styles.xp}>{t("online.xp", { xp: entry.xp })}</Text>
+        <Text style={[Type.metricSmall, styles.xp]}>
+          {t("online.xp", { xp: entry.xp })}
+        </Text>
       </View>
     </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  tabs: {
-    flexDirection: "row",
-    padding: 4,
-    borderRadius: 16,
-    backgroundColor: OnlinePalette.surface,
-    borderWidth: 1,
-    borderColor: OnlinePalette.border,
-    marginBottom: 16,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 11,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-  tabActive: {
-    backgroundColor: OnlinePalette.accentSurface,
-    borderWidth: 1,
-    borderColor: OnlinePalette.accent,
-  },
-  tabPressed: {
-    opacity: 0.8,
-  },
-  tabText: {
-    color: OnlinePalette.textMuted,
-    fontSize: 14,
-    fontWeight: "700",
-    fontFamily: "System",
-  },
-  tabTextActive: {
-    color: OnlinePalette.text,
-  },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    paddingVertical: 11,
-    paddingHorizontal: 6,
-    borderRadius: 12,
+    gap: Space.md,
+    paddingVertical: Space.md,
     borderBottomWidth: 1,
-    borderBottomColor: OnlinePalette.border,
+    borderBottomColor: Color.border.subtle,
+  },
+  rowLast: {
+    borderBottomWidth: 0,
+    // La última fila no necesita relleno abajo: el hueco hasta el borde de la
+    // tarjeta ya lo pone el propio `padding` de la tarjeta.
+    paddingBottom: 0,
   },
   rowMe: {
-    backgroundColor: OnlinePalette.accentSurface,
-    borderBottomColor: OnlinePalette.accent,
+    marginHorizontal: -Space.sm,
+    paddingHorizontal: Space.sm,
+    // ...salvo cuando esa última fila es la propia, que es la única que pinta
+    // fondo. Ahí el relleno no es aire sobrante sino el interior del bloque de
+    // acento, y sin él el color se corta a ras del nombre. Va después de
+    // `rowLast` en el array de estilos, así que lo recupera.
+    paddingVertical: Space.md,
+    borderRadius: Radius.md,
+    borderBottomColor: "transparent",
+    backgroundColor: Color.accent.surface,
   },
   position: {
-    width: 30,
+    width: 26,
     alignItems: "center",
   },
-  positionText: {
-    color: OnlinePalette.textFaint,
-    fontSize: 14,
-    fontWeight: "800",
-    fontFamily: "System",
-    fontVariant: ["tabular-nums"],
-  },
-  medal: {
-    fontSize: 20,
+  positionPodium: {
+    color: Color.text.primary,
   },
   rowText: {
     flex: 1,
+    gap: Space.xxs,
   },
-  rowName: {
-    color: OnlinePalette.text,
-    fontSize: 15,
-    fontWeight: "800",
-    fontFamily: "System",
-  },
-  rowNameMe: {
-    color: OnlinePalette.accentSoft,
-  },
-  rowMeta: {
-    marginTop: 3,
-    color: OnlinePalette.textFaint,
-    fontSize: 12,
-    fontFamily: "System",
+  nameMe: {
+    color: Color.accent.text,
   },
   xp: {
-    color: OnlinePalette.textSoft,
-    fontSize: 14,
-    fontWeight: "800",
-    fontFamily: "System",
-    fontVariant: ["tabular-nums"],
+    color: Color.text.primary,
   },
-  moreRow: {
-    marginTop: 14,
+  more: {
+    marginTop: Space.lg,
   },
 });

@@ -17,16 +17,28 @@ import { getLocales } from "expo-localization";
 type Params = Record<string, string | number>;
 
 const es = {
-  "common.back": "← Inicio",
-  "common.backShort": "← Atrás",
-  "common.exit": "← Salir",
+  "common.back": "Inicio",
+  "common.backShort": "Atrás",
+  "common.exit": "Salir",
   "common.next": "Siguiente",
   "common.retry": "Reintentar",
   "common.share": "Compartir",
   "common.loading": "Cargando juego...",
   "common.continue": "Continuar",
 
-  "landing.badge": "🎨 Color Quest",
+  // Etiquetas que solo lee un lector de pantalla: iconos sueltos y controles
+  // cuyo texto visible no describe la acción.
+  "a11y.back": "Volver",
+  "a11y.close": "Cerrar",
+  "a11y.stars": "{{value}} de {{total}} estrellas",
+  "a11y.rank": "Puesto {{position}}",
+  "a11y.playersDecrease": "Quitar un jugador",
+  "a11y.playersIncrease": "Añadir un jugador",
+  "a11y.wheel": "Rueda de tono y saturación",
+  "a11y.brightness": "Brillo",
+  "a11y.selectedColor": "Color seleccionado",
+
+  "landing.badge": "Color Quest",
   "landing.title": "Elige cómo\nquieres jugar",
   "landing.subtitle":
     "Practica en solitario o reúne a tus amigos alrededor de un mismo móvil.",
@@ -40,7 +52,7 @@ const es = {
   "landing.soon": "Pronto",
   "landing.footer": "Offline funciona sin conexión; online necesita cuenta.",
 
-  "offline.badge": "🎮 Modo offline",
+  "offline.badge": "Modo offline",
   "offline.title": "Práctica y grupo",
   "offline.subtitle": "Juega tú solo o pásate el móvil entre varias personas.",
   "offline.solo.section": "Solitario",
@@ -92,8 +104,8 @@ const es = {
 
   "party.final.title": "Clasificación final",
   "party.final.coopTitle": "Resultado del equipo",
-  "party.final.winner": "🏆 Gana {{name}}",
-  "party.final.tie": "🤝 ¡Empate!",
+  "party.final.winner": "Gana {{name}}",
+  "party.final.tie": "¡Empate!",
   "party.final.points": "{{score}} pts",
   "party.final.rounds": "{{count}} aciertos",
   "party.final.teamScore": "{{score}} / {{max}} pts",
@@ -102,7 +114,7 @@ const es = {
   "party.final.replay": "Jugar otra vez",
   "party.final.home": "Volver a modos",
 
-  "home.badge": "🎨 Color Quest",
+  "home.badge": "Color Quest",
   "home.title": "Pon a prueba\ntu ojo para el color",
   "home.subtitle":
     "Elige un modo de juego y demuestra cuánto te acercas al color perfecto.",
@@ -132,6 +144,9 @@ const es = {
   "game.empty.subtitle":
     "Revisa el catálogo generado o los metadatos de los retos.",
   "game.colorStep": "Color {{current}} de {{total}}",
+  "game.runLabel": "Partida",
+  "game.hits": "Aciertos: {{count}}",
+  "game.points": "{{score}} pts",
 
   "progress.label": "Progreso",
   "progress.counter": "Reto {{current}} de {{total}}",
@@ -139,7 +154,7 @@ const es = {
   "timer.label": "Tiempo",
   "timer.seconds": "{{seconds}}s",
   "streak.label": "Racha",
-  "streak.value": "🔥 {{count}}",
+  "streak.value": "{{count}}",
 
   "result.kicker": "Resultado",
   "result.yours": "Tu color",
@@ -153,31 +168,35 @@ const es = {
   "summary.subtitle": "Has superado todos los retos disponibles.",
   "summary.total": "Puntuación total",
   "summary.average": "Media",
-  "summary.record": "🎉 ¡Nuevo récord!",
+  "summary.record": "¡Nuevo récord!",
   "summary.best": "Mejor: {{score}}",
   "summary.bestStreak": "Mejor racha: {{count}}",
+  "summary.points": "Puntos",
+  "summary.hits": "Aciertos",
+  "summary.hitsOf": "de {{rounds}} intentos",
   "summary.home": "Volver al inicio",
   "summary.shareText":
     "🎨 Color Quest — {{mode}}\nPuntuación: {{total}}/{{max}} ({{average}}%)\n{{stars}}",
+  "summary.shareTimed":
+    "🎨 Color Quest — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} aciertos ({{average}}%)\n{{stars}}",
 
   "daily.done.title": "Reto diario completado",
   "daily.done.subtitle": "Vuelve mañana para un color nuevo.",
   "daily.score": "Tu resultado de hoy: {{score}}%",
 
-  "finished.emoji": "🏁",
 
-  "score.perfect": "🎉 ¡Perfecto!",
+  "score.perfect": "¡Perfecto!",
   "score.close": "¡Muy cerca!",
   "score.good": "Buen intento",
   "score.tryAgain": "Sigue probando",
 
-  "run.artist": "🏆 ¡Ojo de artista!",
-  "run.great": "🎯 ¡Gran puntería!",
-  "run.good": "👍 Buen trabajo",
-  "run.practice": "💪 Sigue practicando",
+  "run.artist": "¡Ojo de artista!",
+  "run.great": "¡Gran puntería!",
+  "run.good": "Buen trabajo",
+  "run.practice": "Sigue practicando",
 
-  "validate.correct": "🎉 ¡Correcto!",
-  "validate.tryAgain": "❌ Sigue probando.",
+  "validate.correct": "¡Correcto!",
+  "validate.tryAgain": "Sigue probando.",
 
   "settings.title": "Ajustes de sonido",
   "settings.music": "Música",
@@ -190,7 +209,7 @@ const es = {
   "online.xp": "{{xp}} XP",
   "online.xpToNext": "Faltan {{xp}} XP",
 
-  "online.auth.badge": "🌐 Modo online",
+  "online.auth.badge": "Modo online",
   "online.auth.title": "Entra en tu cuenta",
   "online.auth.titleRegister": "Crea tu cuenta",
   "online.auth.subtitle":
@@ -236,7 +255,7 @@ const es = {
   "online.auth.verify.resent": "Código reenviado.",
   "online.auth.verify.back": "Cambiar de email",
 
-  "online.hub.badge": "🌐 Modo online",
+  "online.hub.badge": "Modo online",
   "online.hub.title": "Tu cuenta",
   "online.hub.subtitle":
     "Gestiona tu perfil, tus amigos y mira cómo vas en la clasificación.",
@@ -254,7 +273,7 @@ const es = {
   "online.hub.match.description": "Compite en tiempo real contra otros jugadores.",
   "online.hub.match.locked": "Necesita partidas en tiempo real · en desarrollo",
 
-  "online.profile.badge": "👤 Perfil",
+  "online.profile.badge": "Perfil",
   "online.profile.title": "Tu perfil",
   "online.profile.subtitle": "Así te ven el resto de jugadores.",
   "online.profile.account": "Datos de la cuenta",
@@ -269,7 +288,7 @@ const es = {
     "Al salir se borra la sesión de este dispositivo. El modo offline no se ve afectado.",
   "online.profile.logout": "Cerrar sesión",
 
-  "online.friends.badge": "🤝 Amigos",
+  "online.friends.badge": "Amigos",
   "online.friends.title": "Tus amigos",
   "online.friends.subtitle": "Busca jugadores por su nombre y añádelos.",
   "online.friends.searchLabel": "Buscar jugadores",
@@ -296,7 +315,7 @@ const es = {
   "online.friends.emptyHint":
     "Busca a alguien por su nombre de usuario y envíale una solicitud.",
 
-  "online.leaderboard.badge": "🏆 Clasificación",
+  "online.leaderboard.badge": "Clasificación",
   "online.leaderboard.title": "Ranking",
   "online.leaderboard.subtitle": "Se ordena por XP acumulada.",
   "online.leaderboard.global": "Mundial",
@@ -337,16 +356,26 @@ const es = {
 export type TranslationKey = keyof typeof es;
 
 const en: Record<TranslationKey, string> = {
-  "common.back": "← Home",
-  "common.backShort": "← Back",
-  "common.exit": "← Exit",
+  "common.back": "Home",
+  "common.backShort": "Back",
+  "common.exit": "Exit",
   "common.next": "Next",
   "common.retry": "Retry",
   "common.share": "Share",
   "common.loading": "Loading game...",
   "common.continue": "Continue",
 
-  "landing.badge": "🎨 Color Quest",
+  "a11y.back": "Go back",
+  "a11y.close": "Close",
+  "a11y.stars": "{{value}} out of {{total}} stars",
+  "a11y.rank": "Rank {{position}}",
+  "a11y.playersDecrease": "Remove a player",
+  "a11y.playersIncrease": "Add a player",
+  "a11y.wheel": "Hue and saturation wheel",
+  "a11y.brightness": "Brightness",
+  "a11y.selectedColor": "Selected colour",
+
+  "landing.badge": "Color Quest",
   "landing.title": "Choose how\nyou want to play",
   "landing.subtitle":
     "Practise on your own or gather your friends around a single phone.",
@@ -359,7 +388,7 @@ const en: Record<TranslationKey, string> = {
   "landing.soon": "Soon",
   "landing.footer": "Offline works with no connection; online needs an account.",
 
-  "offline.badge": "🎮 Offline mode",
+  "offline.badge": "Offline mode",
   "offline.title": "Practice & group",
   "offline.subtitle": "Play solo or pass the phone around several people.",
   "offline.solo.section": "Single player",
@@ -410,8 +439,8 @@ const en: Record<TranslationKey, string> = {
 
   "party.final.title": "Final ranking",
   "party.final.coopTitle": "Team result",
-  "party.final.winner": "🏆 {{name}} wins",
-  "party.final.tie": "🤝 It's a tie!",
+  "party.final.winner": "{{name}} wins",
+  "party.final.tie": "It's a tie!",
   "party.final.points": "{{score}} pts",
   "party.final.rounds": "{{count}} hits",
   "party.final.teamScore": "{{score}} / {{max}} pts",
@@ -420,7 +449,7 @@ const en: Record<TranslationKey, string> = {
   "party.final.replay": "Play again",
   "party.final.home": "Back to modes",
 
-  "home.badge": "🎨 Color Quest",
+  "home.badge": "Color Quest",
   "home.title": "Put your eye\nfor color to the test",
   "home.subtitle":
     "Pick a game mode and show how close you get to the perfect color.",
@@ -449,6 +478,9 @@ const en: Record<TranslationKey, string> = {
   "game.empty.subtitle":
     "Check the generated catalog or the challenge metadata.",
   "game.colorStep": "Color {{current}} of {{total}}",
+  "game.runLabel": "Run",
+  "game.hits": "Hits: {{count}}",
+  "game.points": "{{score}} pts",
 
   "progress.label": "Progress",
   "progress.counter": "Challenge {{current}} of {{total}}",
@@ -456,7 +488,7 @@ const en: Record<TranslationKey, string> = {
   "timer.label": "Time",
   "timer.seconds": "{{seconds}}s",
   "streak.label": "Streak",
-  "streak.value": "🔥 {{count}}",
+  "streak.value": "{{count}}",
 
   "result.kicker": "Result",
   "result.yours": "Your color",
@@ -470,31 +502,35 @@ const en: Record<TranslationKey, string> = {
   "summary.subtitle": "You've cleared every available challenge.",
   "summary.total": "Total score",
   "summary.average": "Average",
-  "summary.record": "🎉 New record!",
+  "summary.record": "New record!",
   "summary.best": "Best: {{score}}",
   "summary.bestStreak": "Best streak: {{count}}",
+  "summary.points": "Points",
+  "summary.hits": "Hits",
+  "summary.hitsOf": "of {{rounds}} guesses",
   "summary.home": "Back to home",
   "summary.shareText":
     "🎨 Color Quest — {{mode}}\nScore: {{total}}/{{max}} ({{average}}%)\n{{stars}}",
+  "summary.shareTimed":
+    "🎨 Color Quest — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} hits ({{average}}%)\n{{stars}}",
 
   "daily.done.title": "Daily challenge complete",
   "daily.done.subtitle": "Come back tomorrow for a new color.",
   "daily.score": "Your result today: {{score}}%",
 
-  "finished.emoji": "🏁",
 
-  "score.perfect": "🎉 Perfect!",
+  "score.perfect": "Perfect!",
   "score.close": "Very close!",
   "score.good": "Good try",
   "score.tryAgain": "Keep trying",
 
-  "run.artist": "🏆 Artist's eye!",
-  "run.great": "🎯 Great aim!",
-  "run.good": "👍 Good job",
-  "run.practice": "💪 Keep practising",
+  "run.artist": "Artist's eye!",
+  "run.great": "Great aim!",
+  "run.good": "Good job",
+  "run.practice": "Keep practising",
 
-  "validate.correct": "🎉 Correct!",
-  "validate.tryAgain": "❌ Keep trying.",
+  "validate.correct": "Correct!",
+  "validate.tryAgain": "Keep trying.",
 
   "settings.title": "Sound settings",
   "settings.music": "Music",
@@ -507,7 +543,7 @@ const en: Record<TranslationKey, string> = {
   "online.xp": "{{xp}} XP",
   "online.xpToNext": "{{xp}} XP to go",
 
-  "online.auth.badge": "🌐 Online mode",
+  "online.auth.badge": "Online mode",
   "online.auth.title": "Sign in",
   "online.auth.titleRegister": "Create your account",
   "online.auth.subtitle":
@@ -552,7 +588,7 @@ const en: Record<TranslationKey, string> = {
   "online.auth.verify.resent": "Code sent again.",
   "online.auth.verify.back": "Use another email",
 
-  "online.hub.badge": "🌐 Online mode",
+  "online.hub.badge": "Online mode",
   "online.hub.title": "Your account",
   "online.hub.subtitle":
     "Manage your profile and friends, and see how you rank.",
@@ -570,7 +606,7 @@ const en: Record<TranslationKey, string> = {
   "online.hub.match.description": "Compete in real time against other players.",
   "online.hub.match.locked": "Needs real-time matches · in development",
 
-  "online.profile.badge": "👤 Profile",
+  "online.profile.badge": "Profile",
   "online.profile.title": "Your profile",
   "online.profile.subtitle": "This is how other players see you.",
   "online.profile.account": "Account details",
@@ -585,7 +621,7 @@ const en: Record<TranslationKey, string> = {
     "Signing out clears the session on this device. Offline mode is unaffected.",
   "online.profile.logout": "Sign out",
 
-  "online.friends.badge": "🤝 Friends",
+  "online.friends.badge": "Friends",
   "online.friends.title": "Your friends",
   "online.friends.subtitle": "Search players by name and add them.",
   "online.friends.searchLabel": "Find players",
@@ -612,7 +648,7 @@ const en: Record<TranslationKey, string> = {
   "online.friends.emptyHint":
     "Search someone by their username and send them a request.",
 
-  "online.leaderboard.badge": "🏆 Leaderboard",
+  "online.leaderboard.badge": "Leaderboard",
   "online.leaderboard.title": "Ranking",
   "online.leaderboard.subtitle": "Sorted by total XP.",
   "online.leaderboard.global": "Global",
@@ -651,16 +687,26 @@ const en: Record<TranslationKey, string> = {
 };
 
 const fr: Record<TranslationKey, string> = {
-  "common.back": "← Accueil",
-  "common.backShort": "← Retour",
-  "common.exit": "← Quitter",
+  "common.back": "Accueil",
+  "common.backShort": "Retour",
+  "common.exit": "Quitter",
   "common.next": "Suivant",
   "common.retry": "Réessayer",
   "common.share": "Partager",
   "common.loading": "Chargement du jeu...",
   "common.continue": "Continuer",
 
-  "landing.badge": "🎨 Color Quest",
+  "a11y.back": "Revenir",
+  "a11y.close": "Fermer",
+  "a11y.stars": "{{value}} étoiles sur {{total}}",
+  "a11y.rank": "Place {{position}}",
+  "a11y.playersDecrease": "Retirer un joueur",
+  "a11y.playersIncrease": "Ajouter un joueur",
+  "a11y.wheel": "Roue de teinte et saturation",
+  "a11y.brightness": "Luminosité",
+  "a11y.selectedColor": "Couleur sélectionnée",
+
+  "landing.badge": "Color Quest",
   "landing.title": "Choisis comment\ntu veux jouer",
   "landing.subtitle":
     "Entraîne-toi en solo ou rassemble tes amis autour d'un même téléphone.",
@@ -673,7 +719,7 @@ const fr: Record<TranslationKey, string> = {
   "landing.soon": "Bientôt",
   "landing.footer": "Le mode en ligne arrivera avec la prochaine mise à jour.",
 
-  "offline.badge": "🎮 Mode hors ligne",
+  "offline.badge": "Mode hors ligne",
   "offline.title": "Entraînement & groupe",
   "offline.subtitle":
     "Joue seul ou fais passer le téléphone entre plusieurs personnes.",
@@ -726,8 +772,8 @@ const fr: Record<TranslationKey, string> = {
 
   "party.final.title": "Classement final",
   "party.final.coopTitle": "Résultat de l'équipe",
-  "party.final.winner": "🏆 {{name}} gagne",
-  "party.final.tie": "🤝 Égalité !",
+  "party.final.winner": "{{name}} gagne",
+  "party.final.tie": "Égalité !",
   "party.final.points": "{{score}} pts",
   "party.final.rounds": "{{count}} réussites",
   "party.final.teamScore": "{{score}} / {{max}} pts",
@@ -736,7 +782,7 @@ const fr: Record<TranslationKey, string> = {
   "party.final.replay": "Rejouer",
   "party.final.home": "Retour aux modes",
 
-  "home.badge": "🎨 Color Quest",
+  "home.badge": "Color Quest",
   "home.title": "Mets ton œil\npour la couleur à l'épreuve",
   "home.subtitle":
     "Choisis un mode de jeu et montre à quel point tu approches la couleur parfaite.",
@@ -766,6 +812,9 @@ const fr: Record<TranslationKey, string> = {
   "game.empty.subtitle":
     "Vérifie le catalogue généré ou les métadonnées des défis.",
   "game.colorStep": "Couleur {{current}} sur {{total}}",
+  "game.runLabel": "Partie",
+  "game.hits": "Réussites : {{count}}",
+  "game.points": "{{score}} pts",
 
   "progress.label": "Progression",
   "progress.counter": "Défi {{current}} sur {{total}}",
@@ -773,7 +822,7 @@ const fr: Record<TranslationKey, string> = {
   "timer.label": "Temps",
   "timer.seconds": "{{seconds}}s",
   "streak.label": "Série",
-  "streak.value": "🔥 {{count}}",
+  "streak.value": "{{count}}",
 
   "result.kicker": "Résultat",
   "result.yours": "Ta couleur",
@@ -787,31 +836,35 @@ const fr: Record<TranslationKey, string> = {
   "summary.subtitle": "Tu as réussi tous les défis disponibles.",
   "summary.total": "Score total",
   "summary.average": "Moyenne",
-  "summary.record": "🎉 Nouveau record !",
+  "summary.record": "Nouveau record !",
   "summary.best": "Meilleur : {{score}}",
   "summary.bestStreak": "Meilleure série : {{count}}",
+  "summary.points": "Points",
+  "summary.hits": "Réussites",
+  "summary.hitsOf": "sur {{rounds}} essais",
   "summary.home": "Retour à l'accueil",
   "summary.shareText":
     "🎨 Color Quest — {{mode}}\nScore : {{total}}/{{max}} ({{average}}%)\n{{stars}}",
+  "summary.shareTimed":
+    "🎨 Color Quest — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} réussites ({{average}}%)\n{{stars}}",
 
   "daily.done.title": "Défi quotidien terminé",
   "daily.done.subtitle": "Reviens demain pour une nouvelle couleur.",
   "daily.score": "Ton résultat d'aujourd'hui : {{score}}%",
 
-  "finished.emoji": "🏁",
 
-  "score.perfect": "🎉 Parfait !",
+  "score.perfect": "Parfait !",
   "score.close": "Très proche !",
   "score.good": "Bon essai",
   "score.tryAgain": "Continue d'essayer",
 
-  "run.artist": "🏆 Œil d'artiste !",
-  "run.great": "🎯 Super visée !",
-  "run.good": "👍 Bon travail",
-  "run.practice": "💪 Continue de t'entraîner",
+  "run.artist": "Œil d'artiste !",
+  "run.great": "Super visée !",
+  "run.good": "Bon travail",
+  "run.practice": "Continue de t'entraîner",
 
-  "validate.correct": "🎉 Correct !",
-  "validate.tryAgain": "❌ Continue d'essayer.",
+  "validate.correct": "Correct !",
+  "validate.tryAgain": "Continue d'essayer.",
 
   "settings.title": "Réglages du son",
   "settings.music": "Musique",
@@ -824,7 +877,7 @@ const fr: Record<TranslationKey, string> = {
   "online.xp": "{{xp}} XP",
   "online.xpToNext": "Encore {{xp}} XP",
 
-  "online.auth.badge": "🌐 Mode en ligne",
+  "online.auth.badge": "Mode en ligne",
   "online.auth.title": "Connexion",
   "online.auth.titleRegister": "Cree ton compte",
   "online.auth.subtitle":
@@ -870,7 +923,7 @@ const fr: Record<TranslationKey, string> = {
   "online.auth.verify.resent": "Code renvoye.",
   "online.auth.verify.back": "Changer d'email",
 
-  "online.hub.badge": "🌐 Mode en ligne",
+  "online.hub.badge": "Mode en ligne",
   "online.hub.title": "Ton compte",
   "online.hub.subtitle":
     "Gere ton profil, tes amis et vois ou tu en es au classement.",
@@ -888,7 +941,7 @@ const fr: Record<TranslationKey, string> = {
   "online.hub.match.description": "Affronte d'autres joueurs en temps reel.",
   "online.hub.match.locked": "Necessite les parties en temps reel · en cours",
 
-  "online.profile.badge": "👤 Profil",
+  "online.profile.badge": "Profil",
   "online.profile.title": "Ton profil",
   "online.profile.subtitle": "Voila comment les autres joueurs te voient.",
   "online.profile.account": "Donnees du compte",
@@ -903,7 +956,7 @@ const fr: Record<TranslationKey, string> = {
     "La deconnexion efface la session de cet appareil. Le mode hors ligne n'est pas touche.",
   "online.profile.logout": "Se deconnecter",
 
-  "online.friends.badge": "🤝 Amis",
+  "online.friends.badge": "Amis",
   "online.friends.title": "Tes amis",
   "online.friends.subtitle": "Cherche des joueurs par leur nom et ajoute-les.",
   "online.friends.searchLabel": "Chercher des joueurs",
@@ -930,7 +983,7 @@ const fr: Record<TranslationKey, string> = {
   "online.friends.emptyHint":
     "Cherche quelqu'un par son pseudo et envoie-lui une demande.",
 
-  "online.leaderboard.badge": "🏆 Classement",
+  "online.leaderboard.badge": "Classement",
   "online.leaderboard.title": "Classement",
   "online.leaderboard.subtitle": "Trie par XP cumulee.",
   "online.leaderboard.global": "Mondial",

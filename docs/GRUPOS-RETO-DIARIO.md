@@ -14,21 +14,300 @@
 
 | Fase | Estado | Sesión | Notas |
 |---|---|---|---|
-| 1 — Backend: grupos y temporadas | ⬜ sin empezar | — | |
-| 2 — Backend: reto diario | ⬜ sin empezar | — | |
-| 3 — Backend: chat y avisos | ⬜ sin empezar | — | |
-| 4 — Front: menú y grupos | ⬜ sin empezar | — | |
-| 5 — Front: reto diario | ⬜ sin empezar | — | |
+| 1 — Backend: grupos y temporadas | ✅ hecha | 2026-08-27 | El aviso `season_renewed` que quedaba pendiente ya está, con la Fase 3 |
+| 2 — Backend: reto diario | ✅ hecha | 2026-08-27 | |
+| 3 — Backend: chat y avisos | ✅ hecha | 2026-08-27 | Backend completo: las tres fases de servidor están cerradas |
+| 4 — Front: menú y grupos | ✅ hecha | 2026-08-27 | Falta probarla a mano en un dispositivo con dos cuentas de Clerk |
+| 5 — Front: reto diario | ✅ hecha | 2026-08-28 | Falta probarla a mano, igual que la 4 |
 | 6 — Front: chat y avisos | ⬜ sin empezar | — | |
 | 7 — Remates | ⬜ sin empezar | — | |
 
-**Última actualización:** 2026-08-26 — plan escrito, implementación no iniciada.
+**Última actualización:** 2026-08-28 — **Backend completo (fases 1-3) y Fases 4
+y 5 del frontend hechas: el reto diario ya se juega desde la app.** En
+`back-colors`, `npm test` pasa (213 tests). En `front-colors`, `npx tsc
+--noEmit` y `npm run lint` pasan limpios. Lo siguiente es la Fase 6, el chat.
+
+> **Ojo:** ni la Fase 4 ni la Fase 5 **se han probado a mano**. Hace falta un
+> dispositivo o simulador y **dos cuentas de Clerk reales** para comprobar los
+> criterios de aceptación (crear un grupo en una y entrar con el código desde
+> la otra; jugar los dos intentos y ver moverse la clasificación). Lo que sí
+> está verificado por otras vías está más abajo.
+
+**Fase 1** (`back-colors`): `src/services/clock.ts` con `Clock`, `systemClock` y
+`DevClock`, inyectado desde `src/container.ts`; `SEASON_DURATION_MS` y
+`DEV_TIME_TRAVEL` en `src/config/env.ts` con `env.devToolsEnabled`;
+`src/routes/dev.ts` montado solo si procede; tablas `groups`, `group_seasons` y
+`group_members` (`drizzle/0002_groups.sql`); `GroupRepository`, `GroupService`,
+controlador y rutas `/api/groups*`.
+
+**Fase 2**: `src/game/daily/calendar.ts` (la jornada, el corte de las 15:00 y la
+semilla determinista); tablas `daily_challenges` y `daily_attempts`
+(`drizzle/0003_daily_challenge.sql`); `DailyService` con `GET /api/daily` y
+`POST /api/daily/attempts`; `GET /api/groups/:id/leaderboard` filtrando por la
+ventana de la temporada; XP diario por posición en el ranking global.
+
+**Fase 3**:
+
+- Tablas `group_messages` y `notifications`
+  (`drizzle/0004_chat_notifications.sql`, ya aplicada a `colors_tst`).
+  `notifications.pushed_at` se crea vacía y **no la escribe nadie**: es para el
+  push del futuro (4.4).
+- `ChatService` con `GET /api/groups/:id/messages` en sus dos modos y
+  `POST /api/groups/:id/messages`. **Ni el servicio, ni el controlador, ni el
+  repositorio miran el estado de la temporada**: la única guarda es
+  `GroupService.assertMember`, que comprueba pertenencia y nada más (5.2.1). Hay
+  tests que escriben y leen en un grupo terminado, por servicio y por HTTP.
+- Paginación por cursor `(created_at, id)`, no por `offset`. Ver el diario.
+- Límite de 500 caracteres (recortado antes de medir, `MESSAGE_TOO_LONG`) y
+  limitador de 20 mensajes por minuto **por jugador**, en
+  `src/middleware/rateLimit.ts`.
+- `NotificationService` con `GET /api/notifications` y
+  `POST /api/notifications/read`; `GroupService.renew` deja un aviso
+  `season_renewed` por cada miembro (paso 2 del 5.6), y `GET /groups` trae el
+  contador de no leídos de cada grupo para el punto rojo.
+- Como en las fases anteriores, hay un humo manual pasado contra PostgreSQL de
+  verdad (paginación por cursor, mensajes del mismo milisegundo, chat vivo tras
+  terminar, avisos al renovar sin borrar la conversación y `pushed_at` intacta).
+
+**La API está documentada al día.** `src/docs/openapi.ts` describe las 33
+operaciones que monta el router. Se ve en `/api/docs` (Swagger UI) o en
+`/openapi.json`.
+
+**Fase 4** (`front-colors`):
+
+- `src/api/types.ts` y `endpoints.ts`: grupos, avisos y la lectura del reto
+  diario. `src/api/dev.ts` va aparte a propósito, porque esas rutas no existen
+  en producción.
+- `src/app/online/index.tsx` rehecho como **menú de cómo jugar**: primero los
+  grupos, la fila de partida rápida deshabilitada, los atajos de crear y unirse,
+  y perfil/amigos/clasificación en un bloque secundario.
+- `src/app/online/groups/index.tsx`: mis grupos, crear y unirse con código. El
+  menú entra aquí con `?action=create` o `?action=join`.
+- `src/app/online/groups/[id].tsx`: los tres estados del apartado 8 —activo,
+  terminado con clasificación congelada y botón de renovar **solo para el
+  `owner`**, y el aviso de que el reto no suma si no hay temporada activa—, más
+  miembros, código con botón de compartir y salir del grupo. Los avisos del
+  grupo se marcan leídos al abrirlo, filtrando por `groupId` para no apagar el
+  punto rojo de los demás.
+- `src/components/online/DevTimePanel.tsx`: +1 día, +10 días, terminar esta
+  temporada y volver al tiempo real. **Devuelve `null` fuera de `__DEV__`.**
+- `src/online/groups.ts`: días restantes, etiquetas y orden de la lista, en un
+  solo sitio.
+- Todas las cadenas nuevas están en `src/i18n/index.ts` en `es`, `en` y `fr`
+  (los diccionarios están tipados, así que faltar una clave rompe el typecheck).
+
+**Cómo se ha verificado la Fase 4 sin dispositivo:** `tsc` y `eslint` limpios;
+expo-router regenera `.expo/types/router.d.ts` con `/online/groups` y
+`/online/groups/[id]`, que es su propio escaneo de rutas; los tipos del front
+casan campo a campo con las vistas que devuelve el backend (10 tipos
+comprobados); y las 13 llamadas nuevas apuntan a rutas que el backend monta de
+verdad.
+
+**Fase 5** (`front-colors`):
+
+- `src/hooks/useDailyChallenge.ts`: carga la jornada, casa cada ronda con su
+  dibujo del catálogo local, lleva el bucle de juego y cierra el intento. **No
+  elige nada**: los logos y el `colorIndex` llegan del servidor. Exporta además
+  `useCountdown`, la cuenta atrás en su propio hook para que el reloj no corra
+  durante la partida.
+- `src/online/daily.ts`: búsqueda de un logo por `assetId` **sin** el filtro
+  `DEV_ONLY_LOGOS`, formato de la cuenta atrás y de la jornada, y qué grupos
+  hacen que la puntuación cuente.
+- `src/app/online/daily/index.tsx`: la preparación. Cubre los cuatro estados
+  del apartado 8 —sin intentos, reto cerrado, cuenta atrás al próximo y sin
+  ningún grupo activo (5.3)— y lleva el panel de desarrollo, que aquí sirve
+  para cruzar el corte de las 15:00 sin esperarlo.
+- `src/app/online/daily/play.tsx`: el tablero (reutilizando `SVGChallenge` y
+  `ColorWheel` con las mismas medidas que `app/game.tsx`) y el resultado del
+  intento con el desglose por ronda; cada fila abre la `ResultSheet` de siempre
+  con los dos colores y la diferencia en HSV.
+- `src/api/types.ts` y `endpoints.ts`: los tipos del intento y
+  `POST /daily/attempts`, que manda siempre el `challengeId`.
+- El menú y la pantalla de grupo enlazan al reto; en el grupo, el botón
+  sustituye a la pastilla de «pronto».
+- Todas las cadenas nuevas están en `src/i18n/index.ts` en `es`, `en` y `fr`.
+
+**Cómo se ha verificado la Fase 5 sin dispositivo:** `tsc` y `eslint` limpios;
+expo-router regenera `.expo/types/router.d.ts` con `/online/daily` y
+`/online/daily/play`; los tipos del intento casan campo a campo con
+`DailySubmitResult` y `DailyRoundResult` del backend; y un cruce de los dos
+catálogos comprueba que **cualquier ronda que el servidor pueda mandar se puede
+dibujar**: los 137 identificadores coinciden, tienen el mismo número de colores
+a cada lado, todos traen `svgXml` y el `colorIndex` que elige el selector existe
+siempre en el catálogo de la app.
+
+**Lo que el backend NO tiene** y queda para más adelante: envío de push real
+(solo está la columna `pushed_at`, vacía) y editar o borrar mensajes del chat.
 
 ### Diario de decisiones
 
 Apunta aquí lo que se decida sobre la marcha y no esté ya en el plan.
 
-- *(vacío)*
+- **2026-08-27 — El no miembro recibe `404 GROUP_NOT_FOUND`, no `403`.** La
+  tabla del 5.2 decía `403` pero el criterio de aceptación de la Fase 1 dice
+  `GROUP_NOT_FOUND`, y la regla 5 del apartado 6 ("un grupo solo se ve desde
+  dentro") pide no delatar que ese identificador existe. Se ha ido por el 404
+  para las dos cosas: grupo inexistente y grupo del que no eres miembro. El
+  código `NOT_A_MEMBER` queda declarado en `appError.ts` pero sin usar todavía.
+- **2026-08-27 — Al salirse el `owner`, la propiedad pasa al miembro más
+  antiguo.** El plan no lo decía. Sin dueño nadie podría renovar nunca y el
+  grupo quedaría muerto. Si el `owner` era el último, el grupo se queda vacío:
+  no se borra nada (3.3).
+- **2026-08-27 — Renovar todavía no avisa a nadie.** El paso 2 del 5.6 (una
+  fila en `notifications` por miembro) necesita esa tabla, que llega en la Fase
+  3. Hay un comentario marcándolo en `GroupService.renew`.
+- **2026-08-27 — `groups.created_at` sí usa `defaultNow()`**, porque es
+  informativo (lo permite el 5.4). Aun así el servicio le pasa siempre el valor
+  del `Clock`; el default es solo la red de seguridad. `group_seasons.starts_at`
+  y `ends_at` no tienen default ninguno, a propósito.
+- **2026-08-27 (Fase 2) — La jornada se calcula en Node con `Intl`, no en
+  PostgreSQL.** El 4.2 decía "el backend no tiene librería de zonas horarias":
+  sí la tiene, Node 20 trae ICU completo y `Intl` sabe de los cambios de hora.
+  Se ha hecho en `src/game/daily/calendar.ts` para poder escribir los tests de
+  cambio de hora sin levantar una base de datos, que es justo lo que pide la
+  Fase 2. Para que no haya dos verdades,
+  `tests/dailyCalendarPostgres.test.ts` comprueba que el módulo y las dos
+  consultas `AT TIME ZONE` del plan dan **exactamente** lo mismo en 484
+  instantes alrededor de los dos cambios de hora y en 400 aperturas seguidas;
+  ese test se salta solo si no hay base de datos a mano. Lo que no cambia: el
+  instante entra siempre como parámetro desde el `Clock`, nunca `now()`.
+- **2026-08-27 (Fase 2) — La jornada cierra cuando abre la siguiente, no a las
+  24 h.** El esquema del 4.2 ponía `closes_at = opens_at + 24 h`, pero eso es
+  justo la trampa del horario de verano: el último domingo de marzo el día dura
+  23 horas y el de octubre 25. Con un salto fijo quedaría una hora sin reto en
+  octubre y una hora con dos retos abiertos en marzo. Encadenando con la
+  apertura del día siguiente las jornadas se tocan exactamente. Hay tests de los
+  dos domingos y uno que recorre 400 días sin huecos ni solapes.
+- **2026-08-27 (Fase 2) — `POST /daily/attempts` acepta un `challengeId`
+  opcional.** El cuerpo del 7 era solo `{ answers }`. Sin el id, el jugador que
+  empieza a las 14:55 y envía a las 15:01 vería sus respuestas puntuadas contra
+  los logos del reto **nuevo**. Mandándolo, el servidor lo detecta y responde
+  `409 DAILY_CLOSED`. Es opcional, así que el contrato del plan sigue valiendo.
+- **2026-08-27 (Fase 2) — El XP diario se concede como un único neto por
+  jornada, con recargo.** El 3.2 pide "una sola concesión diaria por jugador"
+  según la posición en el ranking global, pero esa posición se mueve mientras la
+  gente juega y hay dos intentos. Solución: en cada intento se mira lo que le
+  correspondería por su posición y se le abona **solo lo que le falte** de lo ya
+  cobrado ese día (`daily_attempts.xp_earned`). Así el segundo intento puede
+  completar al primero si mejora, nunca duplica, y nunca se quita XP a nadie
+  aunque le adelanten después (regla 6.6). Baremo en `game/xp/xp.ts`: 100 / 80 /
+  65 los tres primeros y 50 de participación.
+- **2026-08-27 (Fase 2) — El reto diario no tiene bonus de velocidad.** Se
+  reutiliza `calculateScore` de las partidas en vivo con `durationMs: 0`, así
+  que la puntuación es solo la precisión: 1000 por ronda, 5000 el pleno. Un
+  cronómetro no encaja en un juego asíncrono en el que cada uno entra cuando
+  quiere.
+- **2026-08-27 (Fase 2) — Lo jugado antes de crear un grupo no cuenta en su
+  temporada 1.** La ventana arranca al crear el grupo, así que un grupo nuevo no
+  absorbe retroactivamente las partidas anteriores de sus miembros. Lo destapó
+  el humo contra PostgreSQL; hay un test que lo fija.
+
+
+- **2026-08-27 (Fase 3) — El chat pagina por cursor `(created_at, id)`, no por
+  `offset`.** El 7 pedía `?before=<id>`, que ya es un cursor; se ha completado
+  con el `id` como desempate. En un chat que crece por abajo mientras lo lees,
+  el desplazamiento se descuadra y salen mensajes repetidos o saltados; y sin el
+  `id`, dos mensajes escritos en el mismo milisegundo pueden pisarse y uno no
+  aparecer nunca. Hay tests de las dos cosas, y el humo contra PostgreSQL
+  escribe seis mensajes sin mover el reloj para comprobarlo de verdad.
+- **2026-08-27 (Fase 3) — Un cursor de otro grupo se rechaza.** `before` y
+  `after` exigen que el mensaje sea de esa conversación; si no, `400`. Sin eso,
+  un id ajeno colaría mensajes de otro grupo en la página.
+- **2026-08-27 (Fase 3) — El limitador del chat va por jugador, no por IP.** Son
+  los 20 mensajes por minuto que sugería el 7, pero con `keyGenerator` sobre
+  `req.user.id`: varios compañeros de piso o de oficina comparten IP y no tienen
+  por qué compartir el límite. La ruta va detrás de `requireAuth`, así que el
+  usuario siempre está. `createTestContext({ rateLimitDisabled: false })` permite
+  probarlo.
+- **2026-08-27 (Fase 3) — Al renovar se avisa también al `owner`.** El 5.6 dice
+  "una fila por cada miembro" y el `owner` es miembro. Es discutible avisar a
+  quien acaba de pulsar el botón; si molesta en la Fase 6, se quita filtrando una
+  línea en `GroupService.renew`.
+- **2026-08-27 (Fase 3) — `GET /groups` trae `unreadCount` por grupo.** El 7 pedía
+  "los míos, con estado y avisos sin leer", así que `GroupSummary` (y por tanto
+  el detalle) lleva el contador para el punto rojo de cada fila. Los avisos sin
+  grupo no cuentan para ninguna.
+- **2026-08-27 (Fase 3) — Marcar como leído es idempotente y ajeno a prueba de
+  balas.** El repositorio filtra siempre por `userId` y solo toca los que aún no
+  estaban leídos, así que mandar el id de un aviso de otro no hace nada y volver
+  a marcar no reescribe la hora de lectura.
+- **2026-08-27 — `openapi.ts` pasa a ser una función.** Se llamaba
+  `openApiDocument` y era una constante; ahora es `buildOpenApiDocument({
+  devToolsEnabled })`. El motivo: las rutas de `/api/dev` solo se documentan
+  cuando están montadas de verdad. Anunciarlas siempre sería describir rutas que
+  en producción dan 404 y, peor, delataría que existen, que es justo lo que el
+  5.5 quiere evitar. `createApp` le pasa la misma condición que usa para
+  montarlas, así que no pueden desincronizarse.
+- **2026-08-27 (Fase 4) — El estado del grupo NO se recalcula en el cliente.**
+  Llega en `group.status`, ya derivado por el servidor. El reloj del teléfono
+  puede ir descuadrado y, sobre todo, no sabe nada del viaje en el tiempo del
+  backend: si la app comparase fechas por su cuenta, el panel de desarrollo
+  dejaría de funcionar. Lo único que se calcula en local es cuántos días quedan,
+  y solo para pintar una etiqueta (`src/online/groups.ts`).
+- **2026-08-27 (Fase 4) — Crear y unirse viven en la lista de grupos, y el menú
+  entra con un parámetro.** El apartado 8 pide que las dos acciones estén
+  también en el menú principal. En vez de duplicar los formularios, los botones
+  del menú navegan a `/online/groups?action=create` o `?action=join` y la
+  pantalla abre la pestaña que toca. Un solo formulario que mantener.
+- **2026-08-27 (Fase 4) — Los avisos se marcan leídos filtrando por grupo.**
+  Al abrir un grupo se piden los no leídos y se marcan **solo los suyos**, no
+  todos: entrar en un grupo no debe apagar el punto rojo de los demás.
+- **2026-08-27 (Fase 4) — El panel de desarrollo no tiene hooks propios.** La
+  guarda `if (!__DEV__) return null` va antes que nada y todo el estado vive en
+  un componente interno, así que en producción no hay ni un `useState` que se
+  salte la guarda. Aunque alguien lo forzara, las rutas `/api/dev` tampoco
+  existen allí.
+- **2026-08-27 (Fase 4) — `useSession` expone ahora el `ApiClient` en crudo.**
+  Lo necesita `createDevApi`, que no forma parte de la superficie normal de la
+  API precisamente porque en producción esas rutas no existen.
+- **2026-08-28 (Fase 5) — El reto diario vive en `/online/daily`, no dentro de
+  un grupo.** El árbol del apartado 8 lo dibujaba como
+  `/online/groups/[id]/play`, pero el 5.3 dice que el reto es global y uno de
+  los estados obligatorios es el del jugador **sin ningún grupo activo** —o sin
+  ninguno—, que colgando la pantalla de un grupo no tendría por dónde entrar.
+  Los grupos y el menú enlazan ahí, y la propia pantalla dice en cuántas
+  clasificaciones suma lo que estás jugando.
+- **2026-08-28 (Fase 5) — No hay hoja de resultado por ronda.** En el juego
+  offline, comprobar abre la `ResultSheet` con el color correcto. Aquí no puede
+  ser: el objetivo no llega hasta cerrar el intento (regla 6.2) y sacarlo del
+  catálogo local para adelantar la UI sería enseñar la respuesta. Responder una
+  ronda solo avanza —con el pulso del logo como confirmación— y el desglose de
+  las cinco aparece al final, con lo que devuelve el servidor. Cada fila de ese
+  desglose abre la `ResultSheet` de siempre, que es donde vive la comparación de
+  los dos colores.
+- **2026-08-28 (Fase 5) — Las respuestas viven en una referencia, no en el
+  estado.** Responder la última ronda cierra el intento en el mismo gesto, y un
+  `setState` no se ve dentro del mismo ciclo: leyendo de la referencia, lo que
+  se envía incluye siempre la última respuesta. De regalo, si el envío falla se
+  puede reintentar sin volver a jugar las cinco rondas.
+- **2026-08-28 (Fase 5) — La cuenta atrás se calla si el reloj del móvil no cae
+  dentro de la ventana del reto.** El servidor no dice qué hora tiene, así que
+  la cuenta atrás se calcula con el reloj del teléfono. Al cargar se comprueba
+  si ese reloj está dentro de `[opensAt, closesAt)`: si no lo está —viaje en el
+  tiempo del backend (5.5), o la hora del móvil mal puesta— no se enseña ninguna
+  cifra en vez de enseñar una inventada. Quien decide de verdad si la jornada
+  cerró sigue siendo el servidor, con su `DAILY_CLOSED`.
+- **2026-08-28 (Fase 5) — El catálogo local se consulta sin `DEV_ONLY_LOGOS`.**
+  `hooks/useChallenge.ts` filtra el catálogo con esa constante para acotar los
+  modos offline mientras se prueba algo. Aplicarla aquí dejaría sin dibujo
+  precisamente los logos que el servidor sí ha elegido. La búsqueda por
+  `assetId` va aparte, en `online/daily.ts`.
+- **2026-08-28 (Fase 5) — Un logo que la app no tenga no bloquea el intento.**
+  Si los dos catálogos se desincronizan, esa ronda se pinta como un hueco con su
+  `assetId` y se sigue jugando: el servidor exige respuesta para todas las
+  rondas, así que quedarse parado costaría el intento entero.
+- **2026-08-28 (Fase 5) — El menú pide también `GET /daily`.** La fila del reto
+  dice cuántos intentos quedan sin entrar en ella. Va con su propio `catch`: si
+  esa llamada falla, la fila se queda con el texto genérico en vez de tumbar el
+  menú entero.
+
+- **2026-08-27 — Hay un test que impide que la documentación se vuelva a quedar
+  atrás.** `tests/openapi.test.ts` compara la especificación con la lista de
+  rutas montadas en las dos direcciones (nada sin documentar, nada documentado
+  que no exista), comprueba que no haya `$ref` rotos y que `/api/dev` solo
+  aparezca con las herramientas activas. Las fases 1-3 llegaron a estar enteras
+  sin documentar; con esto la próxima ruta nueva rompe un test en vez de pasar
+  desapercibida. **Si añades una ruta, añádela también a `MOUNTED`.**
 
 ---
 
@@ -520,9 +799,11 @@ lo social en segundo plano:
 │
 ├─ Partida rápida                 fila DESHABILITADA, "próximamente"
 │
+├─ /online/daily                  el reto de hoy: preparación y estados
+│   └─ /online/daily/play            el reto (2 intentos) y su resultado
+│
 ├─ /online/groups                 mis grupos · crear · unirse con código
 │   ├─ /online/groups/[id]           reto de hoy + clasificación + miembros + acceso al chat
-│   ├─ /online/groups/[id]/play      el reto (2 intentos)
 │   └─ /online/groups/[id]/chat      la conversación
 │
 └─ Secundario (ya existen, se mantienen)
@@ -533,6 +814,10 @@ lo social en segundo plano:
 
 Crear y unirse a un grupo deben ser accesibles **también desde el menú
 principal**, no solo desde dentro de la lista de grupos.
+
+> El reto colgaba de `/online/groups/[id]/play` en la primera versión de este
+> árbol. Se movió a `/online/daily` porque es global (5.3) y hay que poder
+> jugarlo sin tener ningún grupo; ver el diario de decisiones.
 
 ### Estados que la UI tiene que cubrir
 
@@ -578,21 +863,26 @@ resueltas del servidor.
 
 ### Fase 1 — Backend: grupos y temporadas
 
-- [ ] **Servicio `Clock` (5.4)** inyectado desde `src/container.ts`, con la
-      implementación real y la de desarrollo con desfase
-- [ ] **`SEASON_DURATION_MS` y `DEV_TIME_TRAVEL`** en `src/config/env.ts` y en
+- [x] **Servicio `Clock` (5.4)** inyectado desde `src/container.ts`, con la
+      implementación real y la de desarrollo con desfase — `src/services/clock.ts`
+- [x] **`SEASON_DURATION_MS` y `DEV_TIME_TRAVEL`** en `src/config/env.ts` y en
       `.env.example`
-- [ ] **Router `/api/dev`** con los endpoints de tiempo (5.5), montado solo si
-      procede
-- [ ] Tablas `groups`, `group_seasons` y `group_members` + migración
-- [ ] Generador de códigos (4.1) con reintento ante colisión
-- [ ] `GroupRepository` (Drizzle + memoria)
-- [ ] `GroupService`: crear, unirse por código, listar, detalle, salir, **renovar**
-- [ ] Estado `activo`/`terminado` derivado (3.4) y **control de acceso del 5.2**
-- [ ] `POST /api/dev/groups/:id/season/end` para terminar una temporada al vuelo
-- [ ] Códigos de error nuevos, controlador y rutas
-- [ ] Tests con repositorios en memoria, al estilo de `tests/friends.test.ts`,
-      usando un `Clock` falso para simular el paso de los días
+- [x] **Router `/api/dev`** con los endpoints de tiempo (5.5), montado solo si
+      procede — `src/routes/dev.ts`, condicionado en `createApp`
+- [x] Tablas `groups`, `group_seasons` y `group_members` + migración
+      (`drizzle/0002_groups.sql`)
+- [x] Generador de códigos (4.1) con reintento ante colisión — `src/utils/joinCode.ts`
+- [x] `GroupRepository` (Drizzle + memoria)
+- [x] `GroupService`: crear, unirse por código, listar, detalle, salir, **renovar**
+- [x] Estado `activo`/`terminado` derivado (3.4) y **control de acceso del 5.2**
+- [x] `POST /api/dev/groups/:id/season/end` para terminar una temporada al vuelo
+- [x] Códigos de error nuevos, controlador y rutas
+- [x] Tests con repositorios en memoria, al estilo de `tests/friends.test.ts`,
+      usando un `Clock` falso para simular el paso de los días — `tests/groups.test.ts`
+
+> Pendiente que arrastra la Fase 3: al renovar falta insertar el aviso
+> `season_renewed` por miembro (paso 2 del 5.6). La tabla `notifications` aún no
+> existe.
 
 **Aceptación:** dos usuarios, uno crea grupo y el otro entra con el código. Un
 tercero sin código recibe `GROUP_NOT_FOUND`. Con la temporada forzada a
@@ -605,15 +895,18 @@ servidor ni esperar. Con `NODE_ENV=production` esa ruta debe devolver `404`.
 
 ### Fase 2 — Backend: reto diario
 
-- [ ] Tablas `daily_challenges` y `daily_attempts` + migración
-- [ ] Cálculo de la jornada con `AT TIME ZONE` (4.2) **alimentado por el `Clock`,
-      nunca por `now()` de SQL**, con **tests de cambio de hora**
-- [ ] Generación bajo demanda con semilla determinista (4.3)
-- [ ] `GET /daily` y `POST /daily/attempts` con validación de ventana e intentos
-- [ ] Puntuación **en el servidor** reutilizando `compare.ts` y `score.ts`
-- [ ] XP diario único por jugador (3.2), reutilizando `game/xp/xp.ts`
-- [ ] `GET /groups/:id/leaderboard` filtrando por la ventana de la temporada
-- [ ] `GET /groups/:id/seasons`
+- [x] Tablas `daily_challenges` y `daily_attempts` + migración
+      (`drizzle/0003_daily_challenge.sql`)
+- [x] Cálculo de la jornada **alimentado por el `Clock`, nunca por `now()` de
+      SQL**, con **tests de cambio de hora** — `src/game/daily/calendar.ts`. Se
+      hace con `Intl` en vez de `AT TIME ZONE` y se comprueba que coincide con
+      PostgreSQL: ver el diario de decisiones
+- [x] Generación bajo demanda con semilla determinista (4.3)
+- [x] `GET /daily` y `POST /daily/attempts` con validación de ventana e intentos
+- [x] Puntuación **en el servidor** reutilizando `compare.ts` y `score.ts`
+- [x] XP diario único por jugador (3.2), reutilizando `game/xp/xp.ts`
+- [x] `GET /groups/:id/leaderboard` filtrando por la ventana de la temporada
+- [x] `GET /groups/:id/seasons` — ya estaba desde la Fase 1
 
 **Aceptación:** jugar dos intentos, ver que cuenta el mejor y que aparece en la
 clasificación. Tras renovar, la clasificación sale a cero **sin que se haya
@@ -625,43 +918,57 @@ de octubre no debe descuadrar la jornada.
 
 ### Fase 3 — Backend: chat y avisos
 
-- [ ] Tablas `group_messages` y `notifications` (con `pushed_at`, ver 4.4) + migración
-- [ ] `GET /groups/:id/messages` en sus dos modos (`before` y `after`)
-- [ ] `POST /groups/:id/messages` con límite de 500 caracteres y de ritmo
-- [ ] **El chat funciona con la temporada terminada** (regla 5.2.1)
-- [ ] Avisos: creación al renovar, `GET /notifications`, `POST /notifications/read`
-- [ ] Tests: no miembro rechazado, chat vivo tras terminar, aviso a todos al renovar
+- [x] Tablas `group_messages` y `notifications` (con `pushed_at`, ver 4.4) +
+      migración (`drizzle/0004_chat_notifications.sql`)
+- [x] `GET /groups/:id/messages` en sus dos modos (`before` y `after`), con
+      cursor `(created_at, id)` — ver el diario de decisiones
+- [x] `POST /groups/:id/messages` con límite de 500 caracteres y de ritmo
+      (20/min por jugador)
+- [x] **El chat funciona con la temporada terminada** (regla 5.2.1) — la única
+      guarda es `GroupService.assertMember`, que no mira la temporada
+- [x] Avisos: creación al renovar, `GET /notifications`, `POST /notifications/read`
+- [x] Tests: no miembro rechazado, chat vivo tras terminar, aviso a todos al
+      renovar — `tests/chat.test.ts` y `tests/notifications.test.ts`
 
 **Aceptación:** dos miembros conversan; con la temporada terminada el chat
 sigue funcionando; renovar deja un aviso sin leer a cada miembro.
 
 ### Fase 4 — Frontend: menú y grupos
 
-- [ ] Rehacer `src/app/online/index.tsx` como menú de "cómo jugar"
-- [ ] Fila de partida rápida visible pero deshabilitada
-- [ ] Tipos y endpoints nuevos en `src/api/types.ts` y `src/api/endpoints.ts`
-- [ ] `/online/groups`: lista, crear, unirse con código
-- [ ] `/online/groups/[id]`: miembros, reto de hoy, clasificación con podio
-- [ ] Estado terminado con podio congelado y botón de renovar solo para el `owner`
-- [ ] Amigos, ranking y perfil pasan a secundario
-- [ ] **Panel de desarrollo bajo `__DEV__`** (dentro de ajustes o del grupo) con
-      botones de "avanzar 1 día", "avanzar 10 días", "terminar esta temporada" y
-      "volver al tiempo real", contra los endpoints de 5.5. Es lo que convierte
-      la prueba del ciclo en un par de toques en vez de `curl`
+- [x] Rehacer `src/app/online/index.tsx` como menú de "cómo jugar"
+- [x] Fila de partida rápida visible pero deshabilitada
+- [x] Tipos y endpoints nuevos en `src/api/types.ts` y `src/api/endpoints.ts`
+- [x] `/online/groups`: lista, crear, unirse con código
+- [x] `/online/groups/[id]`: miembros, reto de hoy, clasificación con podio
+- [x] Estado terminado con podio congelado y botón de renovar solo para el `owner`
+- [x] Amigos, ranking y perfil pasan a secundario
+- [x] **Panel de desarrollo bajo `__DEV__`** — `src/components/online/DevTimePanel.tsx`,
+      en la lista de grupos y dentro de cada grupo (ahí con el atajo de terminar
+      **esa** temporada sin mover el reloj global)
+- [ ] **Probarlo a mano**: hace falta un dispositivo y dos cuentas de Clerk
+      reales. Es el criterio de aceptación y es lo único que queda de esta fase
 
 **Aceptación:** crear un grupo desde la app y que otro dispositivo entre con el
 código. Un grupo terminado se ve como tal, y solo su creador ve el botón.
 
 ### Fase 5 — Frontend: el reto diario
 
-- [ ] `useDailyChallenge`: rondas del servidor, sin selección local
-- [ ] Pantalla de preparación (qué toca hoy, intentos restantes)
-- [ ] Pantalla de juego reutilizando `SVGChallenge` y `ColorWheel`
-- [ ] Envío del intento y resultado con desglose por ronda
-- [ ] Estados: sin intentos, reto cerrado, cuenta atrás, **sin grupo activo** (5.3)
+- [x] `useDailyChallenge`: rondas del servidor, sin selección local —
+      `src/hooks/useDailyChallenge.ts`
+- [x] Pantalla de preparación (qué toca hoy, intentos restantes) —
+      `src/app/online/daily/index.tsx`
+- [x] Pantalla de juego reutilizando `SVGChallenge` y `ColorWheel` —
+      `src/app/online/daily/play.tsx`
+- [x] Envío del intento y resultado con desglose por ronda, con la
+      `ResultSheet` de siempre para el detalle de cada una
+- [x] Estados: sin intentos, reto cerrado, cuenta atrás, **sin grupo activo**
+      (5.3)
+- [ ] **Probarlo a mano**: hace falta un dispositivo y una cuenta de Clerk real.
+      Es el criterio de aceptación y es lo único que queda de esta fase
 
 **Aceptación:** partida diaria completa desde la app, con la clasificación
-actualizándose.
+actualizándose. Al volver de la partida, la pantalla del grupo relee la
+clasificación en su `useFocusEffect`.
 
 ### Fase 6 — Frontend: chat y avisos
 

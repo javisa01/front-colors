@@ -153,6 +153,188 @@ function AmbientOrbsBase(): ReactElement {
 export const AmbientOrbs = memo(AmbientOrbsBase);
 
 // ---------------------------------------------------------------------------
+// Constelación de resultados
+// ---------------------------------------------------------------------------
+
+/**
+ * El fondo de las pantallas de resultado de una partida en grupo.
+ *
+ * Es el mismo idioma que la portada —círculos y los dos tonos ambientales— con
+ * otra sintaxis. Los orbes de arriba son tres manchas enormes desbordadas por
+ * las esquinas, que es lo que hace falta cuando la pantalla está casi vacía y
+ * hay que llenarla de atmósfera. Un marcador no está vacío: lleva tarjetas,
+ * filas y cifras, y esa misma mancha se leería como niebla por debajo del texto.
+ *
+ * Así que aquí los círculos son **dibujo**, no lavado: aros de un píxel y
+ * puntos pequeños repartidos por los bordes, donde el contenido no llega. Se
+ * ven, se reconocen como los círculos del logo y no le quitan contraste a
+ * ninguna cifra, porque no hay relleno debajo de ellas.
+ *
+ * El movimiento es el mínimo: cada pieza flota por su cuenta con un ciclo
+ * distinto y primo de los demás, así que el conjunto no cae nunca en un
+ * compás reconocible.
+ */
+interface ConstellationPiece {
+  /** Diámetro en px. */
+  size: number;
+  /** Posición desde cada borde; solo se declaran los dos que hacen falta. */
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+  /** `ring` es un aro hueco; `dot` es un disco lleno. */
+  shape: "ring" | "dot";
+  cool: boolean;
+  opacity: number;
+  /** Recorrido vertical total y ciclo completo de ida y vuelta. */
+  distance: number;
+  durationMs: number;
+}
+
+/** Grosor del trazo de un aro. Uno solo: dos grosores distintos en el mismo
+ *  fondo se leen como dos capas de profundidad que aquí no existen. */
+const RING_WIDTH = 1.5;
+
+/**
+ * Todo cae en los bordes a propósito: el contenido de un marcador ocupa la
+ * columna central, así que ahí no va nada. Los tres aros grandes salen
+ * parcialmente de la pantalla —igual que los orbes de la portada— para que se
+ * lean como parte del fondo y no como tres circunferencias dibujadas encima.
+ *
+ * Las duraciones son deliberadamente primas entre sí; con múltiplos, las seis
+ * piezas volverían a alinearse cada pocos segundos y el fondo entero latiría a
+ * la vez.
+ */
+const CONSTELLATION: readonly ConstellationPiece[] = [
+  {
+    size: 220,
+    top: -70,
+    left: -80,
+    shape: "ring",
+    cool: true,
+    opacity: 0.5,
+    distance: 14,
+    durationMs: 5200,
+  },
+  {
+    size: 140,
+    top: 120,
+    right: -56,
+    shape: "ring",
+    cool: false,
+    opacity: 0.42,
+    distance: 18,
+    durationMs: 6100,
+  },
+  {
+    size: 300,
+    bottom: -140,
+    right: -110,
+    shape: "ring",
+    cool: true,
+    opacity: 0.34,
+    distance: 22,
+    durationMs: 7300,
+  },
+  {
+    size: 12,
+    top: 96,
+    left: 34,
+    shape: "dot",
+    cool: true,
+    opacity: 0.55,
+    distance: 10,
+    durationMs: 4300,
+  },
+  {
+    size: 8,
+    top: 300,
+    right: 42,
+    shape: "dot",
+    cool: false,
+    opacity: 0.5,
+    distance: 12,
+    durationMs: 5700,
+  },
+  {
+    size: 16,
+    bottom: 150,
+    left: 22,
+    shape: "dot",
+    cool: false,
+    opacity: 0.4,
+    distance: 16,
+    durationMs: 6700,
+  },
+];
+
+function ConstellationCircle({
+  piece,
+}: {
+  piece: ConstellationPiece;
+}): ReactElement {
+  const clock = useAmbientClock(piece.durationMs);
+
+  // Los dos valores que necesita el worklet se sacan del objeto aquí fuera:
+  // dentro de un worklet solo entra lo que se captura, y capturar dos números
+  // es más barato que capturar la pieza entera.
+  const { distance, opacity } = piece;
+
+  const floatStyle = useAnimatedStyle(() => {
+    // El reloj va de 0 a 1; centrarlo reparte el recorrido a ambos lados de la
+    // posición de reposo, igual que en `SoftFloat`.
+    const phase = clock.get() - 0.5;
+    return {
+      transform: [
+        { translateY: phase * distance },
+        // Un tercio del recorrido vertical y en sentido contrario: en diagonal
+        // el desplazamiento se percibe como deriva, y en vertical puro como un
+        // ascensor.
+        { translateX: -phase * distance * 0.35 },
+      ],
+      // Un margen de opacidad estrecho. Más ancho y los puntos parpadean, que
+      // sobre un marcador se lee como un fallo de pintado.
+      opacity: opacity * (0.78 + clock.get() * 0.22),
+    };
+  });
+
+  const color = piece.cool ? Color.ambient.ringCool : Color.ambient.ringWarm;
+
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={[
+        styles.piece,
+        {
+          width: piece.size,
+          height: piece.size,
+          top: piece.top,
+          bottom: piece.bottom,
+          left: piece.left,
+          right: piece.right,
+        },
+        piece.shape === "ring"
+          ? { borderWidth: RING_WIDTH, borderColor: color }
+          : { backgroundColor: color },
+        floatStyle,
+      ]}
+    />
+  );
+}
+
+function ResultConstellationBase(): ReactElement {
+  return (
+    <>
+      {CONSTELLATION.map((piece, index) => (
+        <ConstellationCircle key={index} piece={piece} />
+      ))}
+    </>
+  );
+}
+
+export const ResultConstellation = memo(ResultConstellationBase);
+
+// ---------------------------------------------------------------------------
 // Flotación suave
 // ---------------------------------------------------------------------------
 
@@ -207,6 +389,10 @@ const ORB_SIZE = 320;
 const HAZE_SIZE = 420;
 
 const styles = StyleSheet.create({
+  piece: {
+    position: "absolute",
+    borderRadius: Radius.pill,
+  },
   orb: {
     position: "absolute",
     width: ORB_SIZE,

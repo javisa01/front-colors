@@ -32,7 +32,7 @@ const DEV_ONLY_LOGOS: string[] | null = null
  *
  * Antes servía ocho imágenes y se acababa ahí, así que el modo premiaba llegar
  * al final más que aprovechar el tiempo. Ahora se baraja el catálogo entero,
- * igual que los modos contrarreloj en grupo reparten una baraja larga: en 45
+ * igual que los modos contrarreloj en grupo reparten una baraja larga: en 30
  * segundos no se acaba, y en la práctica eso es «las que te dé tiempo».
  */
 const UNLIMITED = Number.POSITIVE_INFINITY;

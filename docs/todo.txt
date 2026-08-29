@@ -20,3 +20,22 @@
 - Añadir en el script que obvie los colores negros y blancos, para que no los meta en el manifest (ya que se setean para retos multicolor)
 - Revisar textos colorScore.ts u otros
 - Añadir mas logos para el juego.
+- Mod claro/obscuro selector
+
+29/08:
+Haz estos cambios antes de continuar con la fase 6, en front y back:
+- Evitar que se pueda enviar 2 veces un resultado (clicar 2 veces rapido al boton de comprobar)
+- logo lacoste le cambia el color de la boca, no del cuerpo cocodrilo
+- Añadir fondo en pantalla Entrar en tu cuenta y pantallas configurar y turno del jugador X
+- Añadir fondos diferentes en las pantallas que no tienen en el modo online (excepto las de jugar). Fondos tambien minimalistas, diferentes a los de la pantalla principal, parecido a las de resultado del modo offline.  Que los fondos tengan concordancia, por ejemplo lo que esté bajo la ruta /online/groups sea el mismo, pero lo que este bajo /online diferente a /online/groups
+- Cambiar backend para que coincida con el front minimo 8 caracteres en registro de la contraseña
+- Cambiar diseño de la caja contenedora de Miembros y clasificacion, que se diferencie bien no solo por el texto, y aplica esto a las demas cajas que son parecidas y que se diferencian por el texto.
+- Añadir pantalla para ver el perfil de usuarios en tu mismo grupo y ver sus estadisticas, XP, nivel, etc. Que se le pueda dar a tu tarjeta de la pantalla /online y te lleve a tu perfil
+- Haya donde pone "logo" por ejemplo en la pantalla El reto de hoy, que ponga "imagen/imagenes". Igual que en la pantalla de resultado donde pone el nombre de los logos, poner Imagen 1, Imagen 2, ...
+- Mover el "como funciona" en la pantalla del reto de hoy encima del boton, y cambiar el diseño a uno diferente a la mayoria de cards, uno en el que se entienda que (por la forma y colores), es un aviso de tutorial.
+- En la pantalla de mis grupos, tiene que estar la parte de crear grupos y/o unirse debajo de la card de mis grupos, y esta parte de Mis grupos tiene que ser mas llamativa
+- IMPORTANTE: los retos diarios son diferentes por cada grupo, cada grupo tiene sus 5 imagenes diferentes, resultados individuales por cada grupo.
+- En la pantalla principal de /online, debe verse una card por cada grupo, con el nombre del grupo, si hay reto actio, intentos, lo mismo que havia antes o incluso añadir algun parametro mas sobre la puntuacion, ya que la Card debe ser mas grande y vistosa. Debajo de todas las cards de los grupos, un texto con link para ir a "Ver todos mis grupos". Mantener debajo de eso lo de partida online bloqueada y crear o unirse a grupo
+
+En resumen, que se diferencien un poco mas cada card de informacion con lo que contiene y que sea mas vistosa en funcion de la importancia que tiene, y añadir fondos diferentes, minimalistas y manteniendo la linea.
+Crea un fichero de texto o .md o lo que prefieres mientras vas realizando las tareas, conforme se hacen, o hay algun error, y que quede todo registrado para que luego pueda revisarlo.

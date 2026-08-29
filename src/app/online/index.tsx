@@ -4,34 +4,43 @@ import { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { describeError } from "@/api/errors";
-import type { FriendsOverview, MyRanking } from "@/api/types";
+import type {
+  DailyStatus,
+  FriendsOverview,
+  GroupSummary,
+  MyRanking,
+} from "@/api/types";
 import { SettingsButton } from "@/components/SettingsButton";
 import { Avatar } from "@/design/Avatar";
-import { ErrorBanner, Pill, ProgressBar, Stat } from "@/design/Feedback";
+import { Button } from "@/design/Button";
+import { ErrorBanner, Pill, ProgressBar } from "@/design/Feedback";
 import type { IconName } from "@/design/Icon";
-import { Card, Divider, OptionRow, Screen } from "@/design/Layout";
+import { Card, OptionRow, Screen, SectionHeader } from "@/design/Layout";
 import { AmbientOrbs } from "@/design/Ambient";
-import { Color, Space, Type, type SpectrumTone } from "@/design/tokens";
+import { Space, Type, type SpectrumTone } from "@/design/tokens";
 import { t, type TranslationKey } from "@/i18n";
 import { useSession } from "@/online/session";
 
 /**
- * Punto de entrada del modo online: quién eres y a dónde puedes ir.
+ * Punto de entrada del modo online: **un menú de cómo quieres jugar**.
  *
- * Las tres entradas son la misma `OptionRow` que usan la portada y el menú
- * offline. Antes cada una llevaba su emoji sobre un degradado propio —azul,
- * verde, dorado—, así que la lista tenía tres colores fuertes que no
- * significaban nada y no se parecía a ninguna otra lista de la aplicación.
+ * Antes era una lista plana de perfil, amigos y clasificación, es decir un
+ * índice de la cuenta. Ahora lo primero es con quién compites —los grupos— y lo
+ * social pasa a un bloque secundario. La identidad se queda arriba, pero
+ * reducida a una tira: quién eres y cuánto te falta para el siguiente nivel.
+ *
+ * Crear y unirse a un grupo están también aquí, no solo dentro de la lista de
+ * grupos: son las dos primeras cosas que hace alguien que acaba de entrar.
  */
 
-interface HubEntry {
+interface AccountEntry {
   key: "profile" | "friends" | "leaderboard";
   route: "/online/profile" | "/online/friends" | "/online/leaderboard";
   icon: IconName;
   tone: SpectrumTone;
 }
 
-const ENTRIES: HubEntry[] = [
+const ACCOUNT: AccountEntry[] = [
   { key: "profile", route: "/online/profile", icon: "user", tone: "violet" },
   { key: "friends", route: "/online/friends", icon: "users", tone: "green" },
   {
@@ -48,6 +57,8 @@ export default function OnlineHubScreen(): ReactElement {
   const { user, api, reloadUser } = useSession();
   const router = useRouter();
 
+  const [groups, setGroups] = useState<GroupSummary[] | null>(null);
+  const [daily, setDaily] = useState<DailyStatus | null>(null);
   const [ranking, setRanking] = useState<MyRanking | null>(null);
   const [friends, setFriends] = useState<FriendsOverview | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -56,20 +67,29 @@ export default function OnlineHubScreen(): ReactElement {
   const load = useCallback(async () => {
     setError(null);
     try {
-      // Las tres en paralelo: son independientes y así el hub abre de una vez.
-      const [rankingResult, friendsResult] = await Promise.all([
-        api.leaderboards.me(),
-        api.friends.list(),
-        reloadUser(),
-      ]);
+      // Todas a la vez: son independientes y así el menú abre de una tacada.
+      const [groupsResult, rankingResult, friendsResult, dailyResult] =
+        await Promise.all([
+          api.groups.list(),
+          api.leaderboards.me(),
+          api.friends.list(),
+          // El reto de hoy es lo primero que se mira al abrir: se pide aquí
+          // para poder decir cuántos intentos quedan sin entrar. Si falla, la
+          // fila se queda con su texto genérico en vez de tumbar el menú.
+          api.daily.today().catch(() => null),
+          reloadUser(),
+        ]);
+      setGroups(groupsResult.groups);
       setRanking(rankingResult);
       setFriends(friendsResult);
+      setDaily(dailyResult);
     } catch (loadError) {
       setError(describeError(loadError));
     }
   }, [api, reloadUser]);
 
-  // Al volver de amigos o perfil los contadores pueden haber cambiado.
+  // Al volver de un grupo el estado puede haber cambiado: una temporada que
+  // termina, un aviso que se marca leído, alguien que entra.
   useFocusEffect(
     useCallback(() => {
       void load();
@@ -82,9 +102,11 @@ export default function OnlineHubScreen(): ReactElement {
     setRefreshing(false);
   }, [load]);
 
+  const activeGroups = groups?.filter((group) => group.status === "active") ?? [];
+  const unread = groups?.reduce((total, group) => total + group.unreadCount, 0) ?? 0;
   const pendingRequests = friends?.incoming.length ?? 0;
 
-  const badgeFor = (key: HubEntry["key"]): string | null => {
+  const accountBadge = (key: AccountEntry["key"]): string | null => {
     if (key === "friends") {
       return pendingRequests > 0 ? String(pendingRequests) : null;
     }
@@ -92,6 +114,28 @@ export default function OnlineHubScreen(): ReactElement {
       return `#${ranking.global.position}`;
     }
     return null;
+  };
+
+  const dailyDescription = (): string => {
+    if (!daily) {
+      return t("online.hub.daily.description");
+    }
+    if (daily.attemptsLeft === 0) {
+      return t("online.hub.daily.done");
+    }
+    return daily.attemptsLeft === 1
+      ? t("online.hub.daily.oneLeft")
+      : t("online.hub.daily.attemptsLeft", { count: daily.attemptsLeft });
+  };
+
+  const groupsDescription = (): string => {
+    if (!groups || groups.length === 0) {
+      return t("online.hub.groups.none");
+    }
+    if (activeGroups.length > 0) {
+      return t("online.hub.groups.count", { count: activeGroups.length });
+    }
+    return t("online.hub.groups.description");
   };
 
   return (
@@ -116,65 +160,117 @@ export default function OnlineHubScreen(): ReactElement {
       {user ? (
         <Card enterDelay={0} style={styles.identityCard}>
           <View style={styles.identityRow}>
-            <Avatar username={user.username} size={52} />
+            <Avatar username={user.username} size={44} />
             <View style={styles.identityText}>
-              <Text style={Type.heading} numberOfLines={1}>
+              <Text style={Type.bodyStrong} numberOfLines={1}>
                 {user.username}
               </Text>
               <Text style={Type.caption} numberOfLines={1}>
-                {user.email}
+                {t("online.xp", { xp: user.xp })} ·{" "}
+                {t("online.xpToNext", { xp: user.progress.xpToNextLevel })}
               </Text>
             </View>
             <Pill label={t("online.level", { level: user.level })} tone="accent" />
           </View>
-
           <View style={styles.progressBlock}>
-            <View style={styles.progressLabels}>
-              <Text style={Type.metricSmall}>
-                {t("online.xp", { xp: user.xp })}
-              </Text>
-              <Text style={Type.caption}>
-                {t("online.xpToNext", { xp: user.progress.xpToNextLevel })}
-              </Text>
-            </View>
             <ProgressBar value={user.progress.progress} />
-          </View>
-
-          <Divider style={styles.divider} />
-
-          <View style={styles.statsRow}>
-            <Stat
-              label={t("online.hub.globalRank")}
-              value={
-                ranking?.global.position ? `#${ranking.global.position}` : "—"
-              }
-              hint={
-                ranking
-                  ? t("online.hub.ofPlayers", { total: ranking.global.total })
-                  : undefined
-              }
-            />
-            <View style={styles.statDivider} />
-            <Stat
-              label={t("online.hub.friendsRank")}
-              value={
-                ranking?.friends.position ? `#${ranking.friends.position}` : "—"
-              }
-              hint={
-                friends
-                  ? t("online.hub.friendCount", {
-                      count: friends.friends.length,
-                    })
-                  : undefined
-              }
-            />
           </View>
         </Card>
       ) : null}
 
+      {/* ----------------------------- Jugar ----------------------------- */}
+      <SectionHeader title={t("online.hub.playSection")} hint={t("online.hub.playHint")} />
+
       <View style={styles.entries}>
-        {ENTRIES.map((entry, index) => {
-          const badge = badgeFor(entry.key);
+        {/*
+          El reto diario, lo primero: es la única cosa que se juega cada día y
+          es global (5.3), así que no depende de tener ningún grupo.
+        */}
+        <OptionRow
+          icon="palette"
+          tone="amber"
+          title={t("online.hub.daily.title")}
+          description={dailyDescription()}
+          badge={
+            daily && daily.attemptsLeft > 0 ? (
+              <Pill label={t("online.hub.daily.open")} tone="success" />
+            ) : undefined
+          }
+          onPress={() => router.push("/online/daily")}
+          enterDelay={STAGGER_MS}
+        />
+
+        <OptionRow
+          icon="calendar"
+          tone="teal"
+          title={t("online.hub.groups.title")}
+          description={groupsDescription()}
+          badge={
+            unread > 0 ? (
+              <Pill label={t("online.groups.unread")} tone="accent" />
+            ) : undefined
+          }
+          onPress={() => router.push("/online/groups")}
+          enterDelay={STAGGER_MS * 2}
+        />
+
+        {/*
+          Partidas 1v1 en tiempo real: decididas a nivel de producto pero
+          aparcadas. La fila se pinta para que se vea qué falta, y se queda
+          desactivada a propósito: no se promete nada más allá de esto.
+        */}
+        <OptionRow
+          icon="swords"
+          title={t("online.hub.match.title")}
+          description={t("online.hub.match.description")}
+          badge={<Pill label={t("landing.soon")} />}
+          note={t("online.hub.match.locked")}
+          onPress={() => undefined}
+          disabled
+          enterDelay={STAGGER_MS * 3}
+        />
+      </View>
+
+      {/*
+        Los dos atajos que más se usan al empezar. Están aquí además de dentro
+        de la lista de grupos porque quien abre la app por primera vez no tiene
+        ninguno, y quien recibe un código quiere teclearlo sin buscar dónde.
+      */}
+      <View style={styles.quickActions}>
+        <Button
+          label={t("online.hub.quickCreate")}
+          icon="plus"
+          variant="secondary"
+          fullWidth={false}
+          onPress={() =>
+            router.push({
+              pathname: "/online/groups",
+              params: { action: "create" },
+            })
+          }
+          style={styles.quickButton}
+        />
+        <Button
+          label={t("online.hub.quickJoin")}
+          icon="users"
+          variant="secondary"
+          fullWidth={false}
+          onPress={() =>
+            router.push({ pathname: "/online/groups", params: { action: "join" } })
+          }
+          style={styles.quickButton}
+        />
+      </View>
+
+      {/* --------------------------- Tu cuenta --------------------------- */}
+      <SectionHeader
+        title={t("online.hub.accountSection")}
+        hint={t("online.hub.accountHint")}
+      />
+
+      <View style={styles.entries}>
+        {ACCOUNT.map((entry, index) => {
+          const badge = accountBadge(entry.key);
 
           return (
             <OptionRow
@@ -187,26 +283,10 @@ export default function OnlineHubScreen(): ReactElement {
               )}
               badge={badge ? <Pill label={badge} tone="accent" /> : undefined}
               onPress={() => router.push(entry.route)}
-              enterDelay={(index + 1) * STAGGER_MS}
+              enterDelay={(index + 4) * STAGGER_MS}
             />
           );
         })}
-
-        {/*
-          Las partidas en tiempo real viajan por Socket.IO, no por REST. La fila
-          queda visible pero desactivada para que se vea qué falta, igual que la
-          portada hacía con el propio modo online.
-        */}
-        <OptionRow
-          icon="swords"
-          title={t("online.hub.match.title")}
-          description={t("online.hub.match.description")}
-          badge={<Pill label={t("landing.soon")} />}
-          note={t("online.hub.match.locked")}
-          onPress={() => undefined}
-          disabled
-          enterDelay={(ENTRIES.length + 1) * STAGGER_MS}
-        />
       </View>
     </Screen>
   );
@@ -226,26 +306,18 @@ const styles = StyleSheet.create({
     gap: Space.xxs,
   },
   progressBlock: {
-    marginTop: Space.xl,
-  },
-  progressLabels: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    justifyContent: "space-between",
-    marginBottom: Space.sm,
-  },
-  divider: {
-    marginTop: Space.xl,
-  },
-  statsRow: {
-    flexDirection: "row",
-    alignItems: "stretch",
-  },
-  statDivider: {
-    width: 1,
-    backgroundColor: Color.border.subtle,
+    marginTop: Space.lg,
   },
   entries: {
     gap: Space.md,
+    marginBottom: Space.xl,
+  },
+  quickActions: {
+    flexDirection: "row",
+    gap: Space.sm,
+    marginBottom: Space.xxxl,
+  },
+  quickButton: {
+    flex: 1,
   },
 });

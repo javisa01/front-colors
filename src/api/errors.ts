@@ -24,6 +24,14 @@ export const ApiErrorCode = {
   FRIENDSHIP_ALREADY_EXISTS: "FRIENDSHIP_ALREADY_EXISTS",
   FRIENDSHIP_SELF: "FRIENDSHIP_SELF",
   FRIENDSHIP_NOT_PENDING: "FRIENDSHIP_NOT_PENDING",
+  GROUP_NOT_FOUND: "GROUP_NOT_FOUND",
+  GROUP_CODE_INVALID: "GROUP_CODE_INVALID",
+  ALREADY_MEMBER: "ALREADY_MEMBER",
+  NOT_GROUP_OWNER: "NOT_GROUP_OWNER",
+  SEASON_STILL_ACTIVE: "SEASON_STILL_ACTIVE",
+  DAILY_CLOSED: "DAILY_CLOSED",
+  NO_ATTEMPTS_LEFT: "NO_ATTEMPTS_LEFT",
+  MESSAGE_TOO_LONG: "MESSAGE_TOO_LONG",
   /** Solo del cliente: no hubo respuesta (sin red, servidor caído, timeout). */
   NETWORK_ERROR: "NETWORK_ERROR",
 } as const;
@@ -86,6 +94,13 @@ const MESSAGE_BY_CODE: Partial<Record<string, TranslationKey>> = {
   [ApiErrorCode.UNAUTHORIZED]: "online.error.sessionExpired",
   [ApiErrorCode.TOKEN_EXPIRED]: "online.error.sessionExpired",
   [ApiErrorCode.INVALID_TOKEN]: "online.error.sessionExpired",
+  [ApiErrorCode.GROUP_NOT_FOUND]: "online.error.groupNotFound",
+  [ApiErrorCode.GROUP_CODE_INVALID]: "online.error.groupCodeInvalid",
+  [ApiErrorCode.ALREADY_MEMBER]: "online.error.alreadyMember",
+  [ApiErrorCode.NOT_GROUP_OWNER]: "online.error.notGroupOwner",
+  [ApiErrorCode.SEASON_STILL_ACTIVE]: "online.error.seasonStillActive",
+  [ApiErrorCode.DAILY_CLOSED]: "online.error.dailyClosed",
+  [ApiErrorCode.NO_ATTEMPTS_LEFT]: "online.error.noAttemptsLeft",
 };
 
 export function describeError(error: unknown): string {

@@ -33,6 +33,12 @@ interface SessionValue {
   /** Perfil de juego. `null` mientras se carga o si el backend no responde. */
   user: PrivateProfile | null;
   api: Api;
+  /**
+   * El cliente en crudo, ya autenticado. Lo usa el panel de desarrollo para
+   * montar `createDevApi`, que no forma parte de la superficie normal de la
+   * API porque en producción esas rutas no existen.
+   */
+  client: ApiClient;
   logout: () => Promise<void>;
   /** Refresca el perfil desde el servidor (XP y nivel cambian al jugar). */
   reloadUser: () => Promise<void>;
@@ -159,11 +165,12 @@ export function SessionProvider({
       status,
       user,
       api,
+      client,
       logout,
       reloadUser,
       applyUser: persist,
     }),
-    [status, user, api, logout, reloadUser, persist],
+    [status, user, api, client, logout, reloadUser, persist],
   );
 
   return (

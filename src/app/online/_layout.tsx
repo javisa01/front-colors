@@ -58,6 +58,15 @@ export default function OnlineLayout(): ReactElement {
             <Stack.Screen name="profile" />
             <Stack.Screen name="friends" />
             <Stack.Screen name="leaderboard" />
+            {/* Grupos. La carpeta no lleva `_layout` propio: sus pantallas
+                viven en esta misma pila, así que el gesto de volver funciona
+                igual que en el resto del árbol online. */}
+            <Stack.Screen name="groups/index" />
+            <Stack.Screen name="groups/[id]" />
+            {/* El reto diario es GLOBAL (5.3): cuelga de `/online` y no de un
+                grupo, porque se juega igual sin tener ninguno. */}
+            <Stack.Screen name="daily/index" />
+            <Stack.Screen name="daily/play" />
           </Stack>
         </SessionGate>
       </SessionProvider>

@@ -6,6 +6,7 @@ import Animated, { FadeIn } from "react-native-reanimated";
 
 import { ColorWheel, type ColorWheelHandle } from "@/components/ColorWheel";
 import SVGChallenge from "@/components/SVGChallenge";
+import { ResultConstellation } from "@/design/Ambient";
 import { Button } from "@/design/Button";
 import { Pill, StatPill, scoreTone } from "@/design/Feedback";
 import { Icon } from "@/design/Icon";
@@ -31,6 +32,10 @@ import {
 import { feedbackForScore } from "@/utils/haptics";
 import { buildPartyConfig, getPartyConfig } from "@/utils/party";
 import { playGameOver, playScoreSound } from "@/utils/sound";
+import {
+  submitTeamAverageRecord,
+  type HighScoreResult,
+} from "@/utils/storage";
 
 /**
  * Partida en grupo sobre un mismo móvil.
@@ -257,6 +262,36 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
     return Math.round(total / guesses.length);
   }, [guesses]);
 
+  /**
+   * Récord del equipo, solo en los modos colaborativos.
+   *
+   * Se guarda la media de precisión y no los puntos: ver
+   * `submitTeamAverageRecord`. Se envía una sola vez, al entrar en la fase
+   * final —`teamAverage` ya no cambia ahí, porque no quedan intentos que
+   * añadir—, y hasta que la lectura vuelve no se pinta ninguna línea: enseñar
+   * «Mejor media: 0 %» durante un fotograma para corregirlo después es peor que
+   * no enseñar nada.
+   */
+  const [teamRecord, setTeamRecord] = useState<HighScoreResult | null>(null);
+
+  useEffect(() => {
+    if (phase !== "final" || !config.cooperative) {
+      return;
+    }
+
+    let active = true;
+    void (async () => {
+      const result = await submitTeamAverageRecord(config.mode, teamAverage);
+      if (active) {
+        setTeamRecord(result);
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [config.cooperative, config.mode, phase, teamAverage]);
+
   const modeTitle = t(`party.mode.${config.mode}.title` as TranslationKey);
 
   // ---- Fases ------------------------------------------------------------
@@ -400,6 +435,7 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
         eyebrow={currentPlayer.name}
         title={t("party.guess.title")}
         subtitle={t("party.guess.hidden")}
+        backdrop={<ResultConstellation />}
       >
         <Card>
           <Animated.View
@@ -433,6 +469,7 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
           total: config.sharedSteps.length,
         })}
         title={t("party.round.title")}
+        backdrop={<ResultConstellation />}
       >
         <Card style={styles.block}>
           {currentStep ? (
@@ -486,6 +523,7 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
   return (
     <Screen
       eyebrow={modeTitle}
+      backdrop={<ResultConstellation />}
       title={
         config.cooperative
           ? t("party.final.coopTitle")
@@ -514,6 +552,15 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
               <Text style={Type.body}>
                 {t("party.final.teamAverage", { average: teamAverage })}
               </Text>
+              {teamRecord != null ? (
+                <Text style={[Type.caption, styles.teamRecord]}>
+                  {teamRecord.isRecord
+                    ? t("party.final.teamRecordNew")
+                    : t("party.final.teamRecord", {
+                        average: teamRecord.best,
+                      })}
+                </Text>
+              ) : null}
             </View>
           </Card>
 
@@ -684,6 +731,12 @@ const styles = StyleSheet.create({
   scoreBlock: {
     alignItems: "center",
     gap: Space.xs,
+  },
+  teamRecord: {
+    marginTop: Space.xs,
+    // El récord es el único texto en color de la tarjeta: es lo que hay que ver
+    // de un vistazo al terminar, por encima de la media de esta partida.
+    color: Color.accent.text,
   },
   correctBlock: {
     flexDirection: "row",

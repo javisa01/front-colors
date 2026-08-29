@@ -1,9 +1,17 @@
 import type { ApiClient } from "./client";
 import type {
+  DailyAnswer,
+  DailyStatus,
+  DailySubmitResult,
   FriendsOverview,
   Friendship,
+  GroupDetail,
+  GroupLeaderboard,
+  GroupSeason,
+  GroupSummary,
   LeaderboardResponse,
   MyRanking,
+  NotificationList,
   PrivateProfile,
   UserProfile,
 } from "./types";
@@ -15,8 +23,8 @@ export interface PageInput {
 
 /**
  * Superficie REST del backend, agrupada por área. Solo cubre lo que NO
- * necesita WebSocket: perfil, amigos y rankings. Las partidas en tiempo real
- * van por Socket.IO y llegarán en una segunda fase.
+ * necesita WebSocket: perfil, amigos, rankings, grupos, reto diario y avisos.
+ * Las partidas 1v1 en tiempo real van por Socket.IO y están aparcadas.
  *
  * No hay endpoints de registro ni de login: la cuenta la crea y la valida
  * Clerk desde el cliente. El backend se limita a comprobar el token y a crear
@@ -64,6 +72,90 @@ export function createApi(client: ApiClient) {
 
       remove: (userId: string) =>
         client.request<null>(`/friends/${userId}`, { method: "DELETE" }),
+    },
+
+    groups: {
+      /** Mis grupos, con su estado ya derivado y sus avisos sin leer. */
+      list: () => client.request<{ groups: GroupSummary[] }>("/groups"),
+
+      create: (input: { name: string }) =>
+        client.request<{ group: GroupDetail }>("/groups", {
+          method: "POST",
+          body: input,
+        }),
+
+      /**
+       * El código se normaliza en el servidor (mayúsculas, sin espacios ni
+       * guiones), así que se puede mandar tal y como lo teclee el jugador.
+       */
+      join: (code: string) =>
+        client.request<{ group: GroupDetail }>("/groups/join", {
+          method: "POST",
+          body: { code },
+        }),
+
+      get: (groupId: string) =>
+        client.request<{ group: GroupDetail }>(`/groups/${groupId}`),
+
+      seasons: (groupId: string) =>
+        client.request<{ seasons: GroupSeason[] }>(`/groups/${groupId}/seasons`),
+
+      /**
+       * Con la temporada terminada sigue devolviéndose, congelada: la ventana
+       * ya no admite intentos nuevos.
+       */
+      leaderboard: (groupId: string) =>
+        client.request<GroupLeaderboard>(`/groups/${groupId}/leaderboard`),
+
+      /** Solo el `owner`, y solo con la temporada terminada. */
+      renew: (groupId: string) =>
+        client.request<{ group: GroupDetail }>(`/groups/${groupId}/renew`, {
+          method: "POST",
+        }),
+
+      leave: (groupId: string) =>
+        client.request<null>(`/groups/${groupId}/members/me`, {
+          method: "DELETE",
+        }),
+    },
+
+    /**
+     * El reto diario es GLOBAL: no lleva grupo y no se bloquea aunque todas tus
+     * temporadas hayan terminado. La puntuación no suma en ninguna
+     * clasificación hasta que alguien renueve, pero se juega y se gana XP igual.
+     */
+    daily: {
+      today: () => client.request<DailyStatus>("/daily"),
+
+      /**
+       * Cierra un intento. Se mandan los colores elegidos, **nunca la
+       * puntuación**: la recalcula el servidor (regla 6.1).
+       *
+       * El `challengeId` es opcional en el contrato, pero aquí se manda
+       * siempre: si el jugador empieza a las 14:55 y envía a las 15:01, el
+       * servidor detecta que el reto que tenía en pantalla ya no es el de la
+       * jornada y responde `DAILY_CLOSED` en vez de puntuar sus respuestas
+       * contra otros logos.
+       */
+      submit: (input: { challengeId: string; answers: DailyAnswer[] }) =>
+        client.request<DailySubmitResult>("/daily/attempts", {
+          method: "POST",
+          body: input,
+        }),
+    },
+
+    notifications: {
+      list: (options: { unreadOnly?: boolean } = {}) =>
+        client.request<NotificationList>("/notifications", {
+          query: options.unreadOnly ? { unreadOnly: "true" } : undefined,
+        }),
+
+      /** Sin `ids` se marcan todos los del jugador. */
+      markRead: (ids?: string[]) =>
+        client.request<{ unreadCount: number }>("/notifications/read", {
+          method: "POST",
+          body: ids ? { ids } : {},
+        }),
     },
 
     leaderboards: {

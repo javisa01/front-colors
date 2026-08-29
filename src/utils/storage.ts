@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import type { GameMode } from "@/types/challenge";
+import type { GameMode, PartyMode } from "@/types/challenge";
 
 // All persisted keys live under a single namespace so they are easy to find and
 // wipe. Bump the version suffix if the stored shape ever changes in a breaking
@@ -15,15 +15,21 @@ const PREFIX = "colorquest:v1:";
  * buena partida ronda los cien puntos. Sin estrenar clave, el récord guardado
  * con las reglas viejas se quedaría arriba para siempre y ninguna partida nueva
  * podría batirlo.
+ *
+ * El reloj bajó después de 45 a 30 segundos, que es el mismo problema con otra
+ * cara: en un tercio menos de tiempo caben un tercio menos de intentos, así que
+ * un récord conseguido con el reloj largo dejaría el marcador congelado. De ahí
+ * el `30` en el sufijo.
  */
 const SCORING_SCHEME: Partial<Record<GameMode, string>> = {
-  timed: ":pts",
+  timed: ":pts30",
 };
 
 const KEYS = {
   highScore: (mode: GameMode) =>
     `${PREFIX}highscore:${mode}${SCORING_SCHEME[mode] ?? ""}`,
   bestStreak: (mode: GameMode) => `${PREFIX}beststreak:${mode}`,
+  teamAverage: (mode: PartyMode) => `${PREFIX}teamaverage:${mode}`,
   progress: `${PREFIX}progress`,
   dailyResult: `${PREFIX}daily`,
   musicVolume: `${PREFIX}musicVolume`,
@@ -93,6 +99,37 @@ export async function submitBestStreak(
   if (streak > previous) {
     await writeJSON(KEYS.bestStreak(mode), streak);
     return { best: streak, isRecord: true };
+  }
+  return { best: previous, isRecord: false };
+}
+
+// ---------------------------------------------------------------------------
+// Récord de equipo (modos colaborativos en grupo)
+// ---------------------------------------------------------------------------
+
+/**
+ * En los modos colaborativos el récord es la **media de precisión** del equipo,
+ * no su puntuación.
+ *
+ * Los puntos de un colaborativo no se pueden comparar entre partidas: dependen
+ * de cuánta gente juega —cada jugador añade sus imágenes al total— y, en el
+ * colaborativo contrarreloj, de cuántos intentos dio tiempo a hacer. Cuatro
+ * jugadores mediocres superan siempre a dos jugadores finos, así que un récord
+ * de puntos solo mediría el tamaño de la mesa. La media en porcentaje sí mide
+ * lo mismo con dos jugadores que con doce: lo bien que ve los colores el equipo.
+ */
+export async function getTeamAverageRecord(mode: PartyMode): Promise<number> {
+  return readNumber(KEYS.teamAverage(mode));
+}
+
+export async function submitTeamAverageRecord(
+  mode: PartyMode,
+  average: number,
+): Promise<HighScoreResult> {
+  const previous = await getTeamAverageRecord(mode);
+  if (average > previous) {
+    await writeJSON(KEYS.teamAverage(mode), average);
+    return { best: average, isRecord: true };
   }
   return { best: previous, isRecord: false };
 }

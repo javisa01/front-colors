@@ -16,7 +16,7 @@ import SVGChallenge from "@/components/SVGChallenge";
 import { Button } from "@/design/Button";
 import { Loading, Stat, StatPill, StarRating } from "@/design/Feedback";
 import { Card, Divider, Screen, useIsTablet } from "@/design/Layout";
-import { Space, Type } from "@/design/tokens";
+import { Color, Space, Type } from "@/design/tokens";
 import { INITIAL_HSV, useChallenge } from "@/hooks/useChallenge";
 import { t, type TranslationKey } from "@/i18n";
 import type { GameMode, HSVColor } from "@/types/challenge";
@@ -46,7 +46,7 @@ import {
 } from "@/utils/storage";
 
 const VALID_MODES: GameMode[] = ["quick", "timed", "daily", "multicolor"];
-const TIMED_SECONDS = 45;
+const TIMED_SECONDS = 30;
 
 /**
  * Retardo entre el intento y la aparición del resultado.
@@ -195,6 +195,13 @@ function GamePlay({ mode, seed, resume }: GamePlayProps): ReactElement {
   const [gameFinished, setGameFinished] = useState(false);
   const [isRecord, setIsRecord] = useState(false);
   const [bestScore, setBestScore] = useState(0);
+  /**
+   * El récord se lee del almacenamiento y llega después de que la pantalla de
+   * resumen ya esté pintada. Sin esta bandera, el primer fotograma del resumen
+   * decía «Mejor: 0» —el valor inicial— y se corregía al siguiente: una cifra
+   * falsa parpadeando justo donde el jugador va a mirar.
+   */
+  const [recordReady, setRecordReady] = useState(false);
   const [streak, setStreak] = useState(0);
   const [bestStreakValue, setBestStreakValue] = useState(0);
   const [timeLeft, setTimeLeft] = useState(TIMED_SECONDS);
@@ -286,6 +293,7 @@ function GamePlay({ mode, seed, resume }: GamePlayProps): ReactElement {
     const record = await submitHighScore(mode, runTotal);
     setIsRecord(record.isRecord);
     setBestScore(record.best);
+    setRecordReady(true);
 
     if (mode === "timed") {
       const streakRecord = await submitBestStreak("timed", maxStreakRef.current);
@@ -336,8 +344,8 @@ function GamePlay({ mode, seed, resume }: GamePlayProps): ReactElement {
 
     // El contrarreloj no se guarda. Reanudar restaura los puntos pero no el
     // reloj, así que con un límite de ocho imágenes ya era una fuga —salir y
-    // volver regalaba 45 segundos— y sin límite no tendría fondo. Una carrera
-    // de 45 segundos se juega entera o no se juega.
+    // volver regalaba el reloj entero— y sin límite no tendría fondo. Una
+    // carrera de 30 segundos se juega entera o no se juega.
     if (!isTimed) {
       void saveProgress({
         mode,
@@ -497,15 +505,19 @@ function GamePlay({ mode, seed, resume }: GamePlayProps): ReactElement {
             )}
           </View>
 
-          <Text style={[Type.caption, styles.centeredText]}>
-            {isRecord
-              ? t("summary.record")
-              : t("summary.best", { score: bestScore })}
-          </Text>
-          {isTimed ? (
-            <Text style={[Type.caption, styles.centeredText]}>
-              {t("summary.bestStreak", { count: bestStreakValue })}
-            </Text>
+          {recordReady ? (
+            <>
+              <Text style={[Type.caption, styles.centeredText, styles.record]}>
+                {isRecord
+                  ? t("summary.record")
+                  : t("summary.best", { score: bestScore })}
+              </Text>
+              {isTimed ? (
+                <Text style={[Type.caption, styles.centeredText]}>
+                  {t("summary.bestStreak", { count: bestStreakValue })}
+                </Text>
+              ) : null}
+            </>
           ) : null}
 
           <View style={styles.summaryActions}>
@@ -735,6 +747,14 @@ const styles = StyleSheet.create({
   summaryStats: {
     flexDirection: "row",
     marginBottom: Space.lg,
+  },
+  /**
+   * El récord es lo único en color de la tarjeta de resumen: es la cifra que
+   * decide si esta partida ha valido para algo, y en gris se pierde entre las
+   * estadísticas que tiene justo encima.
+   */
+  record: {
+    color: Color.accent.text,
   },
   summaryActions: {
     marginTop: Space.xxl,

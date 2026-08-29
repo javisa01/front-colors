@@ -149,6 +149,15 @@ export type SpectrumTone = keyof typeof spectrum;
 const ambient = {
   violet: ["#6B5FD6", "#3B317F"] as const,
   rose: ["#8E3A63", "#4A1F38"] as const,
+  /**
+   * Trazo y relleno de los círculos sueltos que decoran las pantallas de
+   * resultado en grupo. Son los mismos dos tonos de arriba: el fondo de la
+   * portada y el de un marcador tienen que ser reconociblemente la misma app,
+   * y lo que cambia entre ellos es la forma —aros y puntos frente a manchas—,
+   * no la paleta.
+   */
+  ringCool: "#6B5FD6",
+  ringWarm: "#8E3A63",
 } as const;
 
 export const Color = {

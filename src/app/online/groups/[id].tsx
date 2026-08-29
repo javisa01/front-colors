@@ -58,8 +58,10 @@ export default function GroupDetailScreen(): ReactElement {
       const [detail, leaderboard, today] = await Promise.all([
         api.groups.get(id),
         api.groups.leaderboard(id),
-        // El reto es global: se pide aunque el grupo esté terminado.
-        api.daily.today(),
+        // El reto es de ESTE grupo. Se pide aunque la temporada esté
+        // terminada: entonces no se puede jugar, pero la tarjeta sigue
+        // enseñando lo que se hizo hoy.
+        api.daily.today(id),
       ]);
       setGroup(detail.group);
       setBoard(leaderboard);
@@ -267,18 +269,31 @@ export default function GroupDetailScreen(): ReactElement {
             ) : null}
           </View>
           {/*
-            El reto es global (5.3): se juega en `/online/daily` y suma en
-            todos los grupos activos a la vez, no solo en este. Al volver, el
-            `useFocusEffect` de esta pantalla relee la clasificación.
+            El reto de ESTE grupo, con sus imágenes y sus dos intentos: se
+            juega en `/online/daily?group=<id>` y solo suma en su clasificación.
+            Al volver, el `useFocusEffect` de esta pantalla la relee.
+
+            Con la temporada terminada no se puede jugar —el reto no sumaría en
+            ningún sitio y solo serviría para cobrar XP en un grupo muerto—, así
+            que el botón se apaga igual que cuando no quedan intentos.
           */}
           <Button
             label={t("online.group.daily.play")}
             icon="play"
             size="md"
             fullWidth={false}
-            variant={daily && daily.attemptsLeft === 0 ? "secondary" : "primary"}
-            disabled={daily != null && daily.attemptsLeft === 0}
-            onPress={() => router.push("/online/daily")}
+            variant={
+              finished || (daily && daily.attemptsLeft === 0)
+                ? "secondary"
+                : "primary"
+            }
+            disabled={finished || (daily != null && daily.attemptsLeft === 0)}
+            onPress={() =>
+              router.push({
+                pathname: "/online/daily",
+                params: { group: id },
+              })
+            }
           />
         </View>
 

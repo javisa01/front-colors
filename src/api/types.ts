@@ -217,11 +217,43 @@ export interface DailyChallenge {
 }
 
 export interface DailyStatus {
+  /** El grupo cuyo reto es este. Cada grupo tiene el suyo, con otras imágenes. */
+  group: DailyGroupView;
   challenge: DailyChallenge;
   attemptsUsed: number;
   attemptsLeft: number;
   bestScore: number | null;
   closesAt: string;
+}
+
+export interface DailyGroupView {
+  id: string;
+  name: string;
+  memberCount: number;
+}
+
+/**
+ * El estado del reto de hoy en UN grupo, sin el reto en sí.
+ *
+ * Es lo que el menú principal necesita para saber en qué grupos queda algo por
+ * jugar. Consultarlo no crea ningún reto: un grupo que nadie ha abierto todavía
+ * llega con `challengeId: null` y cero intentos usados, que es justo lo que es.
+ */
+export interface DailyGroupStatus {
+  groupId: string;
+  challengeId: string | null;
+  attemptsUsed: number;
+  attemptsLeft: number;
+  bestScore: number | null;
+  /** Quedan intentos y la temporada del grupo sigue viva. */
+  canPlay: boolean;
+}
+
+export interface DailyOverview {
+  challengeDate: string;
+  opensAt: string;
+  closesAt: string;
+  groups: DailyGroupStatus[];
 }
 
 /**

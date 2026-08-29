@@ -277,24 +277,27 @@ const es = {
   "online.hub.match.locked": "Necesita partidas en tiempo real · en desarrollo",
 
   "online.hub.playSection": "Jugar",
-  "online.hub.playHint": "Elige con quién compites.",
+  "online.hub.playHint": "El reto de hoy se juega con grupo o sin él.",
+  "online.hub.playHintPending":
+    "Cada grupo tiene su propio reto de hoy. Te quedan por jugar.",
+  "online.hub.playHintDone": "Ya has jugado el reto de hoy en todos tus grupos.",
+  "online.hub.group.play": "Jugar el reto",
+  "online.hub.group.played": "Reto de hoy jugado · mejor {{score}}",
+  "online.hub.todayPoints": "Puntos de hoy",
+  "online.hub.todayPointsHint": "Sumando todos tus grupos",
   "online.hub.accountSection": "Tu cuenta",
   "online.hub.accountHint": "Perfil, amigos y clasificación mundial.",
-  "online.hub.daily.title": "Reto de hoy",
-  "online.hub.daily.description":
-    "Cinco logos, dos intentos, los mismos para todos.",
-  "online.hub.daily.attemptsLeft": "Te quedan {{count}} intentos",
-  "online.hub.daily.oneLeft": "Te queda 1 intento",
-  "online.hub.daily.done": "Ya has jugado hoy",
-  "online.hub.daily.open": "Abierto",
 
-  "online.hub.groups.title": "Grupos",
-  "online.hub.groups.description":
-    "Un reto al día con tus amigos y clasificación privada.",
-  "online.hub.groups.none": "Crea uno o entra con un código",
-  "online.hub.groups.count": "{{count}} activo(s)",
   "online.hub.quickCreate": "Crear grupo",
   "online.hub.quickJoin": "Tengo un código",
+  "online.hub.seeAllGroups": "Ver todos mis grupos",
+  "online.hub.groupsEmpty": "Todavía no estás en ningún grupo",
+  "online.hub.groupsEmptyHint":
+    "Crea uno e invita con su código, o entra en el de alguien.",
+  "online.hub.moreSection": "Más",
+  "online.hub.scoreSection": "Tu puntuación",
+  "online.hub.levelProgress": "{{current}} / {{total}} XP para el nivel {{next}}",
+  "online.hub.unranked": "—",
 
   "online.groups.badge": "Grupos",
   "online.groups.title": "Tus grupos",
@@ -376,9 +379,10 @@ const es = {
   "online.daily.badge": "Reto diario",
   "online.daily.title": "El reto de hoy",
   "online.daily.loading": "Cargando el reto de hoy...",
-  "online.daily.roundsTitle": "{{count}} logos",
+  "online.daily.roundsTitle": "{{count}} imágenes",
+  "online.daily.roundsTitleOne": "1 imagen",
   "online.daily.roundsHint":
-    "Los mismos para todo el mundo. Cambian cada día a las 15:00.",
+    "Las mismas para todo el mundo. Cambian cada día a las 15:00.",
   "online.daily.statusOpen": "Abierto",
   "online.daily.statusUsed": "Sin intentos",
   "online.daily.statusClosed": "Cerrado",
@@ -401,11 +405,15 @@ const es = {
   "online.daily.noAttemptsHint":
     "Son dos intentos por jornada. Vuelve cuando abra el reto siguiente.",
   "online.daily.noActiveGroups": "No cuenta en ninguna clasificación",
-  "online.daily.noActiveGroupsHint":
-    "Puedes jugar y ganar XP igual. Entra en un grupo activo, o renueva el tuyo, para que la puntuación sume.",
   "online.daily.countsOne": "Cuenta en 1 clasificación",
   "online.daily.countsMany": "Cuenta en {{count}} clasificaciones",
-  "online.daily.notCountingPill": "No puntúa",
+  "online.daily.noGroupTitle": "Este reto es de un grupo",
+  "online.daily.noGroupHint":
+    "Cada grupo tiene su propio reto diario, con otras imágenes. Entra en uno para jugar.",
+  "online.daily.countsIn": "Cuenta en {{group}}",
+  "online.daily.countsInHint":
+    "La puntuación de hoy suma solo en la clasificación de este grupo.",
+  "online.daily.goToGroup": "Ver la clasificación",
   "online.daily.goToGroups": "Ver mis grupos",
   "online.daily.play": "Jugar el reto",
   "online.daily.playSecond": "Segundo intento",
@@ -427,6 +435,7 @@ const es = {
   "online.daily.finishAttempt": "Terminar",
   "online.daily.roundPoints": "{{points}} pts",
   "online.daily.roundDetail": "Ver el detalle de la ronda {{round}}",
+  "online.daily.roundImage": "Imagen {{round}}",
   "online.daily.missingAsset": "Logo no disponible",
   "online.daily.rulesTitle": "Cómo funciona",
   "online.daily.ruleAttempts": "Dos intentos por jornada; cuenta el mejor.",
@@ -792,24 +801,28 @@ const en: Record<TranslationKey, string> = {
   "online.hub.match.locked": "Needs real-time matches · in development",
 
   "online.hub.playSection": "Play",
-  "online.hub.playHint": "Choose who you compete against.",
+  "online.hub.playHint":
+    "Today's challenge can be played with or without a group.",
+  "online.hub.playHintPending":
+    "Every group has its own challenge today. You still have some to play.",
+  "online.hub.playHintDone": "You have played today's challenge in every group.",
+  "online.hub.group.play": "Play the challenge",
+  "online.hub.group.played": "Today's challenge played · best {{score}}",
+  "online.hub.todayPoints": "Points today",
+  "online.hub.todayPointsHint": "Across all your groups",
   "online.hub.accountSection": "Your account",
   "online.hub.accountHint": "Profile, friends and the world ranking.",
-  "online.hub.daily.title": "Today's challenge",
-  "online.hub.daily.description":
-    "Five logos, two attempts, the same for everyone.",
-  "online.hub.daily.attemptsLeft": "{{count}} attempts left",
-  "online.hub.daily.oneLeft": "1 attempt left",
-  "online.hub.daily.done": "You already played today",
-  "online.hub.daily.open": "Open",
 
-  "online.hub.groups.title": "Groups",
-  "online.hub.groups.description":
-    "One challenge a day with your friends and a private ranking.",
-  "online.hub.groups.none": "Create one or join with a code",
-  "online.hub.groups.count": "{{count}} active",
   "online.hub.quickCreate": "Create group",
   "online.hub.quickJoin": "I have a code",
+  "online.hub.seeAllGroups": "See all my groups",
+  "online.hub.groupsEmpty": "You are not in any group yet",
+  "online.hub.groupsEmptyHint":
+    "Create one and share its code, or join someone else's.",
+  "online.hub.moreSection": "More",
+  "online.hub.scoreSection": "Your score",
+  "online.hub.levelProgress": "{{current}} / {{total}} XP to level {{next}}",
+  "online.hub.unranked": "—",
 
   "online.groups.badge": "Groups",
   "online.groups.title": "Your groups",
@@ -891,7 +904,8 @@ const en: Record<TranslationKey, string> = {
   "online.daily.badge": "Daily challenge",
   "online.daily.title": "Today's challenge",
   "online.daily.loading": "Loading today's challenge...",
-  "online.daily.roundsTitle": "{{count}} logos",
+  "online.daily.roundsTitle": "{{count}} images",
+  "online.daily.roundsTitleOne": "1 image",
   "online.daily.roundsHint":
     "The same ones for everybody. They change every day at 15:00.",
   "online.daily.statusOpen": "Open",
@@ -916,11 +930,15 @@ const en: Record<TranslationKey, string> = {
   "online.daily.noAttemptsHint":
     "Two attempts a day. Come back when the next challenge opens.",
   "online.daily.noActiveGroups": "It does not count in any ranking",
-  "online.daily.noActiveGroupsHint":
-    "You can still play and earn XP. Join an active group, or renew yours, for the score to count.",
   "online.daily.countsOne": "Counts in 1 ranking",
   "online.daily.countsMany": "Counts in {{count}} rankings",
-  "online.daily.notCountingPill": "No ranking",
+  "online.daily.noGroupTitle": "This challenge belongs to a group",
+  "online.daily.noGroupHint":
+    "Every group has its own daily challenge, with different images. Join one to play.",
+  "online.daily.countsIn": "Counts in {{group}}",
+  "online.daily.countsInHint":
+    "Today's score only counts in this group's standings.",
+  "online.daily.goToGroup": "See the standings",
   "online.daily.goToGroups": "See my groups",
   "online.daily.play": "Play the challenge",
   "online.daily.playSecond": "Second attempt",
@@ -942,6 +960,7 @@ const en: Record<TranslationKey, string> = {
   "online.daily.finishAttempt": "Finish",
   "online.daily.roundPoints": "{{points}} pts",
   "online.daily.roundDetail": "See round {{round}} in detail",
+  "online.daily.roundImage": "Image {{round}}",
   "online.daily.missingAsset": "Logo not available",
   "online.daily.rulesTitle": "How it works",
   "online.daily.ruleAttempts": "Two attempts a day; the best one counts.",
@@ -1309,24 +1328,27 @@ const fr: Record<TranslationKey, string> = {
   "online.hub.match.locked": "Necessite les parties en temps reel · en cours",
 
   "online.hub.playSection": "Jouer",
-  "online.hub.playHint": "Choisis contre qui tu joues.",
+  "online.hub.playHint": "Le defi du jour se joue avec ou sans groupe.",
+  "online.hub.playHintPending":
+    "Chaque groupe a son propre defi du jour. Il t'en reste a jouer.",
+  "online.hub.playHintDone": "Tu as joue le defi du jour dans tous tes groupes.",
+  "online.hub.group.play": "Jouer le defi",
+  "online.hub.group.played": "Defi du jour joue · meilleur {{score}}",
+  "online.hub.todayPoints": "Points du jour",
+  "online.hub.todayPointsHint": "Tous groupes confondus",
   "online.hub.accountSection": "Ton compte",
   "online.hub.accountHint": "Profil, amis et classement mondial.",
-  "online.hub.daily.title": "Defi du jour",
-  "online.hub.daily.description":
-    "Cinq logos, deux essais, les memes pour tous.",
-  "online.hub.daily.attemptsLeft": "Il te reste {{count}} essais",
-  "online.hub.daily.oneLeft": "Il te reste 1 essai",
-  "online.hub.daily.done": "Tu as deja joue aujourd'hui",
-  "online.hub.daily.open": "Ouvert",
 
-  "online.hub.groups.title": "Groupes",
-  "online.hub.groups.description":
-    "Un défi par jour avec tes amis et un classement privé.",
-  "online.hub.groups.none": "Crée-en un ou rejoins avec un code",
-  "online.hub.groups.count": "{{count}} actif(s)",
   "online.hub.quickCreate": "Créer un groupe",
   "online.hub.quickJoin": "J'ai un code",
+  "online.hub.seeAllGroups": "Voir tous mes groupes",
+  "online.hub.groupsEmpty": "Tu n'es encore dans aucun groupe",
+  "online.hub.groupsEmptyHint":
+    "Cree-en un et partage son code, ou rejoins celui de quelqu'un.",
+  "online.hub.moreSection": "Plus",
+  "online.hub.scoreSection": "Ton score",
+  "online.hub.levelProgress": "{{current}} / {{total}} XP pour le niveau {{next}}",
+  "online.hub.unranked": "—",
 
   "online.groups.badge": "Groupes",
   "online.groups.title": "Tes groupes",
@@ -1408,9 +1430,10 @@ const fr: Record<TranslationKey, string> = {
   "online.daily.badge": "Defi du jour",
   "online.daily.title": "Le defi du jour",
   "online.daily.loading": "Chargement du defi du jour...",
-  "online.daily.roundsTitle": "{{count}} logos",
+  "online.daily.roundsTitle": "{{count}} images",
+  "online.daily.roundsTitleOne": "1 image",
   "online.daily.roundsHint":
-    "Les memes pour tout le monde. Ils changent chaque jour a 15h00.",
+    "Les memes pour tout le monde. Elles changent chaque jour a 15h00.",
   "online.daily.statusOpen": "Ouvert",
   "online.daily.statusUsed": "Plus d'essais",
   "online.daily.statusClosed": "Ferme",
@@ -1433,11 +1456,15 @@ const fr: Record<TranslationKey, string> = {
   "online.daily.noAttemptsHint":
     "Deux essais par journee. Reviens a l'ouverture du prochain defi.",
   "online.daily.noActiveGroups": "Ne compte dans aucun classement",
-  "online.daily.noActiveGroupsHint":
-    "Tu peux jouer et gagner de l'XP quand meme. Rejoins un groupe actif, ou renouvelle le tien, pour que le score compte.",
   "online.daily.countsOne": "Compte dans 1 classement",
   "online.daily.countsMany": "Compte dans {{count}} classements",
-  "online.daily.notCountingPill": "Hors classement",
+  "online.daily.noGroupTitle": "Ce defi appartient a un groupe",
+  "online.daily.noGroupHint":
+    "Chaque groupe a son propre defi quotidien, avec d'autres images. Rejoins-en un pour jouer.",
+  "online.daily.countsIn": "Compte dans {{group}}",
+  "online.daily.countsInHint":
+    "Le score du jour compte uniquement dans le classement de ce groupe.",
+  "online.daily.goToGroup": "Voir le classement",
   "online.daily.goToGroups": "Voir mes groupes",
   "online.daily.play": "Jouer le defi",
   "online.daily.playSecond": "Deuxieme essai",
@@ -1459,6 +1486,7 @@ const fr: Record<TranslationKey, string> = {
   "online.daily.finishAttempt": "Terminer",
   "online.daily.roundPoints": "{{points}} pts",
   "online.daily.roundDetail": "Voir le detail de la manche {{round}}",
+  "online.daily.roundImage": "Image {{round}}",
   "online.daily.missingAsset": "Logo indisponible",
   "online.daily.rulesTitle": "Comment ca marche",
   "online.daily.ruleAttempts": "Deux essais par journee ; le meilleur compte.",

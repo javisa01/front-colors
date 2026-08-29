@@ -5,9 +5,8 @@ import type {
   DailyAnswer,
   DailyStatus,
   DailySubmitResult,
-  GroupSummary,
 } from "@/api/types";
-import { findAsset, scoringGroups } from "@/online/daily";
+import { findAsset } from "@/online/daily";
 import { useSession } from "@/online/session";
 // Del hook offline se toma SOLO el color de arranque de la rueda, para que el
 // punto de partida sea el mismo en los dos modos. Todo lo demás de
@@ -27,6 +26,8 @@ import { hsvToHex } from "@/utils/color";
  *
  * Tres reglas del plan se notan en el diseño de este hook:
  *
+ *  - **El reto es de un grupo** y hay uno por grupo y jornada, con imágenes
+ *    distintas. El hook recibe el grupo y no lo elige; sin grupo no hay reto.
  *  - **Los logos y el color a adivinar los manda el servidor** (6.2). Aquí solo
  *    se busca el dibujo por `assetId` y se pinta el color `colorIndex` que
  *    llega; nunca se elige nada.
@@ -55,12 +56,6 @@ export interface UseDailyChallengeResult {
   status: DailyStatus | null;
   rounds: DailyRoundView[];
   attemptsLeft: number;
-  /**
-   * Grupos en los que este reto suma. `null` mientras no se sabe: solo se
-   * avisa de que «no cuenta para ninguna clasificación» cuando consta que no
-   * hay ninguno, no cuando la petición ha fallado (apartado 5.3).
-   */
-  activeGroups: GroupSummary[] | null;
   /**
    * El servidor ha dicho que la jornada que teníamos en pantalla ya cerró.
    * La cuenta atrás local es un adorno; la autoridad es esto.
@@ -100,11 +95,10 @@ export interface UseDailyChallengeResult {
   restart: () => void;
 }
 
-export function useDailyChallenge(): UseDailyChallengeResult {
+export function useDailyChallenge(groupId: string | null): UseDailyChallengeResult {
   const { api, reloadUser } = useSession();
 
   const [status, setStatus] = useState<DailyStatus | null>(null);
-  const [activeGroups, setActiveGroups] = useState<GroupSummary[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [clockTrusted, setClockTrusted] = useState(false);
@@ -128,6 +122,16 @@ export function useDailyChallenge(): UseDailyChallengeResult {
   const answersRef = useRef<DailyAnswer[]>([]);
   /** El reto al que pertenecen esas respuestas, para mandarlo en el `POST`. */
   const challengeIdRef = useRef<string | null>(null);
+  /**
+   * Cierra el paso a un segundo `POST` mientras el primero está en vuelo.
+   *
+   * `submitting` es estado, y el estado se lee viejo dentro del mismo
+   * fotograma: dos toques seguidos al botón de reintentar de la pantalla de
+   * error salían los dos, y el servidor los contaba como **dos intentos** de la
+   * jornada —de los dos que hay al día—. Una referencia se ve escrita al
+   * instante, así que el segundo se cae aquí y no llega a salir.
+   */
+  const submittingRef = useRef(false);
   const mountedRef = useRef(true);
 
   useEffect(() => {
@@ -144,25 +148,26 @@ export function useDailyChallenge(): UseDailyChallengeResult {
    * peticiones al montar, una del hook y otra de la pantalla.
    */
   const load = useCallback(async () => {
+    if (!groupId) {
+      // Sin grupo no hay reto que cargar. La pantalla ya se encarga de mandar
+      // al jugador a elegir uno; aquí basta con no pedir nada.
+      setLoading(false);
+      return;
+    }
+
     setError(null);
     try {
-      // El reto es lo único imprescindible. Los grupos se piden a la vez
-      // porque hacen falta para saber si esto cuenta en alguna clasificación,
-      // pero que fallen no puede impedir jugar (5.3).
-      const [today, groups] = await Promise.all([
-        api.daily.today(),
-        api.groups
-          .list()
-          .then((response) => response.groups)
-          .catch(() => null),
-      ]);
+      // Solo el reto. La lista de grupos se pedía aquí para decir en cuáles
+      // sumaba la puntuación, y con un reto por grupo esa pregunta ya no
+      // existe: suma en el suyo y en ninguno más. El propio reto trae el
+      // nombre del grupo, así que era una petición por pantalla para nada.
+      const today = await api.daily.today(groupId);
 
       if (!mountedRef.current) {
         return;
       }
 
       setStatus(today);
-      setActiveGroups(groups ? scoringGroups(groups) : null);
       setServerClosed(false);
 
       // Si el reto que acaba de llegar no contiene al reloj del teléfono, los
@@ -191,7 +196,7 @@ export function useDailyChallenge(): UseDailyChallengeResult {
         setLoading(false);
       }
     }
-  }, [api]);
+  }, [api, groupId]);
 
   const rounds = useMemo<DailyRoundView[]>(
     () =>
@@ -240,14 +245,19 @@ export function useDailyChallenge(): UseDailyChallengeResult {
 
   const submit = useCallback(async (): Promise<void> => {
     const challengeId = challengeIdRef.current;
-    if (!challengeId || answersRef.current.length === 0) {
+    if (!challengeId || !groupId || answersRef.current.length === 0) {
       return;
     }
+    if (submittingRef.current) {
+      return;
+    }
+    submittingRef.current = true;
 
     setSubmitting(true);
     setSubmitError(null);
     try {
       const submitted = await api.daily.submit({
+        groupId,
         challengeId,
         answers: answersRef.current,
       });
@@ -282,11 +292,15 @@ export function useDailyChallenge(): UseDailyChallengeResult {
       }
       setSubmitError(describeError(error_));
     } finally {
+      // Se libera pase lo que pase y aunque la pantalla ya no esté montada: si
+      // el envío falló, la pantalla de error ofrece reintentar y ese botón
+      // tiene que volver a funcionar.
+      submittingRef.current = false;
       if (mountedRef.current) {
         setSubmitting(false);
       }
     }
-  }, [api, reloadUser]);
+  }, [api, groupId, reloadUser]);
 
   const restart = useCallback((): void => {
     answersRef.current = [];
@@ -302,7 +316,6 @@ export function useDailyChallenge(): UseDailyChallengeResult {
     status,
     rounds,
     attemptsLeft: status?.attemptsLeft ?? 0,
-    activeGroups,
     serverClosed,
     clockTrusted,
     reload: load,

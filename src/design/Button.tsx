@@ -1,4 +1,4 @@
-import { memo, useCallback, type ReactElement } from "react";
+import { memo, useCallback, useRef, type ReactElement } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -40,6 +40,32 @@ import { playTick } from "@/utils/sound";
  * El feedback al pulsar se centraliza aquí a propósito: ninguna pantalla debe
  * volver a llamar a `playTick()` a mano junto a un `onPress`.
  */
+
+/**
+ * Ventana en la que un segundo toque se ignora.
+ *
+ * Un botón no se deshabilita en el mismo instante en que se pulsa: `onPress`
+ * cambia el estado, React repinta y solo entonces llega el `disabled`. Entre
+ * las dos cosas hay al menos un fotograma, y dos toques rápidos caben de sobra
+ * ahí dentro —los dos leen el estado viejo y los dos ejecutan el manejador—.
+ * Es lo que permitía enviar dos veces el mismo resultado dando dos toques
+ * seguidos a «comprobar».
+ *
+ * 350 ms está por encima del umbral con el que los dos sistemas reconocen un
+ * doble toque (250-300 ms), así que se traga el accidente entero, y por debajo
+ * del tiempo que tarda alguien en decidir volver a pulsar a propósito.
+ *
+ * Va en el botón y no en cada pantalla porque el problema es del botón: toda
+ * acción primaria de la aplicación pasa por aquí, y arreglarlo pantalla a
+ * pantalla dejaría fuera la siguiente que se escriba. Las pantallas que además
+ * no pueden permitirse el doble envío por motivos de datos —el resultado de una
+ * ronda, el cierre de un intento— llevan su propia guarda encima de esta: esto
+ * es una red, no la cerradura.
+ *
+ * `IconButton` se queda fuera a propósito: sus usos son contadores y flechas de
+ * navegación, donde pulsar rápido varias veces es justo lo que se espera.
+ */
+const REPRESS_LOCK_MS = 350;
 
 type Variant = "primary" | "secondary" | "ghost" | "danger";
 type Size = "lg" | "md";
@@ -104,10 +130,22 @@ function ButtonBase({
   const blocked = disabled || loading;
   const press = usePressScale();
 
+  /** Instante del último toque aceptado. Ver `REPRESS_LOCK_MS`. */
+  const lastPressRef = useRef(0);
+
   const handlePress = useCallback((): void => {
     if (blocked) {
       return;
     }
+
+    const now = Date.now();
+    if (now - lastPressRef.current < REPRESS_LOCK_MS) {
+      // Ni háptico ni sonido: el toque no ha ocurrido. Un «clic» sin efecto es
+      // peor que el silencio, porque hace creer que sí se ha registrado algo.
+      return;
+    }
+    lastPressRef.current = now;
+
     selectionTick();
     playTick();
     onPress();

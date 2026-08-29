@@ -1,4 +1,4 @@
-import { useFocusEffect, useRouter } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import type { ReactElement } from "react";
 import { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -7,15 +7,12 @@ import { SettingsButton } from "@/components/SettingsButton";
 import { DevTimePanel } from "@/components/online/DevTimePanel";
 import { Button } from "@/design/Button";
 import { ErrorBanner, Loading, Pill, Stat } from "@/design/Feedback";
-import { Card, Screen, SectionHeader } from "@/design/Layout";
+import { AmbientOrbit } from "@/design/Ambient";
+import { Card, NoticePanel, Screen } from "@/design/Layout";
 import { Color, Space, Type } from "@/design/tokens";
 import { useCountdown, useDailyChallenge } from "@/hooks/useDailyChallenge";
 import { t } from "@/i18n";
-import {
-  formatChallengeDate,
-  formatCountdown,
-  scoringLabel,
-} from "@/online/daily";
+import { formatChallengeDate, formatCountdown } from "@/online/daily";
 
 /**
  * La antesala del reto diario: qué toca hoy y si se puede jugar.
@@ -33,17 +30,24 @@ import {
  */
 export default function DailyScreen(): ReactElement {
   const router = useRouter();
+  /**
+   * El grupo llega por parámetro porque hay un reto por grupo: esta pantalla no
+   * elige ninguno. Se entra desde el menú principal o desde la ficha del grupo,
+   * y las dos mandan el `group`.
+   */
+  const { group: groupParam } = useLocalSearchParams<{ group?: string }>();
+  const groupId = Array.isArray(groupParam) ? groupParam[0] : (groupParam ?? null);
+
   const {
     loading,
     error,
     status,
     rounds,
     attemptsLeft,
-    activeGroups,
     serverClosed,
     clockTrusted,
     reload,
-  } = useDailyChallenge();
+  } = useDailyChallenge(groupId);
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -75,6 +79,37 @@ export default function DailyScreen(): ReactElement {
   const closed = serverClosed || expired;
   const canPlay = !closed && attemptsLeft > 0;
 
+  /**
+   * Sin grupo no hay reto.
+   *
+   * Se llega aquí por un enlace directo o por una recarga en web que pierde el
+   * parámetro. En vez de una pantalla vacía, se dice lo que pasa y se ofrece lo
+   * único que arregla la situación: entrar en un grupo.
+   */
+  if (!groupId) {
+    return (
+      <Screen
+        eyebrow={t("online.daily.badge")}
+        title={t("online.daily.title")}
+        backTo="/online"
+        backdrop={<AmbientOrbit />}
+      >
+        <Card>
+          <Text style={Type.bodyStrong}>{t("online.daily.noGroupTitle")}</Text>
+          <Text style={[Type.caption, styles.blockHint]}>
+            {t("online.daily.noGroupHint")}
+          </Text>
+          <Button
+            label={t("online.daily.goToGroups")}
+            icon="users"
+            onPress={() => router.push("/online/groups")}
+            style={styles.blockAction}
+          />
+        </Card>
+      </Screen>
+    );
+  }
+
   if (loading && !status) {
     return (
       <Screen
@@ -103,6 +138,7 @@ export default function DailyScreen(): ReactElement {
         status ? formatChallengeDate(status.challenge.challengeDate) : undefined
       }
       backTo="/online"
+      backdrop={<AmbientOrbit />}
       headerAction={<SettingsButton />}
       onRefresh={refresh}
       refreshing={refreshing}
@@ -120,8 +156,12 @@ export default function DailyScreen(): ReactElement {
           {/* ----------------------- Qué toca hoy ---------------------- */}
           <Card style={styles.block}>
             <View style={styles.headRow}>
+              {/* «Imágenes» y no «logos»: el nombre de la marca es la
+                  respuesta, y aquí no se nombra ninguna. */}
               <Text style={Type.heading}>
-                {t("online.daily.roundsTitle", { count: rounds.length })}
+                {rounds.length === 1
+                  ? t("online.daily.roundsTitleOne")
+                  : t("online.daily.roundsTitle", { count: rounds.length })}
               </Text>
               <Pill
                 label={
@@ -205,39 +245,58 @@ export default function DailyScreen(): ReactElement {
             </Card>
           ) : null}
 
-          {/* ------------------- Dónde cuenta esto --------------------- */}
-          {activeGroups != null ? (
-            <Card style={styles.block}>
-              <View style={styles.headRow}>
-                <Text style={Type.bodyStrong}>
-                  {scoringLabel(activeGroups.length)}
-                </Text>
-                {activeGroups.length === 0 ? (
-                  <Pill label={t("online.daily.notCountingPill")} tone="warning" />
-                ) : null}
-              </View>
+          {/*
+            ------------------- Dónde cuenta esto ---------------------
 
-              {activeGroups.length === 0 ? (
-                <>
-                  {/* Apartado 5.3: se puede jugar igual, pero hay que decirlo. */}
-                  <Text style={[Type.caption, styles.blockHint]}>
-                    {t("online.daily.noActiveGroupsHint")}
-                  </Text>
-                  <Button
-                    label={t("online.daily.goToGroups")}
-                    icon="users"
-                    variant="secondary"
-                    onPress={() => router.push("/online/groups")}
-                    style={styles.blockAction}
-                  />
-                </>
-              ) : (
-                <Text style={[Type.caption, styles.blockHint]}>
-                  {activeGroups.map((group) => group.name).join(" · ")}
-                </Text>
-              )}
-            </Card>
-          ) : null}
+            Antes aquí se listaban todos los grupos activos, porque el reto era
+            global y sumaba en todos a la vez. Ahora cuenta en uno y solo uno:
+            el que se está jugando. La tarjeta lo dice y ofrece ir a su
+            clasificación, que es la pregunta siguiente.
+          */}
+          <Card style={styles.block}>
+            <View style={styles.headRow}>
+              <Text style={Type.bodyStrong}>
+                {t("online.daily.countsIn", { group: status.group.name })}
+              </Text>
+              <Pill
+                label={t("online.groups.members", {
+                  count: status.group.memberCount,
+                })}
+              />
+            </View>
+            <Text style={[Type.caption, styles.blockHint]}>
+              {t("online.daily.countsInHint")}
+            </Text>
+            <Button
+              label={t("online.daily.goToGroup")}
+              icon="trophy"
+              variant="secondary"
+              onPress={() =>
+                router.push({
+                  pathname: "/online/groups/[id]",
+                  params: { id: status.group.id },
+                })
+              }
+              style={styles.blockAction}
+            />
+          </Card>
+
+          {/*
+            --------------------------- Reglas -------------------------
+            Encima del botón y no debajo: son las condiciones de lo que se va a
+            pulsar —dos intentos, cuenta el mejor—, y una condición que se lee
+            después de haber decidido llega tarde. Debajo del botón, además,
+            quedaba fuera de pantalla en un móvil corto.
+          */}
+          <NoticePanel
+            title={t("online.daily.rulesTitle")}
+            items={[
+              t("online.daily.ruleAttempts"),
+              t("online.daily.ruleBest"),
+              t("online.daily.ruleServer"),
+            ]}
+            style={styles.rules}
+          />
 
           {/* --------------------------- Jugar ------------------------- */}
           <Button
@@ -248,16 +307,13 @@ export default function DailyScreen(): ReactElement {
             )}
             icon="play"
             disabled={!canPlay}
-            onPress={() => router.push("/online/daily/play")}
+            onPress={() =>
+              router.push({
+                pathname: "/online/daily/play",
+                params: { group: groupId },
+              })
+            }
           />
-
-          {/* --------------------------- Reglas ------------------------ */}
-          <SectionHeader title={t("online.daily.rulesTitle")} />
-          <Card style={styles.rules}>
-            <Text style={Type.caption}>{t("online.daily.ruleAttempts")}</Text>
-            <Text style={Type.caption}>{t("online.daily.ruleBest")}</Text>
-            <Text style={Type.caption}>{t("online.daily.ruleServer")}</Text>
-          </Card>
         </>
       ) : null}
 
@@ -304,8 +360,6 @@ const styles = StyleSheet.create({
     marginTop: Space.lg,
   },
   rules: {
-    marginTop: Space.md,
-    marginBottom: Space.xxl,
-    gap: Space.sm,
+    marginBottom: Space.xl,
   },
 });

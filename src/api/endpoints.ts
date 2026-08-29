@@ -1,6 +1,7 @@
 import type { ApiClient } from "./client";
 import type {
   DailyAnswer,
+  DailyOverview,
   DailyStatus,
   DailySubmitResult,
   FriendsOverview,
@@ -120,12 +121,21 @@ export function createApi(client: ApiClient) {
     },
 
     /**
-     * El reto diario es GLOBAL: no lleva grupo y no se bloquea aunque todas tus
-     * temporadas hayan terminado. La puntuación no suma en ninguna
-     * clasificación hasta que alguien renueve, pero se juega y se gana XP igual.
+     * El reto diario es **por grupo**: hay uno por grupo y jornada, con
+     * imágenes distintas y con sus propios dos intentos. Sin grupos no hay reto
+     * que jugar, y con la temporada de un grupo terminada tampoco.
      */
     daily: {
-      today: () => client.request<DailyStatus>("/daily"),
+      /**
+       * En qué grupos queda algo por jugar hoy. Es lo que pinta el menú
+       * principal, y **no crea ningún reto**: los grupos donde nadie lo ha
+       * abierto salen con `challengeId: null` y cero intentos.
+       */
+      overview: () => client.request<DailyOverview>("/daily"),
+
+      /** El reto de hoy de un grupo. Lo crea si es la primera visita del día. */
+      today: (groupId: string) =>
+        client.request<DailyStatus>(`/groups/${groupId}/daily`),
 
       /**
        * Cierra un intento. Se mandan los colores elegidos, **nunca la
@@ -137,11 +147,18 @@ export function createApi(client: ApiClient) {
        * jornada y responde `DAILY_CLOSED` en vez de puntuar sus respuestas
        * contra otros logos.
        */
-      submit: (input: { challengeId: string; answers: DailyAnswer[] }) =>
-        client.request<DailySubmitResult>("/daily/attempts", {
-          method: "POST",
-          body: input,
-        }),
+      submit: (input: {
+        groupId: string;
+        challengeId: string;
+        answers: DailyAnswer[];
+      }) =>
+        client.request<DailySubmitResult>(
+          `/groups/${input.groupId}/daily/attempts`,
+          {
+            method: "POST",
+            body: { challengeId: input.challengeId, answers: input.answers },
+          },
+        ),
     },
 
     notifications: {

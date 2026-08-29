@@ -335,6 +335,185 @@ function ResultConstellationBase(): ReactElement {
 export const ResultConstellation = memo(ResultConstellationBase);
 
 // ---------------------------------------------------------------------------
+// Órbita
+// ---------------------------------------------------------------------------
+
+/**
+ * El fondo del área online.
+ *
+ * Tercer miembro de la familia, y el más callado de los tres. La portada tiene
+ * manchas desbordadas por las esquinas; los marcadores de una partida en grupo,
+ * aros y puntos repartidos por los bordes. Aquí son **anillos concéntricos**:
+ * el mismo círculo del logo repetido a tres tamaños alrededor de un único
+ * centro, colgado fuera de la esquina superior derecha.
+ *
+ * Concéntricos y no dispersos porque esta pantalla es un menú largo y con
+ * scroll. Compartiendo centro, los tres anillos se leen como **un solo objeto**
+ * al que le pasa el contenido por encima; repartidos, serían tres cosas que
+ * aparecen y desaparecen conforme se desplaza la lista, y eso sí distrae.
+ *
+ * Un único reloj para los tres, con el radio como única diferencia: respiran a
+ * la vez, como una onda. Es lo contrario que en la constelación, donde cada
+ * pieza va por libre justamente para que no se lean como un conjunto.
+ */
+
+/** Ciclo completo del pulso. Largo: es un menú, no una celebración. */
+const ORBIT_MS = 7600;
+
+/** Diámetros de los tres anillos. El centro es común a los tres. */
+const ORBIT_SIZES = [200, 340, 500] as const;
+
+/** Centro compartido, desbordado por la esquina superior derecha. */
+const ORBIT_TOP = -150;
+const ORBIT_RIGHT = -170;
+
+/**
+ * El satélite: un punto lleno posado sobre el anillo intermedio.
+ *
+ * Es lo que convierte tres circunferencias en una órbita. Sin él los anillos se
+ * leen como una diana —tres aros y nada que los recorra—; con un punto encima
+ * de uno de ellos, el ojo entiende de golpe que lo que hay dibujado es un
+ * trayecto. Va en el intermedio y no en el de fuera para que caiga dentro de la
+ * pantalla en un móvil estrecho.
+ */
+const SATELLITE_SIZE = 10;
+
+/**
+ * Cuánto crece un anillo en su pulso. Los de fuera crecen algo más, que es lo
+ * que hace que la onda se propague en vez de latir todo a la vez.
+ *
+ * Es una función y no un número escrito en cada sitio porque el satélite tiene
+ * que crecer **exactamente** lo mismo que el anillo en el que se posa: con dos
+ * copias del número, la primera vez que se retoque una el punto se despega del
+ * trazo y nadie sabrá por qué.
+ */
+function ringGrowth(index: number): number {
+  return 0.02 + index * 0.012;
+}
+
+/**
+ * Dónde se posa, medido desde el centro común con el convenio de siempre: 0° a
+ * la derecha y los grados creciendo en sentido antihorario.
+ *
+ * El centro está desbordado por la esquina superior derecha, así que el único
+ * cuadrante que entra en pantalla es el tercero —abajo y a la izquierda del
+ * centro—, y por eso el ángulo cae entre 180° y 270°. Con 150°, que es lo
+ * primero que se probó, el punto quedaba 140 puntos por encima del borde
+ * superior: invisible.
+ */
+const SATELLITE_ANGLE = (215 * Math.PI) / 180;
+
+/** En qué anillo se posa. El intermedio: ver `SATELLITE_ANGLE`. */
+const SATELLITE_RING_INDEX = 1;
+
+function OrbitSatellite({ clock }: { clock: SharedValue<number> }): ReactElement {
+  const ringSize = ORBIT_SIZES[SATELLITE_RING_INDEX];
+  const radius = ringSize / 2;
+  const cos = Math.cos(SATELLITE_ANGLE);
+  const sin = Math.sin(SATELLITE_ANGLE);
+
+  // El centro común, en coordenadas de la esquina superior derecha. Es el mismo
+  // cálculo que hace `OrbitRing` para alinear los tres anillos.
+  const centerTop = ORBIT_TOP - (ringSize - ORBIT_SIZES[0]) / 2 + radius;
+  const centerRight = ORBIT_RIGHT - (ringSize - ORBIT_SIZES[0]) / 2 + radius;
+
+  /** Cuánto se aleja del centro cuando el anillo está en lo alto de su pulso. */
+  const reach = radius * ringGrowth(SATELLITE_RING_INDEX);
+
+  const satelliteStyle = useAnimatedStyle(() => {
+    // El anillo se ensancha escalando; el punto no puede hacer lo mismo, porque
+    // escalar un disco lo agranda sin moverlo del sitio. Para seguir pegado al
+    // trazo tiene que recorrer el radio: se desplaza a lo largo de la misma
+    // recta que lo une con el centro, y exactamente lo que el anillo crece.
+    const grown = reach * clock.get();
+    return {
+      opacity: 0.3 + clock.get() * 0.35,
+      transform: [
+        { translateX: cos * grown },
+        // El eje vertical de la pantalla va al revés que el de la
+        // circunferencia: hacia abajo es positivo.
+        { translateY: -sin * grown },
+      ],
+    };
+  });
+
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={[
+        styles.piece,
+        {
+          width: SATELLITE_SIZE,
+          height: SATELLITE_SIZE,
+          top: centerTop - radius * sin - SATELLITE_SIZE / 2,
+          right: centerRight - radius * cos - SATELLITE_SIZE / 2,
+          backgroundColor: Color.ambient.ringCool,
+        },
+        satelliteStyle,
+      ]}
+    />
+  );
+}
+
+function AmbientOrbitBase(): ReactElement {
+  const clock = useAmbientClock(ORBIT_MS);
+
+  return (
+    <>
+      {ORBIT_SIZES.map((size, index) => (
+        <OrbitRing key={size} size={size} index={index} clock={clock} />
+      ))}
+      <OrbitSatellite clock={clock} />
+    </>
+  );
+}
+
+function OrbitRing({
+  size,
+  index,
+  clock,
+}: {
+  size: number;
+  index: number;
+  clock: SharedValue<number>;
+}): ReactElement {
+  // El anillo de fuera es el más tenue: si los tres pesaran igual, el conjunto
+  // se leería como una diana en lugar de como algo que se desvanece.
+  const opacity = 0.34 - index * 0.09;
+  const growth = ringGrowth(index);
+
+  const ringStyle = useAnimatedStyle(() => ({
+    // Cada anillo va un paso por detrás del anterior, así que el pulso se
+    // propaga de dentro hacia fuera en vez de latir todo a la vez.
+    opacity: opacity * (0.6 + clock.get() * 0.4),
+    transform: [{ scale: 1 + clock.get() * growth }],
+  }));
+
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={[
+        styles.piece,
+        {
+          width: size,
+          height: size,
+          // Centro común: al crecer el diámetro, la posición se corrige media
+          // diferencia por cada lado. Sin esto los anillos serían concéntricos
+          // por la esquina y no por su centro.
+          top: ORBIT_TOP - (size - ORBIT_SIZES[0]) / 2,
+          right: ORBIT_RIGHT - (size - ORBIT_SIZES[0]) / 2,
+          borderWidth: 1,
+          borderColor: Color.ambient.ringCool,
+        },
+        ringStyle,
+      ]}
+    />
+  );
+}
+
+export const AmbientOrbit = memo(AmbientOrbitBase);
+
+// ---------------------------------------------------------------------------
 // Flotación suave
 // ---------------------------------------------------------------------------
 

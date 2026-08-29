@@ -21,6 +21,8 @@ import {
   CONTENT_MAX_WIDTH,
   Duration,
   Elevation,
+  HIT_SLOP,
+  HIT_TARGET,
   Radius,
   Space,
   TABLET_BREAKPOINT,
@@ -404,6 +406,110 @@ function OptionRowBase({
 
 export const OptionRow = memo(OptionRowBase);
 
+// ---------------------------------------------------------------------------
+// Enlace de texto
+// ---------------------------------------------------------------------------
+
+/**
+ * Un enlace, no un botón.
+ *
+ * Existe porque «ver todo» no es una acción del mismo peso que «jugar» o
+ * «crear grupo», y con un botón lo parecía: en una pantalla con tres botones a
+ * ancho completo, el cuarto que dice «ver todos mis grupos» compite con el que
+ * de verdad importa. Un enlace centrado, en el acento y con la flecha detrás,
+ * se lee como «hay más de esto por aquí» y no como una decisión.
+ *
+ * Conserva el área táctil de 44 puntos aunque el texto sea de 13: el tamaño de
+ * lo que se ve y el de lo que se toca son cosas distintas.
+ */
+function TextLinkBase({
+  label,
+  onPress,
+}: {
+  label: string;
+  onPress: () => void;
+}): ReactElement {
+  const handlePress = useCallback((): void => {
+    selectionTick();
+    playTick();
+    onPress();
+  }, [onPress]);
+
+  return (
+    <Pressable
+      onPress={handlePress}
+      style={({ pressed }) => [styles.textLink, pressed && styles.textLinkPressed]}
+      hitSlop={HIT_SLOP}
+      accessibilityRole="link"
+      accessibilityLabel={label}
+    >
+      <Text style={[Type.bodyStrong, styles.textLinkLabel]}>{label}</Text>
+      <Icon name="chevronRight" size={16} color={Color.accent.text} />
+    </Pressable>
+  );
+}
+
+export const TextLink = memo(TextLinkBase);
+
+// ---------------------------------------------------------------------------
+// Panel de aviso
+// ---------------------------------------------------------------------------
+
+interface NoticePanelProps {
+  title: string;
+  /** Una línea por punto. Van con viñeta; el orden es el que se pasa. */
+  items: string[];
+  icon?: IconName;
+  style?: StyleProp<ViewStyle>;
+}
+
+/**
+ * Un aviso: reglas, condiciones, «cómo funciona».
+ *
+ * **No es una `Card`, y eso es justo lo que tiene que verse.** Una tarjeta es
+ * contenido —lo que hay hoy, cuánto llevas, quién va ganando—; esto es la letra
+ * que explica ese contenido. Puestas del mismo modo, las dos cosas compiten y
+ * la explicación se lee con el mismo peso que los datos.
+ *
+ * Se separa por cuatro cosas a la vez, porque una sola no basta para que se lea
+ * como otra categoría:
+ *
+ *  - **Riel de color a la izquierda.** Es la forma que ningún otro elemento de
+ *    la app usa, y es la que se reconoce de lejos sin leer nada.
+ *  - **Fondo teñido y hundido** en lugar de la superficie elevada de una
+ *    tarjeta: se hunde en la pantalla en vez de flotar sobre ella.
+ *  - **Radio menor y sin sombra**: una tarjeta se levanta, un aviso no.
+ *  - **Icono y título en el acento**, que aquí significa «esto es información
+ *    sobre el resto», no un estado que haya que atender.
+ */
+function NoticePanelBase({
+  title,
+  items,
+  icon = "alert",
+  style,
+}: NoticePanelProps): ReactElement {
+  return (
+    <View style={[styles.notice, style]} accessibilityRole="summary">
+      <Icon name={icon} size={18} color={Color.accent.text} />
+
+      <View style={styles.noticeBody}>
+        <Text style={[Type.label, styles.noticeTitle]}>{title}</Text>
+
+        {items.map((item, index) => (
+          <View key={index} style={styles.noticeItem}>
+            {/* Un punto dibujado y no un «•» del texto: así queda alineado con
+                la primera línea aunque el punto envuelva a dos. */}
+            <View style={styles.noticeBullet} />
+            <Text style={[Type.caption, styles.noticeText]}>{item}</Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+export const NoticePanel = memo(NoticePanelBase);
+
 /** Línea divisoria de 1px. */
 export const Divider = memo(function Divider({
   style,
@@ -485,6 +591,54 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     marginBottom: Space.md,
+  },
+  textLink: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: Space.xs,
+    // El texto es de 13 puntos; el objetivo táctil, de 44. Ver `HIT_TARGET`.
+    minHeight: HIT_TARGET,
+  },
+  textLinkPressed: {
+    opacity: 0.6,
+  },
+  textLinkLabel: {
+    color: Color.accent.text,
+  },
+  notice: {
+    flexDirection: "row",
+    gap: Space.md,
+    padding: Space.lg,
+    // Radio menor que el de una tarjeta y sin sombra: se hunde, no flota.
+    borderRadius: Radius.md,
+    backgroundColor: Color.accent.surface,
+    // El riel. Va solo a la izquierda a propósito: un borde completo lo
+    // devolvería al aspecto de tarjeta, que es de lo que hay que separarlo.
+    borderLeftWidth: 3,
+    borderLeftColor: Color.accent.default,
+  },
+  noticeBody: {
+    flex: 1,
+    gap: Space.sm,
+  },
+  noticeTitle: {
+    color: Color.accent.text,
+  },
+  noticeItem: {
+    flexDirection: "row",
+    gap: Space.sm,
+  },
+  noticeBullet: {
+    width: 3,
+    height: 3,
+    borderRadius: Radius.pill,
+    backgroundColor: Color.text.muted,
+    // Centrado ópticamente con la primera línea de texto (13/18).
+    marginTop: 8,
+  },
+  noticeText: {
+    flex: 1,
   },
   sectionHint: {
     marginTop: Space.xs,

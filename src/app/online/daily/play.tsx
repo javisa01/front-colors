@@ -1,4 +1,9 @@
-import { useFocusEffect, useRouter } from "expo-router";
+import {
+  useFocusEffect,
+  useLocalSearchParams,
+  useRouter,
+  type Href,
+} from "expo-router";
 import type { ReactElement, RefObject } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -62,12 +67,25 @@ const ADVANCE_DELAY_MS = 260;
 
 export default function DailyPlayScreen(): ReactElement {
   const router = useRouter();
-  const daily = useDailyChallenge();
+  // Mismo parámetro que la antesala: el reto es de un grupo concreto.
+  const { group: groupParam } = useLocalSearchParams<{ group?: string }>();
+  const groupId = Array.isArray(groupParam) ? groupParam[0] : (groupParam ?? null);
+  const daily = useDailyChallenge(groupId);
 
   const wheelRef = useRef<ColorWheelHandle>(null);
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [animationToken, setAnimationToken] = useState(0);
-  /** Entre el pulso y el cambio de ronda no se admite otro toque. */
+  /**
+   * Entre el pulso y el cambio de ronda no se admite otro toque.
+   *
+   * El estado es lo que deshabilita el botón; la referencia es lo que de verdad
+   * cierra la puerta. Dos toques en el mismo fotograma leen los dos
+   * `checking === false` —el repintado que lo pone a `true` aún no ha
+   * ocurrido—, así que la comprobación tenía que salir del estado. Sin esto,
+   * en la última ronda los dos toques respondían la ronda y disparaban el
+   * cierre del intento.
+   */
+  const checkingRef = useRef(false);
   const [checking, setChecking] = useState(false);
 
   useEffect(
@@ -107,11 +125,40 @@ export default function DailyPlayScreen(): ReactElement {
     }, [reload]),
   );
 
+  /**
+   * La ronda en pantalla es la dueña de la guarda.
+   *
+   * Reabrirla a mano en cada sitio que avanza —el temporizador, el segundo
+   * intento, un reto nuevo que llega al recargar— era pedir que algún camino se
+   * quedase sin reabrirla y dejase el tablero muerto. Colgándola de la ronda
+   * hay una sola regla: **cambia la ronda, se admite otro toque**. La última no
+   * cambia a ninguna, así que tras enviar el intento la guarda se queda echada
+   * sola, que es justo lo que se quiere.
+   */
+  useEffect(() => {
+    checkingRef.current = false;
+  }, [currentRound?.round]);
+
+  /**
+   * Destino de la vuelta, con el grupo puesto.
+   *
+   * La antesala necesita saber de qué grupo es el reto, así que el parámetro
+   * viaja también hacia atrás; sin él, volver llevaría a la pantalla de «este
+   * reto es de un grupo».
+   */
+  const dailyHref: Href = useMemo(
+    () =>
+      groupId
+        ? { pathname: "/online/daily", params: { group: groupId } }
+        : "/online/daily",
+    [groupId],
+  );
+
   const back = useCallback(() => {
     // `replace` y no `back`: al terminar el intento no tiene sentido que el
     // gesto de volver devuelva a un tablero que ya se ha enviado.
-    router.replace("/online/daily");
-  }, [router]);
+    router.replace(dailyHref);
+  }, [dailyHref, router]);
 
   const handleColorChange = useCallback(
     (hsv: HSVColor): void => {
@@ -121,9 +168,10 @@ export default function DailyPlayScreen(): ReactElement {
   );
 
   const handleCheck = useCallback((): void => {
-    if (checking) {
+    if (checkingRef.current) {
       return;
     }
+    checkingRef.current = true;
     setChecking(true);
     // El pulso del logo es la única confirmación de que el color se aplicó:
     // sin hoja de resultado por ronda, es lo que marca que la ronda se cerró.
@@ -135,6 +183,8 @@ export default function DailyPlayScreen(): ReactElement {
     advanceTimer.current = setTimeout(() => {
       setChecking(false);
       if (!answerCurrent()) {
+        // Era la última ronda: se cierra el intento y la guarda se queda
+        // echada, porque ya no hay ronda a la que avanzar que la reabra.
         void submit();
         return;
       }
@@ -142,7 +192,7 @@ export default function DailyPlayScreen(): ReactElement {
       // `components/ColorWheel.tsx`).
       wheelRef.current?.setColor(INITIAL_HSV);
     }, ADVANCE_DELAY_MS);
-  }, [answerCurrent, checking, submit]);
+  }, [answerCurrent, submit]);
 
   // -- Carga y errores duros -------------------------------------------------
 
@@ -151,7 +201,7 @@ export default function DailyPlayScreen(): ReactElement {
       <Screen
         eyebrow={t("online.daily.badge")}
         title={t("online.daily.title")}
-        backTo="/online/daily"
+        backTo={dailyHref}
         scrollable={false}
         contentStyle={styles.centered}
       >
@@ -201,7 +251,7 @@ export default function DailyPlayScreen(): ReactElement {
       <Screen
         eyebrow={t("online.daily.badge")}
         title={t("online.daily.title")}
-        backTo="/online/daily"
+        backTo={dailyHref}
         scrollable={false}
         contentStyle={styles.centered}
       >
@@ -236,7 +286,7 @@ export default function DailyPlayScreen(): ReactElement {
       <Screen
         eyebrow={t("online.daily.badge")}
         title={t("online.daily.title")}
-        backTo="/online/daily"
+        backTo={dailyHref}
         scrollable={false}
         contentStyle={styles.centered}
       >
@@ -270,6 +320,7 @@ export default function DailyPlayScreen(): ReactElement {
 
   return (
     <PlayBoard
+      backHref={dailyHref}
       round={currentRound}
       roundIndex={roundIndex}
       totalRounds={rounds.length}
@@ -294,6 +345,8 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 interface PlayBoardProps {
+  /** Destino de reserva de la flecha, con el grupo puesto. Ver `dailyHref`. */
+  backHref: Href;
   round: DailyRoundView;
   roundIndex: number;
   totalRounds: number;
@@ -314,6 +367,7 @@ interface PlayBoardProps {
  * ya están probadas en pantallas cortas.
  */
 function PlayBoard({
+  backHref,
   round,
   roundIndex,
   totalRounds,
@@ -349,7 +403,7 @@ function PlayBoard({
 
   return (
     <Screen
-      backTo="/online/daily"
+      backTo={backHref}
       headerAction={
         <StatPill
           label={t("online.daily.attemptLabel")}
@@ -380,7 +434,11 @@ function PlayBoard({
               animationToken={animationToken}
             />
           ) : (
-            <MissingAsset assetId={round.assetId} size={challengeSize} />
+            <MissingAsset
+              assetId={round.assetId}
+              round={round.round}
+              size={challengeSize}
+            />
           )}
         </View>
 
@@ -414,9 +472,11 @@ function PlayBoard({
  */
 function MissingAsset({
   assetId,
+  round,
   size,
 }: {
   assetId: string;
+  round: number;
   size: number;
 }): ReactElement {
   return (
@@ -424,7 +484,15 @@ function MissingAsset({
       <Text style={[Type.bodyStrong, styles.centeredText]}>
         {t("online.daily.missingAsset")}
       </Text>
-      <Text style={[Type.caption, styles.centeredText]}>{assetId}</Text>
+      {/*
+        El identificador solo en desarrollo. Es el nombre de la marca, así que
+        enseñárselo al jugador en producción sería regalarle la respuesta justo
+        en el caso en que no puede ver el dibujo — que es cuando más tentado
+        estaría de buscarla. Para depurar sí hace falta saber qué logo faltó.
+      */}
+      <Text style={[Type.caption, styles.centeredText]}>
+        {__DEV__ ? assetId : t("online.daily.roundImage", { round })}
+      </Text>
     </View>
   );
 }
@@ -592,8 +660,11 @@ function RoundRow({
       </View>
 
       <View style={styles.roundText}>
+        {/* El identificador del logo era el nombre de la marca —«lacoste»—, es
+            decir media respuesta escrita en la fila del desglose. La ronda ya
+            la identifica igual de bien y no cuenta nada. */}
         <Text style={Type.bodyStrong} numberOfLines={1}>
-          {detail.assetId}
+          {t("online.daily.roundImage", { round: detail.round })}
         </Text>
         <Text style={Type.caption}>
           {t("online.daily.roundPoints", { points: detail.score })}

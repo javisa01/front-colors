@@ -117,6 +117,17 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
   );
   const wheelRef = useRef<ColorWheelHandle>(null);
 
+  /**
+   * Cierra el paso a un segundo intento sobre la misma imagen.
+   *
+   * Sin esto, dos toques seguidos a «comprobar» registraban **dos** intentos
+   * del jugador de turno: en contrarreloj le regalaban puntos y aciertos, y en
+   * los modos por turnos le gastaban de golpe la imagen siguiente. Es una
+   * referencia y no estado porque dos toques en el mismo fotograma leerían los
+   * dos el mismo estado viejo. Ver la misma guarda en `app/game.tsx`.
+   */
+  const checkingRef = useRef(false);
+
   useEffect(() => {
     if (phase === "final") {
       playGameOver();
@@ -148,7 +159,13 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
 
   // La rueda es no controlada, así que reposicionarla es un efecto secundario y
   // no puede hacerse durante el render como el estado de arriba.
+  //
+  // `stepKey` incluye el número de intentos, así que cambia en cuanto uno se
+  // registra: es exactamente el momento en que vuelve a admitirse otro, tanto
+  // en los modos por turnos —donde además cambia el jugador— como en
+  // contrarreloj, donde el mismo jugador encadena imágenes sin soltar el móvil.
   useEffect(() => {
+    checkingRef.current = false;
     wheelRef.current?.setColor(INITIAL_HSV);
   }, [stepKey]);
 
@@ -183,9 +200,11 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
   }, []);
 
   const handleCheck = useCallback((): void => {
-    if (!currentStep) {
+    if (!currentStep || checkingRef.current) {
       return;
     }
+    checkingRef.current = true;
+
     const accuracy = calculateColorScore(selectedHSV, currentStep.target.hsv);
     feedbackForScore(accuracy);
     playScoreSound(accuracy);

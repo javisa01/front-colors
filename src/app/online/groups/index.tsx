@@ -7,6 +7,7 @@ import { describeError } from "@/api/errors";
 import type { GroupSummary } from "@/api/types";
 import { SettingsButton } from "@/components/SettingsButton";
 import { DevTimePanel } from "@/components/online/DevTimePanel";
+import { AmbientOrbit } from "@/design/Ambient";
 import { Button } from "@/design/Button";
 import { EmptyState, ErrorBanner, Loading, Pill } from "@/design/Feedback";
 import { Field, Notice, SegmentedControl } from "@/design/Form";
@@ -114,6 +115,7 @@ export default function GroupsScreen(): ReactElement {
       title={t("online.groups.title")}
       subtitle={t("online.groups.subtitle")}
       backTo="/online"
+      backdrop={<AmbientOrbit />}
       headerAction={<SettingsButton />}
       onRefresh={refresh}
       refreshing={refreshing}

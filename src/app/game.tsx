@@ -207,6 +207,17 @@ function GamePlay({ mode, seed, resume }: GamePlayProps): ReactElement {
   const [timeLeft, setTimeLeft] = useState(TIMED_SECONDS);
 
   const resultTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /**
+   * Cierra el paso a un segundo intento sobre la misma imagen.
+   *
+   * `scoresRef` se muta a mano y la hoja de resultado tarda `RESULT_DELAY_MS` en
+   * aparecer, así que dos toques seguidos a «comprobar» añadían **dos**
+   * puntuaciones al mismo reto: la partida terminaba con más intentos que
+   * imágenes y la media salía contaminada. Es una referencia y no estado porque
+   * dos toques en el mismo fotograma leerían los dos el mismo estado viejo; una
+   * referencia se ve escrita al instante.
+   */
+  const checkingRef = useRef(false);
   const scoresRef = useRef(scores);
   const maxStreakRef = useRef(0);
   const finishedRef = useRef(false);
@@ -316,9 +327,10 @@ function GamePlay({ mode, seed, resume }: GamePlayProps): ReactElement {
   );
 
   const handleCheck = useCallback((): void => {
-    if (!targetColor) {
+    if (!targetColor || checkingRef.current) {
       return;
     }
+    checkingRef.current = true;
 
     const nextScore = calculateColorScore(selectedHSV, targetColor.hsv);
     const nextScores = [...scoresRef.current, nextScore];
@@ -377,6 +389,8 @@ function GamePlay({ mode, seed, resume }: GamePlayProps): ReactElement {
 
   const handleNext = useCallback((): void => {
     setResultVisible(false);
+    // Se abre la siguiente imagen: vuelve a admitirse un intento.
+    checkingRef.current = false;
 
     const hasNext = nextStep();
     if (!hasNext) {
@@ -647,10 +661,14 @@ function GamePlay({ mode, seed, resume }: GamePlayProps): ReactElement {
           </View>
         </View>
 
+        {/* `resultVisible` deshabilita además el botón mientras la hoja de
+            resultado está abierta: la guarda de `handleCheck` ya impide el
+            doble envío, pero un botón que sigue pareciendo pulsable debajo del
+            modal invita a intentarlo. */}
         <Button
           label={t("game.check")}
           onPress={handleCheck}
-          disabled={targetColor == null}
+          disabled={targetColor == null || resultVisible}
           style={styles.checkButton}
         />
       </Screen>

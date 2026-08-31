@@ -64,6 +64,15 @@ interface ScreenProps {
   /** Acción al vuelo a la derecha de la barra superior (ajustes, contador...). */
   headerAction?: ReactNode;
   /**
+   * Acción pegada al **título**, no a la barra.
+   *
+   * La diferencia importa: lo que va en la barra es de la aplicación —los
+   * ajustes están ahí en todas las pantallas—, y lo que va aquí es de **esta**
+   * cosa que se está mirando. El lápiz que abre los ajustes de un grupo tiene
+   * que salir junto al nombre de ese grupo, porque es lo que edita.
+   */
+  titleAction?: ReactNode;
+  /**
    * Capa decorativa detrás del contenido, dentro del lienzo. Va aquí y no
    * envolviendo a `Screen` desde fuera porque el `SafeAreaView` pinta el fondo
    * opaco de la aplicación y taparía cualquier cosa que quedase por detrás.
@@ -83,6 +92,7 @@ function ScreenBase({
   eyebrow,
   backTo,
   headerAction,
+  titleAction,
   backdrop,
   onRefresh,
   refreshing = false,
@@ -150,7 +160,20 @@ function ScreenBase({
           {eyebrow != null ? (
             <Text style={[Type.label, styles.eyebrow]}>{eyebrow}</Text>
           ) : null}
-          <Text style={Type.display}>{title}</Text>
+          {titleAction != null ? (
+            <View style={styles.titleRow}>
+              {/*
+                El título encoge y la acción no: con un nombre largo se recorta
+                el texto antes que empujar el lápiz fuera de la pantalla.
+              */}
+              <Text style={[Type.display, styles.titleGrow]} numberOfLines={2}>
+                {title}
+              </Text>
+              {titleAction}
+            </View>
+          ) : (
+            <Text style={Type.display}>{title}</Text>
+          )}
           {subtitle != null ? (
             <Text style={[Type.body, styles.subtitle]}>{subtitle}</Text>
           ) : null}
@@ -577,6 +600,14 @@ const styles = StyleSheet.create({
     // siguen en gris a propósito: si también fuesen de color, dejaría de
     // señalar nada.
     color: Color.accent.text,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Space.sm,
+  },
+  titleGrow: {
+    flex: 1,
   },
   subtitle: {
     marginTop: Space.sm,

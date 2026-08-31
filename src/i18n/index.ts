@@ -299,6 +299,27 @@ const es = {
   "online.hub.levelProgress": "{{current}} / {{total}} XP para el nivel {{next}}",
   "online.hub.unranked": "—",
 
+  // --- Barra de pestañas del modo online ---
+  "online.tabs.today": "Hoy",
+  "online.tabs.groups": "Grupos",
+  "online.tabs.ranking": "Ranking",
+  "online.tabs.profile": "Perfil",
+
+  // --- El reto de hoy, en el menú ---
+  "online.hub.question": "¿De qué color es la imagen?",
+  "online.hub.queuePosition": "Hoy · {{index}} de {{total}}",
+  "online.hub.queueDone": "Todo jugado · {{total}} grupos",
+  "online.hub.allDoneHint": "Ya has jugado en todos tus grupos. El siguiente reto abre a las 15:00.",
+  "online.hub.attempts": "Te quedan {{count}} intentos",
+  "online.hub.attemptsOne": "Te queda 1 intento",
+  "online.hub.overtake": "Con {{points}} adelantas a {{name}}",
+  "online.hub.competing": "{{count}} de {{total}} compiten esta temporada",
+  "online.hub.nextUp": "Siguiente",
+  "online.hub.opensAfter": "Se abre al terminar este",
+  "online.hub.opensAfterMore": "Se abre al terminar este · y {{count}} más",
+  "online.hub.streakSecured": "Racha de {{count}} jornadas, asegurada hoy",
+  "online.hub.streakAtRisk": "Racha de {{count}} jornadas. Hoy aún no has jugado",
+
   "online.groups.badge": "Grupos",
   "online.groups.title": "Tus grupos",
   "online.groups.subtitle":
@@ -368,6 +389,9 @@ const es = {
   "online.group.daily.play": "Jugar",
   "online.group.daily.notCounting":
     "Puedes jugar el reto, pero no sumará en esta clasificación hasta que empiece una temporada nueva.",
+  "online.group.daily.attemptsBoth": "Tienes dos intentos",
+  "online.group.daily.closesIn": "Cierra en {{time}}",
+  "online.group.daily.rule": "Cuenta el mejor de los dos intentos.",
   "online.group.chat.title": "Chat del grupo",
   "online.group.chat.description": "Píquense mientras dure la temporada.",
   "online.group.chat.soon": "En desarrollo",
@@ -375,6 +399,20 @@ const es = {
   "online.group.leaveOwnerHint":
     "Si te vas, el grupo pasa al miembro más antiguo.",
   "online.group.left": "Has salido del grupo.",
+  "online.group.edit": "Ajustes del grupo",
+  "online.group.settings.title": "Ajustes del grupo",
+  "online.group.settings.saveName": "Guardar nombre",
+  "online.group.settings.renamed": "Nombre cambiado.",
+  "online.group.settings.ownerOnly":
+    "Solo quien creó el grupo puede cambiarle el nombre.",
+  "online.group.settings.notifications": "Avisos de este grupo",
+  "online.group.settings.notificationsHint":
+    "Todavía no enviamos avisos. Guardamos tu decisión para cuando lleguen.",
+  "online.group.settings.membersHint": "Puntos y jornadas de esta temporada.",
+  "online.group.settings.addFriend": "Añadir a {{name}} como amigo",
+  "online.group.settings.shareCode": "Compartir el código",
+  "online.group.settings.leaveHint":
+    "Puedes volver a entrar con el código.",
 
   "online.daily.badge": "Reto diario",
   "online.daily.title": "El reto de hoy",
@@ -824,6 +862,25 @@ const en: Record<TranslationKey, string> = {
   "online.hub.levelProgress": "{{current}} / {{total}} XP to level {{next}}",
   "online.hub.unranked": "—",
 
+  "online.tabs.today": "Today",
+  "online.tabs.groups": "Groups",
+  "online.tabs.ranking": "Ranking",
+  "online.tabs.profile": "Profile",
+
+  "online.hub.question": "What colour is it?",
+  "online.hub.queuePosition": "Today · {{index}} of {{total}}",
+  "online.hub.queueDone": "All played · {{total}} groups",
+  "online.hub.allDoneHint": "You have played in every group. The next challenge opens at 15:00.",
+  "online.hub.attempts": "{{count}} attempts left",
+  "online.hub.attemptsOne": "1 attempt left",
+  "online.hub.overtake": "{{points}} more and you pass {{name}}",
+  "online.hub.competing": "{{count}} of {{total}} playing this season",
+  "online.hub.nextUp": "Up next",
+  "online.hub.opensAfter": "Opens when you finish this one",
+  "online.hub.opensAfterMore": "Opens when you finish this one · and {{count}} more",
+  "online.hub.streakSecured": "{{count}} day streak, secured today",
+  "online.hub.streakAtRisk": "{{count}} day streak. You have not played today",
+
   "online.groups.badge": "Groups",
   "online.groups.title": "Your groups",
   "online.groups.subtitle":
@@ -893,6 +950,9 @@ const en: Record<TranslationKey, string> = {
   "online.group.daily.play": "Play",
   "online.group.daily.notCounting":
     "You can play the challenge, but it will not count towards this ranking until a new season starts.",
+  "online.group.daily.attemptsBoth": "You have two attempts",
+  "online.group.daily.closesIn": "Closes in {{time}}",
+  "online.group.daily.rule": "The better of your two attempts counts.",
   "online.group.chat.title": "Group chat",
   "online.group.chat.description": "Trash talk while the season lasts.",
   "online.group.chat.soon": "In development",
@@ -900,6 +960,19 @@ const en: Record<TranslationKey, string> = {
   "online.group.leaveOwnerHint":
     "If you leave, the group passes to the oldest member.",
   "online.group.left": "You left the group.",
+  "online.group.edit": "Group settings",
+  "online.group.settings.title": "Group settings",
+  "online.group.settings.saveName": "Save name",
+  "online.group.settings.renamed": "Name changed.",
+  "online.group.settings.ownerOnly":
+    "Only whoever created the group can change its name.",
+  "online.group.settings.notifications": "Alerts from this group",
+  "online.group.settings.notificationsHint":
+    "We do not send alerts yet. We keep your choice for when we do.",
+  "online.group.settings.membersHint": "Points and days played this season.",
+  "online.group.settings.addFriend": "Add {{name}} as a friend",
+  "online.group.settings.shareCode": "Share the code",
+  "online.group.settings.leaveHint": "You can join again with the code.",
 
   "online.daily.badge": "Daily challenge",
   "online.daily.title": "Today's challenge",
@@ -1350,6 +1423,25 @@ const fr: Record<TranslationKey, string> = {
   "online.hub.levelProgress": "{{current}} / {{total}} XP pour le niveau {{next}}",
   "online.hub.unranked": "—",
 
+  "online.tabs.today": "Aujourd'hui",
+  "online.tabs.groups": "Groupes",
+  "online.tabs.ranking": "Classement",
+  "online.tabs.profile": "Profil",
+
+  "online.hub.question": "De quelle couleur?",
+  "online.hub.queuePosition": "Aujourd'hui · {{index}} sur {{total}}",
+  "online.hub.queueDone": "Tout joué · {{total}} groupes",
+  "online.hub.allDoneHint": "Tu as joué dans tous tes groupes. Le prochain défi ouvre à 15h00.",
+  "online.hub.attempts": "Il te reste {{count}} essais",
+  "online.hub.attemptsOne": "Il te reste 1 essai",
+  "online.hub.overtake": "Avec {{points}} tu dépasses {{name}}",
+  "online.hub.competing": "{{count}} sur {{total}} jouent cette saison",
+  "online.hub.nextUp": "Ensuite",
+  "online.hub.opensAfter": "S'ouvre à la fin de celui-ci",
+  "online.hub.opensAfterMore": "S'ouvre à la fin de celui-ci · et {{count}} de plus",
+  "online.hub.streakSecured": "Série de {{count}} jours, assurée aujourd'hui",
+  "online.hub.streakAtRisk": "Série de {{count}} jours. Tu n'as pas encore joué",
+
   "online.groups.badge": "Groupes",
   "online.groups.title": "Tes groupes",
   "online.groups.subtitle":
@@ -1419,6 +1511,9 @@ const fr: Record<TranslationKey, string> = {
   "online.group.daily.play": "Jouer",
   "online.group.daily.notCounting":
     "Tu peux jouer le défi, mais il ne comptera pas dans ce classement tant qu'une nouvelle saison n'aura pas commencé.",
+  "online.group.daily.attemptsBoth": "Tu as deux essais",
+  "online.group.daily.closesIn": "Ferme dans {{time}}",
+  "online.group.daily.rule": "Le meilleur de tes deux essais compte.",
   "online.group.chat.title": "Chat du groupe",
   "online.group.chat.description": "Chambrez-vous pendant la saison.",
   "online.group.chat.soon": "En cours",
@@ -1426,6 +1521,19 @@ const fr: Record<TranslationKey, string> = {
   "online.group.leaveOwnerHint":
     "Si tu pars, le groupe passe au membre le plus ancien.",
   "online.group.left": "Tu as quitté le groupe.",
+  "online.group.edit": "Réglages du groupe",
+  "online.group.settings.title": "Réglages du groupe",
+  "online.group.settings.saveName": "Enregistrer le nom",
+  "online.group.settings.renamed": "Nom modifié.",
+  "online.group.settings.ownerOnly":
+    "Seule la personne qui a créé le groupe peut en changer le nom.",
+  "online.group.settings.notifications": "Alertes de ce groupe",
+  "online.group.settings.notificationsHint":
+    "Nous n'envoyons pas encore d'alertes. Ton choix est gardé pour plus tard.",
+  "online.group.settings.membersHint": "Points et journées de cette saison.",
+  "online.group.settings.addFriend": "Ajouter {{name}} en ami",
+  "online.group.settings.shareCode": "Partager le code",
+  "online.group.settings.leaveHint": "Tu peux revenir avec le code.",
 
   "online.daily.badge": "Defi du jour",
   "online.daily.title": "Le defi du jour",

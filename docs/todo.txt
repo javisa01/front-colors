@@ -39,3 +39,7 @@ Haz estos cambios antes de continuar con la fase 6, en front y back:
 
 En resumen, que se diferencien un poco mas cada card de informacion con lo que contiene y que sea mas vistosa en funcion de la importancia que tiene, y añadir fondos diferentes, minimalistas y manteniendo la linea.
 Crea un fichero de texto o .md o lo que prefieres mientras vas realizando las tareas, conforme se hacen, o hay algun error, y que quede todo registrado para que luego pueda revisarlo.
+
+
+30/08:
+- Revisar el logo de WORD parece que no funciona bien en online

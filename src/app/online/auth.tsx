@@ -1,4 +1,5 @@
 import { useSignIn, useSignUp } from "@clerk/expo";
+import { AmbientOrbs } from "@/design/Ambient";
 import { useSSO } from "@clerk/expo/experimental";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
@@ -303,6 +304,7 @@ export default function AuthScreen(): ReactElement {
       title={headings.title}
       subtitle={headings.subtitle}
       backTo="/"
+      backdrop={<AmbientOrbs />}
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}

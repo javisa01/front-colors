@@ -27,6 +27,7 @@ export type IconName =
   | "close"
   // Acciones
   | "settings"
+  | "gear"
   | "share"
   | "retry"
   | "play"
@@ -58,6 +59,7 @@ export type IconName =
   | "target"
   | "user"
   | "userPlus"
+  | "bell"
   // Ajustes de audio
   | "music"
   | "volume"
@@ -115,6 +117,25 @@ const ICONS: Record<IconName, (c: string, filled: boolean) => ReactNode> = {
       <Path d="M3.5 16.5H7" />
       <Path d="M12 16.5h8.5" />
       <Circle cx={9.5} cy={16.5} r={2.4} />
+    </>
+  ),
+  /**
+   * Engranaje clásico, para los ajustes de una cosa concreta —un grupo, por
+   * ejemplo—. No se solapa con `settings`: aquel son los deslizadores de la
+   * app entera y los dos conviven en la misma cabecera.
+   */
+  gear: () => (
+    <>
+      <Circle cx={12} cy={12} r={6.6} />
+      <Circle cx={12} cy={12} r={2.9} />
+      <Path d="M18.6 12h2" />
+      <Path d="M5.4 12h-2" />
+      <Path d="M12 5.4v-2" />
+      <Path d="M12 18.6v2" />
+      <Path d="m16.67 7.33 1.41-1.41" />
+      <Path d="M7.33 7.33 5.92 5.92" />
+      <Path d="m7.33 16.67-1.41 1.41" />
+      <Path d="m16.67 16.67 1.41 1.41" />
     </>
   ),
   share: () => (
@@ -260,6 +281,12 @@ const ICONS: Record<IconName, (c: string, filled: boolean) => ReactNode> = {
       <Path d="M16.5 5.5h2.3a2.2 2.2 0 0 1 0 4.5h-1.6" />
       <Path d="M12 13.5v3.8" />
       <Path d="M8.2 20.5h7.6" />
+    </>
+  ),
+  bell: () => (
+    <>
+      <Path d="M6.2 10.2a5.8 5.8 0 0 1 11.6 0v3.6l1.6 3H4.6l1.6-3v-3.6Z" />
+      <Path d="M10 20a2.2 2.2 0 0 0 4 0" />
     </>
   ),
   alert: (c) => (

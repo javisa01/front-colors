@@ -34,6 +34,7 @@ const KEYS = {
   dailyResult: `${PREFIX}daily`,
   musicVolume: `${PREFIX}musicVolume`,
   sfxVolume: `${PREFIX}sfxVolume`,
+  groupNotifications: (groupId: string) => `${PREFIX}groupNotify:${groupId}`,
 } as const;
 
 async function readJSON<T>(key: string): Promise<T | null> {
@@ -208,4 +209,33 @@ export async function getSfxVolume(): Promise<number> {
 
 export async function setSfxVolume(volume: number): Promise<void> {
   await writeJSON(KEYS.sfxVolume, volume);
+}
+
+// ---------------------------------------------------------------------------
+// Avisos de un grupo
+// ---------------------------------------------------------------------------
+
+/**
+ * Si el jugador quiere recibir avisos de un grupo.
+ *
+ * Vive en el teléfono y no en el servidor **a propósito, y de momento**: todavía
+ * no se envía ningún aviso push, así que no hay nada que un servidor tuviera que
+ * consultar. Lo que sí hay es una preferencia que la persona ha expresado, y
+ * perderla al salir de la pantalla sería peor que no ofrecer el interruptor.
+ * Cuando existan los avisos de verdad, esto pasa a `PATCH /groups/:id/members/me`
+ * y este par de funciones se queda como caché.
+ *
+ * Por defecto **encendido**: quien entra en un grupo quiere enterarse de lo que
+ * pasa en él.
+ */
+export async function getGroupNotifications(groupId: string): Promise<boolean> {
+  const value = await readJSON<boolean>(KEYS.groupNotifications(groupId));
+  return typeof value === "boolean" ? value : true;
+}
+
+export async function setGroupNotifications(
+  groupId: string,
+  enabled: boolean,
+): Promise<void> {
+  await writeJSON(KEYS.groupNotifications(groupId), enabled);
 }

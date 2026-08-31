@@ -564,10 +564,132 @@ function SoftFloatBase({
 
 export const SoftFloat = memo(SoftFloatBase);
 
+// ---------------------------------------------------------------------------
+// Franjas
+// ---------------------------------------------------------------------------
+
+/**
+ * El fondo de la lista de grupos.
+ *
+ * Cuarto miembro de la familia y el único que no está hecho de círculos. Los
+ * otros tres ya se reparten esa forma —manchas desbordadas en la portada, aros
+ * y puntos en un marcador, anillos concéntricos en el menú—, así que un cuarto
+ * redondo sería el tercer aro con otra excusa. Aquí son **franjas diagonales**:
+ * tres bandas largas y muy tenues que cruzan la pantalla de esquina a esquina.
+ *
+ * La forma dice algo de la pantalla. Una lista de grupos es una pila de filas
+ * paralelas, y unas bandas paralelas por detrás continúan ese ritmo en lugar de
+ * pelearse con él; un círculo grande detrás de una lista larga se lee como una
+ * mancha que aparece y desaparece al desplazarse.
+ *
+ * Van a 22 grados y no a 45: inclinadas lo justo para que se note que no son
+ * horizontales, sin llegar a competir con la horizontal fuerte de cada fila.
+ * Y solo hay tres, muy separadas, porque a partir de cuatro dejan de ser
+ * atmósfera y empiezan a ser una textura de rayas.
+ */
+
+/** Ciclo del deslizamiento. Larguísimo: el movimiento no debe percibirse. */
+const BAND_MS = 9200;
+
+interface BandSpec {
+  /** Distancia desde el borde superior al centro de la banda. */
+  top: number;
+  /** Grosor. La de en medio es la ancha; las otras dos, hilos. */
+  height: number;
+  /** El par frío o el cálido. */
+  cool: boolean;
+  opacity: number;
+  /** Recorrido horizontal total del vaivén. */
+  drift: number;
+}
+
+/**
+ * Tres bandas, repartidas por el alto de la pantalla.
+ *
+ * La ancha va arriba, donde está la cabecera y no hay filas todavía; las dos
+ * finas caen sobre la lista, que es donde el contenido manda y el fondo tiene
+ * que desaparecer.
+ */
+const BANDS: BandSpec[] = [
+  { top: 90, height: 200, cool: true, opacity: 0.2, drift: 34 },
+  { top: 380, height: 3, cool: false, opacity: 0.32, drift: -22 },
+  { top: 620, height: 120, cool: false, opacity: 0.14, drift: 26 },
+];
+
+/** Inclinación de las tres. Ver la nota de arriba. */
+const BAND_ANGLE = "22deg";
+
+function AmbientBandsBase(): ReactElement {
+  const clock = useAmbientClock(BAND_MS);
+
+  return (
+    <>
+      {BANDS.map((band, index) => (
+        <Band key={index} spec={band} clock={clock} />
+      ))}
+    </>
+  );
+}
+
+function Band({
+  spec,
+  clock,
+}: {
+  spec: BandSpec;
+  clock: SharedValue<number>;
+}): ReactElement {
+  const bandStyle = useAnimatedStyle(() => ({
+    // Centrado en el recorrido: la banda se mueve a los dos lados de su
+    // posición de reposo en vez de quedarse siempre desplazada a un lado.
+    transform: [
+      { translateX: (clock.get() - 0.5) * spec.drift },
+      { rotate: BAND_ANGLE },
+    ],
+    opacity: spec.opacity * (0.65 + clock.get() * 0.35),
+  }));
+
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={[
+        styles.band,
+        { top: spec.top, height: spec.height },
+        bandStyle,
+      ]}
+    >
+      {/*
+        El degradado va de transparente a color y otra vez a transparente: es
+        lo que hace que la banda se desvanezca por los dos extremos en lugar de
+        cortarse a ras del borde de la pantalla, que es lo que la delataría como
+        un rectángulo girado.
+      */}
+      <LinearGradient
+        colors={[
+          "transparent",
+          spec.cool ? Color.ambient.ringCool : Color.ambient.ringWarm,
+          "transparent",
+        ]}
+        start={{ x: 0, y: 0.5 }}
+        end={{ x: 1, y: 0.5 }}
+        style={styles.fill}
+      />
+    </Animated.View>
+  );
+}
+
+export const AmbientBands = memo(AmbientBandsBase);
+
 const ORB_SIZE = 320;
 const HAZE_SIZE = 420;
 
 const styles = StyleSheet.create({
+  band: {
+    position: "absolute",
+    // Más anchas que la pantalla: giradas 22 grados, una banda del ancho justo
+    // dejaría las dos esquinas sin cubrir.
+    left: -140,
+    right: -140,
+  },
   piece: {
     position: "absolute",
     borderRadius: Radius.pill,

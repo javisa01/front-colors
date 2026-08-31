@@ -1,4 +1,6 @@
 import type { ReactElement } from "react";
+import { useOnlineTabBarSpace } from "@/components/online/OnlineTabBar";
+import { AmbientOrbs } from "@/design/Ambient";
 import { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -24,6 +26,7 @@ const USERNAME_PATTERN = /^[A-Za-z0-9_.-]+$/;
  */
 export default function ProfileScreen(): ReactElement {
   const { user, api, applyUser, logout } = useSession();
+  const tabBarSpace = useOnlineTabBarSpace();
 
   const [editing, setEditing] = useState(false);
   const [username, setUsername] = useState(user?.username ?? "");
@@ -93,7 +96,8 @@ export default function ProfileScreen(): ReactElement {
     return (
       <Screen
         title={t("online.profile.title")}
-        backTo="/online"
+        backdrop={<AmbientOrbs />}
+        contentStyle={{ paddingBottom: tabBarSpace }}
         headerAction={<SettingsButton />}
       >
         <ErrorBanner message={t("online.error.sessionExpired")} />
@@ -108,7 +112,8 @@ export default function ProfileScreen(): ReactElement {
       eyebrow={t("online.profile.badge")}
       title={t("online.profile.title")}
       subtitle={t("online.profile.subtitle")}
-      backTo="/online"
+      backdrop={<AmbientOrbs />}
+      contentStyle={{ paddingBottom: tabBarSpace }}
       headerAction={<SettingsButton />}
     >
       {banner ? <ErrorBanner message={banner} /> : null}

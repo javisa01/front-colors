@@ -444,6 +444,124 @@ function StepperButton({
 }
 
 // ---------------------------------------------------------------------------
+// Interruptor
+// ---------------------------------------------------------------------------
+
+interface ToggleProps {
+  /** Lo que se enciende o se apaga, dicho como lo diría quien lo usa. */
+  label: string;
+  /** Qué pasa al encenderlo. Una línea. */
+  description?: string;
+  value: boolean;
+  onValueChange: (value: boolean) => void;
+  icon?: IconName;
+  disabled?: boolean;
+  style?: StyleProp<ViewStyle>;
+}
+
+/**
+ * Recorrido del botón dentro del raíl.
+ *
+ * Sale de las medidas de abajo: 46 de raíl − 2 de borde − 4 de relleno = 40 de
+ * hueco, menos los 22 del botón. Si cambian, cambia esto.
+ */
+const TOGGLE_TRAVEL = 18;
+
+/**
+ * Interruptor de encendido/apagado.
+ *
+ * Se dibuja en vez de usar el `Switch` de React Native a propósito: el nativo lo
+ * pinta el sistema, así que sale verde manzana en iOS y morado de Material en
+ * Android, y en una interfaz que tiene un solo acento cromático eso es una
+ * segunda marca. Aquí el raíl encendido va en el acento de la app, que es lo
+ * mismo que significa «activo» en el resto de los controles.
+ *
+ * La fila entera es pulsable, no solo el raíl: un objetivo de 44 puntos de alto
+ * y del ancho de la tarjeta se acierta sin mirar.
+ */
+function ToggleBase({
+  label,
+  description,
+  value,
+  onValueChange,
+  icon,
+  disabled = false,
+  style,
+}: ToggleProps): ReactElement {
+  const progress = useSharedValue(value ? 1 : 0);
+
+  useEffect(() => {
+    progress.set(withTiming(value ? 1 : 0, { duration: Duration.fast }));
+  }, [progress, value]);
+
+  const trackStyle = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(
+      progress.get(),
+      [0, 1],
+      [Color.surface.sunken, Color.accent.default],
+    ),
+    borderColor: interpolateColor(
+      progress.get(),
+      [0, 1],
+      [Color.border.default, Color.accent.default],
+    ),
+  }));
+
+  const knobStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: progress.get() * TOGGLE_TRAVEL }],
+  }));
+
+  const handlePress = useCallback((): void => {
+    if (disabled) return;
+    selectionTick();
+    playTick();
+    onValueChange(!value);
+  }, [disabled, onValueChange, value]);
+
+  return (
+    <Pressable
+      onPress={handlePress}
+      disabled={disabled}
+      style={({ pressed }) => [
+        styles.toggleRow,
+        pressed && !disabled && styles.togglePressed,
+        disabled && styles.disabled,
+        style,
+      ]}
+      accessibilityRole="switch"
+      accessibilityLabel={label}
+      accessibilityHint={description}
+      accessibilityState={{ checked: value, disabled }}
+    >
+      {icon ? (
+        <View style={styles.toggleIcon}>
+          <Icon
+            name={icon}
+            size={18}
+            color={value ? Color.accent.text : Color.text.muted}
+          />
+        </View>
+      ) : null}
+
+      <View style={styles.toggleBody}>
+        <Text style={Type.bodyStrong}>{label}</Text>
+        {description != null ? (
+          <Text style={[Type.caption, styles.toggleDescription]}>
+            {description}
+          </Text>
+        ) : null}
+      </View>
+
+      <Animated.View style={[styles.toggleTrack, trackStyle]}>
+        <Animated.View style={[styles.toggleKnob, knobStyle]} />
+      </Animated.View>
+    </Pressable>
+  );
+}
+
+export const Toggle = memo(ToggleBase);
+
+// ---------------------------------------------------------------------------
 
 /** Fila etiqueta/valor de solo lectura, para bloques de datos. */
 function InfoRowBase({
@@ -652,6 +770,46 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 1,
     backgroundColor: Color.border.subtle,
+  },
+  toggleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Space.md,
+    minHeight: HIT_TARGET,
+    borderRadius: Radius.md,
+  },
+  togglePressed: {
+    opacity: 0.7,
+  },
+  toggleIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: Radius.md,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: Color.surface.sunken,
+    borderWidth: 1,
+    borderColor: Color.border.subtle,
+  },
+  toggleBody: {
+    flex: 1,
+  },
+  toggleDescription: {
+    marginTop: Space.xxs,
+  },
+  toggleTrack: {
+    width: 46,
+    height: 28,
+    borderRadius: Radius.pill,
+    borderWidth: 1,
+    padding: 2,
+    justifyContent: "center",
+  },
+  toggleKnob: {
+    width: 22,
+    height: 22,
+    borderRadius: Radius.pill,
+    backgroundColor: Color.text.primary,
   },
   rowActions: {
     flexDirection: "row",

@@ -25,7 +25,7 @@ export const INITIAL_HSV: HSVColor = hexToHSV(INITIAL_COLOR);
 // DEV: Set this to an array of logo IDs to force only those logos to appear in
 // any game mode. Leave as null (or empty) for normal random behavior.
 // Example: ["spotify", "google", "2xko"]
-const DEV_ONLY_LOGOS: string[] | null = null
+const DEV_ONLY_LOGOS: string[] | null = ["word"]
 
 /**
  * El contrarreloj no tiene lista: la partida la termina el cronómetro.

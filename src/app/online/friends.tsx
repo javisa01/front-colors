@@ -1,4 +1,5 @@
 import { useFocusEffect } from "expo-router";
+import { AmbientOrbs } from "@/design/Ambient";
 import type { ReactElement, ReactNode } from "react";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
@@ -179,6 +180,7 @@ export default function FriendsScreen(): ReactElement {
       title={t("online.friends.title")}
       subtitle={t("online.friends.subtitle")}
       backTo="/online"
+      backdrop={<AmbientOrbs />}
       headerAction={<SettingsButton />}
       onRefresh={refresh}
       refreshing={refreshing}

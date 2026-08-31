@@ -98,6 +98,16 @@ export function createApi(client: ApiClient) {
       get: (groupId: string) =>
         client.request<{ group: GroupDetail }>(`/groups/${groupId}`),
 
+      /**
+       * Renombrar. **Solo el `owner`**: a los demás el servidor les responde
+       * `NOT_GROUP_OWNER`. El código de invitación no se regenera.
+       */
+      rename: (groupId: string, name: string) =>
+        client.request<{ group: GroupDetail }>(`/groups/${groupId}`, {
+          method: "PATCH",
+          body: { name },
+        }),
+
       seasons: (groupId: string) =>
         client.request<{ seasons: GroupSeason[] }>(`/groups/${groupId}/seasons`),
 

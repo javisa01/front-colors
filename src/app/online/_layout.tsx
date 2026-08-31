@@ -1,10 +1,11 @@
 import { ClerkProvider } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
-import { Stack, useRouter, useSegments } from "expo-router";
+import { Tabs, useRouter, useSegments } from "expo-router";
 import type { ReactElement, ReactNode } from "react";
 import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 
+import { OnlineTabBar } from "@/components/online/OnlineTabBar";
 import { ErrorBanner, Loading } from "@/design/Feedback";
 import { Screen } from "@/design/Layout";
 import { Color } from "@/design/tokens";
@@ -46,28 +47,46 @@ export default function OnlineLayout(): ReactElement {
     >
       <SessionProvider>
         <SessionGate>
-          <Stack
+          {/*
+            Pestañas, no pila.
+
+            Los cuatro destinos permanentes —hoy, grupos, ranking, perfil— eran
+            filas dentro del menú principal, y por eso el menú no podía ser un
+            menú: la mitad de su alto la ocupaba un índice de la cuenta. Aquí
+            pasan a ser una barra, y la pantalla de inicio se queda con un solo
+            trabajo, que es decir qué hay que jugar hoy.
+
+            `href: null` saca una ruta de la barra pero la deja navegable con
+            `router.push`. La barra además se esconde sola en esas pantallas
+            —lo decide `OnlineTabBar`—, porque son sitios a los que se entra y
+            de los que se vuelve, no destinos: jugar el reto con una barra de
+            pestañas debajo es invitar a abandonar la partida a media ronda.
+          */}
+          <Tabs
+            tabBar={(props) => <OnlineTabBar {...props} />}
             screenOptions={{
               headerShown: false,
-              contentStyle: { backgroundColor: Color.surface.canvas },
-              animation: "slide_from_right",
+              sceneStyle: { backgroundColor: Color.surface.canvas },
             }}
           >
-            <Stack.Screen name="index" />
-            <Stack.Screen name="auth" />
-            <Stack.Screen name="profile" />
-            <Stack.Screen name="friends" />
-            <Stack.Screen name="leaderboard" />
-            {/* Grupos. La carpeta no lleva `_layout` propio: sus pantallas
-                viven en esta misma pila, así que el gesto de volver funciona
-                igual que en el resto del árbol online. */}
-            <Stack.Screen name="groups/index" />
-            <Stack.Screen name="groups/[id]" />
-            {/* El reto diario es GLOBAL (5.3): cuelga de `/online` y no de un
-                grupo, porque se juega igual sin tener ninguno. */}
-            <Stack.Screen name="daily/index" />
-            <Stack.Screen name="daily/play" />
-          </Stack>
+            <Tabs.Screen name="index" />
+            {/* Grupos. La carpeta no lleva `_layout` propio: la lista es
+                pestaña y la ficha de un grupo es una pantalla profunda. */}
+            <Tabs.Screen name="groups/index" />
+            <Tabs.Screen name="leaderboard" />
+            <Tabs.Screen name="profile" />
+
+            {/* --- Profundas: navegables, pero fuera de la barra --- */}
+            <Tabs.Screen name="auth" options={{ href: null }} />
+            <Tabs.Screen name="friends" options={{ href: null }} />
+            <Tabs.Screen name="groups/[id]/index" options={{ href: null }} />
+            <Tabs.Screen name="groups/[id]/edit" options={{ href: null }} />
+            {/* `daily/index` ya no es una pantalla: solo redirige a la ficha
+                del grupo, que es donde se juega desde ella. Sigue declarada
+                para que los enlaces guardados encuentren la redirección. */}
+            <Tabs.Screen name="daily/index" options={{ href: null }} />
+            <Tabs.Screen name="daily/play" options={{ href: null }} />
+          </Tabs>
         </SessionGate>
       </SessionProvider>
     </ClerkProvider>

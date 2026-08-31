@@ -1,4 +1,6 @@
 import type { ReactElement } from "react";
+import { useOnlineTabBarSpace } from "@/components/online/OnlineTabBar";
+import { AmbientOrbs } from "@/design/Ambient";
 import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -31,6 +33,7 @@ const PAGE_SIZE = 20;
  */
 export default function LeaderboardScreen(): ReactElement {
   const { api, user } = useSession();
+  const tabBarSpace = useOnlineTabBarSpace();
 
   const [scope, setScope] = useState<Scope>("global");
   const [page, setPage] = useState<LeaderboardResponse | null>(null);
@@ -134,7 +137,8 @@ export default function LeaderboardScreen(): ReactElement {
       eyebrow={t("online.leaderboard.badge")}
       title={t("online.leaderboard.title")}
       subtitle={t("online.leaderboard.subtitle")}
-      backTo="/online"
+      backdrop={<AmbientOrbs />}
+      contentStyle={{ paddingBottom: tabBarSpace }}
       headerAction={<SettingsButton />}
       onRefresh={refresh}
       refreshing={refreshing}

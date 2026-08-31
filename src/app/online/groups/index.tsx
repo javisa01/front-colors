@@ -7,7 +7,8 @@ import { describeError } from "@/api/errors";
 import type { GroupSummary } from "@/api/types";
 import { SettingsButton } from "@/components/SettingsButton";
 import { DevTimePanel } from "@/components/online/DevTimePanel";
-import { AmbientOrbit } from "@/design/Ambient";
+import { useOnlineTabBarSpace } from "@/components/online/OnlineTabBar";
+import { AmbientBands } from "@/design/Ambient";
 import { Button } from "@/design/Button";
 import { EmptyState, ErrorBanner, Loading, Pill } from "@/design/Feedback";
 import { Field, Notice, SegmentedControl } from "@/design/Form";
@@ -39,6 +40,8 @@ type Action = "create" | "join";
 export default function GroupsScreen(): ReactElement {
   const { api } = useSession();
   const router = useRouter();
+
+  const tabBarSpace = useOnlineTabBarSpace();
   const params = useLocalSearchParams<{ action?: string }>();
 
   const [groups, setGroups] = useState<GroupSummary[] | null>(null);
@@ -114,8 +117,9 @@ export default function GroupsScreen(): ReactElement {
       eyebrow={t("online.groups.badge")}
       title={t("online.groups.title")}
       subtitle={t("online.groups.subtitle")}
-      backTo="/online"
-      backdrop={<AmbientOrbit />}
+      backdrop={<AmbientBands />}
+
+      contentStyle={{ paddingBottom: tabBarSpace }}
       headerAction={<SettingsButton />}
       onRefresh={refresh}
       refreshing={refreshing}

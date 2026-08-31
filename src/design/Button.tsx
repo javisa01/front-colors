@@ -67,7 +67,7 @@ import { playTick } from "@/utils/sound";
  */
 const REPRESS_LOCK_MS = 350;
 
-type Variant = "primary" | "secondary" | "ghost" | "danger";
+type Variant = "primary" | "secondary" | "ghost" | "accent" | "danger";
 type Size = "lg" | "md";
 
 interface ButtonProps {
@@ -294,6 +294,28 @@ const TONES: Record<
     container: { backgroundColor: "transparent" },
     pressed: { backgroundColor: Color.surface.raised },
     label: { color: Color.text.secondary },
+  },
+  /**
+   * Acción con color, pero de segunda fila.
+   *
+   * Se construye igual que `danger` —relleno tenue, borde y texto de la misma
+   * rampa— porque son la misma clase de botón: el que dice de qué va la acción
+   * antes de leerla. La usan los pares de acciones donde las dos importan y
+   * ninguna es «la principal» de la pantalla, como compartir el código frente a
+   * salirse del grupo: dos secundarios grises harían falta leerlos para saber
+   * cuál es cuál.
+   *
+   * **No sustituye al primario.** El primario sigue siendo claro sobre oscuro y
+   * sigue habiendo uno por pantalla.
+   */
+  accent: {
+    container: {
+      backgroundColor: Color.accent.surface,
+      borderWidth: 1,
+      borderColor: Color.accent.border,
+    },
+    pressed: { backgroundColor: Color.accent.border },
+    label: { color: Color.accent.text },
   },
   danger: {
     container: {

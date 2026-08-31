@@ -19,6 +19,7 @@ import ChallengeNavigation from "@/components/ChallengeNavigation";
 import { ColorWheel, type ColorWheelHandle } from "@/components/ColorWheel";
 import { ResultSheet } from "@/components/ResultSheet";
 import SVGChallenge from "@/components/SVGChallenge";
+import { ResultConstellation } from "@/design/Ambient";
 import { Button } from "@/design/Button";
 import {
   ErrorBanner,
@@ -38,32 +39,68 @@ import {
   type DailyRoundView,
 } from "@/hooks/useDailyChallenge";
 import { t } from "@/i18n";
+import { saveAttempt } from "@/online/attempts";
 import type { HSVColor } from "@/types/challenge";
-import { getHSVDelta, getScoreMessage } from "@/utils/colorScore";
-import { impact } from "@/utils/haptics";
+import {
+  calculateColorScore,
+  getHSVDelta,
+  getScoreMessage,
+} from "@/utils/colorScore";
+import { feedbackForScore, impact } from "@/utils/haptics";
+import { playScoreSound } from "@/utils/sound";
 
 /**
  * El reto diario, jugándose.
  *
- * El bucle es el mismo que el de `app/game.tsx` —logo, rueda, comprobar— pero
- * con dos diferencias que vienen de las reglas del plan y que explican por qué
- * esta pantalla no puede ser aquella:
+ * El bucle es exactamente el de `app/game.tsx` —logo, rueda, comprobar, hoja de
+ * resultado— con una diferencia que viene de las reglas del plan:
  *
- *  1. **No hay resultado por ronda.** El color objetivo no llega hasta cerrar
- *     el intento (regla 6.2), así que responder una ronda solo avanza a la
- *     siguiente. El desglose de las cinco aparece de golpe al final, con lo que
- *     devuelve el servidor.
- *  2. **Aquí no se puntúa nada.** La cifra la calcula el backend (regla 6.1);
- *     la app se limita a mandar los colores elegidos.
+ * **La puntuación que vale es la del servidor.** El backend recalcula el
+ * intento entero al cerrarlo (regla 6.1) y es la suya la que entra en la
+ * clasificación; la app se limita a mandar los colores elegidos.
+ *
+ * ## Por qué SÍ se puede enseñar el acierto de cada ronda
+ *
+ * Antes esta pantalla no daba ningún resultado por ronda, con el argumento de
+ * que el color objetivo no llega hasta cerrar el intento (regla 6.2). Eso
+ * confundía dos cosas distintas:
+ *
+ *  - Lo que la **API** no manda antes de tiempo: cierto, `DailyRound` solo trae
+ *    `assetId` y `colorIndex`.
+ *  - Lo que la **app** tiene: el catálogo local, que sí lleva los colores de
+ *    los 137 logos. `findAsset(assetId).colors[colorIndex]` es el objetivo, y
+ *    es de donde el modo offline saca el suyo desde siempre.
+ *
+ * Es decir: el color ya viajaba en el bundle, así que callárselo no protegía
+ * nada — solo dejaba al jugador cinco rondas a ciegas, sin sonido y sin saber
+ * si iba bien, en el mismo juego que sin conexión le contesta al instante. La
+ * regla que de verdad importa —que el cliente no decida la puntuación— se
+ * respeta igual: esto es feedback, no marcador.
+ *
+ * La cifra de cada ronda sale de `calculateColorScore`, la misma función del
+ * modo offline. Si algún día el backend puntuase con otra fórmula, estos
+ * porcentajes y el total del desglose final dejarían de cuadrar; hoy la
+ * autoridad sigue siendo el desglose del servidor, que es el que se enseña al
+ * terminar.
  */
 /**
- * Pausa entre comprobar y pasar a la ronda siguiente.
+ * Pausa entre comprobar y abrir la hoja de resultado.
  *
- * El pulso del logo es la única confirmación de que el color se aplicó, y sin
- * esta pausa se vería sobre el logo **siguiente**: el mismo motivo por el que
- * `app/game.tsx` retrasa su hoja de resultado.
+ * El logo pulsa al aplicar el color, y la hoja tiene que llegar después de ese
+ * pulso: si sale encima, el jugador no llega a ver aplicado el color que acaba
+ * de elegir. Mismo valor y mismo motivo que el `RESULT_DELAY_MS` de
+ * `app/game.tsx`.
  */
-const ADVANCE_DELAY_MS = 260;
+const RESULT_DELAY_MS = 260;
+
+/** Lo que hay que enseñar de la ronda recién cerrada. */
+interface RoundOutcome {
+  score: number;
+  message: string;
+  targetHex: string;
+  yourHex: string;
+  delta: ReturnType<typeof getHSVDelta>;
+}
 
 export default function DailyPlayScreen(): ReactElement {
   const router = useRouter();
@@ -87,6 +124,10 @@ export default function DailyPlayScreen(): ReactElement {
    */
   const checkingRef = useRef(false);
   const [checking, setChecking] = useState(false);
+
+  /** El desglose de la ronda recién cerrada, y si su hoja está abierta. */
+  const [roundOutcome, setRoundOutcome] = useState<RoundOutcome | null>(null);
+  const [resultVisible, setResultVisible] = useState(false);
 
   useEffect(
     () => () => {
@@ -140,17 +181,44 @@ export default function DailyPlayScreen(): ReactElement {
   }, [currentRound?.round]);
 
   /**
-   * Destino de la vuelta, con el grupo puesto.
+   * El desglose del intento se guarda en el teléfono al cerrarlo.
    *
-   * La antesala necesita saber de qué grupo es el reto, así que el parámetro
-   * viaja también hacia atrás; sin él, volver llevaría a la pantalla de «este
-   * reto es de un grupo».
+   * Es la única vez que las rondas —color enviado y acierto de cada una—
+   * viajan: ni `daily.overview()` ni `daily.today()` las traen. Sin guardarlas,
+   * al volver al menú el anillo de rondas no tendría con qué pintarse.
+   *
+   * Va aquí, colgado del resultado, y no dentro de `submit`: el hook se ocupa
+   * de hablar con la API y esto es una decisión de presentación del menú.
+   */
+  useEffect(() => {
+    if (result == null || groupId == null || status == null) {
+      return;
+    }
+    void saveAttempt(
+      groupId,
+      status.challenge.challengeDate,
+      result.attempt.rounds.map((round) => ({
+        answerHex: round.answer.hex,
+        accuracy: round.accuracy,
+      })),
+    );
+  }, [result, groupId, status]);
+
+  /**
+   * Destino de la vuelta: la ficha del grupo cuyo reto se está jugando.
+   *
+   * Antes era la antesala `/online/daily?group=…`, que ya no existe como
+   * pantalla. Se vuelve al sitio del que se vino y donde está la clasificación,
+   * que es justo lo que se quiere mirar después de enviar un intento.
+   *
+   * Sin grupo —enlace directo o recarga en web— se vuelve a la lista: no hay
+   * ficha a la que ir.
    */
   const dailyHref: Href = useMemo(
     () =>
       groupId
-        ? { pathname: "/online/daily", params: { group: groupId } }
-        : "/online/daily",
+        ? { pathname: "/online/groups/[id]" as const, params: { id: groupId } }
+        : "/online/groups",
     [groupId],
   );
 
@@ -167,32 +235,80 @@ export default function DailyPlayScreen(): ReactElement {
     [setSelectedHSV],
   );
 
+  /**
+   * Cierra la ronda en pantalla y pasa a la siguiente —o envía el intento.
+   *
+   * La respuesta quedó fijada al pulsar «comprobar», así que mover la rueda
+   * mientras la hoja está abierta ya no cambia nada.
+   */
+  const advance = useCallback((): void => {
+    setChecking(false);
+    if (!answerCurrent()) {
+      // Era la última ronda: se cierra el intento y la guarda se queda echada,
+      // porque ya no hay ronda a la que avanzar que la reabra.
+      void submit();
+      return;
+    }
+    // La rueda es no controlada: se reposiciona por referencia (ver
+    // `components/ColorWheel.tsx`).
+    wheelRef.current?.setColor(INITIAL_HSV);
+  }, [answerCurrent, submit]);
+
   const handleCheck = useCallback((): void => {
     if (checkingRef.current) {
       return;
     }
     checkingRef.current = true;
     setChecking(true);
-    // El pulso del logo es la única confirmación de que el color se aplicó:
-    // sin hoja de resultado por ronda, es lo que marca que la ronda se cerró.
+    // El pulso del logo confirma que el color se aplicó. Va antes que la hoja
+    // para que el jugador llegue a ver su propia elección puesta en el dibujo.
     setAnimationToken((value) => value + 1);
-    impact("light");
 
-    // La respuesta queda fijada aquí, con el color que había al pulsar: mover
-    // la rueda durante la pausa ya no cambia nada.
+    /**
+     * El color a acertar, del catálogo que la app ya trae.
+     *
+     * `colorIndex` lo manda el SERVIDOR y se usa tal cual: el
+     * `editableColorIndex` del catálogo local no siempre coincide.
+     */
+    const target = currentRound?.asset?.colors[currentRound.colorIndex] ?? null;
+
+    if (target == null) {
+      /*
+        El servidor mandó un logo que esta versión de la app no tiene, o un
+        índice que su catálogo no cubre. Sin color no hay nada que comparar, así
+        que se conserva el comportamiento de antes —un pulso y a la siguiente—
+        en vez de enseñar un 0 % que sería mentira. El intento sigue siendo
+        válido: lo puntúa el servidor igual.
+      */
+      impact("light");
+      advanceTimer.current = setTimeout(advance, RESULT_DELAY_MS);
+      return;
+    }
+
+    const score = calculateColorScore(selectedHSV, target.hsv);
+
+    setRoundOutcome({
+      score,
+      message: t(getScoreMessage(score)),
+      targetHex: target.hex,
+      yourHex: selectedColor,
+      delta: getHSVDelta(selectedHSV, target.hsv),
+    });
+
+    // El mismo par que el modo offline: la vibración dice cómo de cerca has
+    // estado antes de que dé tiempo a leer la cifra, y el sonido la remata.
+    feedbackForScore(score);
+    playScoreSound(score);
+
     advanceTimer.current = setTimeout(() => {
-      setChecking(false);
-      if (!answerCurrent()) {
-        // Era la última ronda: se cierra el intento y la guarda se queda
-        // echada, porque ya no hay ronda a la que avanzar que la reabra.
-        void submit();
-        return;
-      }
-      // La rueda es no controlada: se reposiciona por referencia (ver
-      // `components/ColorWheel.tsx`).
-      wheelRef.current?.setColor(INITIAL_HSV);
-    }, ADVANCE_DELAY_MS);
-  }, [answerCurrent, submit]);
+      setResultVisible(true);
+    }, RESULT_DELAY_MS);
+  }, [advance, currentRound, selectedColor, selectedHSV]);
+
+  const handleNextRound = useCallback((): void => {
+    setResultVisible(false);
+    advance();
+  }, [advance]);
 
   // -- Carga y errores duros -------------------------------------------------
 
@@ -319,20 +435,48 @@ export default function DailyPlayScreen(): ReactElement {
   // -- El tablero ------------------------------------------------------------
 
   return (
-    <PlayBoard
-      backHref={dailyHref}
-      round={currentRound}
-      roundIndex={roundIndex}
-      totalRounds={rounds.length}
-      attemptNumber={(status?.attemptsUsed ?? 0) + 1}
-      selectedColor={selectedColor}
-      selectedHSV={selectedHSV}
-      animationToken={animationToken}
-      checking={checking}
-      wheelRef={wheelRef}
-      onColorChange={handleColorChange}
-      onCheck={handleCheck}
-    />
+    <>
+      <PlayBoard
+        backHref={dailyHref}
+        round={currentRound}
+        roundIndex={roundIndex}
+        totalRounds={rounds.length}
+        attemptNumber={(status?.attemptsUsed ?? 0) + 1}
+        selectedColor={selectedColor}
+        selectedHSV={selectedHSV}
+        animationToken={animationToken}
+        checking={checking || resultVisible}
+        wheelRef={wheelRef}
+        onColorChange={handleColorChange}
+        onCheck={handleCheck}
+      />
+
+      {/*
+        La hoja de resultado de la ronda: la misma que el modo offline, para que
+        cerrar una imagen se sienta igual con conexión y sin ella.
+
+        No se puede descartar tocando fuera —lo impide `Sheet`—, así que el
+        único camino a la ronda siguiente pasa por su botón. Eso es lo que
+        mantiene una sola vía de avance y evita que el tablero se quede con la
+        hoja abierta y la ronda ya cambiada por debajo.
+      */}
+      {roundOutcome ? (
+        <ResultSheet
+          visible={resultVisible}
+          score={roundOutcome.score}
+          message={roundOutcome.message}
+          targetColor={roundOutcome.targetHex}
+          yourColor={roundOutcome.yourHex}
+          delta={roundOutcome.delta}
+          onNext={handleNextRound}
+          nextLabel={
+            roundIndex === rounds.length - 1
+              ? t("online.daily.finish")
+              : undefined
+          }
+        />
+      ) : null}
+    </>
   );
 }
 
@@ -529,6 +673,17 @@ function AttemptResult({
         subtitle={t("online.daily.attemptValue", {
           number: result.attempt.attemptNumber,
         })}
+        /*
+          El mismo fondo que los marcadores de una partida en grupo, y por el
+          mismo motivo: esto es una pantalla de resultado, con tarjetas, cifras
+          y un desglose de cinco filas. Los orbes de la portada son manchas
+          enormes pensadas para llenar una pantalla vacía, y aquí se leerían
+          como niebla por debajo del texto. La constelación son aros de un píxel
+          y puntos repartidos por los bordes, donde el contenido no llega: se
+          reconocen como los círculos del logo y no le quitan contraste a
+          ninguna cifra.
+        */
+        backdrop={<ResultConstellation />}
       >
         <Card style={styles.block}>
           <View style={styles.resultStats}>

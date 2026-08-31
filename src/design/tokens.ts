@@ -32,6 +32,18 @@ const surface = {
   elevated: "#1B1B1E",
   /** Estado hover/press sobre una superficie elevada. */
   interactive: "#232327",
+  /**
+   * Superficie que flota POR ENCIMA del contenido y deja verlo pasar por
+   * debajo: hoy solo la pastilla de pestañas del modo online.
+   *
+   * Es el único color de la rampa con alfa, y lo lleva porque su trabajo es
+   * justamente ese. Con el `elevated` opaco, la barra era una franja negra que
+   * cortaba la pantalla por abajo y tapaba el fondo ambiental; al 82 % se sigue
+   * leyendo el icono encima —el contraste con el texto claro aguanta sobre
+   * cualquier cosa que pase por debajo, porque debajo siempre hay lienzo casi
+   * negro— y a la vez se ve moverse el orbe detrás.
+   */
+  floating: "rgba(27,27,30,0.82)",
 } as const;
 
 const border = {
@@ -160,6 +172,69 @@ const ambient = {
   ringWarm: "#8E3A63",
 } as const;
 
+/**
+ * La aurora: el degradado que recorre el borde de lo importante.
+ *
+ * Es la única cosa cromática que se mueve por delante del contenido, y por eso
+ * está acotada a **un elemento por pantalla** — el que hay que mirar. Si dos
+ * superficies brillan a la vez, ninguna es la principal, que es exactamente el
+ * problema que tenía el menú online antes de reordenarlo.
+ *
+ * Los tonos son los mismos primos del acento que ya usa la portada
+ * (`ambient.violet` y `ambient.rose`), pero **subidos de saturación**: los de
+ * `ambient` están calculados para leerse al 25 % de opacidad detrás del texto,
+ * y a plena opacidad en un borde de 1,5 px se ven sucios. El magenta sube de
+ * `#8E3A63` a `#D64C9B` y el azul se separa del violeta para que el recorrido
+ * tenga de verdad dos extremos y no se lea como un solo morado.
+ *
+ * `stops` empieza y acaba en el mismo azul a propósito: el degradado gira sin
+ * parar, y si los extremos no coincidieran se vería pasar la costura una vez
+ * por vuelta.
+ */
+const glow = {
+  blue: "#4C7DF0",
+  violet: "#7A6FF0",
+  magenta: "#D64C9B",
+  /** Recorrido cerrado para la rotación. Ver arriba. */
+  stops: ["#4C7DF0", "#7A6FF0", "#D64C9B", "#7A6FF0", "#4C7DF0"],
+} as const;
+
+/**
+ * El podio: los tres primeros puestos de una clasificación.
+ *
+ * Vive fuera de `spectrum` porque no es una categoría sino un **rango**, y por
+ * eso los tres tonos NO están a la misma luminosidad: el oro pesa más que la
+ * plata y la plata más que el bronce, que es exactamente la información que
+ * tienen que dar. Un cuarto puesto no lleva color: la frontera del podio es la
+ * frontera del color.
+ *
+ * El oro es el mismo ámbar que ya usa `warning.text` —no hace falta un amarillo
+ * nuevo para esto— y los otros dos se calculan a su misma saturación baja para
+ * que los tres se lean como una familia y no como tres avisos distintos.
+ */
+const podium = {
+  gold: { fill: "#2A2011", border: "#5C4622", text: "#F0C673" },
+  silver: { fill: "#1D1E22", border: "#3E4048", text: "#C9CBD6" },
+  bronze: { fill: "#241A13", border: "#4E3626", text: "#D08A5A" },
+} as const;
+
+/**
+ * La racha encendida. Vive fuera de `spectrum` porque no es una categoría de
+ * una lista: es el único elemento cálido de una interfaz deliberadamente fría,
+ * y su trabajo es que se le vaya el ojo.
+ */
+const ember = {
+  outer: "#FF6B1A",
+  inner: "#FFB020",
+  core: "#FFF0C4",
+  text: "#FFC53D",
+  surface: "#17110B",
+  border: "#43301B",
+  /** Apagada: la racha existe pero hoy todavía no está asegurada. */
+  dimOuter: "#2E2E38",
+  dimInner: "#23232B",
+} as const;
+
 export const Color = {
   surface,
   border,
@@ -167,6 +242,9 @@ export const Color = {
   accent,
   ambient,
   spectrum,
+  podium,
+  glow,
+  ember,
   ...semantic,
 } as const;
 

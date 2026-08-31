@@ -44,3 +44,6 @@ example
 /ios
 /android
 package-lock.json
+
+# Cygwin/Git Bash crash dumps
+*.stackdump

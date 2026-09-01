@@ -29,8 +29,9 @@ import {
   Stat,
   StatPill,
 } from "@/design/Feedback";
+import { Notice } from "@/design/Form";
 import { Card, Divider, Screen, useIsTablet } from "@/design/Layout";
-import { Color, Radius, Space, Type } from "@/design/tokens";
+import { Color, Radius, SECTION_TONE, Space, Type } from "@/design/tokens";
 // Del hook offline solo se toma el color de arranque de la rueda; ver el
 // comentario de `useDailyChallenge`, que explica por qué el resto no sirve.
 import { INITIAL_HSV } from "@/hooks/useChallenge";
@@ -39,7 +40,7 @@ import {
   type DailyRoundView,
 } from "@/hooks/useDailyChallenge";
 import { t } from "@/i18n";
-import { saveAttempt } from "@/online/attempts";
+import { addDailyXp, saveAttempt } from "@/online/attempts";
 import type { HSVColor } from "@/types/challenge";
 import {
   calculateColorScore,
@@ -153,6 +154,7 @@ export default function DailyPlayScreen(): ReactElement {
     submitting,
     submitError,
     result,
+    levelBefore,
     serverClosed,
     attemptsLeft,
     reload,
@@ -202,6 +204,9 @@ export default function DailyPlayScreen(): ReactElement {
         accuracy: round.accuracy,
       })),
     );
+    // Y lo que este intento ha dado de XP, que el perfil suma para poder decir
+    // cuánto has subido hoy. `GET /me` solo trae el total de siempre.
+    void addDailyXp(status.challenge.challengeDate, result.xpEarned);
   }, [result, groupId, status]);
 
   /**
@@ -325,7 +330,6 @@ export default function DailyPlayScreen(): ReactElement {
           <ErrorBanner
             message={error}
             onRetry={() => void daily.reload()}
-            retryLabel={t("common.retry")}
           />
         ) : (
           <Loading label={t("online.daily.loading")} />
@@ -340,6 +344,7 @@ export default function DailyPlayScreen(): ReactElement {
     return (
       <AttemptResult
         result={result}
+        levelBefore={levelBefore}
         canRetry={result.attemptsLeft > 0 && !serverClosed}
         onRetry={daily.restart}
         onFinish={back}
@@ -380,6 +385,8 @@ export default function DailyPlayScreen(): ReactElement {
             <Button
               label={t("online.daily.submitRetry")}
               icon="retry"
+              // Ambar: reintentar pide atencion sin ser un error en si mismo.
+              tone="amber"
               onPress={() => void submit()}
               style={styles.cardAction}
             />
@@ -597,8 +604,14 @@ function PlayBoard({
         </View>
       </View>
 
+      {/*
+        Neutro, y es obligatorio: aqui hay una muestra de color del juego en
+        pantalla, y es la que hay que mirar. Ver la regla del pigmento en
+        `design/Button.tsx` — dentro de una ronda, el boton no compite.
+      */}
       <Button
         label={t(isLast ? "online.daily.finish" : "online.daily.check")}
+        tone="neutral"
         onPress={onCheck}
         disabled={checking}
         style={styles.checkButton}
@@ -652,11 +665,14 @@ function MissingAsset({
  */
 function AttemptResult({
   result,
+  levelBefore,
   canRetry,
   onRetry,
   onFinish,
 }: {
   result: DailySubmitResult;
+  /** El nivel de antes de enviar. Ver `levelBefore` en `useDailyChallenge`. */
+  levelBefore: number | null;
   canRetry: boolean;
   onRetry: () => void;
   onFinish: () => void;
@@ -664,6 +680,12 @@ function AttemptResult({
   const [detail, setDetail] = useState<DailyRoundResult | null>(null);
 
   const improved = result.attempt.score >= result.best;
+  /**
+   * Subir de nivel es la única noticia de esta pantalla que no cabe en una
+   * cifra, así que se dice con todas las letras y solo cuando pasa. El resto de
+   * los días, el XP se lee en su renglón y ya está.
+   */
+  const leveledUp = levelBefore != null && result.level > levelBefore;
 
   return (
     <>
@@ -720,6 +742,10 @@ function AttemptResult({
               tone={result.attemptsLeft > 0 ? "accent" : "neutral"}
             />
           </View>
+
+          {leveledUp ? (
+            <Notice message={t("online.daily.levelUp", { level: result.level })} />
+          ) : null}
         </Card>
 
         {/* --------------------- Ronda a ronda ------------------------- */}
@@ -739,6 +765,7 @@ function AttemptResult({
             <Button
               label={t("online.daily.playSecond")}
               icon="retry"
+              tone={SECTION_TONE.today}
               onPress={onRetry}
             />
           ) : null}
@@ -746,6 +773,8 @@ function AttemptResult({
             label={t("online.daily.finishAttempt")}
             icon="home"
             variant={canRetry ? "secondary" : "primary"}
+            // Solo lo lee cuando es el primario: da por terminado el intento.
+            tone="green"
             onPress={onFinish}
           />
         </View>

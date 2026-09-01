@@ -8,12 +8,13 @@ import type { GroupSummary } from "@/api/types";
 import { SettingsButton } from "@/components/SettingsButton";
 import { DevTimePanel } from "@/components/online/DevTimePanel";
 import { useOnlineTabBarSpace } from "@/components/online/OnlineTabBar";
+import { UnreadDot } from "@/components/online/UnreadDot";
 import { AmbientBands } from "@/design/Ambient";
 import { Button } from "@/design/Button";
 import { EmptyState, ErrorBanner, Loading, Pill } from "@/design/Feedback";
 import { Field, Notice, SegmentedControl } from "@/design/Form";
 import { Card, OptionRow, Screen, SectionHeader } from "@/design/Layout";
-import { Space } from "@/design/tokens";
+import { SECTION_TONE, Space } from "@/design/tokens";
 import { t } from "@/i18n";
 import {
   GROUP_NAME_MAX,
@@ -22,6 +23,7 @@ import {
   membersLabel,
   normalizeJoinCode,
   seasonLabel,
+  silenceMutedGroups,
   sortGroups,
 } from "@/online/groups";
 import { useSession } from "@/online/session";
@@ -61,7 +63,8 @@ export default function GroupsScreen(): ReactElement {
     setError(null);
     try {
       const { groups: mine } = await api.groups.list();
-      setGroups(sortGroups(mine));
+      // El punto rojo de un grupo silenciado no se pinta (ajustes del grupo).
+      setGroups(sortGroups(await silenceMutedGroups(mine)));
     } catch (loadError) {
       setError(describeError(loadError));
     }
@@ -128,12 +131,16 @@ export default function GroupsScreen(): ReactElement {
         <ErrorBanner
           message={error}
           onRetry={() => void load()}
-          retryLabel={t("common.retry")}
         />
       ) : null}
 
       {/* ----------------------- Crear o unirse ------------------------ */}
-      <Card style={styles.block}>
+      {/*
+        La tarjeta que abre la sección lleva el canto teal. Es la única de la
+        pantalla que lo lleva: el estado vacío de más abajo y las filas de
+        grupos no lo repiten, o el tono dejaría de distinguir nada.
+      */}
+      <Card tone={SECTION_TONE.groups} style={styles.block}>
         <SegmentedControl
           options={[
             { value: "create" as Action, label: t("online.groups.tabCreate") },
@@ -189,6 +196,7 @@ export default function GroupsScreen(): ReactElement {
                 : "online.groups.joinSubmit",
             )}
             icon={action === "create" ? "plus" : "check"}
+            tone={SECTION_TONE.groups}
             loading={busy}
             disabled={!canSubmit}
             onPress={() => void submit()}
@@ -199,8 +207,14 @@ export default function GroupsScreen(): ReactElement {
       {/* --------------------------- Mis grupos ------------------------- */}
       <SectionHeader title={t("online.groups.mine")} />
 
+      {/*
+        Al fallar la carga, `groups` se queda a `null`: sin esta guarda el
+        indicador giraba indefinidamente **debajo** del banner de error, que es
+        la peor combinación posible —una pantalla que dice que ha fallado y a la
+        vez que sigue trabajando—.
+      */}
       {!groups ? (
-        <Loading label={t("online.groups.loading")} />
+        error ? null : <Loading label={t("online.groups.loading")} />
       ) : groups.length === 0 ? (
         <Card>
           <EmptyState
@@ -261,9 +275,13 @@ function GroupRow({
       description={`${membersLabel(group.memberCount)} · ${seasonLabel(group)}`}
       badge={
         <View style={styles.badges}>
-          {group.unreadCount > 0 ? (
-            <Pill label={t("online.groups.unread")} tone="accent" />
-          ) : null}
+          {/*
+            El punto rojo, no una pastilla que ponga «Novedades». Una pastilla
+            más al lado de la de estado obliga a leer dos etiquetas para saber
+            dos cosas distintas; el punto se ve sin leer nada y deja el estado
+            de la temporada como la única palabra de la fila.
+          */}
+          <UnreadDot count={group.unreadCount} />
           <Pill
             label={t(
               finished
@@ -273,6 +291,12 @@ function GroupRow({
             tone={finished ? "neutral" : "success"}
           />
         </View>
+      }
+      // El punto no se oye: lo que significa entra por aquí.
+      accessibilityLabel={
+        group.unreadCount > 0
+          ? `${group.name}. ${t("online.groups.unread")}`
+          : group.name
       }
       onPress={onPress}
       enterDelay={Math.min(index, 12) * 35}

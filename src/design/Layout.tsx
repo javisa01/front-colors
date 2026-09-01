@@ -236,6 +236,13 @@ interface CardProps {
   children: ReactNode;
   /** `flat` quita la sombra: para tarjetas dentro de otra superficie. */
   variant?: "raised" | "flat";
+  /**
+   * A qué sección pertenece la tarjeta. Ver la nota de `CardBase`.
+   *
+   * Sin tono, la tarjeta es la gris de siempre — y esa sigue siendo la opción
+   * por defecto, porque la mayoría de las tarjetas no pertenecen a nada.
+   */
+  tone?: SpectrumTone;
   /** Retardo de la animación de entrada, en ms. */
   enterDelay?: number;
   style?: StyleProp<ViewStyle>;
@@ -248,10 +255,29 @@ interface CardProps {
  * `FadeInDown` escalonado con retardos de hasta 460 ms, así que abrir el menú de
  * modos obligaba a mirar cómo se montaba la lista antes de poder tocarla. Un
  * fundido de 260 ms comunica «esto acaba de aparecer» sin cobrar peaje.
+ *
+ * ## El canto de color
+ *
+ * Con `tone`, la tarjeta lleva un canto de 2 px del pigmento de su sección en el
+ * borde superior. Nace de un problema real: apiladas, todas las pantallas eran
+ * la misma tarjeta gris repetida, y nada decía si lo que estabas mirando era del
+ * ranking o de tu cuenta.
+ *
+ * Es un canto y no un relleno teñido —ni un borde completo— por dos motivos. El
+ * relleno bajaría el contraste de todo el texto que va encima, que es
+ * exactamente lo que una tarjeta no puede permitirse; y el borde entero
+ * convertiría cada tarjeta en un aviso de colores, que es el aspecto de
+ * plantilla del que veníamos huyendo. Un canto arriba se lee como el borde
+ * pintado de una muestra de color, que es el material de este juego.
+ *
+ * **Con avaricia.** El tono va en la tarjeta que abre una sección, no en las
+ * cinco de la pantalla: si todas lo llevan, deja de distinguir nada y vuelve a
+ * ser decoración.
  */
 function CardBase({
   children,
   variant = "raised",
+  tone,
   enterDelay,
   style,
 }: CardProps): ReactElement {
@@ -260,6 +286,10 @@ function CardBase({
       style={[
         styles.card,
         variant === "raised" && Elevation.raised,
+        tone != null && {
+          borderTopWidth: 2,
+          borderTopColor: Color.spectrum[tone].pigment,
+        },
         style,
       ]}
     >
@@ -315,6 +345,14 @@ interface OptionRowProps {
   description?: string;
   /** Elemento a la derecha del título: un récord, un estado. */
   badge?: ReactNode;
+  /**
+   * Lo que anuncia un lector de pantalla. Por defecto, el título.
+   *
+   * Existe porque la fila se anuncia como un solo elemento: lo que se cuele en
+   * el galón —un punto rojo de avisos, por ejemplo— se ve pero no se oye. Quien
+   * ponga ahí algo que signifique alguna cosa tiene que decirlo también aquí.
+   */
+  accessibilityLabel?: string;
   /** Nota bajo la descripción, en tono apagado. */
   note?: string;
   onPress: () => void;
@@ -337,6 +375,7 @@ function OptionRowBase({
   title,
   description,
   badge,
+  accessibilityLabel,
   note,
   onPress,
   disabled = false,
@@ -366,7 +405,7 @@ function OptionRowBase({
           disabled && styles.optionRowDisabled,
         ]}
         accessibilityRole="button"
-        accessibilityLabel={title}
+        accessibilityLabel={accessibilityLabel ?? title}
         accessibilityHint={description}
         accessibilityState={{ disabled }}
       >

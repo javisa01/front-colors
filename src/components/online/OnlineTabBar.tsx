@@ -1,17 +1,36 @@
-import { memo, type ReactElement } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { memo, useCallback, useEffect, useState, type ReactElement } from "react";
+import {
+  Pressable,
+  Text,
+  View,
+  type LayoutChangeEvent,
+} from "react-native";
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { UnreadDot } from "@/components/online/UnreadDot";
 import { Icon, type IconName } from "@/design/Icon";
+import { useColors, useThemedStyles } from "@/design/theme";
 import {
-  Color,
+  Duration,
   Elevation,
   HIT_TARGET,
+  Motion,
   Radius,
+  SECTION_TONE,
   Space,
   Type,
+  type Palette,
+  type SpectrumTone,
 } from "@/design/tokens";
 import { t, type TranslationKey } from "@/i18n";
+import { useSocial } from "@/online/social";
 import { selectionTick } from "@/utils/haptics";
 import { playTick } from "@/utils/sound";
 
@@ -59,6 +78,12 @@ interface TabDef {
   name: string;
   icon: IconName;
   labelKey: TranslationKey;
+  /**
+   * El pigmento de la sección. Sale de `SECTION_TONE`, no se escribe aquí: el
+   * mismo tono tiñe los botones de esa sección, y con el valor copiado las dos
+   * cosas se separarían en cuanto alguien retocase una.
+   */
+  tone: SpectrumTone;
 }
 
 /**
@@ -97,10 +122,30 @@ interface TabBarProps {
  * cómo vas, quién eres.
  */
 const TABS: TabDef[] = [
-  { name: "index", icon: "target", labelKey: "online.tabs.today" },
-  { name: "groups/index", icon: "users", labelKey: "online.tabs.groups" },
-  { name: "leaderboard", icon: "trophy", labelKey: "online.tabs.ranking" },
-  { name: "profile", icon: "user", labelKey: "online.tabs.profile" },
+  {
+    name: "index",
+    icon: "target",
+    labelKey: "online.tabs.today",
+    tone: SECTION_TONE.today,
+  },
+  {
+    name: "groups/index",
+    icon: "users",
+    labelKey: "online.tabs.groups",
+    tone: SECTION_TONE.groups,
+  },
+  {
+    name: "leaderboard",
+    icon: "trophy",
+    labelKey: "online.tabs.ranking",
+    tone: SECTION_TONE.ranking,
+  },
+  {
+    name: "profile",
+    icon: "user",
+    labelKey: "online.tabs.profile",
+    tone: SECTION_TONE.account,
+  },
 ];
 
 const TAB_NAMES = new Set(TABS.map((tab) => tab.name));
@@ -127,14 +172,112 @@ export function useOnlineTabBarSpace(): number {
   return PILL_BLOCK + Math.max(insets.bottom, Space.md);
 }
 
+/** Dónde está y cuánto mide una pestaña, medido por `onLayout`. */
+interface TabBox {
+  x: number;
+  width: number;
+}
+
 function OnlineTabBarBase({
   state,
   navigation,
   insets,
 }: TabBarProps): ReactElement | null {
-  const activeName = state.routes[state.index]?.name;
+  const styles = useThemedStyles(tabBarStyles);
+  const colors = useColors();
 
-  // Ruta profunda: no hay barra. Ver la nota de arriba.
+  const activeName = state.routes[state.index]?.name;
+  const activeIndex = TABS.findIndex((tab) => tab.name === activeName);
+
+  /**
+   * Las solicitudes de amistad sin responder, que salen como punto rojo sobre
+   * el icono del perfil.
+   *
+   * Se vuelve a preguntar al cambiar de pestaña, no en un temporizador: es el
+   * momento en que alguien está mirando la barra, y `refresh` trae su propio
+   * intervalo mínimo para que cuatro toques seguidos no sean cuatro peticiones.
+   */
+  const { incoming, refresh } = useSocial();
+
+  useEffect(() => {
+    refresh();
+  }, [activeName, refresh]);
+
+  /**
+   * La pastilla activa se mide, no se calcula.
+   *
+   * Las cuatro pestañas **no miden lo mismo**: solo la activa escribe su
+   * etiqueta, así que es bastante más ancha que las otras tres. Repartir el
+   * ancho a partes iguales dejaría el relleno descuadrado respecto al icono que
+   * envuelve, y con las etiquetas traducidas —«Ranking», «Classement»— el
+   * descuadre cambia además con el idioma. Medir es lo único que aguanta las
+   * tres traducciones sin tocar nada.
+   */
+  const [boxes, setBoxes] = useState<Record<string, TabBox>>({});
+
+  const measure = useCallback((name: string, box: TabBox) => {
+    setBoxes((previous) => {
+      const old = previous[name];
+      // `onLayout` se dispara en cada repintado; sin esta comparación, el
+      // `setState` incondicional es un bucle de renders.
+      if (
+        old != null &&
+        Math.abs(old.x - box.x) < 1 &&
+        Math.abs(old.width - box.width) < 1
+      ) {
+        return previous;
+      }
+      return { ...previous, [name]: box };
+    });
+  }, []);
+
+  const slot = activeIndex >= 0 ? boxes[TABS[activeIndex].name] : undefined;
+
+  const x = useSharedValue(0);
+  const width = useSharedValue(0);
+  /**
+   * En qué punto del espectro está el relleno. Es un número real, no el índice
+   * entero: mientras la pastilla viaja de «grupos» a «perfil» pasa por los tonos
+   * intermedios en vez de cambiar de golpe al llegar.
+   */
+  const hue = useSharedValue(Math.max(0, activeIndex));
+
+  useEffect(() => {
+    if (slot == null) {
+      return;
+    }
+    // La primera colocación es un salto, no un viaje: sin esto la pastilla
+    // entra deslizándose desde el borde izquierdo cada vez que se abre el modo
+    // online, como si acabases de cambiar de pestaña sin haberla tocado.
+    if (width.get() === 0) {
+      x.set(slot.x);
+      width.set(slot.width);
+      return;
+    }
+    x.set(withSpring(slot.x, Motion.spring));
+    width.set(withSpring(slot.width, Motion.spring));
+  }, [slot, width, x]);
+
+  useEffect(() => {
+    if (activeIndex >= 0) {
+      hue.set(withTiming(activeIndex, { duration: Duration.base }));
+    }
+  }, [activeIndex, hue]);
+
+  const pigments = TABS.map((tab) => colors.spectrum[tab.tone].pigment);
+  const stops = TABS.map((_, index) => index);
+
+  const indicatorStyle = useAnimatedStyle(() => ({
+    width: width.get(),
+    transform: [{ translateX: x.get() }],
+    backgroundColor: interpolateColor(hue.get(), stops, pigments),
+    // Antes de la primera medida no hay nada que enseñar: una pastilla de ancho
+    // cero se vería como una raya en el borde izquierdo.
+    opacity: width.get() > 0 ? 1 : 0,
+  }));
+
+  // Ruta profunda: no hay barra. Ver la nota de arriba. Va después de los
+  // ganchos a propósito: React exige que se llamen siempre, y en el mismo orden.
   if (activeName == null || !TAB_NAMES.has(activeName)) {
     return null;
   }
@@ -153,56 +296,49 @@ function OnlineTabBarBase({
       ]}
     >
       <View style={styles.pill}>
-        {TABS.map((tab) => {
-          const focused = activeName === tab.name;
-          const label = t(tab.labelKey);
+        {/*
+          El carril no lleva relleno propio, y eso es justo lo que permite que
+          el indicador cuadre: la `x` que devuelve `onLayout` de cada pestaña y
+          el `translateX` del indicador se miden desde el mismo origen. Con el
+          relleno en este mismo nodo, las dos referencias se separan por el
+          ancho del relleno y la pastilla queda descolocada.
+        */}
+        <View style={styles.track}>
+          <Animated.View
+            pointerEvents="none"
+            style={[styles.indicator, indicatorStyle]}
+          />
 
-          const onPress = (): void => {
-            selectionTick();
-            playTick();
-
-            const event = navigation.emit({
-              type: "tabPress",
-              target: state.routes.find(
-                (route: { key: string; name: string }) => route.name === tab.name,
-              )?.key,
-              canPreventDefault: true,
-            });
-
-            if (!focused && !event.defaultPrevented) {
-              navigation.navigate(tab.name);
-            }
-          };
-
-          return (
-            <Pressable
+          {TABS.map((tab) => (
+            <Tab
               key={tab.name}
-              onPress={onPress}
-              style={[styles.tab, focused && styles.tabActive]}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: focused }}
-              accessibilityLabel={label}
-            >
-              <Icon
-                name={tab.icon}
-                size={20}
-                color={focused ? Color.text.inverse : Color.text.muted}
-              />
-              {/*
-                La etiqueta solo aparece en la activa. Con las cuatro escritas,
-                la pastilla se come el ancho de la pantalla y hay que encoger el
-                texto hasta que no se lee; con una sola, la pestaña activa se
-                nombra a sí misma y las otras tres se reconocen por el icono,
-                que es como funciona una barra de este tamaño.
-              */}
-              {focused ? (
-                <Text style={[Type.caption, styles.label]} numberOfLines={1}>
-                  {label}
-                </Text>
-              ) : null}
-            </Pressable>
-          );
-        })}
+              tab={tab}
+              focused={activeName === tab.name}
+              styles={styles}
+              ink={colors.spectrum[tab.tone].ink}
+              muted={colors.text.muted}
+              badge={tab.name === "profile" ? incoming : 0}
+              onMeasure={measure}
+              onPress={() => {
+                selectionTick();
+                playTick();
+
+                const event = navigation.emit({
+                  type: "tabPress",
+                  target: state.routes.find(
+                    (route: { key: string; name: string }) =>
+                      route.name === tab.name,
+                  )?.key,
+                  canPreventDefault: true,
+                });
+
+                if (activeName !== tab.name && !event.defaultPrevented) {
+                  navigation.navigate(tab.name);
+                }
+              }}
+            />
+          ))}
+        </View>
       </View>
     </View>
   );
@@ -210,49 +346,182 @@ function OnlineTabBarBase({
 
 export const OnlineTabBar = memo(OnlineTabBarBase);
 
-const styles = StyleSheet.create({
+/**
+ * Una pestaña.
+ *
+ * El icono va **dos veces, superpuestas**: el apagado debajo y el entintado
+ * encima, y lo que cambia es la opacidad del de encima. No es un capricho: el
+ * color de un icono es una prop de SVG, así que no se puede interpolar en el
+ * hilo de UI como se interpola el relleno de la pastilla. Cambiándolo de golpe
+ * se veía el icono oscuro sobre el hueco todavía translúcido durante el cuarto
+ * de segundo que la pastilla tarda en llegar. Con dos capas, el entintado
+ * aparece al ritmo al que llega el relleno que lo hace legible.
+ */
+function Tab({
+  tab,
+  focused,
+  styles,
+  ink,
+  muted,
+  badge,
+  onMeasure,
+  onPress,
+}: {
+  tab: TabDef;
+  focused: boolean;
+  styles: ReturnType<typeof useThemedStyles<ReturnType<typeof tabBarStyles>>>;
+  ink: string;
+  muted: string;
+  /** Cuántas cosas te esperan dentro. Cero, ninguna. */
+  badge: number;
+  onMeasure: (name: string, box: TabBox) => void;
+  onPress: () => void;
+}): ReactElement {
+  const label = t(tab.labelKey);
+  const lit = useSharedValue(focused ? 1 : 0);
+
+  useEffect(() => {
+    lit.set(withTiming(focused ? 1 : 0, { duration: Duration.base }));
+  }, [focused, lit]);
+
+  const inkStyle = useAnimatedStyle(() => ({ opacity: lit.get() }));
+
+  const handleLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      const { x, width } = event.nativeEvent.layout;
+      onMeasure(tab.name, { x, width });
+    },
+    [onMeasure, tab.name],
+  );
+
+  return (
+    <Pressable
+      onPress={onPress}
+      onLayout={handleLayout}
+      style={styles.tab}
+      accessibilityRole="tab"
+      accessibilityState={{ selected: focused }}
+      /*
+        El punto va dentro de la pestaña, y una pestaña se anuncia entera: si
+        lo que significa no entra en esta etiqueta, no se oye.
+      */
+      accessibilityLabel={
+        badge > 0
+          ? `${label}. ${
+              badge === 1
+                ? t("online.friends.pendingOneA11y")
+                : t("online.friends.pendingA11y", { count: badge })
+            }`
+          : label
+      }
+    >
+      <View style={styles.iconStack}>
+        <Icon name={tab.icon} size={20} color={muted} />
+        <Animated.View style={[styles.iconInk, inkStyle]}>
+          <Icon name={tab.icon} size={20} color={ink} />
+        </Animated.View>
+        {/*
+          El mismo punto rojo que la lista de grupos y la entrada al chat.
+          Tercer sitio, mismo significado: hay algo que no has visto. Aquí sí
+          lleva la cifra cuando son varias, porque desde la barra no hay
+          ninguna otra forma de saber cuántas son.
+        */}
+        <View style={styles.badge} pointerEvents="none">
+          <UnreadDot count={badge} label={null} />
+        </View>
+      </View>
+
+      {/*
+        La etiqueta solo aparece en la activa. Con las cuatro escritas, la
+        pastilla se come el ancho de la pantalla y hay que encoger el texto
+        hasta que no se lee; con una sola, la pestaña activa se nombra a sí
+        misma y las otras tres se reconocen por el icono, que es como funciona
+        una barra de este tamaño.
+      */}
+      {focused ? (
+        <Text
+          style={[Type.caption, styles.label, { color: ink }]}
+          numberOfLines={1}
+        >
+          {label}
+        </Text>
+      ) : null}
+    </Pressable>
+  );
+}
+
+const tabBarStyles = (colors: Palette) => ({
   dock: {
     // Flota: no ocupa sitio en la disposición, así que el contenido y el fondo
     // ambiental de la pantalla siguen pasando por debajo.
-    position: "absolute",
+    position: "absolute" as const,
     left: 0,
     right: 0,
     bottom: 0,
-    alignItems: "center",
+    alignItems: "center" as const,
     paddingTop: Space.sm,
     // Sin relleno propio a propósito: la franja opaca era justo el problema.
     backgroundColor: "transparent",
   },
   pill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Space.xxs,
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
     padding: Space.xs + 2,
     borderRadius: Radius.pill,
     // Translúcida, no opaca: ver `surface.floating`.
-    backgroundColor: Color.surface.floating,
+    backgroundColor: colors.surface.floating,
     borderWidth: 1,
-    borderColor: Color.border.default,
+    borderColor: colors.border.default,
     // La sombra es lo que separa la pastilla del contenido que pasa por
     // debajo. Sin ella, al cruzar una tarjeta clara, las dos se funden.
     ...Elevation.overlay,
   },
+  track: {
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
+    gap: Space.xxs,
+  },
+  /**
+   * El relleno de la pestaña activa. Es **uno solo** para las cuatro, y por eso
+   * puede viajar: cuatro rellenos que se encienden y se apagan no dicen que las
+   * pestañas sean un conjunto; uno que se mueve entre ellas, sí.
+   */
+  indicator: {
+    position: "absolute" as const,
+    left: 0,
+    top: 0,
+    bottom: 0,
+    borderRadius: Radius.pill,
+  },
   tab: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
     gap: Space.sm,
     minHeight: HIT_TARGET - 6,
     paddingHorizontal: Space.lg,
     borderRadius: Radius.pill,
   },
-  tabActive: {
-    // Claro sobre oscuro, igual que el botón primario: en una interfaz casi
-    // negra el contraste puro es la señal más fuerte que hay, y así la pestaña
-    // activa no gasta el acento cromático.
-    backgroundColor: Color.text.primary,
+  iconStack: {
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
+  },
+  badge: {
+    position: "absolute" as const,
+    // Colgado de la esquina del icono, no dentro: el dibujo mide 20 puntos y
+    // un punto metido en ese cuadrado taparía justo la cabeza del muñeco.
+    top: -6,
+    right: -9,
+  },
+  iconInk: {
+    position: "absolute" as const,
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
   },
   label: {
-    color: Color.text.inverse,
-    fontWeight: "600",
+    fontWeight: "600" as const,
   },
 });

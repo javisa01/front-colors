@@ -1,5 +1,12 @@
 import { memo, useEffect, type ReactElement } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -7,6 +14,7 @@ import Animated, {
   type WithTimingConfig,
 } from "react-native-reanimated";
 
+import { Button } from "@/design/Button";
 import { Icon, type IconName } from "@/design/Icon";
 import {
   Color,
@@ -251,34 +259,67 @@ export const StarRating = memo(StarRatingBase);
 // Estados
 // ---------------------------------------------------------------------------
 
-/** Banner de error, con reintento opcional. */
+/**
+ * Algo ha fallado, y qué se puede hacer al respecto.
+ *
+ * ## Por qué pesa lo que pesa
+ *
+ * Era un renglón de 13 puntos con un enlace de texto debajo, y en una pantalla
+ * llena se leía como un pie de página. Cuando esto aparece es porque **lo que
+ * el jugador venía a hacer no ha ocurrido**, así que tiene que verse antes que
+ * nada: canto rojo vivo —no el apagado del resto de las superficies teñidas—,
+ * el mensaje al tamaño del cuerpo de texto y el reintento como botón de verdad.
+ *
+ * El enlace de texto no era un botón: su objetivo táctil medía lo que medía la
+ * palabra, trece puntos de alto, muy por debajo del mínimo de las dos
+ * plataformas. Ahora es un `Button` como los demás, con sus 44.
+ *
+ * ## Por qué trae sus propios márgenes
+ *
+ * Porque no forma parte del ritmo de la página: se cuela entre dos cosas que ya
+ * estaban colocadas. Sin margen propio quedaba pegado a lo de arriba y a lo de
+ * abajo en casi todas las pantallas, y cada sitio lo resolvía —o no— por su
+ * cuenta. Aquí el aire va con el componente, y `style` queda para el caso raro
+ * que necesite otra cosa.
+ *
+ * ## Qué dice
+ *
+ * El mensaje cuenta **qué ha pasado**; el botón dice **qué hacer**. Por eso el
+ * texto no acaba en «inténtalo otra vez»: eso ya lo pone el botón, y repetirlo
+ * es hacer que dos elementos hagan el mismo trabajo.
+ */
 function ErrorBannerBase({
   message,
   onRetry,
   retryLabel,
+  style,
 }: {
   message: string;
+  /** Sin esto no hay botón: para un fallo cuyo reintento es otra acción. */
   onRetry?: () => void;
+  /** Por defecto, «Reintentar». Solo se pasa si la acción tiene otro nombre. */
   retryLabel?: string;
+  style?: StyleProp<ViewStyle>;
 }): ReactElement {
   return (
-    <View
-      style={[styles.banner, TONE_SURFACE.danger]}
-      accessibilityRole="alert"
-    >
-      <Icon name="alert" size={18} color={Color.danger.text} />
+    <View style={[styles.banner, style]} accessibilityRole="alert">
+      <View style={styles.bannerIcon}>
+        <Icon name="alert" size={20} color={Color.danger.default} />
+      </View>
+
       <View style={styles.bannerBody}>
-        <Text style={[Type.caption, { color: Color.danger.text }]}>
-          {message}
-        </Text>
-        {onRetry != null && retryLabel != null ? (
-          <Text
-            style={[Type.caption, styles.bannerAction]}
+        <Text style={[Type.body, styles.bannerMessage]}>{message}</Text>
+
+        {onRetry != null ? (
+          <Button
+            label={retryLabel ?? t("common.retry")}
+            icon="retry"
+            variant="secondary"
+            size="md"
+            fullWidth={false}
             onPress={onRetry}
-            accessibilityRole="button"
-          >
-            {retryLabel}
-          </Text>
+            style={styles.bannerAction}
+          />
         ) : null}
       </View>
     </View>
@@ -371,17 +412,31 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     gap: Space.md,
-    padding: Space.md,
+    padding: Space.lg,
     borderRadius: Radius.md,
+    backgroundColor: Color.danger.surface,
     borderWidth: 1,
+    // El rojo vivo, no el canto apagado que usan las pastillas. Es la única
+    // superficie de la app cuyo trabajo es interrumpir.
+    borderColor: Color.danger.default,
+    // El aire va con el componente. Ver la nota de `ErrorBannerBase`.
+    marginTop: Space.md,
+    marginBottom: Space.lg,
+  },
+  bannerIcon: {
+    // Un pelo abajo: el icono mide 20 y la línea de texto 22, así que sin esto
+    // el símbolo queda alto respecto a la primera línea.
+    paddingTop: 1,
   },
   bannerBody: {
     flex: 1,
   },
+  bannerMessage: {
+    color: Color.danger.text,
+  },
   bannerAction: {
-    marginTop: Space.sm,
-    color: Color.accent.text,
-    fontWeight: "700",
+    marginTop: Space.md,
+    alignSelf: "flex-start",
   },
   empty: {
     alignItems: "center",

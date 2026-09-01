@@ -12,6 +12,7 @@ import { Color } from "@/design/tokens";
 import { t } from "@/i18n";
 import { CLERK_PUBLISHABLE_KEY } from "@/online/clerk";
 import { SessionProvider, useSession } from "@/online/session";
+import { SocialProvider } from "@/online/social";
 
 /**
  * Frontera entre el modo offline y el online.
@@ -46,48 +47,58 @@ export default function OnlineLayout(): ReactElement {
       tokenCache={tokenCache}
     >
       <SessionProvider>
-        <SessionGate>
-          {/*
-            Pestañas, no pila.
+        {/*
+          El contador de solicitudes de amistad vive aquí porque lo pinta la
+          barra de pestañas, que está siempre montada y no es de ninguna
+          pantalla. Va dentro de `SessionProvider` porque necesita el cliente
+          autenticado, y por fuera de la guarda para existir ya cuando la
+          barra se monte. No sondea: ver `online/social`.
+        */}
+        <SocialProvider>
+          <SessionGate>
+            {/*
+              Pestañas, no pila.
 
-            Los cuatro destinos permanentes —hoy, grupos, ranking, perfil— eran
-            filas dentro del menú principal, y por eso el menú no podía ser un
-            menú: la mitad de su alto la ocupaba un índice de la cuenta. Aquí
-            pasan a ser una barra, y la pantalla de inicio se queda con un solo
-            trabajo, que es decir qué hay que jugar hoy.
+              Los cuatro destinos permanentes —hoy, grupos, ranking, perfil— eran
+              filas dentro del menú principal, y por eso el menú no podía ser un
+              menú: la mitad de su alto la ocupaba un índice de la cuenta. Aquí
+              pasan a ser una barra, y la pantalla de inicio se queda con un solo
+              trabajo, que es decir qué hay que jugar hoy.
 
-            `href: null` saca una ruta de la barra pero la deja navegable con
-            `router.push`. La barra además se esconde sola en esas pantallas
-            —lo decide `OnlineTabBar`—, porque son sitios a los que se entra y
-            de los que se vuelve, no destinos: jugar el reto con una barra de
-            pestañas debajo es invitar a abandonar la partida a media ronda.
-          */}
-          <Tabs
-            tabBar={(props) => <OnlineTabBar {...props} />}
-            screenOptions={{
-              headerShown: false,
-              sceneStyle: { backgroundColor: Color.surface.canvas },
-            }}
-          >
-            <Tabs.Screen name="index" />
-            {/* Grupos. La carpeta no lleva `_layout` propio: la lista es
-                pestaña y la ficha de un grupo es una pantalla profunda. */}
-            <Tabs.Screen name="groups/index" />
-            <Tabs.Screen name="leaderboard" />
-            <Tabs.Screen name="profile" />
+              `href: null` saca una ruta de la barra pero la deja navegable con
+              `router.push`. La barra además se esconde sola en esas pantallas
+              —lo decide `OnlineTabBar`—, porque son sitios a los que se entra y
+              de los que se vuelve, no destinos: jugar el reto con una barra de
+              pestañas debajo es invitar a abandonar la partida a media ronda.
+            */}
+            <Tabs
+              tabBar={(props) => <OnlineTabBar {...props} />}
+              screenOptions={{
+                headerShown: false,
+                sceneStyle: { backgroundColor: Color.surface.canvas },
+              }}
+            >
+              <Tabs.Screen name="index" />
+              {/* Grupos. La carpeta no lleva `_layout` propio: la lista es
+                  pestaña y la ficha de un grupo es una pantalla profunda. */}
+              <Tabs.Screen name="groups/index" />
+              <Tabs.Screen name="leaderboard" />
+              <Tabs.Screen name="profile" />
 
-            {/* --- Profundas: navegables, pero fuera de la barra --- */}
-            <Tabs.Screen name="auth" options={{ href: null }} />
-            <Tabs.Screen name="friends" options={{ href: null }} />
-            <Tabs.Screen name="groups/[id]/index" options={{ href: null }} />
-            <Tabs.Screen name="groups/[id]/edit" options={{ href: null }} />
-            {/* `daily/index` ya no es una pantalla: solo redirige a la ficha
-                del grupo, que es donde se juega desde ella. Sigue declarada
-                para que los enlaces guardados encuentren la redirección. */}
-            <Tabs.Screen name="daily/index" options={{ href: null }} />
-            <Tabs.Screen name="daily/play" options={{ href: null }} />
-          </Tabs>
-        </SessionGate>
+              {/* --- Profundas: navegables, pero fuera de la barra --- */}
+              <Tabs.Screen name="auth" options={{ href: null }} />
+              <Tabs.Screen name="friends" options={{ href: null }} />
+              <Tabs.Screen name="groups/[id]/index" options={{ href: null }} />
+              <Tabs.Screen name="groups/[id]/edit" options={{ href: null }} />
+              <Tabs.Screen name="groups/[id]/chat" options={{ href: null }} />
+              {/* `daily/index` ya no es una pantalla: solo redirige a la ficha
+                  del grupo, que es donde se juega desde ella. Sigue declarada
+                  para que los enlaces guardados encuentren la redirección. */}
+              <Tabs.Screen name="daily/index" options={{ href: null }} />
+              <Tabs.Screen name="daily/play" options={{ href: null }} />
+            </Tabs>
+          </SessionGate>
+        </SocialProvider>
       </SessionProvider>
     </ClerkProvider>
   );

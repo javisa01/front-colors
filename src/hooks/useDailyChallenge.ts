@@ -7,6 +7,7 @@ import type {
   DailySubmitResult,
 } from "@/api/types";
 import { findAsset } from "@/online/daily";
+import { readDailyStatus, writeDailyStatus } from "@/online/dailyCache";
 import { useSession } from "@/online/session";
 // Del hook offline se toma SOLO el color de arranque de la rueda, para que el
 // punto de partida sea el mismo en los dos modos. Todo lo demás de
@@ -91,12 +92,23 @@ export interface UseDailyChallengeResult {
    * las respuestas no se pierden.
    */
   submit: () => Promise<void>;
+  /**
+   * El nivel que tenías **antes** de enviar este intento, o `null` si todavía
+   * no has enviado ninguno.
+   *
+   * Existe porque `DailySubmitResult` trae el nivel resultante pero no dice si
+   * ha cambiado, y para cuando la pantalla del resultado se pinta, el perfil de
+   * la sesión ya se ha refrescado con el nuevo: comparar contra él diría
+   * siempre que no. Se captura al empezar el envío, que es el único momento en
+   * que el nivel anterior sigue siendo el vigente.
+   */
+  levelBefore: number | null;
   /** Prepara otro intento con el mismo reto, sin recargar la pantalla. */
   restart: () => void;
 }
 
 export function useDailyChallenge(groupId: string | null): UseDailyChallengeResult {
-  const { api, reloadUser } = useSession();
+  const { api, user, reloadUser } = useSession();
 
   const [status, setStatus] = useState<DailyStatus | null>(null);
   const [loading, setLoading] = useState(true);
@@ -110,6 +122,8 @@ export function useDailyChallenge(groupId: string | null): UseDailyChallengeResu
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [result, setResult] = useState<DailySubmitResult | null>(null);
+  /** Ver `levelBefore` en la interfaz: el nivel de antes de enviar. */
+  const [levelBefore, setLevelBefore] = useState<number | null>(null);
 
   /**
    * Las respuestas viven en una referencia, no en el estado.
@@ -169,6 +183,8 @@ export function useDailyChallenge(groupId: string | null): UseDailyChallengeResu
 
       setStatus(today);
       setServerClosed(false);
+      // Para que la próxima visita a este grupo salga llena sin esperar.
+      void writeDailyStatus(groupId, today);
 
       // Si el reto que acaba de llegar no contiene al reloj del teléfono, los
       // dos relojes no están de acuerdo y la cuenta atrás local sobra.
@@ -197,6 +213,39 @@ export function useDailyChallenge(groupId: string | null): UseDailyChallengeResu
       }
     }
   }, [api, groupId]);
+
+  /**
+   * Siembra la pantalla con lo último que dijo el servidor, guardado en el
+   * teléfono.
+   *
+   * Se pinta **antes** de que llegue la red, y la red lo sustituye al llegar.
+   * `current ?? cached` es la guarda que importa: si la respuesta de verdad se
+   * ha adelantado a la lectura del disco, lo guardado no la pisa.
+   *
+   * La caché caduca sola comparando con el `closesAt` que trae dentro, así que
+   * esto no puede enseñar la jornada de ayer. Ver `online/dailyCache`.
+   */
+  useEffect(() => {
+    if (!groupId) {
+      return;
+    }
+    let active = true;
+
+    void (async () => {
+      const cached = await readDailyStatus(groupId);
+      if (!active || !cached) {
+        return;
+      }
+      setStatus((current) => current ?? cached);
+      // Ya hay algo que enseñar: seguir diciendo «cargando» sobre una tarjeta
+      // llena es mentir sobre el estado de la pantalla.
+      setLoading(false);
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [groupId]);
 
   const rounds = useMemo<DailyRoundView[]>(
     () =>
@@ -253,6 +302,10 @@ export function useDailyChallenge(groupId: string | null): UseDailyChallengeResu
     }
     submittingRef.current = true;
 
+    // El nivel de ahora mismo, antes de que el intento lo mueva. Se guarda aquí
+    // porque en cuanto vuelva la respuesta se refresca el perfil de la sesión y
+    // este número deja de estar en ninguna parte.
+    setLevelBefore(user?.level ?? null);
     setSubmitting(true);
     setSubmitError(null);
     try {
@@ -300,7 +353,7 @@ export function useDailyChallenge(groupId: string | null): UseDailyChallengeResu
         setSubmitting(false);
       }
     }
-  }, [api, groupId, reloadUser]);
+  }, [api, groupId, reloadUser, user]);
 
   const restart = useCallback((): void => {
     answersRef.current = [];
@@ -331,6 +384,7 @@ export function useDailyChallenge(groupId: string | null): UseDailyChallengeResu
     submitError,
     result,
     submit,
+    levelBefore,
     restart,
   };
 }

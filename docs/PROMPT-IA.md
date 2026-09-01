@@ -315,8 +315,8 @@ CONTEXTO OBLIGATORIO:
 - docs/ONLINE.md
 - las pantallas de grupos, reto y chat que ya existen
 
-QUÉ HACER: revisar que toda cadena visible esté en es/en/fr, reflejar el XP y el
-nivel del reto diario en el perfil, repasar el fin de temporada de punta a punta
+QUÉ HACER: revisar que toda cadena visible esté en es/en/fr y añadir el catalán, reflejar el XP y el
+nivel en el perfil, repasar el fin de temporada de punta a punta
 (clasificación congelada, chat vivo, renovación y aviso), y actualizar
 docs/ONLINE.md con la estructura nueva.
 

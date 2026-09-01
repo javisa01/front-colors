@@ -125,26 +125,81 @@ const semantic = {
  *
  * Se tiñe el icono y su cuadro, nunca el fondo de la fila entera: ocho rellenos
  * de colores distintos apilados es exactamente el aspecto que hay que evitar.
+ *
+ * ## `pigment` e `ink`: la muestra de pintura
+ *
+ * Los tres primeros campos son la versión **apagada** del tono, para teñir un
+ * icono sobre una superficie oscura. `pigment` es el mismo tono a plena
+ * saturación, pensado para **rellenar** —hoy solo el botón primario y la
+ * pestaña activa—, e `ink` es el texto que va encima.
+ *
+ * Que exista un relleno saturado es un cambio de rumbo respecto a la versión
+ * anterior, donde el botón primario era blanco sobre negro y el color no
+ * rellenaba nada. El motivo: en una app **de colores**, un botón blanco es la
+ * única superficie de la pantalla que no dice nada sobre lo que hace. Con
+ * pigmento, el relleno se lee como una muestra de pintura —que es el material
+ * del juego— y además carga información: el tono dice a qué sección pertenece
+ * la acción. La barra de pestañas es la leyenda de ese mapa.
+ *
+ * La regla que sustituye a la vieja está en `Button`: el pigmento es para lo
+ * que ocurre **fuera** de una ronda. Dentro, el único color saturado sigue
+ * siendo el del juego y el botón vuelve a ser claro sobre oscuro.
+ *
+ * Los seis pigmentos van a la misma luminosidad —igual que los iconos— para
+ * que ninguna sección grite más que otra, y esa luminosidad está elegida para
+ * que la tinta casi negra de encima pase de 8:1 en los seis. `ink` no es negro
+ * puro sino el mismo tono llevado casi al negro: es lo que hace que la etiqueta
+ * parezca impresa sobre la pintura en vez de pegada encima.
  */
 const spectrum = {
   violet: {
     surface: accent.surface,
     border: accent.border,
     icon: accent.text,
+    pigment: "#A79BF5",
+    pigmentPressed: "#8E80E8",
+    ink: "#120E2E",
   },
-  blue: { surface: "#0D1B2A", border: "#1E3A55", icon: "#7FB6F0" },
-  teal: { surface: "#0A2020", border: "#17423E", icon: "#6FD3C8" },
+  blue: {
+    surface: "#0D1B2A",
+    border: "#1E3A55",
+    icon: "#7FB6F0",
+    pigment: "#6FA8F0",
+    pigmentPressed: "#5A92DC",
+    ink: "#071628",
+  },
+  teal: {
+    surface: "#0A2020",
+    border: "#17423E",
+    icon: "#6FD3C8",
+    pigment: "#57CFC0",
+    pigmentPressed: "#43B8A9",
+    ink: "#04211D",
+  },
   green: {
     surface: semantic.success.surface,
     border: semantic.success.border,
     icon: semantic.success.text,
+    pigment: "#5CD394",
+    pigmentPressed: "#47BC7F",
+    ink: "#062114",
   },
   amber: {
     surface: semantic.warning.surface,
     border: semantic.warning.border,
     icon: semantic.warning.text,
+    pigment: "#E9B95C",
+    pigmentPressed: "#D3A448",
+    ink: "#241906",
   },
-  rose: { surface: "#24101A", border: "#4C2233", icon: "#F09AB8" },
+  rose: {
+    surface: "#24101A",
+    border: "#4C2233",
+    icon: "#F09AB8",
+    pigment: "#EE8CB2",
+    pigmentPressed: "#DA779E",
+    ink: "#2A0C18",
+  },
 } as const;
 
 export type SpectrumTone = keyof typeof spectrum;
@@ -235,6 +290,55 @@ const ember = {
   dimInner: "#23232B",
 } as const;
 
+/**
+ * Identidad de grupo: seis superficies teñidas para áreas GRANDES.
+ *
+ * ## Por qué no vale `spectrum`
+ *
+ * Es un error de escala, y costó verlo. Los seis tonos de `spectrum` están
+ * calculados para teñir un chip de 36 puntos detrás de un icono, y ahí funcionan:
+ * a ese tamaño, un tinte del 6 % se lee como «teñido». Puestos a rellenar una
+ * baldosa de 200, los mismos valores se leen como **negro sucio** — el verde
+ * (`#0A1F16`) era el peor, un botella tan oscuro que parecía un fallo de pintado.
+ *
+ * Y hay un problema peor que el brillo: **no se distinguen entre sí**. Los
+ * matices del espectro se eligieron para verse de uno en uno, así que tres de
+ * ellos caben en 33 grados (verde 167°, teal 176°, azul 199°). Como seis bloques
+ * contiguos se colapsan: la pareja más parecida está a una distancia perceptual
+ * de 0,022, que a tamaño de baldosa es «el mismo color».
+ *
+ * ## Cómo está calculada esta
+ *
+ * En OKLCH, y con dos reglas:
+ *
+ *  - **La misma luminosidad para los seis.** Es la regla que `spectrum` ya
+ *    declara y que en la práctica no cumplía: entre su tono más claro y el más
+ *    oscuro había un factor 1,5, así que unos pesaban más que otros. Aquí la
+ *    dispersión es 1,24, y lo que queda es solo lo que el ojo humano no puede
+ *    igualar por construcción.
+ *  - **Croma distinto por matiz.** Un ámbar necesita más croma que un azul para
+ *    leerse como ámbar y no como marrón a esta luminosidad. Fijar el croma para
+ *    los seis es lo que convierte los tonos cálidos en barro.
+ *
+ * Los seis matices están repartidos con al menos 45 grados entre vecinos, así
+ * que la pareja más parecida queda en 0,073 — más del triple de separación que
+ * la del espectro.
+ *
+ * ## Los tres papeles
+ *
+ * `wash` rellena, `edge` es el borde, y `mark` es lo que se dibuja ENCIMA del
+ * relleno: el canto superior, el monograma del fondo y el interrogante del dial.
+ * Los tres del mismo matiz, así que una baldosa es de un color y no de tres.
+ */
+const groupTint = {
+  carmin: { wash: "#44362D", edge: "#635144", mark: "#CCB19F" },
+  ambar: { wash: "#3D3810", edge: "#5A541D", mark: "#BCB56B" },
+  jade: { wash: "#2D3B2C", edge: "#445844", mark: "#9CBC9F" },
+  azul: { wash: "#303B51", edge: "#495876", mark: "#A3BBEB" },
+  indigo: { wash: "#3D3866", edge: "#5B5393", mark: "#BDB5FF" },
+  ciruela: { wash: "#423651", edge: "#615176", mark: "#C9B2EB" },
+} as const;
+
 export const Color = {
   surface,
   border,
@@ -242,11 +346,88 @@ export const Color = {
   accent,
   ambient,
   spectrum,
+  groupTint,
   podium,
   glow,
   ember,
   ...semantic,
 } as const;
+
+/**
+ * La forma de una paleta.
+ *
+ * Existe para que el modo claro no pueda quedarse a medias: cualquier paleta
+ * alternativa tiene que rellenar exactamente estas claves o no compila. Ver
+ * `design/theme.tsx`, donde vive la clara y el interruptor que las cambia.
+ *
+ * `DeepMutable` quita los `readonly` que introduce el `as const` de arriba. Sin
+ * él, una paleta escrita a mano no encaja en el tipo por un detalle que no
+ * importa —que sus cadenas sean literales o no— y habría que salpicar `as
+ * const` por toda la paleta clara.
+ */
+type DeepMutable<T> = {
+  -readonly [K in keyof T]: T[K] extends string ? string : DeepMutable<T[K]>;
+};
+
+export type Palette = DeepMutable<typeof Color>;
+
+/**
+ * Qué tono le toca a cada sección del modo online.
+ *
+ * Es el mapa del que tiran la barra de pestañas —que hace de leyenda— y los
+ * botones de cada sección. Vive aquí, en los tokens, y no en la barra, porque
+ * la barra es solo el sitio donde se ve: el tono de «grupos» tiene que ser el
+ * mismo en la pestaña, en el botón de crear uno y en el borde de sus tarjetas.
+ *
+ * `hoy` es azul porque es lo que está fresco; `grupos` hereda el verde azulado
+ * que ya llevaban sus filas; `ranking` el ámbar del oro del podio; `cuenta` el
+ * violeta que ya era el acento del perfil. Ninguno se ha elegido a ojo: los
+ * cuatro ya estaban usados así en alguna pantalla, y esto solo los hace ley.
+ */
+export const SECTION_TONE = {
+  today: "blue",
+  groups: "teal",
+  ranking: "amber",
+  account: "violet",
+} as const satisfies Record<string, SpectrumTone>;
+
+export type GroupTone = keyof typeof groupTint;
+
+/** Los seis, en orden fijo. Es de donde reparte `tintForKey`. */
+export const GROUP_TONES = [
+  "carmin",
+  "ambar",
+  "jade",
+  "azul",
+  "indigo",
+  "ciruela",
+] as const satisfies readonly GroupTone[];
+
+/**
+ * El tono de una cosa que no tiene color propio: hoy, un grupo.
+ *
+ * Los grupos no guardan ningún color en el servidor, y aun así conviene que
+ * cada uno tenga el suyo: en un muro de baldosas, el color es lo que permite
+ * reconocer la tuya antes de haber leído el nombre. Se deriva del `id`, así que
+ * es **estable sin guardar nada** y el mismo grupo sale del mismo tono en
+ * cualquier dispositivo.
+ *
+ * Reparte entre los seis en vez de calcular un matiz continuo como hace
+ * `playerTint` con los jugadores, y la diferencia importa por dos motivos: seis
+ * tonos elegidos a mano se distinguen entre sí —360 matices contiguos no—, y
+ * **los seis ya tienen su versión clara**, así que esto sigue siendo legible el
+ * día que exista el modo claro.
+ *
+ * El hash es el multiplicador 31 de siempre, el mismo que usa `Avatar`: barato,
+ * determinista y con buen reparto para cadenas cortas.
+ */
+export function tintForKey(key: string): GroupTone {
+  let hash = 0;
+  for (let index = 0; index < key.length; index += 1) {
+    hash = (hash * 31 + key.charCodeAt(index)) % 1_000_003;
+  }
+  return GROUP_TONES[hash % GROUP_TONES.length];
+}
 
 // ---------------------------------------------------------------------------
 // Espaciado
@@ -303,19 +484,51 @@ export const Radius = {
 // ---------------------------------------------------------------------------
 
 /**
- * La app referenciaba `Inter_700Bold` y compañía en 14 estilos, pero nunca
- * llamaba a `expo-font`: esas familias no existían en runtime y React Native
- * caía silenciosamente a la fuente del sistema. En vez de mantener la ficción,
- * usamos la fuente de plataforma de forma explícita y dejamos la jerarquía en
- * manos del peso y del tamaño.
+ * Dos familias, cada una con un trabajo.
  *
- * Para adoptar Inter más adelante: instalar `@expo-google-fonts/inter`,
- * cargarla con `useFonts` en el layout raíz y poner su nombre aquí. Es el único
- * sitio que hay que tocar.
+ * ## La pareja
+ *
+ * **Space Grotesk** para lo que se mira —títulos y, sobre todo, cifras—. Es una
+ * grotesca con las formas algo raras y un aire de instrumento de medida, que es
+ * exactamente lo que es una puntuación de acierto de color. A 34 y 44 puntos
+ * tiene carácter propio; ahí es donde debe estar la personalidad.
+ *
+ * **Inter** para lo que se lee —cuerpo, pastillas, botones, rótulos—. Es
+ * deliberadamente neutra: a 13 y 15 puntos el carácter se paga en legibilidad,
+ * y una fuente con personalidad en un párrafo de ayuda estorba. Que la
+ * personalidad viva en el titular y no en el párrafo es la decisión, no un
+ * atajo.
+ *
+ * ## Por qué cada nivel nombra su peso
+ *
+ * Antes esto era una sola `FONT_FAMILY` más un `fontWeight` por nivel. Con
+ * fuentes del sistema funciona; con fuentes cargadas, **no**: Android no
+ * sintetiza pesos, así que `fontWeight: "700"` sobre una familia cargada como
+ * Regular se queda en regular, sin error ni aviso. Por eso cada token nombra su
+ * corte exacto —`SpaceGrotesk_700Bold`— y `fontWeight` desaparece: mantenerlo
+ * además del corte invita a que iOS sintetice encima de una negrita que ya lo
+ * es.
+ *
+ * Los nombres son las claves que se le pasan a `useFonts` en el layout raíz. Si
+ * se renombra una allí, aquí deja de resolver y se cae a la fuente del sistema
+ * en silencio — es el único acoplamiento de todo esto, y es de una sola línea.
  */
-const FONT_FAMILY: string | undefined = undefined;
+const DISPLAY_BOLD = "SpaceGrotesk_700Bold";
+const DISPLAY_SEMI = "SpaceGrotesk_600SemiBold";
+const BODY_REGULAR = "Inter_400Regular";
+const BODY_SEMI = "Inter_600SemiBold";
+const BODY_BOLD = "Inter_700Bold";
 
-/** Cifras de ancho fijo: marcadores y temporizadores no deben bailar. */
+/**
+ * Cifras de ancho fijo: marcadores y temporizadores no deben bailar.
+ *
+ * **Esta línea ahora es obligatoria, no un adorno.** Las cifras de Space
+ * Grotesk son proporcionales de fábrica —el «1» mide 418 unidades y el «7» 625,
+ * comprobado en la propia TTF—, así que una cuenta atrás sin esto cambia de
+ * ancho en cada segundo. Las dos familias traen la característica `tnum`, que
+ * es la que iguala los anchos; el día que se cambie de fuente hay que
+ * comprobarlo antes, porque si falta no da error: simplemente vuelve a bailar.
+ */
 const TABULAR: TextStyle = { fontVariant: ["tabular-nums"] };
 
 type TypeToken = TextStyle;
@@ -327,100 +540,89 @@ type TypeToken = TextStyle;
 export const Type = {
   /** 34 — título principal de una pantalla. Uno por pantalla, como mucho. */
   display: {
-    fontFamily: FONT_FAMILY,
+    fontFamily: DISPLAY_BOLD,
     fontSize: 34,
     lineHeight: 40,
-    fontWeight: "700",
     letterSpacing: -0.5,
     color: text.primary,
   },
   /** 24 — título de modal o de bloque destacado. */
   title: {
-    fontFamily: FONT_FAMILY,
+    fontFamily: DISPLAY_BOLD,
     fontSize: 24,
     lineHeight: 30,
-    fontWeight: "700",
     letterSpacing: -0.3,
     color: text.primary,
   },
   /** 18 — título de tarjeta o de fila. */
   heading: {
-    fontFamily: FONT_FAMILY,
+    fontFamily: DISPLAY_SEMI,
     fontSize: 18,
     lineHeight: 24,
-    fontWeight: "600",
     letterSpacing: -0.2,
     color: text.primary,
   },
   /** 15 — cuerpo de texto por defecto. */
   body: {
-    fontFamily: FONT_FAMILY,
+    fontFamily: BODY_REGULAR,
     fontSize: 15,
     lineHeight: 22,
-    fontWeight: "400",
     color: text.secondary,
   },
   /** 15 con peso — cuerpo que necesita énfasis sin cambiar de tamaño. */
   bodyStrong: {
-    fontFamily: FONT_FAMILY,
+    fontFamily: BODY_SEMI,
     fontSize: 15,
     lineHeight: 22,
-    fontWeight: "600",
     color: text.primary,
   },
   /** 13 — metadatos, pistas, descripciones secundarias. */
   caption: {
-    fontFamily: FONT_FAMILY,
+    fontFamily: BODY_REGULAR,
     fontSize: 13,
     lineHeight: 18,
-    fontWeight: "400",
     color: text.muted,
   },
   /** 11 en versalitas — kickers y encabezados de sección. */
   label: {
-    fontFamily: FONT_FAMILY,
+    fontFamily: BODY_BOLD,
     fontSize: 11,
     lineHeight: 14,
-    fontWeight: "700",
     letterSpacing: 0.8,
     textTransform: "uppercase",
     color: text.muted,
   },
   /** 16 — texto de botón. Un único tamaño para todos los botones de la app. */
   button: {
-    fontFamily: FONT_FAMILY,
+    fontFamily: BODY_SEMI,
     fontSize: 16,
     lineHeight: 20,
-    fontWeight: "600",
     letterSpacing: -0.1,
     color: text.primary,
   },
   /** 44 — la puntuación en el modal de resultado. Cifra protagonista. */
   metricHero: {
-    fontFamily: FONT_FAMILY,
+    fontFamily: DISPLAY_BOLD,
     fontSize: 44,
     lineHeight: 50,
-    fontWeight: "700",
     letterSpacing: -1.2,
     color: text.primary,
     ...TABULAR,
   },
   /** 20 — cifras de estadística y temporizadores. */
   metric: {
-    fontFamily: FONT_FAMILY,
+    fontFamily: DISPLAY_BOLD,
     fontSize: 20,
     lineHeight: 26,
-    fontWeight: "700",
     letterSpacing: -0.3,
     color: text.primary,
     ...TABULAR,
   },
   /** 13 — valores hexadecimales y deltas numéricos. */
   metricSmall: {
-    fontFamily: FONT_FAMILY,
+    fontFamily: DISPLAY_SEMI,
     fontSize: 13,
     lineHeight: 18,
-    fontWeight: "600",
     color: text.secondary,
     ...TABULAR,
   },

@@ -11,7 +11,7 @@ import { Button } from "@/design/Button";
 import { ErrorBanner } from "@/design/Feedback";
 import { Field, Notice, OrDivider, SegmentedControl } from "@/design/Form";
 import { Card, Screen } from "@/design/Layout";
-import { Color, Space, Type } from "@/design/tokens";
+import { Color, SECTION_TONE, Space, Type } from "@/design/tokens";
 import { t } from "@/i18n";
 import { describeClerkError, type ClerkField } from "@/online/clerkErrors";
 
@@ -341,7 +341,12 @@ export default function AuthScreen(): ReactElement {
             {notice ? <Notice message={notice} /> : null}
 
             <View style={styles.actions}>
-              <Button label={submitLabel} onPress={submit} loading={busy} />
+              <Button
+                label={submitLabel}
+                tone={SECTION_TONE.account}
+                onPress={submit}
+                loading={busy}
+              />
               <Button
                 label={t("online.auth.verify.resend")}
                 variant="secondary"
@@ -408,6 +413,7 @@ export default function AuthScreen(): ReactElement {
 
               <Button
                 label={submitLabel}
+                tone={SECTION_TONE.account}
                 onPress={submit}
                 loading={busy}
                 disabled={ssoBusy !== null}

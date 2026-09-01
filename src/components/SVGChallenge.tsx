@@ -10,6 +10,7 @@ import Animated, {
 import { SvgXml } from "react-native-svg";
 
 import { Radius, Type } from "@/design/tokens";
+import { t } from "@/i18n";
 import type { ChallengeMetadata } from "@/types/challenge";
 import { getChallengeBackgroundTheme, normalizeHex } from "@/utils/color";
 
@@ -254,7 +255,7 @@ function SVGChallenge({
           <SvgXml xml={svgMarkup} width="100%" height="100%" />
         ) : (
           <View style={styles.fallback}>
-            <Text style={styles.fallbackText}>SVG no disponible</Text>
+            <Text style={styles.fallbackText}>{t("challenge.imageMissing")}</Text>
           </View>
         )}
       </Animated.View>

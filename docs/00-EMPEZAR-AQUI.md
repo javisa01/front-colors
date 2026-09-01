@@ -49,8 +49,10 @@ repiten aquí.
    `front-colors/src/app/online/_layout.tsx`. El árbol offline (`/`,
    `/offline`, `/game`, `/party*`) no importa nada de `src/api/` ni
    `src/online/`. Razonado en `docs/ONLINE.md`.
-3. **Tres idiomas siempre.** Toda cadena visible va a
-   `front-colors/src/i18n/index.ts` en `es`, `en` y `fr`.
+3. **Cuatro idiomas siempre.** Toda cadena visible va a
+   `front-colors/src/i18n/index.ts` en `es`, `en`, `fr` y `ca`. El español es la
+   fuente de verdad y el tipo lo impone: `TranslationKey` sale de
+   `keyof typeof es`, así que faltar una clave rompe el typecheck.
 4. **La puntuación la calcula el servidor.** El cliente manda los colores
    elegidos; el backend recalcula. Nunca al revés.
 5. **Una sola fuente de la hora.** Toda la lógica de fechas del backend pasa por
@@ -189,6 +191,9 @@ Fase 5  Front: reto diario           -> partida diaria jugable
 Fase 6  Front: chat y avisos         -> conversación y punto rojo
 Fase 7  Remates                      -> i18n, XP en perfil, fin de temporada
 ```
+
+**Las siete fases están hechas** (2026-09-01). Lo que queda es probarlo a mano
+con dos cuentas de Clerk reales; ver el apartado 0 del plan.
 
 Las fases 1, 2 y 3 son de backend puro y se verifican con tests y `curl`, sin
 tocar la app. No empieces la 4 sin tener backend que consumir: la pantalla no se

@@ -2,7 +2,7 @@ import { memo, type ReactElement, type ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 
-import { Color } from "@/design/tokens";
+import { useColors } from "@/design/theme";
 
 /**
  * El anillo de rondas: un segmento por imagen del reto, alrededor del logo.
@@ -52,6 +52,13 @@ interface RoundRingProps {
   solved?: readonly SolvedRound[] | null;
   /** Grosor del trazo. */
   stroke?: number;
+  /**
+   * Color de las pistas vacías. Por defecto, el borde sutil de la paleta
+   * activa. Se puede forzar para pintarlo sobre una superficie que no sea la
+   * de siempre —el muro del menú lo pinta sobre la baldosa teñida del grupo—,
+   * donde el borde de la paleta se pierde.
+   */
+  track?: string;
   /** Lo que va dentro del anillo: el logo, o la cifra. */
   children?: ReactNode;
 }
@@ -72,8 +79,10 @@ function RoundRingBase({
   rounds,
   solved = null,
   stroke = 12,
+  track,
   children,
 }: RoundRingProps): ReactElement {
+  const colors = useColors();
   // El radio se mide al centro del trazo, no al borde exterior: si no, medio
   // grosor se sale del `viewBox` y los arcos salen cortados.
   const radius = (size - stroke) / 2;
@@ -98,7 +107,7 @@ function RoundRingBase({
               cx={size / 2}
               cy={size / 2}
               r={radius}
-              stroke={Color.border.subtle}
+              stroke={track ?? colors.border.subtle}
               strokeWidth={stroke}
               fill="none"
               strokeDasharray={`${sectorLength} ${circumference}`}

@@ -667,6 +667,9 @@ function GamePlay({ mode, seed, resume }: GamePlayProps): ReactElement {
             modal invita a intentarlo. */}
         <Button
           label={t("game.check")}
+          // Neutro por la regla del pigmento: la pantalla esta ensenando el
+          // color que hay que acertar. Ver `design/Button.tsx`.
+          tone="neutral"
           onPress={handleCheck}
           disabled={targetColor == null || resultVisible}
           style={styles.checkButton}

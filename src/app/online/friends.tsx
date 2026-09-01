@@ -16,6 +16,7 @@ import { Card, Divider, Screen, SectionHeader } from "@/design/Layout";
 import { Color, Duration, Space, Type } from "@/design/tokens";
 import { t } from "@/i18n";
 import { useSession } from "@/online/session";
+import { useSocial } from "@/online/social";
 
 interface SearchResults {
   /** Termino que produjo estos resultados, para saber si siguen vigentes. */
@@ -37,6 +38,7 @@ const SEARCH_DEBOUNCE_MS = 350;
  */
 export default function FriendsScreen(): ReactElement {
   const { api, user } = useSession();
+  const { apply: applySocial } = useSocial();
 
   const [overview, setOverview] = useState<FriendsOverview | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -48,6 +50,19 @@ export default function FriendsScreen(): ReactElement {
   const [debounced, setDebounced] = useState("");
   const [results, setResults] = useState<SearchResults | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
+  /**
+   * Sube uno cada vez que se pide repetir la búsqueda.
+   *
+   * La búsqueda cuelga de un efecto que depende del término, y reintentar no
+   * cambia el término: sin este contador en las dependencias, pulsar el botón
+   * no volvería a lanzar nada.
+   */
+  const [searchAttempt, setSearchAttempt] = useState(0);
+
+  const searchAgain = useCallback(() => {
+    setSearchError(null);
+    setSearchAttempt((value) => value + 1);
+  }, []);
 
   /** Id del usuario cuya acción está en vuelo, para bloquear solo su fila. */
   const [pendingId, setPendingId] = useState<string | null>(null);
@@ -55,11 +70,15 @@ export default function FriendsScreen(): ReactElement {
   const load = useCallback(async () => {
     setError(null);
     try {
-      setOverview(await api.friends.list());
+      const fresh = await api.friends.list();
+      setOverview(fresh);
+      // Esta pantalla es la fuente del contador de la barra: aceptar o rechazar
+      // aquí apaga su punto en la misma relectura, sin preguntar de nuevo.
+      applySocial(fresh);
     } catch (loadError) {
       setError(describeError(loadError));
     }
-  }, [api]);
+  }, [api, applySocial]);
 
   useFocusEffect(
     useCallback(() => {
@@ -116,7 +135,7 @@ export default function FriendsScreen(): ReactElement {
     return () => {
       active = false;
     };
-  }, [debounced, api]);
+  }, [debounced, api, searchAttempt]);
 
   // Hay busqueda en curso mientras el termino estabilizado no coincida con lo
   // ultimo que se ha recibido.
@@ -189,7 +208,6 @@ export default function FriendsScreen(): ReactElement {
         <ErrorBanner
           message={error}
           onRetry={() => void load()}
-          retryLabel={t("common.retry")}
         />
       ) : null}
 
@@ -214,7 +232,15 @@ export default function FriendsScreen(): ReactElement {
           </View>
         ) : null}
 
-        {searchError ? <ErrorBanner message={searchError} /> : null}
+        {/*
+          Reintentar aquí es volver a lanzar la misma búsqueda: el término
+          sigue escrito en el campo, así que el jugador no tiene que recordar
+          qué había puesto. Sin botón, la única salida era borrar una letra y
+          volver a escribirla.
+        */}
+        {searchError ? (
+          <ErrorBanner message={searchError} onRetry={searchAgain} />
+        ) : null}
 
         {visibleResults && !searching ? (
           visibleResults.length === 0 ? (
@@ -352,8 +378,9 @@ export default function FriendsScreen(): ReactElement {
         }
       />
 
+      {/* Ver la nota de la lista de grupos: al fallar no se sigue girando. */}
       {!overview ? (
-        <Loading label={t("online.friends.loading")} />
+        error ? null : <Loading label={t("online.friends.loading")} />
       ) : friends.length === 0 ? (
         <Card>
           <EmptyState

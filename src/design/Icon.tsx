@@ -29,6 +29,7 @@ export type IconName =
   | "settings"
   | "gear"
   | "share"
+  | "send"
   | "retry"
   | "play"
   | "plus"
@@ -59,6 +60,7 @@ export type IconName =
   | "target"
   | "user"
   | "userPlus"
+  | "message"
   | "bell"
   // Ajustes de audio
   | "music"
@@ -143,6 +145,17 @@ const ICONS: Record<IconName, (c: string, filled: boolean) => ReactNode> = {
       <Path d="M12 15.5V3" />
       <Path d="M8 7l4-4 4 4" />
       <Path d="M5 12v7.5a1.5 1.5 0 0 0 1.5 1.5h11a1.5 1.5 0 0 0 1.5-1.5V12" />
+    </>
+  ),
+  /**
+   * Avión de papel, con el pliegue marcado. El pliegue no es adorno: sin él la
+   * silueta se lee como una flecha, y una flecha ya significa otra cosa en esta
+   * aplicación.
+   */
+  send: () => (
+    <>
+      <Path d="M21 3.6 2.8 10.4l7.1 2.9 2.9 7.1L21 3.6Z" />
+      <Path d="M21 3.6 9.9 13.3" />
     </>
   ),
   retry: () => (
@@ -282,6 +295,10 @@ const ICONS: Record<IconName, (c: string, filled: boolean) => ReactNode> = {
       <Path d="M12 13.5v3.8" />
       <Path d="M8.2 20.5h7.6" />
     </>
+  ),
+  /** El bocadillo del chat. La misma silueta que la entrada al chat del grupo. */
+  message: () => (
+    <Path d="M20.5 12.3c0 3.9-3.8 7.1-8.5 7.1-.98 0-1.93-.14-2.8-.4L3.5 20.8l1.6-3.6a6.8 6.8 0 0 1-1.6-4.9c0-3.9 3.8-7.1 8.5-7.1s8.5 3.2 8.5 7.1Z" />
   ),
   bell: () => (
     <>

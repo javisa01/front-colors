@@ -193,6 +193,41 @@ export interface NotificationList {
 }
 
 // ---------------------------------------------------------------------------
+// Chat de grupo
+// ---------------------------------------------------------------------------
+
+/**
+ * Quién escribió un mensaje. Viaja **dentro** del mensaje, no como referencia:
+ * así pintar una conversación de cinco personas no obliga a pedir cinco
+ * perfiles antes de poder enseñar nada.
+ */
+export interface ChatAuthor {
+  userId: string;
+  username: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  body: string;
+  createdAt: string;
+  author: ChatAuthor;
+}
+
+/**
+ * Una página de la conversación. Es la misma forma para los dos modos del
+ * endpoint, pero **el orden y el significado de `hasMore` cambian**:
+ *
+ *  - `before` (historial): del **más nuevo al más viejo**, y `hasMore` dice si
+ *    queda conversación más arriba.
+ *  - `after` (sondeo): solo lo nuevo, en **orden cronológico**, y `hasMore`
+ *    dice que la página se llenó y todavía hay mensajes más nuevos que pedir.
+ */
+export interface ChatPage {
+  messages: ChatMessage[];
+  hasMore: boolean;
+}
+
+// ---------------------------------------------------------------------------
 // Reto diario
 // ---------------------------------------------------------------------------
 

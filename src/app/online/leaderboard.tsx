@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 import { useOnlineTabBarSpace } from "@/components/online/OnlineTabBar";
-import { AmbientOrbs } from "@/design/Ambient";
+import { AmbientAscent } from "@/design/Ambient";
 import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -14,7 +14,14 @@ import { EmptyState, ErrorBanner, Loading } from "@/design/Feedback";
 import { SegmentedControl } from "@/design/Form";
 import { Icon } from "@/design/Icon";
 import { Card, Screen, SectionHeader } from "@/design/Layout";
-import { Color, Duration, Radius, Space, Type } from "@/design/tokens";
+import {
+  Color,
+  Duration,
+  Radius,
+  SECTION_TONE,
+  Space,
+  Type,
+} from "@/design/tokens";
 import { t } from "@/i18n";
 import { useSession } from "@/online/session";
 
@@ -137,7 +144,7 @@ export default function LeaderboardScreen(): ReactElement {
       eyebrow={t("online.leaderboard.badge")}
       title={t("online.leaderboard.title")}
       subtitle={t("online.leaderboard.subtitle")}
-      backdrop={<AmbientOrbs />}
+      backdrop={<AmbientAscent />}
       contentStyle={{ paddingBottom: tabBarSpace }}
       headerAction={<SettingsButton />}
       onRefresh={refresh}
@@ -156,7 +163,6 @@ export default function LeaderboardScreen(): ReactElement {
         <ErrorBanner
           message={error}
           onRetry={() => void load(scope)}
-          retryLabel={t("common.retry")}
         />
       ) : null}
 
@@ -171,9 +177,15 @@ export default function LeaderboardScreen(): ReactElement {
         />
       ) : null}
 
+      {/*
+        Un fallo sin datos NO es una clasificación vacía. Enseñar «no hay
+        nadie» cuando lo que ha pasado es que no se ha podido preguntar es
+        mentir sobre el estado del servidor, y encima deja al jugador sin
+        entender por qué su propio nombre no sale.
+      */}
       {loading ? (
         <Loading label={t("online.leaderboard.loading")} />
-      ) : !entries || entries.length === 0 ? (
+      ) : error && !entries ? null : !entries || entries.length === 0 ? (
         <Card>
           <EmptyState
             icon={scope === "global" ? "trophy" : "users"}
@@ -190,7 +202,7 @@ export default function LeaderboardScreen(): ReactElement {
           />
         </Card>
       ) : (
-        <Card>
+        <Card tone={SECTION_TONE.ranking}>
           {entries.map((entry, index) => (
             <Row
               key={entry.userId}

@@ -42,6 +42,20 @@ interface Stored {
   /** Jornada `YYYY-MM-DD` a la que pertenece todo lo de dentro. */
   dateKey: string;
   byGroup: Record<string, StoredRound[]>;
+  /**
+   * XP ganado hoy con el reto, sumando todos los grupos.
+   *
+   * El backend concede XP **por reto**, y hay un reto por grupo: quien juega en
+   * tres grupos cobra tres veces. La cifra viaja una sola vez, dentro de
+   * `DailySubmitResult.xpEarned` al cerrar cada intento, y `GET /me` solo trae
+   * el total acumulado de siempre. Sumarla aquí es lo que permite al perfil
+   * decir cuánto ha subido **hoy**: sin ella, el nivel cambia sin que nada
+   * cuente por qué.
+   *
+   * Es opcional porque quien guardó antes de que existiera no lo tiene. Se lee
+   * como cero.
+   */
+  xp?: number;
 }
 
 function isValid(value: unknown): value is Stored {
@@ -80,6 +94,36 @@ export async function readAttempt(
   }
   return stored.byGroup[groupId] ?? null;
 }
+/**
+ * Lo mismo, pero **sin saber todavía de qué jornada es**: devuelve el desglose
+ * junto a la jornada a la que pertenece, para que quien llama decida.
+ *
+ * Existe porque la jornada la dice el servidor, y esperar a su respuesta para
+ * empezar a leer el disco encadenaba dos esperas donde solo hacía falta una: la
+ * ficha del grupo pedía la red, y solo cuando volvía miraba lo que ya tenía
+ * guardado. Así las dos salen a la vez y el anillo se pinta en cuanto ambas
+ * están, no una después de la otra.
+ *
+ * La comparación de jornadas no desaparece, se mueve: el desglose no se enseña
+ * mientras su `dateKey` no coincida con la del reto en curso. Nunca se pinta el
+ * resultado de ayer.
+ */
+export interface StoredAttempt {
+  /** Jornada `YYYY-MM-DD` a la que pertenece el desglose. */
+  dateKey: string;
+  rounds: StoredRound[];
+}
+
+export async function readLatestAttempt(
+  groupId: string,
+): Promise<StoredAttempt | null> {
+  const stored = await read();
+  const rounds = stored?.byGroup[groupId];
+  if (stored == null || rounds == null) {
+    return null;
+  }
+  return { dateKey: stored.dateKey, rounds };
+}
 
 /**
  * Guarda el desglose de un intento.
@@ -107,9 +151,68 @@ export async function saveAttempt(
       JSON.stringify({
         dateKey,
         byGroup: { ...base.byGroup, [groupId]: rounds },
+        // Se arrastra: guardar el desglose de un intento no puede borrar el XP
+        // del día, que vive en la misma clave.
+        xp: base.xp,
       } satisfies Stored),
     );
   } catch {
     // Es un adorno del menú: si no se puede guardar, el anillo sale vacío.
   }
+}
+
+/**
+ * Suma al XP de hoy lo que acaba de conceder un intento.
+ *
+ * Se llama con `DailySubmitResult.xpEarned`, que ya viene neto: el servidor
+ * abona solo lo que falte de lo cobrado antes en ese mismo reto, así que un
+ * segundo intento que no mejora suma cero. Acumular aquí es correcto porque
+ * cada grupo tiene su reto y su propia concesión.
+ *
+ * Un `xpEarned` de cero no escribe: no cambiaría la cifra y ahorra un viaje al
+ * disco justo después de enviar un intento.
+ */
+export async function addDailyXp(dateKey: string, xp: number): Promise<void> {
+  if (xp <= 0) {
+    return;
+  }
+
+  const stored = await read();
+  const base: Stored =
+    stored != null && stored.dateKey === dateKey
+      ? stored
+      : { dateKey, byGroup: {} };
+
+  try {
+    await AsyncStorage.setItem(
+      KEY,
+      JSON.stringify({
+        ...base,
+        dateKey,
+        xp: (base.xp ?? 0) + xp,
+      } satisfies Stored),
+    );
+  } catch {
+    // El perfil se queda sin la línea de «hoy». El total y el nivel, que son lo
+    // que manda, siguen llegando de `GET /me`.
+  }
+}
+
+/**
+ * El XP ganado hoy con el reto, con la jornada a la que pertenece.
+ *
+ * Devuelve la jornada **sin filtrar**, por el mismo motivo que
+ * `readLatestAttempt`: cuál es la jornada en curso lo dice el servidor, y quien
+ * llama puede no saberlo todavía. Si no coincide, lo guardado es de otro día y
+ * no se enseña.
+ */
+export async function readDailyXp(): Promise<{
+  dateKey: string;
+  xp: number;
+} | null> {
+  const stored = await read();
+  if (stored == null) {
+    return null;
+  }
+  return { dateKey: stored.dateKey, xp: stored.xp ?? 0 };
 }

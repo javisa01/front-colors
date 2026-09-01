@@ -19,19 +19,23 @@
 | 3 — Backend: chat y avisos | ✅ hecha | 2026-08-27 | Backend completo: las tres fases de servidor están cerradas |
 | 4 — Front: menú y grupos | ✅ hecha | 2026-08-27 | Falta probarla a mano en un dispositivo con dos cuentas de Clerk |
 | 5 — Front: reto diario | ✅ hecha | 2026-08-28 | Falta probarla a mano, igual que la 4 |
-| 6 — Front: chat y avisos | ⬜ sin empezar | — | |
-| 7 — Remates | ⬜ sin empezar | — | |
+| 6 — Front: chat y avisos | ✅ hecha | 2026-09-01 | Falta probarla a mano, igual que la 4 y la 5 |
+| 7 — Remates | ✅ hecha | 2026-09-01 | Cuatro idiomas (entra el catalán), XP del reto en el perfil, fin de temporada repasado y `ONLINE.md` reescrito |
 
-**Última actualización:** 2026-08-28 — **Backend completo (fases 1-3) y Fases 4
-y 5 del frontend hechas: el reto diario ya se juega desde la app.** En
-`back-colors`, `npm test` pasa (213 tests). En `front-colors`, `npx tsc
---noEmit` y `npm run lint` pasan limpios. Lo siguiente es la Fase 6, el chat.
+**Última actualización:** 2026-09-01 — **Las siete fases están hechas.** El
+backend está completo (fases 1-3) y la app juega el reto diario, conversa en el
+chat y cierra el ciclo de una temporada (fases 4-7). En `back-colors`,
+`npm test` pasa (213 tests). En `front-colors`, `npx tsc --noEmit` y
+`npm run lint` pasan limpios y `npx expo export` construye el paquete. **Lo que
+queda no es código: es probarlo a mano.**
 
-> **Ojo:** ni la Fase 4 ni la Fase 5 **se han probado a mano**. Hace falta un
-> dispositivo o simulador y **dos cuentas de Clerk reales** para comprobar los
-> criterios de aceptación (crear un grupo en una y entrar con el código desde
-> la otra; jugar los dos intentos y ver moverse la clasificación). Lo que sí
-> está verificado por otras vías está más abajo.
+> **Ojo: nada del frontend se ha probado a mano.** Hace falta un dispositivo o
+> simulador y **dos cuentas de Clerk reales** para comprobar los criterios de
+> aceptación: crear un grupo en una y entrar con el código desde la otra; jugar
+> los dos intentos y ver moverse la clasificación; conversar entre los dos;
+> terminar la temporada con el panel de desarrollo y ver la clasificación
+> congelada, el chat vivo, el botón de renovar solo en el creador y el punto
+> rojo en el otro. Lo que sí está verificado por otras vías está más abajo.
 
 **Fase 1** (`back-colors`): `src/services/clock.ts` con `Clock`, `systemClock` y
 `DevClock`, inyectado desde `src/container.ts`; `SEASON_DURATION_MS` y
@@ -135,6 +139,111 @@ catálogos comprueba que **cualquier ronda que el servidor pueda mandar se puede
 dibujar**: los 137 identificadores coinciden, tienen el mismo número de colores
 a cada lado, todos traen `svgXml` y el `colorIndex` que elige el selector existe
 siempre en el catálogo de la app.
+
+**Fase 6** (`front-colors`):
+
+- `src/online/chat.ts`: las constantes del contrato con el servidor (500
+  caracteres, 5 s de sondeo, 40 mensajes por página) y `buildChatRows`, que
+  convierte la conversación en las filas de la lista invertida —separadores de
+  día, quién abre y quién cierra cada intervención— sin saber nada de red.
+- `src/hooks/useGroupChat.ts`: carga, sondeo y envío. **El sondeo solo corre
+  con la pantalla enfocada Y la app en primer plano**, y el bucle es una cadena
+  de `setTimeout` en vez de un `setInterval`, para que una petición lenta no
+  se solape con la siguiente. Ni el hook ni la pantalla miran `group.status`.
+- `src/app/online/groups/[id]/chat.tsx`: la pantalla. Lista invertida con
+  burbujas teñidas del color de su autor —el mismo `playerTint` del avatar y de
+  la clasificación—, historial hacia arriba con `before=` colgado del
+  `onEndReached` (que en una lista invertida es el borde de arriba), y campo de
+  escritura que crece hasta cinco renglones.
+- `src/components/online/UnreadDot.tsx`: el punto rojo, con cifra a partir de
+  dos avisos. Sustituye a la pastilla «Novedades» en la lista de grupos y en el
+  menú.
+- La ficha del grupo estrena entrada al chat **viva** —con el último mensaje— en
+  lugar del marcador de posición apagado, marca los avisos leídos al abrirse y
+  enseña de qué iban en una línea. El bloque de fin de temporada dice
+  explícitamente que el chat sigue abierto. La entrada lleva contorno y cuadro
+  en violeta encendido, y cuando hay mensajes sin leer suma el punto rojo en la
+  esquina del cuadro y sube la vista previa al claro de los títulos.
+- `src/online/chatSeen.ts`: hasta dónde has leído en el chat de cada grupo,
+  guardado en el teléfono. El backend no lleva registro de lectura del chat
+  —un mensaje no crea aviso—, así que sin esto la ficha solo podría decir «hay
+  conversación», que es verdad siempre.
+- `AmbientThread` en `src/design/Ambient.tsx`: el fondo del chat, cuatro
+  burbujas huecas y enormes. Es el octavo de la familia y el único que **repite
+  una forma de la propia pantalla** en vez de traer una nueva.
+
+**Amistades y rendimiento** (sesión del 2026-09-01, sobre la Fase 6):
+
+- `src/online/social.tsx`: el contador de solicitudes de amistad sin responder,
+  compartido. Lo pinta la barra de pestañas —punto rojo sobre el perfil, el
+  mismo signo que ya usan los grupos y el chat— y **no sondea**: se pregunta al
+  entrar, al volver de segundo plano y al cambiar de pestaña, con intervalo
+  mínimo, y las pantallas que ya piden la lista de amigos se la regalan.
+- `src/online/friends.ts`: `relationOf`, que estaba duplicado dentro de los
+  ajustes del grupo. Ahora la clasificación de la ficha del grupo lleva botón de
+  pedir amistad en cada fila, y el perfil enseña las solicitudes recibidas con
+  sus dos respuestas más un enlace a la pantalla de Amigos, que hasta ahora no
+  tenía ninguna entrada desde el perfil pese a vivir dentro de él.
+- `src/online/dailyCache.ts`: el último estado conocido del reto de cada grupo.
+  La tarjeta del reto —la puntuación, los intentos y el anillo de rondas— salía
+  vacía y se rellenaba sola unos segundos después, porque las tres cosas
+  esperaban a `GET /groups/:id/daily`, que la primera visita del día **crea el
+  reto**. Ahora sale llena al instante y la red la corrige. Caduca sola
+  comparando con el `closesAt` que trae dentro, así que no puede enseñar la
+  jornada de ayer.
+- Iconos nuevos `send` y `message` en `src/design/Icon.tsx`, y `OptionRow`
+  acepta ahora un `accessibilityLabel` propio (el punto rojo se ve, pero no se
+  oye si no se dice).
+- Todas las cadenas nuevas están en `src/i18n/index.ts` en `es`, `en` y `fr`.
+
+**Cómo se ha verificado la Fase 6 sin dos dispositivos:** `tsc` y `eslint`
+limpios; `npx expo export` construye el paquete y lista
+`/online/groups/[id]/chat` como ruta real; los tipos del chat casan campo a
+campo con `ChatMessageView` y `ChatPage` del backend, y los tres modos del
+endpoint (`before`, `after`, `POST`) se llaman con los parámetros que valida
+`listMessagesQuerySchema`. Los cursores que se mandan salen **siempre** de la
+lista confirmada por el servidor, nunca de un mensaje pendiente, que llevaría un
+id temporal que no es un UUID.
+
+**Fase 7** (`front-colors`):
+
+- **Cuatro idiomas.** Entra el catalán (`ca`) como cuarto diccionario de
+  `src/i18n/index.ts`, con las 471 claves. No hay selector: el idioma sale del
+  dispositivo y se cae al español si no está entre los cuatro.
+- **Repaso de las cadenas visibles.** Se ha barrido la app entera buscando texto
+  fuera de `t()` y solo quedaba uno, el «SVG no disponible» de
+  `components/SVGChallenge.tsx`; ahora es `challenge.imageMissing`.
+- **55 claves muertas fuera.** Eran sobre todo del menú anterior a la barra de
+  pestañas. Se han quitado de los cuatro diccionarios; el barrido que las
+  encontró está más abajo, en el diario.
+- **Francés arreglado.** 70 cadenas de las secciones online estaban escritas sin
+  acentos («Le defi est ferme», «Tu as deja joue aujourd'hui»). El bloque
+  offline sí los llevaba, así que era del trabajo de las fases 4 y 5. Corregidas
+  una a una.
+- **El XP y el nivel del reto, en el perfil.** El perfil relee `GET /me` al
+  recuperar el foco —el XP lo mueve otra pantalla, y puede moverlo otro
+  dispositivo— y estrena una línea al pie de la barra de progreso con lo ganado
+  hoy y la racha. El XP del día se acumula en `online/attempts.ts`, que ya
+  guardaba por jornada; `GET /me` solo trae el total de siempre. Y la pantalla
+  del resultado avisa cuando **subes de nivel**, comparando con el nivel que
+  `useDailyChallenge` guarda justo antes de enviar.
+- **Fin de temporada, de punta a punta.** La clasificación congelada dice ahora
+  qué la descongela; el interruptor de avisos del grupo hace algo de verdad (ver
+  el diario); y los ajustes del grupo estrenan el **historial de temporadas**,
+  que usa `GET /groups/:id/seasons` —hasta ahora declarado en `endpoints.ts` y
+  sin llamar desde ninguna parte—.
+- **`docs/ONLINE.md` reescrito.** Describía un hub con cuatro accesos y una
+  tarjeta de «Partida online» bloqueada, que no existe desde la Fase 4. Ahora
+  lleva el árbol real de pantallas, los cinco almacenes locales y por qué cada
+  uno no está en el servidor, las 20 rutas que la app consume, el sondeo del
+  chat, los avisos y el XP.
+
+**Cómo se ha verificado la Fase 7:** `tsc` y `eslint` limpios —y el typecheck es
+aquí la prueba de verdad, porque `Record<TranslationKey, string>` obliga al
+catalán a tener las 471 claves—; `npx expo export` construye el paquete; un
+barrido de las cuatro tablas confirma que tienen las mismas claves, sin
+duplicados y sin ninguna sin usar; y otro sobre los `.tsx` no encuentra ni un
+texto visible fuera de `t()`.
 
 **Lo que el backend NO tiene** y queda para más adelante: envío de push real
 (solo está la columna `pushed_at`, vacía) y editar o borrar mensajes del chat.
@@ -300,6 +409,171 @@ Apunta aquí lo que se decida sobre la marcha y no esté ya en el plan.
   dice cuántos intentos quedan sin entrar en ella. Va con su propio `catch`: si
   esa llamada falla, la fila se queda con el texto genérico en vez de tumbar el
   menú entero.
+
+- **2026-09-01 (Fase 6) — El sondeo exige foco Y primer plano, no solo foco.**
+  `useFocusEffect` cubre navegar a otra pantalla, pero no bloquear el móvil ni
+  cambiar de aplicación: ahí la pantalla sigue montada y enfocada. Sin escuchar
+  también `AppState`, un chat abierto en el bolsillo pide 720 veces por hora.
+  Las dos condiciones se combinan en una sola bandera que enciende y apaga el
+  bucle.
+- **2026-09-01 (Fase 6) — Lo que se está enviando vive en una lista aparte.**
+  Un mensaje recién escrito se pinta al instante, pero si compartiera lista con
+  lo confirmado iría flotando hacia arriba a medida que llegan mensajes de
+  otros. En un `outbox` propio se queda siempre abajo, que es donde se escribe.
+  Al confirmarse pasa a la conversación; si el sondeo se le adelanta y trae el
+  eco antes de que resuelva el `POST`, se descarta por autor y texto para que
+  no se vea dos veces.
+- **2026-09-01 (Fase 6) — El punto rojo es rojo de `danger`, y sustituye a la
+  pastilla «Novedades».** El rojo de la paleta solo se gastaba en errores y un
+  aviso no lo es, pero es el único color de la interfaz cuyo trabajo ya es
+  interrumpir, y un punto rojo sobre el nombre de un grupo no hay que
+  aprendérselo. Dos pastillas seguidas —«Novedades» y «Activo»— obligaban a leer
+  dos etiquetas para saber dos cosas distintas. A partir de dos avisos el punto
+  crece y lleva la cifra, porque ahí cuántos son sí informa.
+- **2026-09-01 (Fase 6) — La entrada al chat lleva el último mensaje, a costa de
+  una petición más al abrir un grupo.** Es un `limit=1` con su propio `catch`:
+  si falla, la fila se queda con su línea de reserva. Una descripción fija dice
+  lo que un chat es, cosa que ya sabe todo el mundo; el último mensaje dice si
+  hay algo que leer, que es lo único que se decide desde ahí.
+- **2026-09-01 (Fase 6) — Renovar marca leído su propio aviso.** `GroupService
+  .renew` deja una fila en `notifications` **por cada miembro**, y eso incluye a
+  quien renueva: sin esto, el `owner` se quedaba un punto rojo de algo que
+  acababa de hacer él. Se marca sin enseñar la línea, que si no diría lo mismo
+  que el mensaje de «temporada en marcha» con otras palabras.
+- **2026-09-01 (Fase 6) — El estado vacío del chat va fuera de la `FlatList`.**
+  `ListEmptyComponent` dentro de una lista invertida hereda el volteo y se pinta
+  del revés. Es de esos fallos que no se ven hasta que hay un móvil delante, así
+  que la lista solo se monta cuando hay algo que enseñar.
+- **2026-09-01 — Repaso de estados de carga y error en las once pantallas que
+  piden algo.** `ErrorBanner` era un renglón de 13 puntos con un enlace de texto
+  debajo, sin márgenes y con un objetivo táctil del alto de la palabra: ahora
+  lleva canto rojo vivo, el mensaje al tamaño del cuerpo, un `Button` de verdad
+  para reintentar —con «Reintentar» por defecto, así que los sitios ya no lo
+  repiten— y sus propios márgenes, porque no forma parte del ritmo de la página
+  sino que se cuela entre dos cosas ya colocadas. Y tres fallos de estado que
+  solo se ven cuando algo falla: la lista de grupos y la de amigos dejaban el
+  indicador **girando para siempre** debajo del banner, la clasificación global
+  decía «no hay nadie» cuando lo que había pasado era que no se pudo preguntar,
+  y el menú principal no decía nada mientras cargaba. El texto genérico ya no
+  acaba en «inténtalo otra vez»: eso lo dice el botón.
+- **2026-09-01 — El anillo del reto no se refrescaba al volver de jugar.** Su
+  desglose se leía del disco en un efecto que dependía de la jornada, y la
+  jornada no cambia por jugar: al volver de la partida el efecto no se disparaba
+  y el anillo seguía enseñando el intento anterior hasta salir del grupo y
+  entrar otra vez. La lectura se ha movido dentro del `load` del
+  `useFocusEffect`, así que además sale **a la vez** que las peticiones en lugar
+  de después de ellas. El filtro por jornada no desaparece: se aplica al pintar.
+- **2026-09-01 — El botón de pedir amistad de la clasificación no es un
+  `IconButton`.** Aquel garantiza su objetivo de 44 puntos dibujándolo, y eso
+  subía las cápsulas de la clasificación de 60 a 68 **solo en las filas que
+  llevan botón**: una lista con dos alturas se lee como una lista mal hecha. Es
+  un `Pressable` con `hitSlop`, que es el mismo objetivo táctil repartido en el
+  hueco de alrededor. Y solo sale con la lista de amigos ya cargada: sin ella,
+  `relationOf` diría «none» de todo el mundo y aparecería un botón de añadir
+  sobre gente que ya es tu amiga.
+- **2026-09-01 — El contador de solicitudes no sondea.** Es la misma regla que
+  el chat, aplicada a un dato que vive en la barra de pestañas y no en una
+  pantalla: se pregunta al entrar en la parte online, al volver la app a primer
+  plano y al cambiar de pestaña, con un intervalo mínimo de 30 s. Encima, las
+  cuatro pantallas que ya piden `GET /friends` por otros motivos alimentan el
+  contador sin una petición de más, así que aceptar una solicitud apaga el punto
+  en el acto.
+- **2026-09-01 (Fase 6) — «Sin leer» se calcula en el teléfono, comparando
+  identificadores.** El backend cuenta avisos, pero de mensajes no lleva
+  registro de lectura, así que la ficha del grupo no tenía forma de distinguir
+  «hay conversación» —verdad siempre— de «hay algo nuevo». Se guarda el id del
+  último mensaje que estuvo en pantalla y se compara con el último del grupo:
+  responde exactamente a esa pregunta y no depende del reloj del móvil, que con
+  el viaje en el tiempo del backend puede no coincidir con el del servidor. No
+  haber abierto nunca el chat cuenta como no leído, que es lo que se quiere.
+- **2026-09-01 (Fase 6) — El punto rojo significa lo mismo en los dos sitios.**
+  En la lista de grupos cuenta avisos y en la entrada al chat cuenta mensajes,
+  pero para quien mira los dos dicen «hay algo que no has visto». Darles colores
+  distintos obligaría a aprenderse dos señales para una idea.
+- **2026-09-01 (Fase 6) — El fondo del chat repite la forma de sus burbujas, y
+  no se mueve.** Los otros siete fondos traen cada uno una forma nueva; aquí no
+  hacía falta inventar ninguna, porque la pantalla ya tiene la suya —tres
+  esquinas redondas y una viva— y no se parece a nada más de la app. Solo la de
+  arriba enseña la silueta entera: las cortadas por el costado pierden las dos
+  esquinas de abajo, que son las que dicen que es una burbuja. Y está quieto
+  porque es la única pantalla donde **el contenido se mueve solo** —llegan
+  mensajes, sube el teclado—, y un fondo que respirase convertiría eso en un
+  movimiento más.
+
+- **2026-09-01 (Fase 6) — La carga inicial de la conversación cuelga del foco,
+  no del montaje.** Es la regla que ya seguía `useDailyChallenge`, y además la
+  que pide el linter de React (`setState` síncrono dentro de un `useEffect`).
+  Una referencia con el grupo ya cargado evita releer la conversación entera
+  cada vez que se vuelve a la pantalla: de ponerla al día se encarga el sondeo,
+  y sin tirar el sitio por el que se estaba leyendo.
+
+- **2026-09-01 (Fase 7) — El reto diario es POR GRUPO, y el 5.3 queda
+  superado.** El apartado 5.3 dice que `/daily` es global, que no lleva grupo y
+  que se puede jugar aunque todas tus temporadas hayan terminado. **No es lo que
+  se construyó.** El backend sirve `GET /groups/:id/daily` y
+  `POST /groups/:id/daily/attempts`: hay un reto por grupo, con sus propios
+  logos, su propia semilla y su propio ranking; `GET /daily` a secas ya solo dice
+  en qué grupos queda algo por jugar. Y con la temporada terminada
+  `seasonAcceptsPlay` devuelve `DAILY_CLOSED`, con un motivo escrito en el
+  servicio: si se pudiera jugar en un grupo muerto, guardarse grupos caducados
+  sería la forma más barata de farmear XP. La app va detrás de eso —el botón de
+  jugar se apaga con el grupo terminado— y por eso la clave
+  `online.group.daily.notCounting` acabó sin usar. **Al leer el 5.3, manda esto.**
+- **2026-09-01 (Fase 7) — El interruptor de avisos del grupo hacía nada.**
+  `getGroupNotifications` guardaba la preferencia y **no la leía nadie**, y el
+  texto de debajo decía «todavía no enviamos avisos» — cierto cuando se escribió,
+  falso desde la Fase 3. Un interruptor que no apaga nada es peor que no tenerlo.
+  Ahora gobierna **el punto rojo** de ese grupo: `getMutedGroups` lee las
+  preferencias de una tacada con `multiGet` y `silenceMutedGroups` pone su
+  `unreadCount` a cero nada más recibir la lista, en la lista de grupos y en el
+  menú. Lo que **no** cambia: los avisos se siguen creando en el servidor y se
+  siguen marcando leídos al entrar. Silenciar no borra nada, solo deja de
+  interrumpir. La regla vive en un sitio, `online/groups.ts`, y no repartida por
+  las tres pantallas que pintan el punto.
+- **2026-09-01 (Fase 7) — El historial de temporadas enseña fechas, no
+  ganadores.** `GET /groups/:id/seasons` estaba en `endpoints.ts` desde la Fase 4
+  sin que lo llamara nadie. Se estrena en los ajustes del grupo, justo antes del
+  botón de salir, y **solo si hay más de una temporada**: en un grupo recién
+  creado, una sección que dice «Temporada 1, en curso» no cuenta nada. No lleva
+  puntuaciones porque el servidor no las guarda por temporada —la clasificación
+  se deriva filtrando los intentos por la ventana—, y poner una cifra ahí
+  obligaría a inventarla.
+- **2026-09-01 (Fase 7) — El nivel de antes de enviar se guarda en el hook.**
+  `DailySubmitResult` trae el nivel resultante pero no dice si ha cambiado, y
+  `useDailyChallenge` refresca el perfil de la sesión en cuanto vuelve la
+  respuesta: para cuando se pinta el resultado, comparar contra el perfil diría
+  siempre que no has subido. Se captura al empezar el envío, que es el único
+  momento en que el nivel anterior sigue siendo el vigente.
+- **2026-09-01 (Fase 7) — El XP de hoy se acumula en el teléfono.** El servidor
+  concede XP **por reto** y hay un reto por grupo, así que quien juega en tres
+  cobra tres veces; la cifra viaja una sola vez, en `xpEarned` al cerrar cada
+  intento, y `GET /me` solo trae el total de siempre. Sumarla en
+  `online/attempts.ts` —que ya guardaba por jornada y se tira sola al cambiar el
+  día— es lo que permite al perfil decir cuánto has subido hoy. Quien juega desde
+  otro dispositivo no tiene la cifra en este, y por eso hay un tercer texto:
+  «Hoy ya has jugado el reto», sin número. Lo que manda sobre si has jugado es el
+  servidor (`GET /daily`), no el almacén local.
+- **2026-09-01 (Fase 7) — Se han borrado 55 claves de traducción muertas.** Un
+  barrido cruzando el diccionario español con los `.tsx` encontró 71 claves sin
+  usar; 16 son de las familias `mode.*` y `party.mode.*`, que se construyen con
+  plantilla —`t()` recibe una cadena montada como `mode.${id}.title`— y por eso
+  parecen muertas sin serlo. Las otras 55, casi todas del hub anterior a la barra
+  de pestañas, se han quitado de los cuatro diccionarios. Sin esto, el catalán
+  habría nacido traduciendo texto que no se enseña en ninguna parte.
+- **2026-09-01 (Fase 7) — El francés de las secciones online estaba sin
+  acentos.** «Le defi est ferme», «Tu as deja joue aujourd'hui», «Resultat de
+  l'essai»: 70 cadenas. El bloque offline del mismo fichero sí los llevaba, así
+  que el fallo entró con las fases 4 y 5 y ningún typecheck podía verlo, porque
+  para TypeScript una cadena mal escrita es una cadena. Es el motivo por el que
+  la revisión de idiomas de la Fase 7 no puede ser solo «¿están todas las
+  claves?».
+- **2026-09-01 (Fase 7) — Renovar el mismo día en que ya has jugado te deja sin
+  intentos.** Si la temporada acaba a las 20:00, jugaste a las 16:00 y el
+  creador renueva a las 20:30, tu intento de las 16:00 queda fuera de la ventana
+  de la temporada 2 —no puntúa— pero sigue contando como intento de la jornada,
+  así que hoy no puedes volver a jugar. La app lo dice bien (el botón sale
+  apagado con «Sin intentos»), así que no miente; queda apuntado por si algún día
+  molesta. Arreglarlo sería del backend, no de aquí.
 
 - **2026-08-27 — Hay un test que impide que la documentación se vuelva a quedar
   atrás.** `tests/openapi.test.ts` compara la especificación con la lista de
@@ -569,6 +843,13 @@ Reglas que se derivan y hay que respetar:
    de invitación es la única puerta de entrada.
 
 ### 5.3 El reto diario NO depende del grupo
+
+> ⚠️ **Superado por la implementación (2026-09-01).** Se construyó **un reto por
+> grupo**: `GET /groups/:id/daily` y `POST /groups/:id/daily/attempts`, cada uno
+> con sus logos, su semilla y su ranking. Y con la temporada terminada el
+> servidor responde `DAILY_CLOSED`, para que guardarse grupos caducados no sea
+> una forma barata de farmear XP. Lo que sigue es el diseño original; el motivo
+> del cambio está en el diario del apartado 0.
 
 `GET /daily` y `POST /daily/attempts` son **globales**: no llevan grupo y no se
 bloquean aunque todos tus grupos estén terminados. Se sigue pudiendo jugar y se
@@ -972,22 +1253,34 @@ clasificación en su `useFocusEffect`.
 
 ### Fase 6 — Frontend: chat y avisos
 
-- [ ] `/online/groups/[id]/chat` con lista invertida y burbujas
-- [ ] Sondeo con `after=` mientras la pantalla está en primer plano, **y parado
-      al salir o al pasar a segundo plano**
-- [ ] Historial hacia arriba con `before=`
-- [ ] Punto rojo de avisos sin leer en la lista de grupos y dentro del grupo
-- [ ] Marcar leído al abrir
+- [x] `/online/groups/[id]/chat` con lista invertida y burbujas —
+      `src/app/online/groups/[id]/chat.tsx`, con `src/online/chat.ts` para el
+      agrupado por día e intervención
+- [x] Sondeo con `after=` mientras la pantalla está en primer plano, **y parado
+      al salir o al pasar a segundo plano** — `src/hooks/useGroupChat.ts`, que
+      exige `useFocusEffect` **y** `AppState`; ver el diario
+- [x] Historial hacia arriba con `before=`, colgado del `onEndReached` de la
+      lista invertida
+- [x] Punto rojo de avisos sin leer en la lista de grupos, en el menú y dentro
+      del grupo — `src/components/online/UnreadDot.tsx` y la línea que dice de
+      qué iba el aviso
+- [x] Marcar leído al abrir, filtrando por `groupId` para no apagar el punto de
+      los demás grupos — y también al renovar, que deja aviso a todos los
+      miembros incluido quien renueva
+- [ ] **Probarlo a mano**: hacen falta **dos** dispositivos y dos cuentas de
+      Clerk reales. Es el criterio de aceptación y es lo único que queda de esta
+      fase
 
 **Aceptación:** dos dispositivos conversan y los mensajes aparecen en segundos.
 Renovar un grupo deja el punto rojo al resto de miembros.
 
 ### Fase 7 — Remates
 
-- [ ] i18n en `es`, `en`, `fr` de todo lo nuevo
-- [ ] XP y nivel del reto reflejados en el perfil
-- [ ] Repaso del fin de temporada de punta a punta
-- [ ] Actualizar `docs/ONLINE.md` con la estructura nueva
+- [x] i18n en `es`, `en`, `fr` de todo lo nuevo — y **el catalán** como cuarto
+      idioma
+- [x] XP y nivel del reto reflejados en el perfil
+- [x] Repaso del fin de temporada de punta a punta
+- [x] Actualizar `docs/ONLINE.md` con la estructura nueva
 
 ---
 
@@ -1030,3 +1323,10 @@ Renovar un grupo deja el punto rojo al resto de miembros.
   se regenera uno, hay que regenerar el otro (`npm run generate:assets`).
 - **Para probar de verdad hacen falta dos cuentas de Clerk.** Las fichas del
   seed (`alice`, `bob`...) no sirven para iniciar sesión.
+- **El apartado 5.3 está superado.** Dice que el reto diario es global; se
+  construyó por grupo, y con la temporada terminada no se puede jugar. Ver el
+  diario, entrada del 2026-09-01.
+- **Una traducción puede estar completa y estar mal.** El typecheck garantiza que
+  las cuatro tablas tienen las mismas claves, no que el texto esté bien escrito:
+  70 cadenas francesas llevaban meses sin acentos y nada lo detectó. Si tocas
+  copy de un idioma que no hablas, léelo entero.

@@ -1,26 +1,56 @@
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import type { ReactElement, ReactNode } from "react";
 import { useCallback, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { describeError } from "@/api/errors";
-import type { GroupDetail, GroupLeaderboard, GroupLeaderboardEntry } from "@/api/types";
+import type {
+  AppNotification,
+  ChatMessage,
+  FriendsOverview,
+  GroupDetail,
+  GroupLeaderboard,
+  GroupLeaderboardEntry,
+} from "@/api/types";
 import { SettingsButton } from "@/components/SettingsButton";
 import { DevTimePanel } from "@/components/online/DevTimePanel";
-import { AmbientOrbs } from "@/design/Ambient";
+import { UnreadDot } from "@/components/online/UnreadDot";
+import { AmbientMesh } from "@/design/Ambient";
 import { Avatar, playerTint } from "@/design/Avatar";
 import { Button, IconButton } from "@/design/Button";
 import { EmptyState, ErrorBanner, Loading, Pill } from "@/design/Feedback";
+import { Flame } from "@/design/Flame";
 import { Icon } from "@/design/Icon";
 import { GlowBorder } from "@/design/Glow";
 import { Notice } from "@/design/Form";
 import { Card, Screen, SectionHeader } from "@/design/Layout";
-import { Color, Radius, Space, Type } from "@/design/tokens";
+import { RoundRing, type SolvedRound } from "@/design/RoundRing";
+import SVGChallenge from "@/components/SVGChallenge";
+import {
+  Color,
+  DISABLED_OPACITY,
+  HIT_SLOP,
+  Radius,
+  SECTION_TONE,
+  Space,
+  Type,
+} from "@/design/tokens";
 import { useCountdown, useDailyChallenge } from "@/hooks/useDailyChallenge";
 import { t } from "@/i18n";
+import { previewOf } from "@/online/chat";
+import { relationOf } from "@/online/friends";
+import { readSeenMessage } from "@/online/chatSeen";
 import { formatCountdown } from "@/online/daily";
-import { daysLeft, membersLabel, playedDaysLabel } from "@/online/groups";
+import {
+  daysLeft,
+  membersLabel,
+  noticeLabel,
+  playedDaysLabel,
+} from "@/online/groups";
 import { useSession } from "@/online/session";
+import { useSocial } from "@/online/social";
+import { readLatestAttempt, type StoredAttempt } from "@/online/attempts";
+import { readStreak, visibleStreak, type Streak } from "@/online/streak";
 
 /**
  * El grupo por dentro. Es **la** pantalla de un grupo: lo que hay que jugar hoy
@@ -56,6 +86,7 @@ import { useSession } from "@/online/session";
  */
 export default function GroupDetailScreen(): ReactElement {
   const { api, user } = useSession();
+  const { apply: applySocial } = useSocial();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const groupId = Array.isArray(id) ? id[0] : (id ?? null);
@@ -66,6 +97,48 @@ export default function GroupDetailScreen(): ReactElement {
   const [notice, setNotice] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [renewing, setRenewing] = useState(false);
+  /**
+   * Los avisos sin leer de este grupo, capturados justo antes de marcarlos.
+   *
+   * Es la «línea dentro del grupo» del apartado 8: el punto rojo de la lista
+   * dice que hay algo, y esto dice qué. Se guarda porque marcarlos leídos es lo
+   * primero que se hace al abrir, así que después ya no habría forma de saber
+   * qué se acaba de apagar.
+   */
+  const [notices, setNotices] = useState<AppNotification[]>([]);
+  /** El último mensaje del chat, solo para la vista previa de su entrada. */
+  const [lastMessage, setLastMessage] = useState<ChatMessage | null>(null);
+  /**
+   * Con quién tienes ya algo: es lo que decide si una fila de la clasificación
+   * sale con el botón de agregar. Mientras sea `null` no sale ninguno — un
+   * botón de «añadir» sobre quien ya es tu amigo es peor que no tener botón.
+   */
+  const [friends, setFriends] = useState<FriendsOverview | null>(null);
+  /** Id de la persona cuya solicitud está en vuelo, para bloquear su fila. */
+  const [pendingFriend, setPendingFriend] = useState<string | null>(null);
+  /**
+   * El último mensaje que este teléfono llegó a ver, del almacén local.
+   *
+   * El backend no lleva registro de lectura del chat —un mensaje no crea aviso—,
+   * así que sin esto la ficha solo podría decir «hay conversación», que es
+   * verdad siempre. Ver `online/chatSeen`.
+   */
+  const [seenMessage, setSeenMessage] = useState<string | null>(null);
+  /**
+   * El desglose del intento de hoy y la racha, los dos del almacén local.
+   *
+   * Ninguno viene de la API: el desglose por rondas solo viaja una vez, al
+   * cerrar el intento (ver `online/attempts`), y la racha se cuenta en el
+   * teléfono. Se leen aquí para poder pintar el mismo anillo que el menú, que
+   * es lo que hace que las dos pantallas hablen del mismo reto.
+   *
+   * Se guardan **con su jornada dentro** y sin filtrar: cuál es la jornada en
+   * curso lo dice el reto, y esperar a su respuesta para empezar a leer el
+   * disco encadenaba dos esperas seguidas. Ahora las dos salen a la vez y el
+   * filtro se aplica al pintar, más abajo.
+   */
+  const [attempt, setAttempt] = useState<StoredAttempt | null>(null);
+  const [streakStore, setStreakStore] = useState<Streak | null>(null);
 
   /**
    * El reto sale del mismo hook que usa la pantalla de juego.
@@ -100,38 +173,132 @@ export default function GroupDetailScreen(): ReactElement {
     }
   }, [api, groupId]);
 
-  const load = useCallback(async () => {
-    await Promise.all([loadGroup(), reloadDaily()]);
-  }, [loadGroup, reloadDaily]);
+  /**
+   * El último mensaje del chat.
+   *
+   * Una sola petición de un solo mensaje, y falla en silencio: la vista previa
+   * es lo que hace que la entrada al chat esté viva, pero no vale romper la
+   * pantalla del grupo porque no se haya podido traer una línea de texto.
+   */
+  const loadPreview = useCallback(async () => {
+    if (!groupId) return;
+    // El registro de lectura es local y no puede fallar por red, así que se lee
+    // aparte del mensaje: aunque no llegue la petición, se sabe qué se vio.
+    setSeenMessage(await readSeenMessage(groupId));
+    try {
+      const page = await api.chat.history(groupId, { limit: 1 });
+      setLastMessage(page.messages[0] ?? null);
+    } catch {
+      // Se queda con la línea de reserva.
+    }
+  }, [api, groupId]);
 
   /**
-   * Los avisos de este grupo se marcan leídos al abrirlo (apartado 8).
+   * Lo que ya está en el teléfono: el desglose del intento y la racha.
+   *
+   * Va dentro de `load` y no en un efecto propio por dos motivos. Uno, sale al
+   * mismo tiempo que las peticiones en vez de después de ellas. Y dos —el que
+   * era un fallo—, **se vuelve a leer al recuperar el foco**: al volver de
+   * jugar, la jornada es la misma, así que un efecto que dependiera de ella no
+   * se disparaba y el anillo seguía enseñando el intento anterior hasta salir
+   * del grupo y volver a entrar.
+   */
+  const loadLocal = useCallback(async () => {
+    if (!groupId) return;
+    const [stored, streak] = await Promise.all([
+      readLatestAttempt(groupId),
+      readStreak(),
+    ]);
+    setAttempt(stored);
+    setStreakStore(streak);
+  }, [groupId]);
+
+  /**
+   * La lista de amigos, para la clasificación.
+   *
+   * Va con su propio `catch` en vez de dentro de `loadGroup`: si esta llamada
+   * falla, lo que se pierde es un botón, no la pantalla. Y de paso alimenta el
+   * contador de la barra de pestañas, que necesita exactamente este dato —así
+   * que abrir un grupo lo deja al día sin una petición de más.
+   */
+  const loadFriends = useCallback(async () => {
+    try {
+      const overview = await api.friends.list();
+      setFriends(overview);
+      applySocial(overview);
+    } catch {
+      // Las filas se quedan sin botón de agregar, que es el fallo bueno.
+    }
+  }, [api, applySocial]);
+
+  const load = useCallback(async () => {
+    await Promise.all([
+      loadGroup(),
+      reloadDaily(),
+      loadPreview(),
+      loadLocal(),
+      loadFriends(),
+    ]);
+  }, [loadFriends, loadGroup, loadLocal, loadPreview, reloadDaily]);
+
+  const addFriend = useCallback(
+    async (userId: string) => {
+      setPendingFriend(userId);
+      try {
+        await api.friends.request(userId);
+        // Se relee entera: el backend acepta la amistad sola si ya había una
+        // solicitud cruzada, así que el resultado no siempre es «enviada».
+        await loadFriends();
+      } catch (requestError) {
+        setError(describeError(requestError));
+      } finally {
+        setPendingFriend(null);
+      }
+    },
+    [api, loadFriends],
+  );
+
+  /**
+   * Los avisos de este grupo se marcan leídos al abrirlo (apartado 8), y de
+   * paso se guardan para poder decir de qué iban.
    *
    * Se filtran por `groupId` en vez de llamar a «marcar todo»: entrar en un
    * grupo no debe apagar el punto rojo de los demás.
+   *
+   * `announce` distingue los dos momentos en que hay que hacer esto. Al abrir
+   * el grupo sí se cuenta lo que había. Al renovar, no: renovar deja un aviso
+   * también a quien renueva, y enseñárselo justo debajo del mensaje de «ya está
+   * en marcha» sería decir lo mismo dos veces con dos voces distintas.
    */
-  const markGroupNotificationsRead = useCallback(async () => {
-    if (!groupId) return;
-    try {
-      const { notifications } = await api.notifications.list({ unreadOnly: true });
-      const mine = notifications
-        .filter((notification) => notification.groupId === groupId)
-        .map((notification) => notification.id);
-      if (mine.length > 0) {
-        await api.notifications.markRead(mine);
+  const consumeGroupNotices = useCallback(
+    async (announce: boolean) => {
+      if (!groupId) return;
+      try {
+        const { notifications } = await api.notifications.list({
+          unreadOnly: true,
+        });
+        const mine = notifications.filter(
+          (notification) => notification.groupId === groupId,
+        );
+        if (mine.length === 0) return;
+        if (announce) {
+          setNotices(mine);
+        }
+        await api.notifications.markRead(mine.map((item) => item.id));
+      } catch {
+        // Que no se marquen los avisos no es motivo para romper la pantalla.
       }
-    } catch {
-      // Que no se marquen los avisos no es motivo para romper la pantalla.
-    }
-  }, [api, groupId]);
+    },
+    [api, groupId],
+  );
 
   useFocusEffect(
     useCallback(() => {
       void (async () => {
         await load();
-        await markGroupNotificationsRead();
+        await consumeGroupNotices(true);
       })();
-    }, [load, markGroupNotificationsRead]),
+    }, [consumeGroupNotices, load]),
   );
 
   const refresh = useCallback(async () => {
@@ -149,6 +316,11 @@ export default function GroupDetailScreen(): ReactElement {
       setGroup(renewed);
       setBoard(await api.groups.leaderboard(group.id));
       await reloadDaily();
+      // El aviso que el servidor acaba de dejarle a todo el mundo incluye a
+      // quien renueva: se marca leído aquí mismo para no dejarle un punto rojo
+      // de algo que acaba de hacer él.
+      setNotices([]);
+      await consumeGroupNotices(false);
       setNotice(
         t("online.group.renewed", { season: renewed.currentSeason.seasonNumber }),
       );
@@ -157,7 +329,7 @@ export default function GroupDetailScreen(): ReactElement {
     } finally {
       setRenewing(false);
     }
-  }, [api, group, reloadDaily]);
+  }, [api, consumeGroupNotices, group, reloadDaily]);
 
   /**
    * La cuenta atrás solo corre si el reloj del teléfono está de acuerdo con la
@@ -169,19 +341,35 @@ export default function GroupDetailScreen(): ReactElement {
     clockTrusted,
   );
 
+  /**
+   * La jornada la manda el reto, no el reloj del teléfono: con el viaje en el
+   * tiempo del backend los dos discrepan, y filtrar por la fecha local diría
+   * «hoy no hay nada» teniendo el intento guardado.
+   *
+   * Aquí es donde se cruza lo leído del disco con lo que dice el servidor. Si
+   * las dos jornadas no coinciden, lo guardado es de otro día y no se pinta.
+   */
+  const challengeDate = daily?.challenge.challengeDate ?? null;
+
+  const solved =
+    attempt != null && attempt.dateKey === challengeDate ? attempt.rounds : null;
+  const streak =
+    streakStore != null && challengeDate != null
+      ? visibleStreak(streakStore, challengeDate)
+      : 0;
+
   if (!group) {
     return (
       <Screen
         eyebrow={t("online.group.badge")}
         title={t("online.groups.title")}
         backTo="/online/groups"
-        backdrop={<AmbientOrbs />}
+        backdrop={<AmbientMesh />}
       >
         {error ? (
           <ErrorBanner
             message={error}
             onRetry={() => void load()}
-            retryLabel={t("common.retry")}
           />
         ) : (
           <Loading label={t("online.group.loading")} />
@@ -201,6 +389,29 @@ export default function GroupDetailScreen(): ReactElement {
   // local solo adelanta el aviso mientras la pantalla está abierta.
   const closed = serverClosed || expired;
   const canPlay = !finished && !closed && attemptsLeft > 0;
+
+  // --- Lo que necesita el anillo ------------------------------------------
+  /** Hoy ya hay puntuación: la tarjeta enseña resultado, no la tarea. */
+  const played = daily?.bestScore != null;
+  const heroAsset = rounds[0]?.asset ?? null;
+  /**
+   * Las rondas guardadas mandan sobre las del reto: si se jugó, son tantas como
+   * arcos hay que pintar, y no dependen de que el reto se haya podido cargar.
+   * El 5 de reserva es el tamaño habitual de una jornada — es lo que se enseña
+   * mientras llega la respuesta, para que el anillo no cambie de número de
+   * sectores a mitad de carga.
+   */
+  const ringRounds = solved?.length || (rounds.length > 0 ? rounds.length : 5);
+  /**
+   * Cada arco con **el color que enviaste**, recortado a tu acierto. Es lo que
+   * convierte el anillo en el resumen de la jornada y no en una barra de
+   * progreso.
+   */
+  const ringSolved: SolvedRound[] | null =
+    solved?.map((round) => ({
+      hex: round.answerHex,
+      accuracy: round.accuracy,
+    })) ?? null;
 
   return (
     <Screen
@@ -222,7 +433,7 @@ export default function GroupDetailScreen(): ReactElement {
         />
       }
       backTo="/online/groups"
-      backdrop={<AmbientOrbs />}
+      backdrop={<AmbientMesh />}
       headerAction={<SettingsButton />}
       onRefresh={refresh}
       refreshing={refreshing}
@@ -236,10 +447,17 @@ export default function GroupDetailScreen(): ReactElement {
         <ErrorBanner
           message={error ?? dailyError ?? ""}
           onRetry={() => void load()}
-          retryLabel={t("common.retry")}
         />
       ) : null}
       {notice ? <Notice message={notice} /> : null}
+
+      {/*
+        La línea del apartado 8: el punto rojo de la lista dice que hay algo y
+        esto dice qué. Se enseña solo la más reciente —llegan de la más nueva a
+        la más vieja— porque el sitio donde se ve lo que pasó es el grupo
+        mismo, no una bandeja de avisos.
+      */}
+      {notices.length > 0 ? <Notice message={noticeLabel(notices[0])} /> : null}
 
       {/*
         ------------------------- La cinta ---------------------------
@@ -279,6 +497,14 @@ export default function GroupDetailScreen(): ReactElement {
               ? t("online.group.finishedOwner")
               : t("online.group.finishedMember", { owner: ownerName })}
           </Text>
+          {/*
+            Se dice aquí, en el mismo bloque que anuncia el final, porque es
+            justo donde alguien puede dar por hecho lo contrario: la
+            clasificación se congela, el reto se apaga, y el chat NO (5.2.1).
+          */}
+          <Text style={[Type.caption, styles.finishedChat]}>
+            {t("online.group.chatStillOpen")}
+          </Text>
 
           {/* El botón de renovar es SOLO del creador (regla 5.2 del plan). */}
           {isOwner ? (
@@ -287,6 +513,8 @@ export default function GroupDetailScreen(): ReactElement {
                 season: group.currentSeason.seasonNumber + 1,
               })}
               icon="retry"
+              // Renovar la temporada es una accion del grupo, no del reto.
+              tone={SECTION_TONE.groups}
               loading={renewing}
               onPress={() => void renew()}
               style={styles.renewButton}
@@ -298,22 +526,88 @@ export default function GroupDetailScreen(): ReactElement {
         <TodaySurface glow={canPlay}>
           <View style={styles.todayHead}>
             <Text style={Type.label}>{t("online.group.daily.title")}</Text>
-            {clockTrusted && !closed ? (
-              <Text style={[Type.metricSmall, styles.countdown]}>
-                {t("online.group.daily.closesIn", {
-                  time: formatCountdown(remainingMs),
-                })}
-              </Text>
-            ) : null}
+
+            <View style={styles.todayMeta}>
+              {/*
+                La racha es **global**, no de este grupo: cuenta los días
+                seguidos que has jugado en cualquiera. Se enseña aquí porque es
+                lo único de la pantalla que se puede perder hoy, y la etiqueta
+                de accesibilidad lo dice con todas las letras para que nadie la
+                lea como «tu racha en este grupo».
+              */}
+              {streak > 0 ? (
+                <View
+                  style={styles.streak}
+                  accessible
+                  accessibilityLabel={t("online.group.daily.streakA11y", {
+                    count: streak,
+                  })}
+                >
+                  <Flame size={18} lit={played} />
+                  <Text style={[Type.metricSmall, styles.streakCount]}>
+                    {streak}
+                  </Text>
+                </View>
+              ) : null}
+
+              {clockTrusted && !closed ? (
+                <Text style={[Type.metricSmall, styles.countdown]}>
+                  {t("online.group.daily.closesIn", {
+                    time: formatCountdown(remainingMs),
+                  })}
+                </Text>
+              ) : null}
+            </View>
           </View>
 
           {/*
-            Cuántas imágenes toca hoy. No se pinta hasta saberlo: un texto de
-            relleno del tamaño de un título es lo primero que se lee, y sería lo
-            primero que cambia al llegar la respuesta.
+            El anillo, el mismo que el menú.
+
+            Antes aquí había un titular con «5 imágenes». Decía cuántas rondas
+            hay, que es justo lo que el anillo dice **con su forma** —un arco
+            por ronda— y además sin gastar el tamaño de un título en una cifra
+            de contexto. Y una vez jugado, el anillo dice algo que el titular no
+            podía: con qué precisión fue cada ronda, pintado con los colores que
+            enviaste.
+
+            Que sea el mismo componente que el menú no es ahorro de código: es
+            que el reto de hoy tiene que ser reconociblemente el mismo objeto
+            desde las dos pantallas.
           */}
-          {rounds.length > 0 ? (
-            <Text style={[Type.title, styles.todayTitle]}>
+          <View style={styles.todayRing}>
+            <RoundRing
+              size={200}
+              rounds={ringRounds}
+              stroke={10}
+              solved={ringSolved}
+            >
+              {heroAsset ? (
+                <SVGChallenge
+                  challenge={heroAsset}
+                  // Gris: el dibujo se conoce, el color es lo que hay que
+                  // acertar. Es el mismo trato que hace el menú.
+                  editableColor={Color.text.faint}
+                  editableColorIndex={rounds[0]?.colorIndex ?? 0}
+                  size={106}
+                  animationToken={0}
+                />
+              ) : (
+                <Icon name="palette" size={38} color={Color.text.faint} />
+              )}
+            </RoundRing>
+          </View>
+
+          {/*
+            Jugado, lo que interesa es la cifra. Sin jugar, cuántas imágenes
+            toca — que ahora es una pista de contexto y no el titular.
+          */}
+          {played ? (
+            <View style={styles.todayScore}>
+              <Text style={Type.metricHero}>{String(daily?.bestScore ?? 0)}</Text>
+              <Text style={Type.label}>{t("online.daily.bestHint")}</Text>
+            </View>
+          ) : rounds.length > 0 ? (
+            <Text style={[Type.caption, styles.todayRounds]}>
               {rounds.length === 1
                 ? t("online.daily.roundsTitleOne")
                 : t("online.daily.roundsTitle", { count: rounds.length })}
@@ -338,6 +632,8 @@ export default function GroupDetailScreen(): ReactElement {
                     : "online.daily.play",
             )}
             icon={canPlay ? "play" : "lock"}
+            // Azul: es la accion del reto de hoy, la misma que abre el menu.
+            tone={SECTION_TONE.today}
             disabled={!canPlay}
             onPress={() =>
               router.push({
@@ -365,7 +661,16 @@ export default function GroupDetailScreen(): ReactElement {
             ? "online.group.leaderboardFrozen"
             : "online.group.leaderboard",
         )}
-        hint={t("online.group.leaderboardHint")}
+        /*
+          Terminada, la lista es idéntica a la de ayer y no se va a mover más.
+          El título ya dice «Resultado final», pero solo la pista puede decir
+          qué la descongela, que es lo que alguien se pregunta al verla quieta.
+        */
+        hint={t(
+          finished
+            ? "online.group.leaderboardFrozenHint"
+            : "online.group.leaderboardHint",
+        )}
       />
 
       {!board || board.entries.every((entry) => entry.playedDays === 0) ? (
@@ -383,13 +688,42 @@ export default function GroupDetailScreen(): ReactElement {
               key={entry.userId}
               entry={entry}
               you={entry.userId === user?.id}
+              /*
+                Solo con la lista de amigos en la mano. Sin ella, `relationOf`
+                diría «none» de todo el mundo y saldría un botón de agregar
+                sobre gente que ya es tu amiga.
+              */
+              canAdd={
+                friends != null &&
+                relationOf(entry.userId, user?.id, friends) === "none"
+              }
+              busy={pendingFriend === entry.userId}
+              onAdd={() => void addFriend(entry.userId)}
             />
           ))}
         </View>
       )}
 
       {/* --------------------------- El chat ---------------------------- */}
-      <ChatBubble />
+      <ChatEntry
+        line={
+          lastMessage
+            ? previewOf(lastMessage, user?.id ?? null)
+            : t("online.group.chat.empty")
+        }
+        /*
+          Sin leer es «lo último que hay no es lo último que vi». Nunca haber
+          abierto el chat cuenta, que es lo que se quiere: un grupo con
+          conversación y sin visitar tiene algo que enseñar.
+        */
+        unread={lastMessage != null && lastMessage.id !== seenMessage}
+        onPress={() =>
+          router.push({
+            pathname: "/online/groups/[id]/chat",
+            params: { id: group.id },
+          })
+        }
+      />
 
       {/*
         Panel de desarrollo. Aquí lleva además el atajo de terminar ESTA
@@ -504,9 +838,16 @@ function medalFor(position: number): (typeof Color.podium)[keyof typeof Color.po
 function StandingRow({
   entry,
   you,
+  canAdd,
+  busy,
+  onAdd,
 }: {
   entry: GroupLeaderboardEntry;
   you: boolean;
+  /** Esta persona todavía no es nada tuyo y se le puede pedir amistad. */
+  canAdd: boolean;
+  busy: boolean;
+  onAdd: () => void;
 }): ReactElement {
   const medal = entry.playedDays > 0 ? medalFor(entry.position) : null;
   const tint = playerTint(entry.username);
@@ -558,6 +899,38 @@ function StandingRow({
       </View>
 
       <Text style={[Type.metric, { color: tint.text }]}>{entry.score}</Text>
+
+      {/*
+        Pedir amistad, desde donde ves a la gente competir.
+
+        Es un `Pressable` con `hitSlop` y no el `IconButton` de siempre porque
+        aquel garantiza su objetivo de 44 puntos **dibujándolo**, y eso subiría
+        estas cápsulas de 60 a 68 solo en las filas que llevan botón: una lista
+        con dos alturas distintas se lee como una lista mal hecha. El objetivo
+        táctil sigue siendo el mismo, repartido en el hueco de alrededor.
+
+        Lleva el tono de esa persona, como su nombre y su cifra. El icono va
+        aquí y no una pastilla de «ya sois amigos» en las demás filas: quien ya
+        es tu amigo no necesita que se lo recuerden en una clasificación.
+      */}
+      {canAdd ? (
+        <Pressable
+          onPress={onAdd}
+          disabled={busy}
+          hitSlop={HIT_SLOP}
+          accessibilityRole="button"
+          accessibilityLabel={t("online.group.settings.addFriend", {
+            name: entry.username,
+          })}
+          accessibilityState={{ disabled: busy }}
+          style={({ pressed }) => [
+            styles.addFriend,
+            (pressed || busy) && styles.addFriendPressed,
+          ]}
+        >
+          <Icon name="userPlus" size={18} color={tint.text} />
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -567,31 +940,84 @@ function StandingRow({
 // ---------------------------------------------------------------------------
 
 /**
- * El chat, con forma de lo que es.
+ * La entrada al chat, con forma de lo que lleva dentro.
  *
  * Tres esquinas redondas y la de abajo a la izquierda cuadrada: es un bocadillo,
  * y es la única superficie de la app con las esquinas desiguales. Se distingue
  * de la clasificación que tiene justo encima sin necesidad de teñirla ni de
- * ponerle un borde de otro color — la silueta ya dice de qué va.
+ * ponerle un borde de otro color — la silueta ya dice de qué va. Es la misma que
+ * llevan las burbujas de dentro, y esa repetición es lo que hace que la entrada
+ * y el sitio al que lleva se lean como el mismo objeto.
  *
- * Va apagado porque todavía no está: el backend tiene los mensajes, pero la
- * pantalla no. Se deja visible en vez de esconderlo porque forma parte de lo que
- * un grupo es, y verlo apagado con «en desarrollo» dice más que no verlo.
+ * Lleva **el último mensaje** en vez de una descripción fija. Una descripción
+ * dice lo que un chat es, cosa que ya sabe todo el mundo; el último mensaje dice
+ * si hay algo que leer, que es lo único que se necesita decidir desde aquí.
+ *
+ * Está igual de accesible con la temporada terminada: no se esconde, no se
+ * apaga y no cambia de sitio (regla 5.2.1 del plan).
  */
-function ChatBubble(): ReactElement {
+function ChatEntry({
+  line,
+  unread,
+  onPress,
+}: {
+  line: string;
+  unread: boolean;
+  onPress: () => void;
+}): ReactElement {
   return (
-    <View style={styles.chat} accessibilityRole="summary">
-      <View style={styles.chatIcon}>
-        <Icon name="users" size={20} color={Color.spectrum.violet.icon} />
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.chat, pressed && styles.chatPressed]}
+      accessibilityRole="button"
+      accessibilityLabel={
+        unread
+          ? `${t("online.group.chat.title")}. ${t("online.group.chat.unread")}`
+          : t("online.group.chat.title")
+      }
+      accessibilityHint={line}
+    >
+      {/*
+        El cuadro va relleno de pigmento, no teñido como los de las listas. Es
+        la regla del pigmento del sistema de diseño —rellena lo que ocurre fuera
+        de una ronda— y aquí hace falta: esta fila es lo último de una pantalla
+        larga y con el cuadro apagado se leía como un pie de página.
+      */}
+      <View>
+        <View style={styles.chatIcon}>
+          <Icon name="message" size={20} color={Color.spectrum.violet.ink} />
+        </View>
+        {/*
+          El punto rojo, en la esquina del cuadro y con el mismo rojo que el de
+          la lista de grupos. Allí cuenta avisos y aquí mensajes, pero para
+          quien mira significan lo mismo —hay algo que no has visto—, y darles
+          dos colores obligaría a aprenderse dos señales para una idea. Sobre el
+          violeta encendido del cuadro no hay forma de que pase desapercibido,
+          que es justo su trabajo.
+        */}
+        {unread ? (
+          <View style={styles.chatBadge}>
+            <UnreadDot count={1} label={t("online.group.chat.unread")} />
+          </View>
+        ) : null}
       </View>
       <View style={styles.chatBody}>
         <Text style={Type.bodyStrong}>{t("online.group.chat.title")}</Text>
-        <Text style={[Type.caption, styles.chatDescription]}>
-          {t("online.group.chat.description")}
+        <Text
+          style={[
+            Type.caption,
+            styles.chatDescription,
+            // Sin leer, la línea sube al claro de los títulos. Es la señal de
+            // toda la vida y no gasta ni un color más.
+            unread && styles.chatDescriptionUnread,
+          ]}
+          numberOfLines={1}
+        >
+          {line}
         </Text>
       </View>
-      <Pill label={t("online.group.chat.soon")} tone="accent" />
-    </View>
+      <Icon name="chevronRight" size={18} color={Color.text.faint} />
+    </Pressable>
   );
 }
 
@@ -610,6 +1036,10 @@ const styles = StyleSheet.create({
   finishedTitle: {
     marginBottom: Space.xs,
   },
+  finishedChat: {
+    marginTop: Space.sm,
+    color: Color.text.secondary,
+  },
   renewButton: {
     marginTop: Space.lg,
   },
@@ -624,8 +1054,31 @@ const styles = StyleSheet.create({
   countdown: {
     color: Color.text.muted,
   },
-  todayTitle: {
-    marginTop: Space.sm,
+  todayMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Space.md,
+  },
+  streak: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Space.xxs,
+  },
+  streakCount: {
+    color: Color.ember.text,
+  },
+  todayRing: {
+    alignItems: "center",
+    marginTop: Space.lg,
+  },
+  todayScore: {
+    alignItems: "center",
+    marginTop: Space.md,
+    gap: Space.xs,
+  },
+  todayRounds: {
+    textAlign: "center",
+    marginTop: Space.md,
   },
   attempts: {
     flexDirection: "row",
@@ -703,6 +1156,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: Space.xs,
   },
+  addFriend: {
+    // Solo el dibujo: el objetivo táctil lo pone el `hitSlop`. Ver la nota de
+    // `StandingRow`. Sin sangrado negativo: la fila es una cápsula y su canto
+    // curva, así que pegar el icono al borde lo mete dentro de la curva.
+    marginLeft: Space.xs,
+  },
+  addFriendPressed: {
+    opacity: DISABLED_OPACITY,
+  },
 
   // -- Chat -----------------------------------------------------------------
   chat: {
@@ -713,12 +1175,18 @@ const styles = StyleSheet.create({
     marginBottom: Space.xxl,
     backgroundColor: Color.surface.raised,
     borderWidth: 1,
-    borderColor: Color.accent.border,
+    // Violeta de verdad, no el canto apagado de antes. El acento es el color
+    // de «esto lleva a alguna parte», y hasta ahora esta fila lo llevaba tan
+    // bajado que no lo decía.
+    borderColor: Color.accent.default,
     // El bocadillo. La esquina viva es la de abajo a la izquierda.
     borderTopLeftRadius: Radius.xl,
     borderTopRightRadius: Radius.xl,
     borderBottomRightRadius: Radius.xl,
     borderBottomLeftRadius: Radius.sm / 2,
+  },
+  chatPressed: {
+    backgroundColor: Color.surface.interactive,
   },
   chatIcon: {
     width: 40,
@@ -726,14 +1194,20 @@ const styles = StyleSheet.create({
     borderRadius: Radius.pill,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Color.spectrum.violet.surface,
-    borderWidth: 1,
-    borderColor: Color.spectrum.violet.border,
+    backgroundColor: Color.spectrum.violet.pigment,
   },
   chatBody: {
     flex: 1,
   },
+  chatBadge: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+  },
   chatDescription: {
     marginTop: Space.xxs,
+  },
+  chatDescriptionUnread: {
+    color: Color.text.primary,
   },
 });

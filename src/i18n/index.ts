@@ -1,30 +1,33 @@
 import { getLocales } from "expo-localization";
 
 /**
- * Lightweight i18n layer.
+ * Capa de i18n, ligera y a mano.
  *
- * The app ships Spanish, English and French. Spanish (`es`) is the source of
- * truth and the fallback; `en` and `fr` mirror the same keys. Every user-facing
- * string goes through `t()`, so adding another language is just a matter of
- * dropping another dictionary into `resources` below. Interpolation uses a
- * simple `{{name}}` syntax.
+ * La app va en **español, inglés, francés y catalán**. El español (`es`) es la
+ * fuente de verdad y la reserva; los demás diccionarios son espejos suyos, y el
+ * tipo lo impone: `TranslationKey` sale de `keyof typeof es`, así que añadir una
+ * clave al español **obliga** a ponerla en los otros tres o el typecheck falla.
+ * Es lo que evita que una pantalla nueva salga a medio traducir.
  *
- * NOTE: `expo-localization` is used only to detect the device language. If it
- * is not installed yet run `npx expo install expo-localization`; the code falls
- * back to Spanish if detection fails.
+ * Toda cadena visible pasa por `t()`. Añadir un idioma es soltar otro
+ * diccionario en `resources`, al final del fichero. La interpolación usa
+ * `{{nombre}}` y nada más.
+ *
+ * `expo-localization` solo sirve para detectar el idioma del dispositivo: si un
+ * teléfono viene en un idioma que no está aquí, se cae al español.
  */
 
 type Params = Record<string, string | number>;
 
 const es = {
   "common.back": "Inicio",
-  "common.backShort": "Atrás",
   "common.exit": "Salir",
   "common.next": "Siguiente",
   "common.retry": "Reintentar",
   "common.share": "Compartir",
   "common.loading": "Cargando juego...",
   "common.continue": "Continuar",
+  "challenge.imageMissing": "Imagen no disponible",
 
   // Etiquetas que solo lee un lector de pantalla: iconos sueltos y controles
   // cuyo texto visible no describe la acción.
@@ -49,7 +52,6 @@ const es = {
   "landing.offline.title": "Offline",
   "landing.offline.description":
     "Modo práctica y partidas en grupo en este dispositivo.",
-  "landing.soon": "Pronto",
   "landing.footer": "Offline funciona sin conexión; online necesita cuenta.",
 
   "offline.badge": "Modo offline",
@@ -100,7 +102,6 @@ const es = {
 
   "party.round.title": "Resultado de la imagen",
   "party.round.correct": "Color correcto",
-  "party.round.you": "{{name}}",
 
   "party.final.title": "Clasificación final",
   "party.final.coopTitle": "Resultado del equipo",
@@ -116,12 +117,6 @@ const es = {
   "party.final.replay": "Jugar otra vez",
   "party.final.home": "Volver a modos",
 
-  "home.badge": "Color Quest",
-  "home.title": "Pon a prueba\ntu ojo para el color",
-  "home.subtitle":
-    "Elige un modo de juego y demuestra cuánto te acercas al color perfecto.",
-  "home.footer": "Más modos de juego en camino.",
-  "home.soon": "Pronto",
   "home.best": "Récord: {{score}}",
   "home.bestAverage": "Récord: {{average}}%",
 
@@ -138,10 +133,6 @@ const es = {
   "mode.multicolor.description":
     "Reconstruye todos los colores de un mismo logo, uno a uno.",
 
-  "game.kicker": "Color Quest",
-  "game.title": "Adivina el color",
-  "game.subtitle":
-    "Ajusta el selector hasta que el resultado se vea igual que el reto.",
   "game.check": "Comprobar",
   "game.empty.title": "No hay retos disponibles.",
   "game.empty.subtitle":
@@ -168,7 +159,6 @@ const es = {
   "result.value": "Brillo",
 
   "summary.title": "Juego completado",
-  "summary.subtitle": "Has superado todos los retos disponibles.",
   "summary.total": "Puntuación total",
   "summary.average": "Media",
   "summary.record": "¡Nuevo récord!",
@@ -187,7 +177,6 @@ const es = {
   "daily.done.subtitle": "Vuelve mañana para un color nuevo.",
   "daily.score": "Tu resultado de hoy: {{score}}%",
 
-
   "score.perfect": "¡Perfecto!",
   "score.close": "¡Muy cerca!",
   "score.good": "Buen intento",
@@ -204,13 +193,11 @@ const es = {
   "settings.title": "Ajustes de sonido",
   "settings.music": "Música",
   "settings.sfx": "Efectos",
-  "settings.close": "Cerrar",
 
   // --- Modo online -------------------------------------------------------
   "online.session.restoring": "Recuperando tu sesión...",
   "online.level": "Nivel {{level}}",
   "online.xp": "{{xp}} XP",
-  "online.xpToNext": "Faltan {{xp}} XP",
 
   "online.auth.badge": "Modo online",
   "online.auth.title": "Entra en tu cuenta",
@@ -258,45 +245,26 @@ const es = {
   "online.auth.verify.resent": "Código reenviado.",
   "online.auth.verify.back": "Cambiar de email",
 
-  "online.hub.badge": "Modo online",
-  "online.hub.title": "¿Cómo quieres\njugar?",
-  "online.hub.subtitle":
-    "Compite con tus amigos en un grupo privado, o mira cómo vas.",
-  "online.hub.globalRank": "Puesto global",
-  "online.hub.friendsRank": "Entre amigos",
-  "online.hub.ofPlayers": "de {{total}} jugadores",
-  "online.hub.friendCount": "{{count}} amigos",
-  "online.hub.profile.title": "Perfil",
-  "online.hub.profile.description": "Tu nivel, tu XP y los datos de la cuenta.",
-  "online.hub.friends.title": "Amigos",
-  "online.hub.friends.description": "Busca jugadores y gestiona tus solicitudes.",
-  "online.hub.leaderboard.title": "Clasificación",
-  "online.hub.leaderboard.description": "El ranking mundial y el de tus amigos.",
-  "online.hub.match.title": "Partida online",
-  "online.hub.match.description": "Compite en tiempo real contra otros jugadores.",
-  "online.hub.match.locked": "Necesita partidas en tiempo real · en desarrollo",
-
   "online.hub.playSection": "Jugar",
-  "online.hub.playHint": "El reto de hoy se juega con grupo o sin él.",
-  "online.hub.playHintPending":
-    "Cada grupo tiene su propio reto de hoy. Te quedan por jugar.",
   "online.hub.playHintDone": "Ya has jugado el reto de hoy en todos tus grupos.",
-  "online.hub.group.play": "Jugar el reto",
   "online.hub.group.played": "Reto de hoy jugado · mejor {{score}}",
   "online.hub.todayPoints": "Puntos de hoy",
-  "online.hub.todayPointsHint": "Sumando todos tus grupos",
-  "online.hub.accountSection": "Tu cuenta",
-  "online.hub.accountHint": "Perfil, amigos y clasificación mundial.",
 
+  "online.hub.dayLeft": "Te quedan {{count}} retos",
+  "online.hub.dayLeftOne": "Te queda 1 reto",
+  "online.hub.dayDone": "Jornada completa",
+  "online.hub.streakDays": "{{count}} días seguidos",
+  "online.hub.streakToday": "Hoy ya cuenta",
+  "online.hub.streakPending": "Hoy aún no cuenta",
+  "online.hub.tileDone": "Reto hecho",
+  "online.hub.tileClosed": "Cerrado por hoy",
+  "online.hub.tileOpenHint": "Abre el grupo y su clasificación",
   "online.hub.quickCreate": "Crear grupo",
   "online.hub.quickJoin": "Tengo un código",
   "online.hub.seeAllGroups": "Ver todos mis grupos",
-  "online.hub.groupsEmpty": "Todavía no estás en ningún grupo",
+  "online.hub.groupsEmpty": "Crea tu grupo y reta a quien quieras",
   "online.hub.groupsEmptyHint":
-    "Crea uno e invita con su código, o entra en el de alguien.",
-  "online.hub.moreSection": "Más",
-  "online.hub.scoreSection": "Tu puntuación",
-  "online.hub.levelProgress": "{{current}} / {{total}} XP para el nivel {{next}}",
+    "Cada día, un logo y un color que acertar. Compites solo con la gente que invites.",
   "online.hub.unranked": "—",
 
   // --- Barra de pestañas del modo online ---
@@ -306,19 +274,14 @@ const es = {
   "online.tabs.profile": "Perfil",
 
   // --- El reto de hoy, en el menú ---
-  "online.hub.question": "¿De qué color es la imagen?",
-  "online.hub.queuePosition": "Hoy · {{index}} de {{total}}",
   "online.hub.queueDone": "Todo jugado · {{total}} grupos",
   "online.hub.allDoneHint": "Ya has jugado en todos tus grupos. El siguiente reto abre a las 15:00.",
   "online.hub.attempts": "Te quedan {{count}} intentos",
   "online.hub.attemptsOne": "Te queda 1 intento",
-  "online.hub.overtake": "Con {{points}} adelantas a {{name}}",
-  "online.hub.competing": "{{count}} de {{total}} compiten esta temporada",
-  "online.hub.nextUp": "Siguiente",
-  "online.hub.opensAfter": "Se abre al terminar este",
-  "online.hub.opensAfterMore": "Se abre al terminar este · y {{count}} más",
   "online.hub.streakSecured": "Racha de {{count}} jornadas, asegurada hoy",
   "online.hub.streakAtRisk": "Racha de {{count}} jornadas. Hoy aún no has jugado",
+
+  "online.hub.loading": "Buscando lo que tienes que jugar hoy...",
 
   "online.groups.badge": "Grupos",
   "online.groups.title": "Tus grupos",
@@ -350,13 +313,16 @@ const es = {
   "online.groups.endsSoon": "Termina hoy",
   "online.groups.finishedHint": "Temporada {{season}} terminada",
   "online.groups.unread": "Novedades",
+  "online.groups.unreadOneA11y": "Tiene 1 aviso sin leer",
+  "online.groups.unreadA11y": "Tiene {{count}} avisos sin leer",
 
   "online.group.loading": "Cargando el grupo...",
   "online.group.badge": "Grupo",
   "online.group.season": "Temporada {{season}}",
+  "online.group.seasonRange": "{{from}} – {{to}}",
+  "online.group.seasonCurrent": "En curso",
   "online.group.codeTitle": "Código de invitación",
   "online.group.codeHint": "Quien lo tenga puede entrar en el grupo.",
-  "online.group.share": "Compartir",
   "online.group.shareMessage":
     "Entra en mi grupo «{{name}}» de Color Quest con el código {{code}}",
   "online.group.finishedTitle": "Esta temporada ha terminado",
@@ -366,10 +332,11 @@ const es = {
     "La clasificación queda congelada. Solo {{owner}}, que creó el grupo, puede empezar una temporada nueva.",
   "online.group.chatStillOpen": "El chat sigue abierto.",
   "online.group.renew": "Empezar temporada {{season}}",
-  "online.group.renewing": "Empezando...",
   "online.group.renewed": "Temporada {{season}} en marcha.",
   "online.group.leaderboard": "Clasificación",
   "online.group.leaderboardFrozen": "Resultado final",
+  "online.group.leaderboardFrozenHint":
+    "Congelada hasta que se renueve la temporada.",
   "online.group.leaderboardHint": "Acumulado de la temporada.",
   "online.group.leaderboardEmpty": "Todavía no ha jugado nadie",
   "online.group.leaderboardEmptyHint":
@@ -382,23 +349,22 @@ const es = {
   "online.group.owner": "Creador",
   "online.group.members": "Miembros",
   "online.group.daily.title": "Reto de hoy",
-  "online.group.daily.attemptsLeft": "Te quedan {{count}} intentos",
   "online.group.daily.attemptsOne": "Te queda 1 intento",
   "online.group.daily.noAttempts": "Ya has usado tus dos intentos",
-  "online.group.daily.best": "Tu mejor puntuación: {{score}}",
-  "online.group.daily.play": "Jugar",
-  "online.group.daily.notCounting":
-    "Puedes jugar el reto, pero no sumará en esta clasificación hasta que empiece una temporada nueva.",
   "online.group.daily.attemptsBoth": "Tienes dos intentos",
   "online.group.daily.closesIn": "Cierra en {{time}}",
   "online.group.daily.rule": "Cuenta el mejor de los dos intentos.",
+  "online.group.daily.streakA11y":
+    "Tu racha: {{count}} días seguidos jugando, en todos tus grupos",
   "online.group.chat.title": "Chat del grupo",
-  "online.group.chat.description": "Píquense mientras dure la temporada.",
-  "online.group.chat.soon": "En desarrollo",
+  "online.group.chat.empty": "Todavía no ha escrito nadie",
+  "online.group.chat.unread": "Sin leer",
+  "online.group.notice.seasonRenewed":
+    "La temporada {{season}} ya está en marcha. La clasificación empieza de cero.",
+  "online.group.notice.generic": "Hay novedades en este grupo.",
   "online.group.leave": "Salir del grupo",
   "online.group.leaveOwnerHint":
     "Si te vas, el grupo pasa al miembro más antiguo.",
-  "online.group.left": "Has salido del grupo.",
   "online.group.edit": "Ajustes del grupo",
   "online.group.settings.title": "Ajustes del grupo",
   "online.group.settings.saveName": "Guardar nombre",
@@ -407,12 +373,38 @@ const es = {
     "Solo quien creó el grupo puede cambiarle el nombre.",
   "online.group.settings.notifications": "Avisos de este grupo",
   "online.group.settings.notificationsHint":
-    "Todavía no enviamos avisos. Guardamos tu decisión para cuando lleguen.",
+    "Enciende el punto rojo cuando pasa algo aquí, como una temporada nueva. Apagado, el grupo no te llama la atención.",
+  "online.group.settings.seasons": "Temporadas",
+  "online.group.settings.seasonsHint":
+    "Cuántas lleva el grupo, y desde cuándo.",
   "online.group.settings.membersHint": "Puntos y jornadas de esta temporada.",
   "online.group.settings.addFriend": "Añadir a {{name}} como amigo",
   "online.group.settings.shareCode": "Compartir el código",
   "online.group.settings.leaveHint":
     "Puedes volver a entrar con el código.",
+
+  "online.chat.badge": "Chat",
+  "online.chat.title": "Conversación",
+  "online.chat.loading": "Cargando la conversación...",
+  "online.chat.loadingOlder": "Trayendo lo anterior...",
+  "online.chat.emptyTitle": "Aquí no ha escrito nadie",
+  "online.chat.emptyHint": "Escribe lo primero. Lo verá todo el grupo.",
+  "online.chat.placeholder": "Escribe al grupo",
+  "online.chat.send": "Enviar el mensaje",
+  "online.chat.sending": "Enviando",
+  "online.chat.failed": "No se envió",
+  "online.chat.retry": "Reintentar",
+  "online.chat.discard": "Descartar",
+  "online.chat.stale":
+    "No llega lo nuevo. Aparecerá en cuanto vuelva la conexión.",
+  "online.chat.remaining": "Quedan {{count}}",
+  "online.chat.tooLong": "Te sobran {{count}}",
+  "online.chat.today": "Hoy",
+  "online.chat.yesterday": "Ayer",
+  "online.chat.finishedHint": "Temporada terminada. El chat sigue abierto.",
+  "online.chat.preview": "{{name}}: {{body}}",
+  "online.chat.previewMine": "Tú: {{body}}",
+  "online.chat.messageA11y": "{{name}}, {{time}}: {{body}}",
 
   "online.daily.badge": "Reto diario",
   "online.daily.title": "El reto de hoy",
@@ -469,6 +461,7 @@ const es = {
   "online.daily.bestIsThis": "Es este intento",
   "online.daily.xpEarned": "+{{xp}} XP",
   "online.daily.xpAlready": "El XP de hoy ya estaba concedido",
+  "online.daily.levelUp": "Has subido al nivel {{level}}.",
   "online.daily.attemptsOneLeft": "Te queda 1 intento",
   "online.daily.finishAttempt": "Terminar",
   "online.daily.roundPoints": "{{points}} pts",
@@ -502,9 +495,21 @@ const es = {
   "online.profile.badge": "Perfil",
   "online.profile.title": "Tu perfil",
   "online.profile.subtitle": "Así te ven el resto de jugadores.",
+  "online.profile.friends": "Amigos",
+  "online.profile.friendsHint": "Tus solicitudes y tu lista.",
+  "online.profile.friendsWaiting": "{{count}} esperando respuesta",
+  "online.profile.friendsLoading": "Cargando tus amigos...",
+  "online.profile.friendsUnknown": "No hemos podido saber quién te espera.",
+  "online.profile.friendsNone": "No tienes solicitudes pendientes.",
+  "online.profile.friendsOpen": "Ver amigos y buscar jugadores",
+  "online.profile.wantsToBeFriends": "Quiere ser tu amigo",
   "online.profile.account": "Datos de la cuenta",
   "online.profile.memberSince": "Miembro desde",
   "online.profile.nextLevel": "Faltan {{xp}} XP para el nivel {{level}}.",
+  "online.profile.dailyToday": "Hoy has ganado {{xp}} XP con el reto.",
+  "online.profile.dailyPlayed": "Hoy ya has jugado el reto.",
+  "online.profile.dailyPending": "El reto de hoy todavía no te ha dado XP.",
+  "online.profile.streakA11y": "{{count}} días seguidos jugando el reto",
   "online.profile.edit": "Cambiar nombre",
   "online.profile.save": "Guardar",
   "online.profile.cancel": "Cancelar",
@@ -531,6 +536,9 @@ const es = {
   "online.friends.incomingHint": "Acepta para veros en la clasificación de amigos.",
   "online.friends.outgoing": "Solicitudes enviadas",
   "online.friends.accept": "Aceptar",
+  "online.friends.pendingOneA11y": "Tienes 1 solicitud de amistad",
+  "online.friends.pendingA11y":
+    "Tienes {{count}} solicitudes de amistad",
   "online.friends.reject": "Rechazar",
   "online.friends.cancel": "Cancelar",
   "online.friends.remove": "Eliminar",
@@ -557,7 +565,7 @@ const es = {
   "online.leaderboard.emptyFriendsHint":
     "Añade amigos y aparecerán aquí ordenados por XP.",
 
-  "online.error.generic": "Algo ha ido mal. Inténtalo otra vez.",
+  "online.error.generic": "El servidor ha respondido con un error inesperado.",
   "online.error.network":
     "No hemos podido conectar con el servidor. Revisa tu conexión.",
   "online.error.credentials": "Email o contraseña incorrectos.",
@@ -586,13 +594,13 @@ export type TranslationKey = keyof typeof es;
 
 const en: Record<TranslationKey, string> = {
   "common.back": "Home",
-  "common.backShort": "Back",
   "common.exit": "Exit",
   "common.next": "Next",
   "common.retry": "Retry",
   "common.share": "Share",
   "common.loading": "Loading game...",
   "common.continue": "Continue",
+  "challenge.imageMissing": "Image unavailable",
 
   "a11y.back": "Go back",
   "a11y.close": "Close",
@@ -614,7 +622,6 @@ const en: Record<TranslationKey, string> = {
   "landing.offline.title": "Offline",
   "landing.offline.description":
     "Practice mode and group matches on this device.",
-  "landing.soon": "Soon",
   "landing.footer": "Offline works with no connection; online needs an account.",
 
   "offline.badge": "Offline mode",
@@ -664,7 +671,6 @@ const en: Record<TranslationKey, string> = {
 
   "party.round.title": "Image result",
   "party.round.correct": "Correct color",
-  "party.round.you": "{{name}}",
 
   "party.final.title": "Final ranking",
   "party.final.coopTitle": "Team result",
@@ -680,12 +686,6 @@ const en: Record<TranslationKey, string> = {
   "party.final.replay": "Play again",
   "party.final.home": "Back to modes",
 
-  "home.badge": "Color Quest",
-  "home.title": "Put your eye\nfor color to the test",
-  "home.subtitle":
-    "Pick a game mode and show how close you get to the perfect color.",
-  "home.footer": "More game modes on the way.",
-  "home.soon": "Soon",
   "home.best": "Best: {{score}}",
   "home.bestAverage": "Best: {{average}}%",
 
@@ -701,10 +701,6 @@ const en: Record<TranslationKey, string> = {
   "mode.multicolor.description":
     "Rebuild every color of a single logo, one by one.",
 
-  "game.kicker": "Color Quest",
-  "game.title": "Guess the color",
-  "game.subtitle":
-    "Tune the picker until the result looks just like the challenge.",
   "game.check": "Check",
   "game.empty.title": "No challenges available.",
   "game.empty.subtitle":
@@ -731,7 +727,6 @@ const en: Record<TranslationKey, string> = {
   "result.value": "Brightness",
 
   "summary.title": "Game complete",
-  "summary.subtitle": "You've cleared every available challenge.",
   "summary.total": "Total score",
   "summary.average": "Average",
   "summary.record": "New record!",
@@ -750,7 +745,6 @@ const en: Record<TranslationKey, string> = {
   "daily.done.subtitle": "Come back tomorrow for a new color.",
   "daily.score": "Your result today: {{score}}%",
 
-
   "score.perfect": "Perfect!",
   "score.close": "Very close!",
   "score.good": "Good try",
@@ -767,13 +761,11 @@ const en: Record<TranslationKey, string> = {
   "settings.title": "Sound settings",
   "settings.music": "Music",
   "settings.sfx": "Effects",
-  "settings.close": "Close",
 
   // --- Online mode -------------------------------------------------------
   "online.session.restoring": "Restoring your session...",
   "online.level": "Level {{level}}",
   "online.xp": "{{xp}} XP",
-  "online.xpToNext": "{{xp}} XP to go",
 
   "online.auth.badge": "Online mode",
   "online.auth.title": "Sign in",
@@ -820,46 +812,26 @@ const en: Record<TranslationKey, string> = {
   "online.auth.verify.resent": "Code sent again.",
   "online.auth.verify.back": "Use another email",
 
-  "online.hub.badge": "Online mode",
-  "online.hub.title": "How do you\nwant to play?",
-  "online.hub.subtitle":
-    "Compete with friends in a private group, or see how you rank.",
-  "online.hub.globalRank": "Global rank",
-  "online.hub.friendsRank": "Among friends",
-  "online.hub.ofPlayers": "of {{total}} players",
-  "online.hub.friendCount": "{{count}} friends",
-  "online.hub.profile.title": "Profile",
-  "online.hub.profile.description": "Your level, your XP and your account details.",
-  "online.hub.friends.title": "Friends",
-  "online.hub.friends.description": "Find players and handle your requests.",
-  "online.hub.leaderboard.title": "Leaderboard",
-  "online.hub.leaderboard.description": "The global ranking and your friends'.",
-  "online.hub.match.title": "Online match",
-  "online.hub.match.description": "Compete in real time against other players.",
-  "online.hub.match.locked": "Needs real-time matches · in development",
-
   "online.hub.playSection": "Play",
-  "online.hub.playHint":
-    "Today's challenge can be played with or without a group.",
-  "online.hub.playHintPending":
-    "Every group has its own challenge today. You still have some to play.",
   "online.hub.playHintDone": "You have played today's challenge in every group.",
-  "online.hub.group.play": "Play the challenge",
   "online.hub.group.played": "Today's challenge played · best {{score}}",
   "online.hub.todayPoints": "Points today",
-  "online.hub.todayPointsHint": "Across all your groups",
-  "online.hub.accountSection": "Your account",
-  "online.hub.accountHint": "Profile, friends and the world ranking.",
 
+  "online.hub.dayLeft": "{{count}} challenges left today",
+  "online.hub.dayLeftOne": "1 challenge left today",
+  "online.hub.dayDone": "Day complete",
+  "online.hub.streakDays": "{{count}} days in a row",
+  "online.hub.streakToday": "Today counts",
+  "online.hub.streakPending": "Today does not count yet",
+  "online.hub.tileDone": "Challenge done",
+  "online.hub.tileClosed": "Closed for today",
+  "online.hub.tileOpenHint": "Opens the group and its standings",
   "online.hub.quickCreate": "Create group",
   "online.hub.quickJoin": "I have a code",
   "online.hub.seeAllGroups": "See all my groups",
-  "online.hub.groupsEmpty": "You are not in any group yet",
+  "online.hub.groupsEmpty": "Create a group and challenge whoever you like",
   "online.hub.groupsEmptyHint":
-    "Create one and share its code, or join someone else's.",
-  "online.hub.moreSection": "More",
-  "online.hub.scoreSection": "Your score",
-  "online.hub.levelProgress": "{{current}} / {{total}} XP to level {{next}}",
+    "One logo, one color to match, every day. You only compete with the people you invite.",
   "online.hub.unranked": "—",
 
   "online.tabs.today": "Today",
@@ -867,19 +839,14 @@ const en: Record<TranslationKey, string> = {
   "online.tabs.ranking": "Ranking",
   "online.tabs.profile": "Profile",
 
-  "online.hub.question": "What colour is it?",
-  "online.hub.queuePosition": "Today · {{index}} of {{total}}",
   "online.hub.queueDone": "All played · {{total}} groups",
   "online.hub.allDoneHint": "You have played in every group. The next challenge opens at 15:00.",
   "online.hub.attempts": "{{count}} attempts left",
   "online.hub.attemptsOne": "1 attempt left",
-  "online.hub.overtake": "{{points}} more and you pass {{name}}",
-  "online.hub.competing": "{{count}} of {{total}} playing this season",
-  "online.hub.nextUp": "Up next",
-  "online.hub.opensAfter": "Opens when you finish this one",
-  "online.hub.opensAfterMore": "Opens when you finish this one · and {{count}} more",
   "online.hub.streakSecured": "{{count}} day streak, secured today",
   "online.hub.streakAtRisk": "{{count}} day streak. You have not played today",
+
+  "online.hub.loading": "Looking up what you have to play today...",
 
   "online.groups.badge": "Groups",
   "online.groups.title": "Your groups",
@@ -911,13 +878,16 @@ const en: Record<TranslationKey, string> = {
   "online.groups.endsSoon": "Ends today",
   "online.groups.finishedHint": "Season {{season}} finished",
   "online.groups.unread": "New",
+  "online.groups.unreadOneA11y": "Has 1 unread alert",
+  "online.groups.unreadA11y": "Has {{count}} unread alerts",
 
   "online.group.loading": "Loading the group...",
   "online.group.badge": "Group",
   "online.group.season": "Season {{season}}",
+  "online.group.seasonRange": "{{from}} – {{to}}",
+  "online.group.seasonCurrent": "Running",
   "online.group.codeTitle": "Invite code",
   "online.group.codeHint": "Anyone with it can join the group.",
-  "online.group.share": "Share",
   "online.group.shareMessage":
     "Join my Color Quest group \"{{name}}\" with the code {{code}}",
   "online.group.finishedTitle": "This season has ended",
@@ -927,10 +897,10 @@ const en: Record<TranslationKey, string> = {
     "The ranking is frozen. Only {{owner}}, who created the group, can start a new season.",
   "online.group.chatStillOpen": "The chat stays open.",
   "online.group.renew": "Start season {{season}}",
-  "online.group.renewing": "Starting...",
   "online.group.renewed": "Season {{season}} is on.",
   "online.group.leaderboard": "Ranking",
   "online.group.leaderboardFrozen": "Final result",
+  "online.group.leaderboardFrozenHint": "Frozen until the season is renewed.",
   "online.group.leaderboardHint": "Season total.",
   "online.group.leaderboardEmpty": "Nobody has played yet",
   "online.group.leaderboardEmptyHint":
@@ -943,23 +913,22 @@ const en: Record<TranslationKey, string> = {
   "online.group.owner": "Creator",
   "online.group.members": "Members",
   "online.group.daily.title": "Today's challenge",
-  "online.group.daily.attemptsLeft": "{{count}} attempts left",
   "online.group.daily.attemptsOne": "1 attempt left",
   "online.group.daily.noAttempts": "You used both attempts",
-  "online.group.daily.best": "Your best score: {{score}}",
-  "online.group.daily.play": "Play",
-  "online.group.daily.notCounting":
-    "You can play the challenge, but it will not count towards this ranking until a new season starts.",
   "online.group.daily.attemptsBoth": "You have two attempts",
   "online.group.daily.closesIn": "Closes in {{time}}",
   "online.group.daily.rule": "The better of your two attempts counts.",
+  "online.group.daily.streakA11y":
+    "Your streak: {{count}} days in a row, across all your groups",
   "online.group.chat.title": "Group chat",
-  "online.group.chat.description": "Trash talk while the season lasts.",
-  "online.group.chat.soon": "In development",
+  "online.group.chat.empty": "Nobody has written yet",
+  "online.group.chat.unread": "Unread",
+  "online.group.notice.seasonRenewed":
+    "Season {{season}} is under way. The standings start from zero.",
+  "online.group.notice.generic": "There is something new in this group.",
   "online.group.leave": "Leave group",
   "online.group.leaveOwnerHint":
     "If you leave, the group passes to the oldest member.",
-  "online.group.left": "You left the group.",
   "online.group.edit": "Group settings",
   "online.group.settings.title": "Group settings",
   "online.group.settings.saveName": "Save name",
@@ -968,11 +937,38 @@ const en: Record<TranslationKey, string> = {
     "Only whoever created the group can change its name.",
   "online.group.settings.notifications": "Alerts from this group",
   "online.group.settings.notificationsHint":
-    "We do not send alerts yet. We keep your choice for when we do.",
+    "Turns on the red dot when something happens here, like a new season. Off, the group stays quiet.",
+  "online.group.settings.seasons": "Seasons",
+  "online.group.settings.seasonsHint":
+    "How many the group has played, and since when.",
   "online.group.settings.membersHint": "Points and days played this season.",
   "online.group.settings.addFriend": "Add {{name}} as a friend",
   "online.group.settings.shareCode": "Share the code",
   "online.group.settings.leaveHint": "You can join again with the code.",
+
+  "online.chat.badge": "Chat",
+  "online.chat.title": "Conversation",
+  "online.chat.loading": "Loading the conversation...",
+  "online.chat.loadingOlder": "Loading earlier messages...",
+  "online.chat.emptyTitle": "Nobody has written here yet",
+  "online.chat.emptyHint":
+    "Write the first message. The whole group sees it.",
+  "online.chat.placeholder": "Message the group",
+  "online.chat.send": "Send the message",
+  "online.chat.sending": "Sending",
+  "online.chat.failed": "Not sent",
+  "online.chat.retry": "Try again",
+  "online.chat.discard": "Discard",
+  "online.chat.stale":
+    "New messages are not coming through. They will appear once the connection is back.",
+  "online.chat.remaining": "{{count}} left",
+  "online.chat.tooLong": "{{count}} too many",
+  "online.chat.today": "Today",
+  "online.chat.yesterday": "Yesterday",
+  "online.chat.finishedHint": "Season over. The chat stays open.",
+  "online.chat.preview": "{{name}}: {{body}}",
+  "online.chat.previewMine": "You: {{body}}",
+  "online.chat.messageA11y": "{{name}}, {{time}}: {{body}}",
 
   "online.daily.badge": "Daily challenge",
   "online.daily.title": "Today's challenge",
@@ -1029,6 +1025,7 @@ const en: Record<TranslationKey, string> = {
   "online.daily.bestIsThis": "This attempt",
   "online.daily.xpEarned": "+{{xp}} XP",
   "online.daily.xpAlready": "Today's XP was already granted",
+  "online.daily.levelUp": "You reached level {{level}}.",
   "online.daily.attemptsOneLeft": "1 attempt left",
   "online.daily.finishAttempt": "Finish",
   "online.daily.roundPoints": "{{points}} pts",
@@ -1062,9 +1059,21 @@ const en: Record<TranslationKey, string> = {
   "online.profile.badge": "Profile",
   "online.profile.title": "Your profile",
   "online.profile.subtitle": "This is how other players see you.",
+  "online.profile.friends": "Friends",
+  "online.profile.friendsHint": "Your requests and your list.",
+  "online.profile.friendsWaiting": "{{count}} waiting for an answer",
+  "online.profile.friendsLoading": "Loading your friends...",
+  "online.profile.friendsUnknown": "We could not find out who is waiting for you.",
+  "online.profile.friendsNone": "No requests waiting.",
+  "online.profile.friendsOpen": "See friends and search players",
+  "online.profile.wantsToBeFriends": "Wants to be your friend",
   "online.profile.account": "Account details",
   "online.profile.memberSince": "Member since",
   "online.profile.nextLevel": "{{xp}} XP to reach level {{level}}.",
+  "online.profile.dailyToday": "You earned {{xp}} XP today with the challenge.",
+  "online.profile.dailyPlayed": "You already played today's challenge.",
+  "online.profile.dailyPending": "Today's challenge hasn't given you XP yet.",
+  "online.profile.streakA11y": "{{count}} days in a row playing the challenge",
   "online.profile.edit": "Change name",
   "online.profile.save": "Save",
   "online.profile.cancel": "Cancel",
@@ -1091,6 +1100,8 @@ const en: Record<TranslationKey, string> = {
   "online.friends.incomingHint": "Accept to appear in each other's friends ranking.",
   "online.friends.outgoing": "Sent requests",
   "online.friends.accept": "Accept",
+  "online.friends.pendingOneA11y": "You have 1 friend request",
+  "online.friends.pendingA11y": "You have {{count}} friend requests",
   "online.friends.reject": "Decline",
   "online.friends.cancel": "Cancel",
   "online.friends.remove": "Remove",
@@ -1117,7 +1128,7 @@ const en: Record<TranslationKey, string> = {
   "online.leaderboard.emptyFriendsHint":
     "Add friends and they will show up here sorted by XP.",
 
-  "online.error.generic": "Something went wrong. Try again.",
+  "online.error.generic": "The server returned an unexpected error.",
   "online.error.network":
     "We could not reach the server. Check your connection.",
   "online.error.credentials": "Wrong email or password.",
@@ -1144,13 +1155,13 @@ const en: Record<TranslationKey, string> = {
 
 const fr: Record<TranslationKey, string> = {
   "common.back": "Accueil",
-  "common.backShort": "Retour",
   "common.exit": "Quitter",
   "common.next": "Suivant",
   "common.retry": "Réessayer",
   "common.share": "Partager",
   "common.loading": "Chargement du jeu...",
   "common.continue": "Continuer",
+  "challenge.imageMissing": "Image indisponible",
 
   "a11y.back": "Revenir",
   "a11y.close": "Fermer",
@@ -1172,7 +1183,6 @@ const fr: Record<TranslationKey, string> = {
   "landing.offline.title": "Hors ligne",
   "landing.offline.description":
     "Mode entraînement et parties de groupe sur cet appareil.",
-  "landing.soon": "Bientôt",
   "landing.footer": "Le mode en ligne arrivera avec la prochaine mise à jour.",
 
   "offline.badge": "Mode hors ligne",
@@ -1224,7 +1234,6 @@ const fr: Record<TranslationKey, string> = {
 
   "party.round.title": "Résultat de l'image",
   "party.round.correct": "Bonne couleur",
-  "party.round.you": "{{name}}",
 
   "party.final.title": "Classement final",
   "party.final.coopTitle": "Résultat de l'équipe",
@@ -1240,12 +1249,6 @@ const fr: Record<TranslationKey, string> = {
   "party.final.replay": "Rejouer",
   "party.final.home": "Retour aux modes",
 
-  "home.badge": "Color Quest",
-  "home.title": "Mets ton œil\npour la couleur à l'épreuve",
-  "home.subtitle":
-    "Choisis un mode de jeu et montre à quel point tu approches la couleur parfaite.",
-  "home.footer": "D'autres modes de jeu arrivent.",
-  "home.soon": "Bientôt",
   "home.best": "Record : {{score}}",
   "home.bestAverage": "Record : {{average}} %",
 
@@ -1262,10 +1265,6 @@ const fr: Record<TranslationKey, string> = {
   "mode.multicolor.description":
     "Reconstitue toutes les couleurs d'un même logo, une par une.",
 
-  "game.kicker": "Color Quest",
-  "game.title": "Devine la couleur",
-  "game.subtitle":
-    "Ajuste le sélecteur jusqu'à ce que le résultat ressemble au défi.",
   "game.check": "Vérifier",
   "game.empty.title": "Aucun défi disponible.",
   "game.empty.subtitle":
@@ -1292,7 +1291,6 @@ const fr: Record<TranslationKey, string> = {
   "result.value": "Luminosité",
 
   "summary.title": "Jeu terminé",
-  "summary.subtitle": "Tu as réussi tous les défis disponibles.",
   "summary.total": "Score total",
   "summary.average": "Moyenne",
   "summary.record": "Nouveau record !",
@@ -1311,7 +1309,6 @@ const fr: Record<TranslationKey, string> = {
   "daily.done.subtitle": "Reviens demain pour une nouvelle couleur.",
   "daily.score": "Ton résultat d'aujourd'hui : {{score}}%",
 
-
   "score.perfect": "Parfait !",
   "score.close": "Très proche !",
   "score.good": "Bon essai",
@@ -1328,17 +1325,15 @@ const fr: Record<TranslationKey, string> = {
   "settings.title": "Réglages du son",
   "settings.music": "Musique",
   "settings.sfx": "Effets",
-  "settings.close": "Fermer",
 
   // --- Mode en ligne -----------------------------------------------------
   "online.session.restoring": "Restauration de ta session...",
   "online.level": "Niveau {{level}}",
   "online.xp": "{{xp}} XP",
-  "online.xpToNext": "Encore {{xp}} XP",
 
   "online.auth.badge": "Mode en ligne",
   "online.auth.title": "Connexion",
-  "online.auth.titleRegister": "Cree ton compte",
+  "online.auth.titleRegister": "Crée ton compte",
   "online.auth.subtitle":
     "Il te faut un compte pour jouer, avoir des amis et figurer au classement.",
   "online.auth.subtitleRegister":
@@ -1348,20 +1343,20 @@ const fr: Record<TranslationKey, string> = {
   "online.auth.username": "Pseudo",
   "online.auth.usernamePlaceholder": "coloriste",
   "online.auth.usernameHint":
-    "De 3 a 24 caracteres : lettres, chiffres et . _ - Tu pourras le changer.",
+    "De 3 à 24 caractères : lettres, chiffres et . _ - Tu pourras le changer.",
   "online.auth.email": "Email",
   "online.auth.emailPlaceholder": "toi@email.com",
-  "online.auth.emailHint": "L'email utilise a la creation du compte.",
+  "online.auth.emailHint": "L'email utilisé à la création du compte.",
   "online.auth.password": "Mot de passe",
   "online.auth.passwordPlaceholder": "••••••••",
-  "online.auth.passwordHint": "8 caracteres minimum.",
+  "online.auth.passwordHint": "8 caractères minimum.",
   "online.auth.switchToRegister": "Pas encore de compte ?",
-  "online.auth.switchToLogin": "Deja un compte ?",
+  "online.auth.switchToLogin": "Déjà un compte ?",
   "online.auth.offlineNote":
     "Le mode hors ligne fonctionne toujours sans compte ni connexion : tes records locaux ne bougent pas.",
   "online.auth.error.passwordRequired": "Saisis ton mot de passe.",
-  "online.auth.error.passwordShort": "{{min}} caracteres minimum.",
-  "online.auth.error.usernameLength": "Entre 3 et 24 caracteres.",
+  "online.auth.error.passwordShort": "{{min}} caractères minimum.",
+  "online.auth.error.usernameLength": "Entre 3 et 24 caractères.",
   "online.auth.error.usernameChars": "Uniquement lettres, chiffres et . _ -",
   "online.auth.error.email": "Cet email ne semble pas valide.",
   "online.auth.error.code": "Le code contient {{length}} chiffres.",
@@ -1370,57 +1365,39 @@ const fr: Record<TranslationKey, string> = {
   "online.auth.apple": "Continuer avec Apple",
   "online.auth.connecting": "Connexion...",
   "online.auth.unavailable":
-    "Le mode en ligne n'est pas configure dans cette version. Le reste du jeu fonctionne normalement.",
+    "Le mode en ligne n'est pas configuré dans cette version. Le reste du jeu fonctionne normalement.",
   "online.auth.verify.title": "Confirme ton email",
   "online.auth.verify.subtitle":
-    "Nous avons envoye un code a 6 chiffres a {{email}}.",
-  "online.auth.verify.code": "Code de verification",
+    "Nous avons envoyé un code à 6 chiffres à {{email}}.",
+  "online.auth.verify.code": "Code de vérification",
   "online.auth.verify.codePlaceholder": "123456",
   "online.auth.verify.hint": "Regarde aussi dans les spams.",
   "online.auth.verify.submit": "Confirmer",
   "online.auth.verify.resend": "Envoyer un autre code",
-  "online.auth.verify.resent": "Code renvoye.",
+  "online.auth.verify.resent": "Code renvoyé.",
   "online.auth.verify.back": "Changer d'email",
 
-  "online.hub.badge": "Mode en ligne",
-  "online.hub.title": "Comment veux-tu\njouer ?",
-  "online.hub.subtitle":
-    "Affronte tes amis dans un groupe prive, ou regarde ton classement.",
-  "online.hub.globalRank": "Rang mondial",
-  "online.hub.friendsRank": "Parmi tes amis",
-  "online.hub.ofPlayers": "sur {{total}} joueurs",
-  "online.hub.friendCount": "{{count}} amis",
-  "online.hub.profile.title": "Profil",
-  "online.hub.profile.description": "Ton niveau, ton XP et les donnees du compte.",
-  "online.hub.friends.title": "Amis",
-  "online.hub.friends.description": "Cherche des joueurs et gere tes demandes.",
-  "online.hub.leaderboard.title": "Classement",
-  "online.hub.leaderboard.description": "Le classement mondial et celui de tes amis.",
-  "online.hub.match.title": "Partie en ligne",
-  "online.hub.match.description": "Affronte d'autres joueurs en temps reel.",
-  "online.hub.match.locked": "Necessite les parties en temps reel · en cours",
-
   "online.hub.playSection": "Jouer",
-  "online.hub.playHint": "Le defi du jour se joue avec ou sans groupe.",
-  "online.hub.playHintPending":
-    "Chaque groupe a son propre defi du jour. Il t'en reste a jouer.",
-  "online.hub.playHintDone": "Tu as joue le defi du jour dans tous tes groupes.",
-  "online.hub.group.play": "Jouer le defi",
-  "online.hub.group.played": "Defi du jour joue · meilleur {{score}}",
+  "online.hub.playHintDone":
+    "Tu as joué le défi du jour dans tous tes groupes.",
+  "online.hub.group.played": "Défi du jour joué · meilleur {{score}}",
   "online.hub.todayPoints": "Points du jour",
-  "online.hub.todayPointsHint": "Tous groupes confondus",
-  "online.hub.accountSection": "Ton compte",
-  "online.hub.accountHint": "Profil, amis et classement mondial.",
 
+  "online.hub.dayLeft": "Il te reste {{count}} défis",
+  "online.hub.dayLeftOne": "Il te reste 1 défi",
+  "online.hub.dayDone": "Journée terminée",
+  "online.hub.streakDays": "{{count}} jours d'affilée",
+  "online.hub.streakToday": "Aujourd'hui compte déjà",
+  "online.hub.streakPending": "Aujourd'hui ne compte pas encore",
+  "online.hub.tileDone": "Défi terminé",
+  "online.hub.tileClosed": "Fermé pour aujourd'hui",
+  "online.hub.tileOpenHint": "Ouvre le groupe et son classement",
   "online.hub.quickCreate": "Créer un groupe",
   "online.hub.quickJoin": "J'ai un code",
   "online.hub.seeAllGroups": "Voir tous mes groupes",
-  "online.hub.groupsEmpty": "Tu n'es encore dans aucun groupe",
+  "online.hub.groupsEmpty": "Crée ton groupe et défie qui tu veux",
   "online.hub.groupsEmptyHint":
-    "Cree-en un et partage son code, ou rejoins celui de quelqu'un.",
-  "online.hub.moreSection": "Plus",
-  "online.hub.scoreSection": "Ton score",
-  "online.hub.levelProgress": "{{current}} / {{total}} XP pour le niveau {{next}}",
+    "Chaque jour, un logo et une couleur à trouver. Tu joues seulement contre les gens que tu invites.",
   "online.hub.unranked": "—",
 
   "online.tabs.today": "Aujourd'hui",
@@ -1428,19 +1405,14 @@ const fr: Record<TranslationKey, string> = {
   "online.tabs.ranking": "Classement",
   "online.tabs.profile": "Profil",
 
-  "online.hub.question": "De quelle couleur?",
-  "online.hub.queuePosition": "Aujourd'hui · {{index}} sur {{total}}",
   "online.hub.queueDone": "Tout joué · {{total}} groupes",
   "online.hub.allDoneHint": "Tu as joué dans tous tes groupes. Le prochain défi ouvre à 15h00.",
   "online.hub.attempts": "Il te reste {{count}} essais",
   "online.hub.attemptsOne": "Il te reste 1 essai",
-  "online.hub.overtake": "Avec {{points}} tu dépasses {{name}}",
-  "online.hub.competing": "{{count}} sur {{total}} jouent cette saison",
-  "online.hub.nextUp": "Ensuite",
-  "online.hub.opensAfter": "S'ouvre à la fin de celui-ci",
-  "online.hub.opensAfterMore": "S'ouvre à la fin de celui-ci · et {{count}} de plus",
   "online.hub.streakSecured": "Série de {{count}} jours, assurée aujourd'hui",
   "online.hub.streakAtRisk": "Série de {{count}} jours. Tu n'as pas encore joué",
+
+  "online.hub.loading": "Recherche de ce que tu dois jouer aujourd'hui...",
 
   "online.groups.badge": "Groupes",
   "online.groups.title": "Tes groupes",
@@ -1472,13 +1444,16 @@ const fr: Record<TranslationKey, string> = {
   "online.groups.endsSoon": "Se termine aujourd'hui",
   "online.groups.finishedHint": "Saison {{season}} terminée",
   "online.groups.unread": "Nouveau",
+  "online.groups.unreadOneA11y": "A 1 alerte non lue",
+  "online.groups.unreadA11y": "A {{count}} alertes non lues",
 
   "online.group.loading": "Chargement du groupe...",
   "online.group.badge": "Groupe",
   "online.group.season": "Saison {{season}}",
+  "online.group.seasonRange": "{{from}} – {{to}}",
+  "online.group.seasonCurrent": "En cours",
   "online.group.codeTitle": "Code d'invitation",
   "online.group.codeHint": "Qui l'a peut rejoindre le groupe.",
-  "online.group.share": "Partager",
   "online.group.shareMessage":
     "Rejoins mon groupe Color Quest « {{name}} » avec le code {{code}}",
   "online.group.finishedTitle": "Cette saison est terminée",
@@ -1488,10 +1463,11 @@ const fr: Record<TranslationKey, string> = {
     "Le classement est figé. Seul {{owner}}, qui a créé le groupe, peut lancer une nouvelle saison.",
   "online.group.chatStillOpen": "Le chat reste ouvert.",
   "online.group.renew": "Lancer la saison {{season}}",
-  "online.group.renewing": "Lancement...",
   "online.group.renewed": "Saison {{season}} lancée.",
   "online.group.leaderboard": "Classement",
   "online.group.leaderboardFrozen": "Résultat final",
+  "online.group.leaderboardFrozenHint":
+    "Gelé jusqu'au renouvellement de la saison.",
   "online.group.leaderboardHint": "Total de la saison.",
   "online.group.leaderboardEmpty": "Personne n'a encore joué",
   "online.group.leaderboardEmptyHint":
@@ -1504,23 +1480,22 @@ const fr: Record<TranslationKey, string> = {
   "online.group.owner": "Créateur",
   "online.group.members": "Membres",
   "online.group.daily.title": "Défi du jour",
-  "online.group.daily.attemptsLeft": "Il te reste {{count}} essais",
   "online.group.daily.attemptsOne": "Il te reste 1 essai",
   "online.group.daily.noAttempts": "Tu as utilisé tes deux essais",
-  "online.group.daily.best": "Ton meilleur score : {{score}}",
-  "online.group.daily.play": "Jouer",
-  "online.group.daily.notCounting":
-    "Tu peux jouer le défi, mais il ne comptera pas dans ce classement tant qu'une nouvelle saison n'aura pas commencé.",
   "online.group.daily.attemptsBoth": "Tu as deux essais",
   "online.group.daily.closesIn": "Ferme dans {{time}}",
   "online.group.daily.rule": "Le meilleur de tes deux essais compte.",
+  "online.group.daily.streakA11y":
+    "Ta série : {{count}} jours d'affilée, tous groupes confondus",
   "online.group.chat.title": "Chat du groupe",
-  "online.group.chat.description": "Chambrez-vous pendant la saison.",
-  "online.group.chat.soon": "En cours",
+  "online.group.chat.empty": "Personne n'a encore écrit",
+  "online.group.chat.unread": "Non lu",
+  "online.group.notice.seasonRenewed":
+    "La saison {{season}} est lancée. Le classement repart de zéro.",
+  "online.group.notice.generic": "Il y a du nouveau dans ce groupe.",
   "online.group.leave": "Quitter le groupe",
   "online.group.leaveOwnerHint":
     "Si tu pars, le groupe passe au membre le plus ancien.",
-  "online.group.left": "Tu as quitté le groupe.",
   "online.group.edit": "Réglages du groupe",
   "online.group.settings.title": "Réglages du groupe",
   "online.group.settings.saveName": "Enregistrer le nom",
@@ -1529,79 +1504,108 @@ const fr: Record<TranslationKey, string> = {
     "Seule la personne qui a créé le groupe peut en changer le nom.",
   "online.group.settings.notifications": "Alertes de ce groupe",
   "online.group.settings.notificationsHint":
-    "Nous n'envoyons pas encore d'alertes. Ton choix est gardé pour plus tard.",
+    "Allume le point rouge quand il se passe quelque chose ici, une nouvelle saison par exemple. Éteint, le groupe ne te sollicite pas.",
+  "online.group.settings.seasons": "Saisons",
+  "online.group.settings.seasonsHint":
+    "Combien le groupe en a jouées, et depuis quand.",
   "online.group.settings.membersHint": "Points et journées de cette saison.",
   "online.group.settings.addFriend": "Ajouter {{name}} en ami",
   "online.group.settings.shareCode": "Partager le code",
   "online.group.settings.leaveHint": "Tu peux revenir avec le code.",
 
-  "online.daily.badge": "Defi du jour",
-  "online.daily.title": "Le defi du jour",
-  "online.daily.loading": "Chargement du defi du jour...",
+  "online.chat.badge": "Chat",
+  "online.chat.title": "Conversation",
+  "online.chat.loading": "Chargement de la conversation...",
+  "online.chat.loadingOlder": "Chargement des messages précédents...",
+  "online.chat.emptyTitle": "Personne n'a encore écrit ici",
+  "online.chat.emptyHint":
+    "Écris le premier message. Tout le groupe le verra.",
+  "online.chat.placeholder": "Écrire au groupe",
+  "online.chat.send": "Envoyer le message",
+  "online.chat.sending": "Envoi",
+  "online.chat.failed": "Non envoyé",
+  "online.chat.retry": "Réessayer",
+  "online.chat.discard": "Supprimer",
+  "online.chat.stale":
+    "Les nouveaux messages n'arrivent pas. Ils apparaîtront au retour de la connexion.",
+  "online.chat.remaining": "Il reste {{count}}",
+  "online.chat.tooLong": "{{count}} de trop",
+  "online.chat.today": "Aujourd'hui",
+  "online.chat.yesterday": "Hier",
+  "online.chat.finishedHint": "Saison terminée. Le chat reste ouvert.",
+  "online.chat.preview": "{{name}} : {{body}}",
+  "online.chat.previewMine": "Toi : {{body}}",
+  "online.chat.messageA11y": "{{name}}, {{time}} : {{body}}",
+
+  "online.daily.badge": "Défi du jour",
+  "online.daily.title": "Le défi du jour",
+  "online.daily.loading": "Chargement du défi du jour...",
   "online.daily.roundsTitle": "{{count}} images",
   "online.daily.roundsTitleOne": "1 image",
   "online.daily.roundsHint":
-    "Les memes pour tout le monde. Elles changent chaque jour a 15h00.",
+    "Les mêmes pour tout le monde. Elles changent chaque jour à 15h00.",
   "online.daily.statusOpen": "Ouvert",
   "online.daily.statusUsed": "Plus d'essais",
-  "online.daily.statusClosed": "Ferme",
+  "online.daily.statusClosed": "Fermé",
   "online.daily.attemptsLabel": "Essais",
-  "online.daily.attemptsHint": "{{used}} sur 2 utilises",
+  "online.daily.attemptsHint": "{{used}} sur 2 utilisés",
   "online.daily.bestLabel": "Ton meilleur",
   "online.daily.bestHint": "Points du jour",
   "online.daily.closesIn": "Se ferme dans",
-  "online.daily.nextChallengeIn": "Prochain defi dans",
-  "online.daily.cutHint": "Le defi change chaque jour a 15h00, heure de Madrid.",
+  "online.daily.nextChallengeIn": "Prochain défi dans",
+  "online.daily.cutHint":
+    "Le défi change chaque jour à 15h00, heure de Madrid.",
   "online.daily.countdownDays": "{{days}} j {{hours}} h",
   "online.daily.countdownHours": "{{hours}} h {{minutes}} min",
   "online.daily.countdownMinutes": "{{minutes}} min {{seconds}} s",
   "online.daily.countdownSeconds": "{{seconds}} s",
-  "online.daily.closedTitle": "Le defi est ferme",
+  "online.daily.closedTitle": "Le défi est fermé",
   "online.daily.closedHint":
-    "Une nouvelle journee a commence. Recharge pour voir les logos du jour.",
+    "Une nouvelle journée a commencé. Recharge pour voir les logos du jour.",
   "online.daily.reload": "Recharger",
-  "online.daily.noAttemptsTitle": "Tu as deja joue aujourd'hui",
+  "online.daily.noAttemptsTitle": "Tu as déjà joué aujourd'hui",
   "online.daily.noAttemptsHint":
-    "Deux essais par journee. Reviens a l'ouverture du prochain defi.",
+    "Deux essais par journée. Reviens à l'ouverture du prochain défi.",
   "online.daily.noActiveGroups": "Ne compte dans aucun classement",
   "online.daily.countsOne": "Compte dans 1 classement",
   "online.daily.countsMany": "Compte dans {{count}} classements",
-  "online.daily.noGroupTitle": "Ce defi appartient a un groupe",
+  "online.daily.noGroupTitle": "Ce défi appartient à un groupe",
   "online.daily.noGroupHint":
-    "Chaque groupe a son propre defi quotidien, avec d'autres images. Rejoins-en un pour jouer.",
+    "Chaque groupe a son propre défi quotidien, avec d'autres images. Rejoins-en un pour jouer.",
   "online.daily.countsIn": "Compte dans {{group}}",
   "online.daily.countsInHint":
     "Le score du jour compte uniquement dans le classement de ce groupe.",
   "online.daily.goToGroup": "Voir le classement",
   "online.daily.goToGroups": "Voir mes groupes",
-  "online.daily.play": "Jouer le defi",
-  "online.daily.playSecond": "Deuxieme essai",
-  "online.daily.check": "Verifier",
+  "online.daily.play": "Jouer le défi",
+  "online.daily.playSecond": "Deuxième essai",
+  "online.daily.check": "Vérifier",
   "online.daily.finish": "Envoyer l'essai",
   "online.daily.submitting": "Envoi de ton essai...",
   "online.daily.submitFailed": "Impossible d'envoyer l'essai",
-  "online.daily.submitRetry": "Reessayer l'envoi",
+  "online.daily.submitRetry": "Réessayer l'envoi",
   "online.daily.attemptLabel": "Essai",
   "online.daily.attemptValue": "{{number}} sur 2",
-  "online.daily.resultTitle": "Resultat de l'essai",
+  "online.daily.resultTitle": "Résultat de l'essai",
   "online.daily.attemptPoints": "Points",
   "online.daily.position": "Place",
-  "online.daily.positionHint": "Dans le defi du jour",
+  "online.daily.positionHint": "Dans le défi du jour",
   "online.daily.bestIsThis": "C'est cet essai",
   "online.daily.xpEarned": "+{{xp}} XP",
-  "online.daily.xpAlready": "L'XP du jour etait deja accorde",
+  "online.daily.xpAlready": "L'XP du jour était déjà accordé",
+  "online.daily.levelUp": "Tu passes au niveau {{level}}.",
   "online.daily.attemptsOneLeft": "Il te reste 1 essai",
   "online.daily.finishAttempt": "Terminer",
   "online.daily.roundPoints": "{{points}} pts",
-  "online.daily.roundDetail": "Voir le detail de la manche {{round}}",
+  "online.daily.roundDetail": "Voir le détail de la manche {{round}}",
   "online.daily.roundImage": "Image {{round}}",
   "online.daily.missingAsset": "Logo indisponible",
-  "online.daily.rulesTitle": "Comment ca marche",
-  "online.daily.ruleAttempts": "Deux essais par journee ; le meilleur compte.",
+  "online.daily.rulesTitle": "Comment ça marche",
+  "online.daily.ruleAttempts": "Deux essais par journée ; le meilleur compte.",
   "online.daily.ruleBest":
     "Ton meilleur score du jour compte dans chaque groupe actif.",
   "online.daily.ruleServer":
-    "La bonne couleur apparait a la fin de l'essai : c'est le serveur qui verifie.",
+    "La bonne couleur apparaît à la fin de l'essai : c'est le serveur qui vérifie.",
 
   "online.dev.title": "Voyage dans le temps",
   "online.dev.hint":
@@ -1622,36 +1626,53 @@ const fr: Record<TranslationKey, string> = {
 
   "online.profile.badge": "Profil",
   "online.profile.title": "Ton profil",
-  "online.profile.subtitle": "Voila comment les autres joueurs te voient.",
-  "online.profile.account": "Donnees du compte",
+  "online.profile.subtitle": "Voilà comment les autres joueurs te voient.",
+  "online.profile.friends": "Amis",
+  "online.profile.friendsHint": "Tes demandes et ta liste.",
+  "online.profile.friendsWaiting": "{{count}} en attente de réponse",
+  "online.profile.friendsLoading": "Chargement de tes amis...",
+  "online.profile.friendsUnknown": "Impossible de savoir qui t'attend.",
+  "online.profile.friendsNone": "Aucune demande en attente.",
+  "online.profile.friendsOpen": "Voir tes amis et chercher des joueurs",
+  "online.profile.wantsToBeFriends": "Veut être ton ami",
+  "online.profile.account": "Données du compte",
   "online.profile.memberSince": "Membre depuis",
   "online.profile.nextLevel": "Encore {{xp}} XP pour le niveau {{level}}.",
+  "online.profile.dailyToday":
+    "Tu as gagné {{xp}} XP aujourd'hui avec le défi.",
+  "online.profile.dailyPlayed": "Tu as déjà joué le défi du jour.",
+  "online.profile.dailyPending":
+    "Le défi du jour ne t'a pas encore donné d'XP.",
+  "online.profile.streakA11y": "{{count}} jours d'affilée à jouer le défi",
   "online.profile.edit": "Changer de nom",
   "online.profile.save": "Enregistrer",
   "online.profile.cancel": "Annuler",
-  "online.profile.saved": "Nom mis a jour.",
+  "online.profile.saved": "Nom mis à jour.",
   "online.profile.session": "Session",
   "online.profile.sessionHint":
-    "La deconnexion efface la session de cet appareil. Le mode hors ligne n'est pas touche.",
-  "online.profile.logout": "Se deconnecter",
+    "La déconnexion efface la session de cet appareil. Le mode hors ligne n'est pas touché.",
+  "online.profile.logout": "Se déconnecter",
 
   "online.friends.badge": "Amis",
   "online.friends.title": "Tes amis",
   "online.friends.subtitle": "Cherche des joueurs par leur nom et ajoute-les.",
   "online.friends.searchLabel": "Chercher des joueurs",
   "online.friends.searchPlaceholder": "Pseudo",
-  "online.friends.searchHint": "Saisis au moins {{min}} caracteres.",
+  "online.friends.searchHint": "Saisis au moins {{min}} caractères.",
   "online.friends.searching": "Recherche...",
-  "online.friends.noResults": "Personne ne correspond a \u00ab {{query}} \u00bb.",
+  "online.friends.noResults": "Personne ne correspond à « {{query}} ».",
   "online.friends.add": "Ajouter",
   "online.friends.you": "C'est toi",
-  "online.friends.alreadyFriend": "Deja amis",
-  "online.friends.requestSent": "Demande envoyee",
-  "online.friends.requestReceived": "Il t'a ecrit",
-  "online.friends.incoming": "Demandes recues",
-  "online.friends.incomingHint": "Accepte pour apparaitre dans vos classements d'amis.",
-  "online.friends.outgoing": "Demandes envoyees",
+  "online.friends.alreadyFriend": "Déjà amis",
+  "online.friends.requestSent": "Demande envoyée",
+  "online.friends.requestReceived": "T'a écrit",
+  "online.friends.incoming": "Demandes reçues",
+  "online.friends.incomingHint":
+    "Accepte pour apparaître dans vos classements d'amis.",
+  "online.friends.outgoing": "Demandes envoyées",
   "online.friends.accept": "Accepter",
+  "online.friends.pendingOneA11y": "Tu as 1 demande d'ami",
+  "online.friends.pendingA11y": "Tu as {{count}} demandes d'ami",
   "online.friends.reject": "Refuser",
   "online.friends.cancel": "Annuler",
   "online.friends.remove": "Supprimer",
@@ -1664,7 +1685,7 @@ const fr: Record<TranslationKey, string> = {
 
   "online.leaderboard.badge": "Classement",
   "online.leaderboard.title": "Classement",
-  "online.leaderboard.subtitle": "Trie par XP cumulee.",
+  "online.leaderboard.subtitle": "Trié par XP cumulée.",
   "online.leaderboard.global": "Mondial",
   "online.leaderboard.friends": "Amis",
   "online.leaderboard.total": "{{total}} joueurs",
@@ -1673,40 +1694,614 @@ const fr: Record<TranslationKey, string> = {
   "online.leaderboard.loadMore": "Voir plus",
   "online.leaderboard.loadingMore": "Chargement...",
   "online.leaderboard.emptyGlobal": "Le classement est vide",
-  "online.leaderboard.emptyGlobalHint": "Sois le premier a gagner de l'XP.",
+  "online.leaderboard.emptyGlobalHint": "Sois le premier à gagner de l'XP.",
   "online.leaderboard.emptyFriends": "Aucun ami au classement",
   "online.leaderboard.emptyFriendsHint":
-    "Ajoute des amis et ils apparaitront ici, tries par XP.",
+    "Ajoute des amis et ils apparaîtront ici, triés par XP.",
 
-  "online.error.generic": "Quelque chose a mal tourne. Reessaie.",
+  "online.error.generic": "Le serveur a renvoyé une erreur inattendue.",
   "online.error.network":
-    "Impossible de joindre le serveur. Verifie ta connexion.",
+    "Impossible de joindre le serveur. Vérifie ta connexion.",
   "online.error.credentials": "Email ou mot de passe incorrect.",
   "online.error.passwordPwned":
-    "Ce mot de passe apparait dans des fuites connues. Choisis-en un autre.",
+    "Ce mot de passe apparaît dans des fuites connues. Choisis-en un autre.",
   "online.error.passwordWeak": "Ce mot de passe est trop faible.",
   "online.error.codeIncorrect": "Ce code n'est pas correct.",
-  "online.error.codeExpired": "Le code a expire. Demandes-en un nouveau.",
-  "online.error.captcha": "Nous n'avons pas pu verifier que tu es humain.",
-  "online.error.sessionExists": "Tu es deja connecte.",
-  "online.error.emailUsed": "Un compte utilise deja cet email.",
-  "online.error.usernameUsed": "Ce pseudo est deja pris.",
+  "online.error.codeExpired": "Le code a expiré. Demandes-en un nouveau.",
+  "online.error.captcha": "Nous n'avons pas pu vérifier que tu es humain.",
+  "online.error.sessionExists": "Tu es déjà connecté.",
+  "online.error.emailUsed": "Un compte utilise déjà cet email.",
+  "online.error.usernameUsed": "Ce pseudo est déjà pris.",
   "online.error.userNotFound": "Joueur introuvable.",
   "online.error.rateLimited": "Trop de tentatives. Patiente un instant.",
-  "online.error.validation": "Verifie les informations saisies.",
-  "online.error.sessionExpired": "Ta session a expire. Reconnecte-toi.",
-  "online.error.friendExists": "Une demande existe deja avec ce joueur.",
-  "online.error.friendSelf": "Tu ne peux pas t'ajouter toi-meme.",
+  "online.error.validation": "Vérifie les informations saisies.",
+  "online.error.sessionExpired": "Ta session a expiré. Reconnecte-toi.",
+  "online.error.friendExists": "Une demande existe déjà avec ce joueur.",
+  "online.error.friendSelf": "Tu ne peux pas t'ajouter toi-même.",
   "online.error.friendNotFound": "Cette demande n'existe plus.",
   "online.error.dailyClosed":
-    "Le defi que tu jouais est ferme. Recharge pour voir celui du jour.",
-  "online.error.noAttemptsLeft": "Tu as deja utilise tes deux essais du jour.",
+    "Le défi que tu jouais est fermé. Recharge pour voir celui du jour.",
+  "online.error.noAttemptsLeft": "Tu as déjà utilisé tes deux essais du jour.",
+};
+
+const ca: Record<TranslationKey, string> = {
+  "common.back": "Inici",
+  "common.exit": "Surt",
+  "common.next": "Següent",
+  "common.retry": "Reintenta",
+  "common.share": "Comparteix",
+  "common.loading": "Carregant el joc...",
+  "common.continue": "Continua",
+  "challenge.imageMissing": "Imatge no disponible",
+
+  "a11y.back": "Torna",
+  "a11y.close": "Tanca",
+  "a11y.stars": "{{value}} de {{total}} estrelles",
+  "a11y.rank": "Posició {{position}}",
+  "a11y.playersDecrease": "Treu un jugador",
+  "a11y.playersIncrease": "Afegeix un jugador",
+  "a11y.wheel": "Roda de to i saturació",
+  "a11y.brightness": "Brillantor",
+  "a11y.selectedColor": "Color seleccionat",
+
+  "landing.badge": "Color Quest",
+  "landing.title": "Tria com\nvols jugar",
+  "landing.subtitle":
+    "Practica sol o reuneix els teus amics al voltant d'un mateix mòbil.",
+  "landing.online.title": "Online",
+  "landing.online.description":
+    "Competeix contra altres jugadors en temps real.",
+  "landing.online.locked": "Necessita connexió a internet",
+  "landing.offline.title": "Offline",
+  "landing.offline.description":
+    "Mode pràctica i partides en grup en aquest dispositiu.",
+  "landing.footer":
+    "L'offline funciona sense connexió; l'online necessita compte.",
+
+  "offline.badge": "Mode offline",
+  "offline.title": "Pràctica i grup",
+  "offline.subtitle":
+    "Juga tu sol o passeu-vos el mòbil entre diverses persones.",
+  "offline.solo.section": "En solitari",
+  "offline.solo.hint": "Modes de pràctica per a un jugador.",
+  "offline.group.section": "En grup · mateix mòbil",
+  "offline.group.hint": "Fins a 99 jugadors per torns.",
+
+  "party.mode.battle.title": "Batalla d'endevinar",
+  "party.mode.battle.description":
+    "5 imatges per torns. Guanya qui més s'hi acosti.",
+  "party.mode.battle-timed.title": "Batalla contrarellotge",
+  "party.mode.battle-timed.description":
+    "20 segons per jugador per sumar els màxims encerts.",
+  "party.mode.coop.title": "Col·laboratiu",
+  "party.mode.coop.description":
+    "Sumeu les vostres puntuacions per a una nota comuna.",
+  "party.mode.coop-timed.title": "Col·laboratiu contrarellotge",
+  "party.mode.coop-timed.description":
+    "20-30 s per jugador segons quants sigueu; sumeu-ho tot en equip.",
+
+  "party.setup.title": "Configura la partida",
+  "party.setup.playersLabel": "Nombre de jugadors",
+  "party.setup.playersHint": "Entre {{min}} i {{max}} jugadors.",
+  "party.setup.namesLabel": "Noms (opcional)",
+  "party.setup.namesHint": "Deixa-ho en blanc per fer servir «Jugador N».",
+  "party.setup.battleInfo": "{{count}} imatges iguals per a tothom.",
+  "party.setup.coopInfo": "{{count}} imatges per jugador.",
+  "party.setup.timedInfo": "{{seconds}} s per jugador.",
+  "party.setup.start": "Comença la partida",
+
+  "party.playerN": "Jugador {{n}}",
+
+  "party.handoff.title": "Torn de {{name}}",
+  "party.handoff.subtitle": "Passa el mòbil a aquest jugador.",
+  "party.handoff.image": "Imatge {{current}} de {{total}}",
+  "party.handoff.timed": "Tens {{seconds}} segons.",
+  "party.handoff.start": "Estic a punt",
+
+  "party.play.image": "Imatge {{current}} de {{total}}",
+  "party.play.solved": "Encerts: {{count}}",
+  "party.play.check": "Comprova",
+
+  "party.guess.title": "Desat!",
+  "party.guess.hidden": "Passa el mòbil sense mirar el color correcte.",
+
+  "party.round.title": "Resultat de la imatge",
+  "party.round.correct": "Color correcte",
+
+  "party.final.title": "Classificació final",
+  "party.final.coopTitle": "Resultat de l'equip",
+  "party.final.winner": "Guanya {{name}}",
+  "party.final.tie": "Empat!",
+  "party.final.points": "{{score}} pts",
+  "party.final.rounds": "{{count}} encerts",
+  "party.final.teamScore": "{{score}} / {{max}} pts",
+  "party.final.teamAverage": "Mitjana de l'equip: {{average}}%",
+  "party.final.teamRecord": "Millor mitjana de l'equip: {{average}}%",
+  "party.final.teamRecordNew": "Nou rècord de l'equip!",
+  "party.final.contributions": "Aportacions",
+  "party.final.replay": "Torna a jugar",
+  "party.final.home": "Torna als modes",
+
+  "home.best": "Rècord: {{score}}",
+  "home.bestAverage": "Rècord: {{average}}%",
+
+  "mode.quick.title": "Joc ràpid",
+  "mode.quick.description":
+    "Endevina el color de cada repte i supera tots els nivells.",
+  "mode.timed.title": "Contrarellotge",
+  "mode.timed.description":
+    "Encerta el màxim de colors abans que s'acabi el temps.",
+  "mode.daily.title": "Repte diari",
+  "mode.daily.description":
+    "Un color nou cada dia per posar a prova el teu ull.",
+  "mode.multicolor.title": "Multicolor",
+  "mode.multicolor.description":
+    "Reconstrueix tots els colors d'un mateix logotip, un a un.",
+
+  "game.check": "Comprova",
+  "game.empty.title": "No hi ha reptes disponibles.",
+  "game.empty.subtitle":
+    "Revisa el catàleg generat o les metadades dels reptes.",
+  "game.colorStep": "Color {{current}} de {{total}}",
+  "game.runLabel": "Partida",
+  "game.hits": "Encerts: {{count}}",
+  "game.points": "{{score}} pts",
+
+  "progress.label": "Progrés",
+  "progress.counter": "Repte {{current}} de {{total}}",
+
+  "timer.label": "Temps",
+  "timer.seconds": "{{seconds}}s",
+  "streak.label": "Ratxa",
+  "streak.value": "{{count}}",
+
+  "result.kicker": "Resultat",
+  "result.yours": "El teu color",
+  "result.target": "Correcte",
+  "result.deltaTitle": "Diferència",
+  "result.hue": "To",
+  "result.saturation": "Saturació",
+  "result.value": "Brillantor",
+
+  "summary.title": "Joc completat",
+  "summary.total": "Puntuació total",
+  "summary.average": "Mitjana",
+  "summary.record": "Nou rècord!",
+  "summary.best": "Millor: {{score}}",
+  "summary.bestStreak": "Millor ratxa: {{count}}",
+  "summary.points": "Punts",
+  "summary.hits": "Encerts",
+  "summary.hitsOf": "de {{rounds}} intents",
+  "summary.home": "Torna a l'inici",
+  "summary.shareText":
+    "🎨 Color Quest — {{mode}}\nPuntuació: {{total}}/{{max}} ({{average}}%)\n{{stars}}",
+  "summary.shareTimed":
+    "🎨 Color Quest — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} encerts ({{average}}%)\n{{stars}}",
+
+  "daily.done.title": "Repte diari completat",
+  "daily.done.subtitle": "Torna demà per a un color nou.",
+  "daily.score": "El teu resultat d'avui: {{score}}%",
+
+  "score.perfect": "Perfecte!",
+  "score.close": "Molt a prop!",
+  "score.good": "Bon intent",
+  "score.tryAgain": "Continua provant",
+
+  "run.artist": "Ull d'artista!",
+  "run.great": "Quina punteria!",
+  "run.good": "Bona feina",
+  "run.practice": "Continua practicant",
+
+  "validate.correct": "Correcte!",
+  "validate.tryAgain": "Continua provant.",
+
+  "settings.title": "Ajustos de so",
+  "settings.music": "Música",
+  "settings.sfx": "Efectes",
+
+  // --- Mode online -------------------------------------------------------
+  "online.session.restoring": "Recuperant la teva sessió...",
+  "online.level": "Nivell {{level}}",
+  "online.xp": "{{xp}} XP",
+
+  "online.auth.badge": "Mode online",
+  "online.auth.title": "Entra al teu compte",
+  "online.auth.titleRegister": "Crea el teu compte",
+  "online.auth.subtitle":
+    "Necessites un compte per competir, tenir amics i sortir a la classificació.",
+  "online.auth.subtitleRegister":
+    "Tria un nom, guarda el teu progrés i competeix amb la resta de jugadors.",
+  "online.auth.login": "Inicia la sessió",
+  "online.auth.register": "Registra't",
+  "online.auth.username": "Nom de jugador",
+  "online.auth.usernamePlaceholder": "colorista",
+  "online.auth.usernameHint":
+    "De 3 a 24 caràcters: lletres, números i . _ - El podràs canviar després.",
+  "online.auth.email": "Email",
+  "online.auth.emailPlaceholder": "tu@email.com",
+  "online.auth.emailHint": "L'email amb què vas crear el compte.",
+  "online.auth.password": "Contrasenya",
+  "online.auth.passwordPlaceholder": "••••••••",
+  "online.auth.passwordHint": "Mínim 8 caràcters.",
+  "online.auth.switchToRegister": "Encara no tens compte?",
+  "online.auth.switchToLogin": "Ja tens compte?",
+  "online.auth.offlineNote":
+    "El mode offline continua funcionant sense compte ni connexió: els teus rècords locals no es toquen.",
+  "online.auth.error.passwordRequired": "Escriu la teva contrasenya.",
+  "online.auth.error.passwordShort": "Mínim {{min}} caràcters.",
+  "online.auth.error.usernameLength": "Entre 3 i 24 caràcters.",
+  "online.auth.error.usernameChars": "Només lletres, números i . _ -",
+  "online.auth.error.email": "Aquest email no sembla vàlid.",
+  "online.auth.error.code": "El codi té {{length}} dígits.",
+  "online.auth.or": "o",
+  "online.auth.google": "Continua amb Google",
+  "online.auth.apple": "Continua amb Apple",
+  "online.auth.connecting": "Connectant...",
+  "online.auth.unavailable":
+    "El mode online no està configurat en aquesta versió de l'app. La resta del joc funciona igual.",
+  "online.auth.verify.title": "Confirma el teu email",
+  "online.auth.verify.subtitle":
+    "T'hem enviat un codi de 6 dígits a {{email}}.",
+  "online.auth.verify.code": "Codi de verificació",
+  "online.auth.verify.codePlaceholder": "123456",
+  "online.auth.verify.hint": "Mira també a la carpeta de correu brossa.",
+  "online.auth.verify.submit": "Confirma",
+  "online.auth.verify.resend": "Envia un altre codi",
+  "online.auth.verify.resent": "Codi reenviat.",
+  "online.auth.verify.back": "Canvia d'email",
+
+  "online.hub.playSection": "Jugar",
+  "online.hub.playHintDone":
+    "Ja has jugat el repte d'avui a tots els teus grups.",
+  "online.hub.group.played": "Repte d'avui jugat · millor {{score}}",
+  "online.hub.todayPoints": "Punts d'avui",
+
+  "online.hub.dayLeft": "Et queden {{count}} reptes",
+  "online.hub.dayLeftOne": "Et queda 1 repte",
+  "online.hub.dayDone": "Jornada completa",
+  "online.hub.streakDays": "{{count}} dies seguits",
+  "online.hub.streakToday": "Avui ja compta",
+  "online.hub.streakPending": "Avui encara no compta",
+  "online.hub.tileDone": "Repte fet",
+  "online.hub.tileClosed": "Tancat per avui",
+  "online.hub.tileOpenHint": "Obre el grup i la seva classificació",
+  "online.hub.quickCreate": "Crea un grup",
+  "online.hub.quickJoin": "Tinc un codi",
+  "online.hub.seeAllGroups": "Mostra tots els meus grups",
+  "online.hub.groupsEmpty": "Crea el teu grup i repta qui vulguis",
+  "online.hub.groupsEmptyHint":
+    "Cada dia, un logotip i un color per encertar. Competeixes només amb la gent que convidis.",
+  "online.hub.unranked": "—",
+
+  // --- Barra de pestanyes del mode online ---
+  "online.tabs.today": "Avui",
+  "online.tabs.groups": "Grups",
+  "online.tabs.ranking": "Rànquing",
+  "online.tabs.profile": "Perfil",
+
+  // --- El repte d'avui, al menú ---
+  "online.hub.queueDone": "Tot jugat · {{total}} grups",
+  "online.hub.allDoneHint":
+    "Ja has jugat a tots els teus grups. El repte següent obre a les 15:00.",
+  "online.hub.attempts": "Et queden {{count}} intents",
+  "online.hub.attemptsOne": "Et queda 1 intent",
+  "online.hub.streakSecured": "Ratxa de {{count}} jornades, assegurada avui",
+  "online.hub.streakAtRisk":
+    "Ratxa de {{count}} jornades. Avui encara no has jugat",
+
+  "online.hub.loading": "Buscant el que has de jugar avui...",
+
+  "online.groups.badge": "Grups",
+  "online.groups.title": "Els teus grups",
+  "online.groups.subtitle":
+    "Cada grup competeix 10 dies. Quan s'acaba, només el seu creador el pot reiniciar.",
+  "online.groups.loading": "Carregant els teus grups...",
+  "online.groups.emptyTitle": "Encara no ets a cap grup",
+  "online.groups.emptyHint":
+    "Crea'n un i convida els teus amics amb el codi, o entra amb el que t'hagin passat.",
+  "online.groups.tabCreate": "Crear",
+  "online.groups.tabJoin": "Unir-m'hi",
+  "online.groups.nameLabel": "Nom del grup",
+  "online.groups.namePlaceholder": "Els Pinzells",
+  "online.groups.nameHint": "Entre 2 i 40 caràcters. El veuran els altres.",
+  "online.groups.createSubmit": "Crea el grup",
+  "online.groups.codeLabel": "Codi d'invitació",
+  "online.groups.codePlaceholder": "K7QMBN",
+  "online.groups.codeHint": "6 caràcters. Tant és majúscules com minúscules.",
+  "online.groups.joinSubmit": "Entra al grup",
+  "online.groups.created": "Grup creat. Comparteix el codi per convidar.",
+  "online.groups.joined": "Ja hi ets a dins.",
+  "online.groups.mine": "Els meus grups",
+  "online.groups.members": "{{count}} membres",
+  "online.groups.membersOne": "1 membre",
+  "online.groups.statusActive": "Actiu",
+  "online.groups.statusFinished": "Acabat",
+  "online.groups.daysLeft": "Queden {{days}} dies",
+  "online.groups.lastDay": "Últim dia",
+  "online.groups.endsSoon": "Acaba avui",
+  "online.groups.finishedHint": "Temporada {{season}} acabada",
+  "online.groups.unread": "Novetats",
+  "online.groups.unreadOneA11y": "Té 1 avís sense llegir",
+  "online.groups.unreadA11y": "Té {{count}} avisos sense llegir",
+
+  "online.group.loading": "Carregant el grup...",
+  "online.group.badge": "Grup",
+  "online.group.season": "Temporada {{season}}",
+  "online.group.seasonRange": "{{from}} – {{to}}",
+  "online.group.seasonCurrent": "En curs",
+  "online.group.codeTitle": "Codi d'invitació",
+  "online.group.codeHint": "Qui el tingui pot entrar al grup.",
+  "online.group.shareMessage":
+    "Entra al meu grup «{{name}}» de Color Quest amb el codi {{code}}",
+  "online.group.finishedTitle": "Aquesta temporada s'ha acabat",
+  "online.group.finishedOwner":
+    "La classificació queda congelada. La pots reiniciar quan vulguis: els punts tornen a zero, però el teu XP i el teu nivell no es toquen.",
+  "online.group.finishedMember":
+    "La classificació queda congelada. Només {{owner}}, que va crear el grup, pot començar una temporada nova.",
+  "online.group.chatStillOpen": "El xat continua obert.",
+  "online.group.renew": "Comença la temporada {{season}}",
+  "online.group.renewed": "Temporada {{season}} en marxa.",
+  "online.group.leaderboard": "Classificació",
+  "online.group.leaderboardFrozen": "Resultat final",
+  "online.group.leaderboardFrozenHint":
+    "Congelada fins que es renovi la temporada.",
+  "online.group.leaderboardHint": "Acumulat de la temporada.",
+  "online.group.leaderboardEmpty": "Encara no hi ha jugat ningú",
+  "online.group.leaderboardEmptyHint":
+    "Les puntuacions del repte diari apareixen aquí tan bon punt algú jugui.",
+  "online.group.points": "{{points}} pts",
+  "online.group.daysPlayed": "{{days}} jornades",
+  "online.group.dayPlayed": "1 jornada",
+  "online.group.notPlayed": "Sense jugar",
+  "online.group.you": "Tu",
+  "online.group.owner": "Creador",
+  "online.group.members": "Membres",
+  "online.group.daily.title": "Repte d'avui",
+  "online.group.daily.attemptsOne": "Et queda 1 intent",
+  "online.group.daily.noAttempts": "Ja has fet servir els dos intents",
+  "online.group.daily.attemptsBoth": "Tens dos intents",
+  "online.group.daily.closesIn": "Tanca d'aquí a {{time}}",
+  "online.group.daily.rule": "Compta el millor dels dos intents.",
+  "online.group.daily.streakA11y":
+    "La teva ratxa: {{count}} dies seguits jugant, a tots els teus grups",
+  "online.group.chat.title": "Xat del grup",
+  "online.group.chat.empty": "Encara no hi ha escrit ningú",
+  "online.group.chat.unread": "Sense llegir",
+  "online.group.notice.seasonRenewed":
+    "La temporada {{season}} ja és en marxa. La classificació comença de zero.",
+  "online.group.notice.generic": "Hi ha novetats en aquest grup.",
+  "online.group.leave": "Surt del grup",
+  "online.group.leaveOwnerHint":
+    "Si te'n vas, el grup passa al membre més antic.",
+  "online.group.edit": "Ajustos del grup",
+  "online.group.settings.title": "Ajustos del grup",
+  "online.group.settings.saveName": "Desa el nom",
+  "online.group.settings.renamed": "Nom canviat.",
+  "online.group.settings.ownerOnly":
+    "Només qui va crear el grup en pot canviar el nom.",
+  "online.group.settings.notifications": "Avisos d'aquest grup",
+  "online.group.settings.notificationsHint":
+    "Encén el punt vermell quan passa alguna cosa aquí, com una temporada nova. Apagat, el grup no et reclama l'atenció.",
+  "online.group.settings.seasons": "Temporades",
+  "online.group.settings.seasonsHint":
+    "Quantes en porta el grup, i des de quan.",
+  "online.group.settings.membersHint": "Punts i jornades d'aquesta temporada.",
+  "online.group.settings.addFriend": "Afegeix {{name}} com a amic",
+  "online.group.settings.shareCode": "Comparteix el codi",
+  "online.group.settings.leaveHint": "Hi pots tornar a entrar amb el codi.",
+
+  "online.chat.badge": "Xat",
+  "online.chat.title": "Conversa",
+  "online.chat.loading": "Carregant la conversa...",
+  "online.chat.loadingOlder": "Portant el que hi havia abans...",
+  "online.chat.emptyTitle": "Aquí no hi ha escrit ningú",
+  "online.chat.emptyHint": "Escriu el primer missatge. El veurà tot el grup.",
+  "online.chat.placeholder": "Escriu al grup",
+  "online.chat.send": "Envia el missatge",
+  "online.chat.sending": "Enviant",
+  "online.chat.failed": "No s'ha enviat",
+  "online.chat.retry": "Reintenta",
+  "online.chat.discard": "Descarta",
+  "online.chat.stale":
+    "No arriba res nou. Apareixerà tan bon punt torni la connexió.",
+  "online.chat.remaining": "En queden {{count}}",
+  "online.chat.tooLong": "Te'n sobren {{count}}",
+  "online.chat.today": "Avui",
+  "online.chat.yesterday": "Ahir",
+  "online.chat.finishedHint": "Temporada acabada. El xat continua obert.",
+  "online.chat.preview": "{{name}}: {{body}}",
+  "online.chat.previewMine": "Tu: {{body}}",
+  "online.chat.messageA11y": "{{name}}, {{time}}: {{body}}",
+
+  "online.daily.badge": "Repte diari",
+  "online.daily.title": "El repte d'avui",
+  "online.daily.loading": "Carregant el repte d'avui...",
+  "online.daily.roundsTitle": "{{count}} imatges",
+  "online.daily.roundsTitleOne": "1 imatge",
+  "online.daily.roundsHint":
+    "Les mateixes per a tothom. Canvien cada dia a les 15:00.",
+  "online.daily.statusOpen": "Obert",
+  "online.daily.statusUsed": "Sense intents",
+  "online.daily.statusClosed": "Tancat",
+  "online.daily.attemptsLabel": "Intents",
+  "online.daily.attemptsHint": "{{used}} de 2 fets",
+  "online.daily.bestLabel": "El teu millor",
+  "online.daily.bestHint": "Punts d'avui",
+  "online.daily.closesIn": "Es tanca d'aquí a",
+  "online.daily.nextChallengeIn": "Pròxim repte d'aquí a",
+  "online.daily.cutHint": "El repte canvia cada dia a les 15:00, hora de Madrid.",
+  "online.daily.countdownDays": "{{days}} d {{hours}} h",
+  "online.daily.countdownHours": "{{hours}} h {{minutes}} min",
+  "online.daily.countdownMinutes": "{{minutes}} min {{seconds}} s",
+  "online.daily.countdownSeconds": "{{seconds}} s",
+  "online.daily.closedTitle": "El repte ha tancat",
+  "online.daily.closedHint":
+    "Ha començat una jornada nova. Torna a carregar per veure els logotips d'avui.",
+  "online.daily.reload": "Torna a carregar",
+  "online.daily.noAttemptsTitle": "Avui ja has jugat",
+  "online.daily.noAttemptsHint":
+    "Són dos intents per jornada. Torna quan obri el repte següent.",
+  "online.daily.noActiveGroups": "No compta a cap classificació",
+  "online.daily.countsOne": "Compta a 1 classificació",
+  "online.daily.countsMany": "Compta a {{count}} classificacions",
+  "online.daily.noGroupTitle": "Aquest repte és d'un grup",
+  "online.daily.noGroupHint":
+    "Cada grup té el seu propi repte diari, amb altres imatges. Entra en un per jugar.",
+  "online.daily.countsIn": "Compta a {{group}}",
+  "online.daily.countsInHint":
+    "La puntuació d'avui només suma a la classificació d'aquest grup.",
+  "online.daily.goToGroup": "Mostra la classificació",
+  "online.daily.goToGroups": "Mostra els meus grups",
+  "online.daily.play": "Juga el repte",
+  "online.daily.playSecond": "Segon intent",
+  "online.daily.check": "Comprova",
+  "online.daily.finish": "Envia l'intent",
+  "online.daily.submitting": "Enviant el teu intent...",
+  "online.daily.submitFailed": "No s'ha pogut enviar l'intent",
+  "online.daily.submitRetry": "Reintenta l'enviament",
+  "online.daily.attemptLabel": "Intent",
+  "online.daily.attemptValue": "{{number}} de 2",
+  "online.daily.resultTitle": "Resultat de l'intent",
+  "online.daily.attemptPoints": "Punts",
+  "online.daily.position": "Posició",
+  "online.daily.positionHint": "Al repte d'avui",
+  "online.daily.bestIsThis": "És aquest intent",
+  "online.daily.xpEarned": "+{{xp}} XP",
+  "online.daily.xpAlready": "L'XP d'avui ja estava concedit",
+  "online.daily.levelUp": "Has pujat al nivell {{level}}.",
+  "online.daily.attemptsOneLeft": "Et queda 1 intent",
+  "online.daily.finishAttempt": "Acaba",
+  "online.daily.roundPoints": "{{points}} pts",
+  "online.daily.roundDetail": "Mostra el detall de la ronda {{round}}",
+  "online.daily.roundImage": "Imatge {{round}}",
+  "online.daily.missingAsset": "Logotip no disponible",
+  "online.daily.rulesTitle": "Com funciona",
+  "online.daily.ruleAttempts": "Dos intents per jornada; compta el millor.",
+  "online.daily.ruleBest":
+    "La teva millor puntuació del dia suma a cada grup actiu.",
+  "online.daily.ruleServer":
+    "El color correcte apareix en tancar l'intent: ho comprova el servidor.",
+
+  "online.dev.title": "Viatge en el temps",
+  "online.dev.hint":
+    "Només en desenvolupament. El desfasament es perd en reiniciar el backend.",
+  "online.dev.day": "+1 dia",
+  "online.dev.tenDays": "+10 dies",
+  "online.dev.endSeason": "Acaba aquesta temporada",
+  "online.dev.reset": "Torna al temps real",
+  "online.dev.offset": "Desfasament: {{days}} d {{hours}} h",
+  "online.dev.realTime": "En temps real",
+
+  "online.error.groupNotFound": "Aquest grup no existeix o ja no hi ets.",
+  "online.error.groupCodeInvalid": "Aquest codi no existeix.",
+  "online.error.alreadyMember": "Ja ets en aquest grup.",
+  "online.error.notGroupOwner": "Només qui va crear el grup pot fer això.",
+  "online.error.seasonStillActive":
+    "La temporada continua en marxa: encara no es pot reiniciar.",
+
+  "online.profile.badge": "Perfil",
+  "online.profile.title": "El teu perfil",
+  "online.profile.subtitle": "Així et veu la resta de jugadors.",
+  "online.profile.friends": "Amics",
+  "online.profile.friendsHint": "Les teves sol·licituds i la teva llista.",
+  "online.profile.friendsWaiting": "{{count}} esperant resposta",
+  "online.profile.friendsLoading": "Carregant els teus amics...",
+  "online.profile.friendsUnknown": "No hem pogut saber qui t'espera.",
+  "online.profile.friendsNone": "No tens cap sol·licitud pendent.",
+  "online.profile.friendsOpen": "Mostra els amics i busca jugadors",
+  "online.profile.wantsToBeFriends": "Vol ser el teu amic",
+  "online.profile.account": "Dades del compte",
+  "online.profile.memberSince": "Membre des de",
+  "online.profile.nextLevel": "Falten {{xp}} XP per al nivell {{level}}.",
+  "online.profile.dailyToday": "Avui has guanyat {{xp}} XP amb el repte.",
+  "online.profile.dailyPlayed": "Avui ja has jugat el repte.",
+  "online.profile.dailyPending": "El repte d'avui encara no t'ha donat XP.",
+  "online.profile.streakA11y": "{{count}} dies seguits jugant el repte",
+  "online.profile.edit": "Canvia el nom",
+  "online.profile.save": "Desa",
+  "online.profile.cancel": "Cancel·la",
+  "online.profile.saved": "Nom actualitzat.",
+  "online.profile.session": "Sessió",
+  "online.profile.sessionHint":
+    "En sortir s'esborra la sessió d'aquest dispositiu. El mode offline no es veu afectat.",
+  "online.profile.logout": "Tanca la sessió",
+
+  "online.friends.badge": "Amics",
+  "online.friends.title": "Els teus amics",
+  "online.friends.subtitle": "Busca jugadors pel seu nom i afegeix-los.",
+  "online.friends.searchLabel": "Busca jugadors",
+  "online.friends.searchPlaceholder": "Nom d'usuari",
+  "online.friends.searchHint": "Escriu com a mínim {{min}} caràcters.",
+  "online.friends.searching": "Buscant...",
+  "online.friends.noResults": "No hi ha ningú que coincideixi amb «{{query}}».",
+  "online.friends.add": "Afegeix",
+  "online.friends.you": "Ets tu",
+  "online.friends.alreadyFriend": "Ja sou amics",
+  "online.friends.requestSent": "Sol·licitud enviada",
+  "online.friends.requestReceived": "T'ha escrit",
+  "online.friends.incoming": "Sol·licituds rebudes",
+  "online.friends.incomingHint":
+    "Accepta-la per veure-us a la classificació d'amics.",
+  "online.friends.outgoing": "Sol·licituds enviades",
+  "online.friends.accept": "Accepta",
+  "online.friends.pendingOneA11y": "Tens 1 sol·licitud d'amistat",
+  "online.friends.pendingA11y": "Tens {{count}} sol·licituds d'amistat",
+  "online.friends.reject": "Rebutja",
+  "online.friends.cancel": "Cancel·la",
+  "online.friends.remove": "Elimina",
+  "online.friends.list": "Amics",
+  "online.friends.listCount": "{{count}} en total.",
+  "online.friends.loading": "Carregant els amics...",
+  "online.friends.emptyTitle": "Encara no tens amics",
+  "online.friends.emptyHint":
+    "Busca algú pel seu nom d'usuari i envia-li una sol·licitud.",
+
+  "online.leaderboard.badge": "Classificació",
+  "online.leaderboard.title": "Rànquing",
+  "online.leaderboard.subtitle": "S'ordena per XP acumulat.",
+  "online.leaderboard.global": "Mundial",
+  "online.leaderboard.friends": "Amics",
+  "online.leaderboard.total": "{{total}} jugadors",
+  "online.leaderboard.you": "tu",
+  "online.leaderboard.loading": "Carregant la classificació...",
+  "online.leaderboard.loadMore": "Mostra'n més",
+  "online.leaderboard.loadingMore": "Carregant...",
+  "online.leaderboard.emptyGlobal": "La classificació és buida",
+  "online.leaderboard.emptyGlobalHint": "Sigues el primer a sumar XP.",
+  "online.leaderboard.emptyFriends": "Cap amic a la classificació",
+  "online.leaderboard.emptyFriendsHint":
+    "Afegeix amics i apareixeran aquí ordenats per XP.",
+
+  "online.error.generic": "El servidor ha respost amb un error inesperat.",
+  "online.error.network":
+    "No hem pogut connectar amb el servidor. Revisa la teva connexió.",
+  "online.error.credentials": "Email o contrasenya incorrectes.",
+  "online.error.passwordPwned":
+    "Aquesta contrasenya ha aparegut en filtracions conegudes. Tria'n una altra.",
+  "online.error.passwordWeak": "Aquesta contrasenya és massa feble.",
+  "online.error.codeIncorrect": "Aquest codi no és correcte.",
+  "online.error.codeExpired": "El codi ha caducat. Demana'n un de nou.",
+  "online.error.captcha": "No hem pogut verificar que ets una persona.",
+  "online.error.sessionExists": "Ja tens la sessió oberta.",
+  "online.error.emailUsed": "Ja hi ha un compte amb aquest email.",
+  "online.error.usernameUsed": "Aquest nom d'usuari ja està agafat.",
+  "online.error.userNotFound": "No hem trobat aquest jugador.",
+  "online.error.rateLimited": "Massa intents. Espera un moment.",
+  "online.error.validation": "Revisa les dades introduïdes.",
+  "online.error.sessionExpired": "La teva sessió ha caducat. Torna a entrar.",
+  "online.error.friendExists": "Ja hi ha una sol·licitud amb aquest jugador.",
+  "online.error.friendSelf": "No et pots afegir a tu mateix.",
+  "online.error.friendNotFound": "Aquesta sol·licitud ja no existeix.",
+  "online.error.dailyClosed":
+    "El repte que estaves jugant ha tancat. Torna a carregar per veure el d'avui.",
+  "online.error.noAttemptsLeft": "Ja has fet servir els dos intents d'avui.",
 };
 
 const resources: Record<string, Partial<Record<TranslationKey, string>>> = {
   es,
   en,
   fr,
+  ca,
 };
 
 function detectLocale(): string {

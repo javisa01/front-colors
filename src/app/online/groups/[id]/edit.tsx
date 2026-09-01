@@ -9,8 +9,9 @@ import type {
   GroupDetail,
   GroupLeaderboard,
   GroupMember,
+  GroupSeason,
 } from "@/api/types";
-import { AmbientOrbs } from "@/design/Ambient";
+import { AmbientMesh } from "@/design/Ambient";
 import { Avatar, playerTint } from "@/design/Avatar";
 import { Button, IconButton } from "@/design/Button";
 import { ErrorBanner, Loading, Pill } from "@/design/Feedback";
@@ -18,8 +19,15 @@ import { Field, Notice, Toggle } from "@/design/Form";
 import { Card, Screen, SectionHeader } from "@/design/Layout";
 import { Color, Radius, Space, Type } from "@/design/tokens";
 import { t } from "@/i18n";
-import { GROUP_NAME_MAX, GROUP_NAME_MIN, playedDaysLabel } from "@/online/groups";
+import {
+  GROUP_NAME_MAX,
+  GROUP_NAME_MIN,
+  playedDaysLabel,
+  seasonRange,
+} from "@/online/groups";
+import { relationOf, type Relation } from "@/online/friends";
 import { useSession } from "@/online/session";
+import { useSocial } from "@/online/social";
 import { getGroupNotifications, setGroupNotifications } from "@/utils/storage";
 
 /**
@@ -46,12 +54,29 @@ import { getGroupNotifications, setGroupNotifications } from "@/utils/storage";
  */
 export default function GroupSettingsScreen(): ReactElement {
   const { api, user } = useSession();
+  const { apply: applySocial } = useSocial();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const groupId = Array.isArray(id) ? id[0] : (id ?? null);
 
   const [group, setGroup] = useState<GroupDetail | null>(null);
   const [board, setBoard] = useState<GroupLeaderboard | null>(null);
+  /**
+   * Las temporadas jugadas, de la más reciente a la más antigua.
+   *
+   * El orden lo da el servidor (`seasonNumber` descendente) y se respeta: la
+   * que está en curso encabeza la lista, que es como se lee un historial.
+   *
+   * Es lo único de la app que dice que el grupo tuvo un pasado. Renovar no
+   * borra nada (3.3), pero la clasificación se filtra por la ventana de la
+   * temporada en curso, así que al empezar la siguiente el podio anterior
+   * desaparece de la vista sin dejar rastro. Aquí queda el rastro.
+   *
+   * El servidor da las fechas, no los ganadores: `GET /groups/:id/leaderboard`
+   * solo sabe de la temporada actual. Enseñar cuántas van y desde cuándo es
+   * todo lo que hay, y es más que nada.
+   */
+  const [seasons, setSeasons] = useState<GroupSeason[] | null>(null);
   const [friends, setFriends] = useState<FriendsOverview | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -68,21 +93,29 @@ export default function GroupSettingsScreen(): ReactElement {
     if (!groupId) return;
     setError(null);
     try {
-      const [detail, leaderboard, overview] = await Promise.all([
+      const [detail, leaderboard, overview, history] = await Promise.all([
         api.groups.get(groupId),
         api.groups.leaderboard(groupId),
         // La lista de amigos es lo que decide si un miembro sale con el botón
         // de agregar o con «ya sois amigos». Sin ella el botón mentiría.
         api.friends.list(),
+        // Con su propio `catch`: el historial es un apunte al pie, y quedarse
+        // sin él no vale tumbar unos ajustes que van sobre todo del código de
+        // invitación.
+        api.groups.seasons(groupId).catch(() => null),
       ]);
       setGroup(detail.group);
       setBoard(leaderboard);
       setFriends(overview);
+      setSeasons(history?.seasons ?? null);
+      // Sale gratis: esta pantalla ya necesitaba la lista, así que el contador
+      // de la barra se pone al día sin una petición más.
+      applySocial(overview);
       setName((current) => (current === "" ? detail.group.name : current));
     } catch (loadError) {
       setError(describeError(loadError));
     }
-  }, [api, groupId]);
+  }, [api, applySocial, groupId]);
 
   useFocusEffect(
     useCallback(() => {
@@ -203,13 +236,12 @@ export default function GroupSettingsScreen(): ReactElement {
         eyebrow={t("online.group.badge")}
         title={t("online.group.settings.title")}
         backTo="/online/groups"
-        backdrop={<AmbientOrbs />}
+        backdrop={<AmbientMesh />}
       >
         {error ? (
           <ErrorBanner
             message={error}
             onRetry={() => void load()}
-            retryLabel={t("common.retry")}
           />
         ) : (
           <Loading label={t("online.group.loading")} />
@@ -231,11 +263,19 @@ export default function GroupSettingsScreen(): ReactElement {
       eyebrow={group.name}
       title={t("online.group.settings.title")}
       backTo={{ pathname: "/online/groups/[id]", params: { id: group.id } }}
-      backdrop={<AmbientOrbs />}
+      backdrop={<AmbientMesh />}
       onRefresh={refresh}
       refreshing={refreshing}
     >
-      {error ? <ErrorBanner message={error} /> : null}
+      {/*
+        Este banner recoge dos clases de fallo —releer la pantalla y las
+        acciones de dentro—, y `load` sirve para las dos: si lo que falló fue
+        la lectura, la repite; si fue una acción, deja la pantalla al día para
+        volver a intentarla sabiendo cómo está de verdad.
+      */}
+      {error ? (
+        <ErrorBanner message={error} onRetry={() => void load()} />
+      ) : null}
       {notice ? <Notice message={notice} /> : null}
 
       <Rosette members={rosette} youId={user?.id} total={group.memberCount} />
@@ -255,6 +295,9 @@ export default function GroupSettingsScreen(): ReactElement {
           <Button
             label={t("online.group.settings.saveName")}
             icon="check"
+            // Verde: cierra bien lo que se estaba editando. No es una accion
+            // "de grupos", es la confirmacion de un cambio.
+            tone="green"
             disabled={!canSave}
             loading={saving}
             onPress={() => void rename()}
@@ -337,6 +380,32 @@ export default function GroupSettingsScreen(): ReactElement {
         />
       </View>
 
+      {/* ------------------------- Temporadas ---------------------------- */}
+      {/*
+        Va aquí, justo antes de la salida, porque es lo único de la pantalla que
+        mira hacia atrás. Y solo si hay más de una: en un grupo estrenado, una
+        sección que dice «Temporada 1, en curso» no cuenta nada que el resto de
+        la ficha no diga ya.
+      */}
+      {seasons != null && seasons.length > 1 ? (
+        <>
+          <SectionHeader
+            title={t("online.group.settings.seasons")}
+            hint={t("online.group.settings.seasonsHint")}
+          />
+          <Card style={styles.block}>
+            {seasons.map((season, index) => (
+              <SeasonRow
+                key={season.id}
+                season={season}
+                current={season.id === group.currentSeason.id}
+                last={index === seasons.length - 1}
+              />
+            ))}
+          </Card>
+        </>
+      ) : null}
+
       {/* ---------------------------- Salir ----------------------------- */}
       <Button
         label={t("online.group.leave")}
@@ -351,6 +420,38 @@ export default function GroupSettingsScreen(): ReactElement {
           : t("online.group.settings.leaveHint")}
       </Text>
     </Screen>
+  );
+}
+
+/**
+ * Una temporada del historial: cuál fue y entre qué fechas.
+ *
+ * Sin puntuaciones a propósito. El servidor no las guarda por temporada más
+ * allá de la actual —la clasificación se deriva filtrando los intentos por la
+ * ventana—, y poner una cifra aquí obligaría a inventarla. Decir cuántas van y
+ * desde cuándo es verdad entera.
+ */
+function SeasonRow({
+  season,
+  current,
+  last,
+}: {
+  season: GroupSeason;
+  current: boolean;
+  last: boolean;
+}): ReactElement {
+  return (
+    <View style={[styles.seasonRow, last && styles.seasonRowLast]}>
+      <View style={styles.seasonText}>
+        <Text style={Type.bodyStrong}>
+          {t("online.group.season", { season: season.seasonNumber })}
+        </Text>
+        <Text style={Type.caption}>{seasonRange(season)}</Text>
+      </View>
+      {current ? (
+        <Pill label={t("online.group.seasonCurrent")} tone="accent" />
+      ) : null}
+    </View>
   );
 }
 
@@ -422,25 +523,6 @@ function Rosette({
 // Miembros
 // ---------------------------------------------------------------------------
 
-type Relation = "you" | "friend" | "pending" | "none";
-
-/** Qué eres de esta persona: tú mismo, su amigo, o todavía nadie. */
-function relationOf(
-  memberId: string,
-  youId: string | undefined,
-  friends: FriendsOverview | null,
-): Relation {
-  if (memberId === youId) return "you";
-  if (friends?.friends.some((entry) => entry.user.id === memberId)) return "friend";
-  if (
-    friends?.outgoing.some((entry) => entry.user.id === memberId) ||
-    friends?.incoming.some((entry) => entry.user.id === memberId)
-  ) {
-    return "pending";
-  }
-  return "none";
-}
-
 function MemberRow({
   member,
   score,
@@ -504,6 +586,26 @@ function MemberRow({
 const styles = StyleSheet.create({
   block: {
     marginBottom: Space.xxl,
+  },
+
+  // -- Temporadas -----------------------------------------------------------
+  seasonRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Space.md,
+    paddingBottom: Space.md,
+    marginBottom: Space.md,
+    borderBottomWidth: 1,
+    borderBottomColor: Color.border.subtle,
+  },
+  seasonRowLast: {
+    paddingBottom: 0,
+    marginBottom: 0,
+    borderBottomWidth: 0,
+  },
+  seasonText: {
+    flex: 1,
+    gap: Space.xxs,
   },
 
   // -- Roseta ---------------------------------------------------------------

@@ -1,5 +1,7 @@
 import type { ApiClient } from "./client";
 import type {
+  ChatMessage,
+  ChatPage,
   DailyAnswer,
   DailyOverview,
   DailyStatus,
@@ -127,6 +129,53 @@ export function createApi(client: ApiClient) {
       leave: (groupId: string) =>
         client.request<null>(`/groups/${groupId}/members/me`, {
           method: "DELETE",
+        }),
+    },
+
+    /**
+     * El chat del grupo (apartado 7 del plan).
+     *
+     * Va por **sondeo, no por WebSocket**: es una decisión cerrada, y por eso
+     * el mismo endpoint tiene dos modos que devuelven la conversación en
+     * órdenes distintos. `history` sube por el historial, `since` pregunta por
+     * lo nuevo. Pedir los dos cursores a la vez es un 400.
+     *
+     * **Ninguna de las tres llamadas mira el estado de la temporada**, ni aquí
+     * ni en el servidor: un grupo terminado sigue siendo un sitio donde hablar
+     * (regla 5.2.1). Lo único que se comprueba es la pertenencia.
+     */
+    chat: {
+      /**
+       * Una página de historial, **del más nuevo al más viejo**. Sin `before`
+       * es la primera página, o sea el final de la conversación.
+       */
+      history: (
+        groupId: string,
+        options: { before?: string; limit?: number } = {},
+      ) =>
+        client.request<ChatPage>(`/groups/${groupId}/messages`, {
+          query: { before: options.before, limit: options.limit },
+        }),
+
+      /**
+       * Solo lo que ha llegado después de `after`, **en orden cronológico**.
+       * Es la llamada del sondeo, y la que hay que dejar de hacer al salir de
+       * la pantalla o al pasar la app a segundo plano.
+       */
+      since: (groupId: string, after: string, limit?: number) =>
+        client.request<ChatPage>(`/groups/${groupId}/messages`, {
+          query: { after, limit },
+        }),
+
+      /**
+       * Envía un mensaje. El servidor lo recorta antes de medirlo y rechaza
+       * con `MESSAGE_TOO_LONG` a partir de 500 caracteres; el limitador de
+       * ritmo son 20 por minuto y por jugador.
+       */
+      send: (groupId: string, body: string) =>
+        client.request<{ message: ChatMessage }>(`/groups/${groupId}/messages`, {
+          method: "POST",
+          body: { body },
         }),
     },
 

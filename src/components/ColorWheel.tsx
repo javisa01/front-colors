@@ -100,6 +100,17 @@ const NOTIFY_INTERVAL_MS = 40;
 
 const THUMB_SIZE = 28;
 const SLIDER_WIDTH = 30;
+
+/**
+ * Lo que el selector ocupa **a la derecha de la rueda**: el deslizador y su
+ * hueco.
+ *
+ * Se exporta para que quien quiera dibujar algo encima de la rueda sepa dónde
+ * cae su centro sin adivinarlo. Hoy lo usa el tutorial, que pinta un dedo
+ * fantasma trazando un arco: sin este dato tendría que copiar aquí dos
+ * constantes privadas y romperse el día que cambiaran.
+ */
+export const WHEEL_SIDE_EXTRA = SLIDER_WIDTH + Space.lg;
 /** Grosor del aro blanco del pulgar. Lo bastante para leerse sobre cualquier tono. */
 const THUMB_RING = 3;
 

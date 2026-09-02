@@ -17,18 +17,21 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { ThemeProvider } from "@/design/theme";
 import { Color } from "@/design/tokens";
+import { setLocale, useLocale } from "@/i18n";
 import { setMusicVolume, startMusic } from "@/utils/music";
 import { setSfxVolume } from "@/utils/sound";
 import {
+  getLanguage as loadLanguage,
   getMusicVolume as loadMusicVolume,
   getSfxVolume as loadSfxVolume,
+  loadTutorialSeen,
 } from "@/utils/storage";
 
 /**
@@ -72,6 +75,54 @@ export default function RootLayout() {
     Inter_700Bold,
   });
 
+  const locale = useLocale();
+
+  /**
+   * El idioma guardado se aplica ANTES del primer pintado, no después.
+   *
+   * `@/i18n` arranca con el idioma del teléfono, que es el correcto mientras
+   * nadie haya elegido otro; la preferencia, en cambio, vive en el
+   * almacenamiento y se lee de forma asíncrona. Pintar sin esperarla daría un
+   * primer fotograma en el idioma del dispositivo que acto seguido se sustituye
+   * por el elegido: un parpadeo de texto en la portada, cada arranque, para
+   * todo el que haya cambiado de idioma.
+   *
+   * La espera es gratis en la práctica: una lectura de `AsyncStorage` es más
+   * rápida que registrar cinco tipografías, así que esto ya ha terminado cuando
+   * `useFonts` da el visto bueno.
+   */
+  const [localeReady, setLocaleReady] = useState(false);
+
+  /**
+   * La marca del tutorial se lee AQUÍ, con el idioma, y no en la portada.
+   *
+   * La portada tiene que decidir en su primer render si se aparta para dejar
+   * paso a la bienvenida, y `AsyncStorage` es asíncrono: leerla allí
+   * enseñaría la portada un instante antes de taparla. Es el mismo parpadeo
+   * que el splash ya está evitando con las tipografías.
+   *
+   * Se guarda en el módulo de almacenamiento, no en un estado: quien la
+   * necesita es una pantalla que aún no existe cuando esto resuelve.
+   */
+  const [tutorialReady, setTutorialReady] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const stored = await loadLanguage();
+      if (stored) {
+        setLocale(stored);
+      }
+      setLocaleReady(true);
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      await loadTutorialSeen();
+      setTutorialReady(true);
+    })();
+  }, []);
+
   useEffect(() => {
     /*
       Se destapa también si la carga FALLÓ. Quedarse con el splash puesto
@@ -79,10 +130,10 @@ export default function RootLayout() {
       una app que no arranca: sin fuentes, se ve con la del sistema y se juega
       igual.
     */
-    if (fontsLoaded || fontError) {
+    if ((fontsLoaded || fontError) && localeReady && tutorialReady) {
       void SplashScreen.hideAsync().catch(() => {});
     }
-  }, [fontsLoaded, fontError]);
+  }, [fontsLoaded, fontError, localeReady, tutorialReady]);
 
   useEffect(() => {
     (async () => {
@@ -93,9 +144,10 @@ export default function RootLayout() {
     })();
   }, []);
 
-  // Ni un render con la fuente equivocada: mientras tanto el splash sigue
-  // cubriendo la pantalla, así que aquí no hay nada que enseñar.
-  if (!fontsLoaded && !fontError) {
+  // Ni un render con la fuente equivocada —ni con el idioma equivocado—:
+  // mientras tanto el splash sigue cubriendo la pantalla, así que aquí no hay
+  // nada que enseñar.
+  if ((!fontsLoaded && !fontError) || !localeReady || !tutorialReady) {
     return null;
   }
 
@@ -120,7 +172,30 @@ export default function RootLayout() {
               van en claro.
             */}
             <StatusBar style="light" />
+            {/*
+              La `key` con el idioma es lo que hace efectivo un cambio de idioma
+              en lo que ya está en pantalla.
+
+              `t()` es una función de módulo: devuelve la cadena del idioma
+              activo en el momento de llamarla, y no avisa a nadie cuando ese
+              idioma cambia. Repintar solo este layout tampoco bastaría —el
+              navegador envuelve cada pantalla en un `StaticContainer`, que
+              existe justamente para NO repintarlas cuando su padre lo hace—,
+              así que las pantallas ya montadas se quedarían en el idioma
+              anterior hasta que algo las tocara.
+
+              Cambiar la `key` las vuelve a montar todas de una vez, con lo que
+              cada `t()` se vuelve a evaluar. La ruta actual no se pierde: el
+              estado de navegación lo guarda el contenedor, que está por encima
+              de este layout y no se remonta. Lo que sí se pierde es el estado
+              local de las pantallas, y por eso el ajuste de idioma solo está
+              donde no hay partida en curso — menús y portada, nunca `game`.
+
+              El precio se paga una vez, y solo cuando alguien cambia de idioma
+              a propósito.
+            */}
             <Stack
+              key={locale}
               screenOptions={{
                 headerShown: false,
                 contentStyle: { backgroundColor: Color.surface.canvas },
@@ -128,6 +203,11 @@ export default function RootLayout() {
               }}
             >
               <Stack.Screen name="index" />
+              {/*
+                La bienvenida entra fundiendo y no deslizando: no se llega a
+                ella desde ningún sitio, es lo primero que hay.
+              */}
+              <Stack.Screen name="welcome" options={{ animation: "fade" }} />
               <Stack.Screen name="offline" />
               <Stack.Screen name="online" />
               <Stack.Screen name="party-setup" />

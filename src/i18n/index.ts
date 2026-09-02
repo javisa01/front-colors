@@ -1,3 +1,5 @@
+import { useSyncExternalStore } from "react";
+
 import { getLocales } from "expo-localization";
 
 /**
@@ -14,7 +16,9 @@ import { getLocales } from "expo-localization";
  * `{{nombre}}` y nada más.
  *
  * `expo-localization` solo sirve para detectar el idioma del dispositivo: si un
- * teléfono viene en un idioma que no está aquí, se cae al español.
+ * teléfono viene en un idioma que no está aquí, se cae al español. Ese es el
+ * valor de partida, no una condena: desde los ajustes se puede elegir cualquiera
+ * de los cuatro (`LOCALES`), y la elección se guarda en el teléfono.
  */
 
 type Params = Record<string, string | number>;
@@ -41,7 +45,7 @@ const es = {
   "a11y.brightness": "Brillo",
   "a11y.selectedColor": "Color seleccionado",
 
-  "landing.badge": "Color Quest",
+  "landing.badge": "Hexy",
   "landing.title": "Elige cómo\nquieres jugar",
   "landing.subtitle":
     "Practica en solitario o reúne a tus amigos alrededor de un mismo móvil.",
@@ -53,6 +57,27 @@ const es = {
   "landing.offline.description":
     "Modo práctica y partidas en grupo en este dispositivo.",
   "landing.footer": "Offline funciona sin conexión; online necesita cuenta.",
+
+  // --- Bienvenida y tutorial de la primera vez ---------------------------
+  "welcome.greeting": "Te doy la bienvenida a",
+  "welcome.name": "Hexy",
+  "welcome.cta": "Haz clic en los círculos para continuar",
+  "welcome.continue": "Continuar",
+  "tutorial.memorize": "Memoriza el color",
+  "tutorial.findLabel": "Ahora",
+  "tutorial.findTitle": "Encuéntralo",
+  "tutorial.accuracy": "Precisión",
+  "tutorial.resultNote": "Cuenta cuánto te acercas.",
+  "tutorial.next": "Siguiente",
+  "tutorial.check": "Comprobar",
+  "tutorial.start": "Empezar",
+  "tutorial.skip": "Saltar",
+  "tutorial.chipHole": "Hueco",
+  "tutorial.chipMine": "Tuyo",
+  "tutorial.chipReal": "Real",
+  "dev.tutorialTitle": "Tutorial",
+  "dev.tutorialHint": "Solo en desarrollo. Se quita antes de publicar.",
+  "dev.tutorialButton": "Ver el tutorial otra vez",
 
   "offline.badge": "Modo offline",
   "offline.title": "Práctica y grupo",
@@ -169,9 +194,9 @@ const es = {
   "summary.hitsOf": "de {{rounds}} intentos",
   "summary.home": "Volver al inicio",
   "summary.shareText":
-    "🎨 Color Quest — {{mode}}\nPuntuación: {{total}}/{{max}} ({{average}}%)\n{{stars}}",
+    "🎨 Hexy — {{mode}}\nPuntuación: {{total}}/{{max}} ({{average}}%)\n{{stars}}",
   "summary.shareTimed":
-    "🎨 Color Quest — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} aciertos ({{average}}%)\n{{stars}}",
+    "🎨 Hexy — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} aciertos ({{average}}%)\n{{stars}}",
 
   "daily.done.title": "Reto diario completado",
   "daily.done.subtitle": "Vuelve mañana para un color nuevo.",
@@ -190,9 +215,13 @@ const es = {
   "validate.correct": "¡Correcto!",
   "validate.tryAgain": "Sigue probando.",
 
-  "settings.title": "Ajustes de sonido",
+  "settings.title": "Ajustes",
+  "settings.sound": "Sonido",
   "settings.music": "Música",
   "settings.sfx": "Efectos",
+  "settings.language": "Idioma",
+  "settings.languageHint":
+    "Se usa el del dispositivo hasta que elijas otro. El cambio se aplica al cerrar.",
 
   // --- Modo online -------------------------------------------------------
   "online.session.restoring": "Recuperando tu sesión...",
@@ -324,7 +353,7 @@ const es = {
   "online.group.codeTitle": "Código de invitación",
   "online.group.codeHint": "Quien lo tenga puede entrar en el grupo.",
   "online.group.shareMessage":
-    "Entra en mi grupo «{{name}}» de Color Quest con el código {{code}}",
+    "Entra en mi grupo «{{name}}» de Hexy con el código {{code}}",
   "online.group.finishedTitle": "Esta temporada ha terminado",
   "online.group.finishedOwner":
     "La clasificación queda congelada. Puedes reiniciarla cuando quieras: los puntos vuelven a cero, pero tu XP y tu nivel no se tocan.",
@@ -612,7 +641,7 @@ const en: Record<TranslationKey, string> = {
   "a11y.brightness": "Brightness",
   "a11y.selectedColor": "Selected colour",
 
-  "landing.badge": "Color Quest",
+  "landing.badge": "Hexy",
   "landing.title": "Choose how\nyou want to play",
   "landing.subtitle":
     "Practise on your own or gather your friends around a single phone.",
@@ -623,6 +652,27 @@ const en: Record<TranslationKey, string> = {
   "landing.offline.description":
     "Practice mode and group matches on this device.",
   "landing.footer": "Offline works with no connection; online needs an account.",
+
+  // --- Bienvenida y tutorial de la primera vez ---------------------------
+  "welcome.greeting": "Welcome to",
+  "welcome.name": "Hexy",
+  "welcome.cta": "Tap the circles to continue",
+  "welcome.continue": "Continue",
+  "tutorial.memorize": "Memorize the color",
+  "tutorial.findLabel": "Now",
+  "tutorial.findTitle": "Find it",
+  "tutorial.accuracy": "Accuracy",
+  "tutorial.resultNote": "It scores how close you get.",
+  "tutorial.next": "Next",
+  "tutorial.check": "Check",
+  "tutorial.start": "Start",
+  "tutorial.skip": "Skip",
+  "tutorial.chipHole": "Gap",
+  "tutorial.chipMine": "Yours",
+  "tutorial.chipReal": "Real",
+  "dev.tutorialTitle": "Tutorial",
+  "dev.tutorialHint": "Development only. It goes before release.",
+  "dev.tutorialButton": "Show the tutorial again",
 
   "offline.badge": "Offline mode",
   "offline.title": "Practice & group",
@@ -737,9 +787,9 @@ const en: Record<TranslationKey, string> = {
   "summary.hitsOf": "of {{rounds}} guesses",
   "summary.home": "Back to home",
   "summary.shareText":
-    "🎨 Color Quest — {{mode}}\nScore: {{total}}/{{max}} ({{average}}%)\n{{stars}}",
+    "🎨 Hexy — {{mode}}\nScore: {{total}}/{{max}} ({{average}}%)\n{{stars}}",
   "summary.shareTimed":
-    "🎨 Color Quest — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} hits ({{average}}%)\n{{stars}}",
+    "🎨 Hexy — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} hits ({{average}}%)\n{{stars}}",
 
   "daily.done.title": "Daily challenge complete",
   "daily.done.subtitle": "Come back tomorrow for a new color.",
@@ -758,9 +808,13 @@ const en: Record<TranslationKey, string> = {
   "validate.correct": "Correct!",
   "validate.tryAgain": "Keep trying.",
 
-  "settings.title": "Sound settings",
+  "settings.title": "Settings",
+  "settings.sound": "Sound",
   "settings.music": "Music",
   "settings.sfx": "Effects",
+  "settings.language": "Language",
+  "settings.languageHint":
+    "Your device language is used until you pick another. The change applies when you close this.",
 
   // --- Online mode -------------------------------------------------------
   "online.session.restoring": "Restoring your session...",
@@ -889,7 +943,7 @@ const en: Record<TranslationKey, string> = {
   "online.group.codeTitle": "Invite code",
   "online.group.codeHint": "Anyone with it can join the group.",
   "online.group.shareMessage":
-    "Join my Color Quest group \"{{name}}\" with the code {{code}}",
+    "Join my Hexy group \"{{name}}\" with the code {{code}}",
   "online.group.finishedTitle": "This season has ended",
   "online.group.finishedOwner":
     "The ranking is frozen. You can restart it whenever you want: points go back to zero, but your XP and level are untouched.",
@@ -1173,7 +1227,7 @@ const fr: Record<TranslationKey, string> = {
   "a11y.brightness": "Luminosité",
   "a11y.selectedColor": "Couleur sélectionnée",
 
-  "landing.badge": "Color Quest",
+  "landing.badge": "Hexy",
   "landing.title": "Choisis comment\ntu veux jouer",
   "landing.subtitle":
     "Entraîne-toi en solo ou rassemble tes amis autour d'un même téléphone.",
@@ -1184,6 +1238,27 @@ const fr: Record<TranslationKey, string> = {
   "landing.offline.description":
     "Mode entraînement et parties de groupe sur cet appareil.",
   "landing.footer": "Le mode en ligne arrivera avec la prochaine mise à jour.",
+
+  // --- Bienvenida y tutorial de la primera vez ---------------------------
+  "welcome.greeting": "Bienvenue sur",
+  "welcome.name": "Hexy",
+  "welcome.cta": "Touche les cercles pour continuer",
+  "welcome.continue": "Continuer",
+  "tutorial.memorize": "Mémorise la couleur",
+  "tutorial.findLabel": "Maintenant",
+  "tutorial.findTitle": "Trouve-la",
+  "tutorial.accuracy": "Précision",
+  "tutorial.resultNote": "Ce qui compte, c’est à quel point tu t’approches.",
+  "tutorial.next": "Suivant",
+  "tutorial.check": "Vérifier",
+  "tutorial.start": "Commencer",
+  "tutorial.skip": "Passer",
+  "tutorial.chipHole": "Trou",
+  "tutorial.chipMine": "Toi",
+  "tutorial.chipReal": "Vraie",
+  "dev.tutorialTitle": "Tutoriel",
+  "dev.tutorialHint": "Développement uniquement. Il partira avant la sortie.",
+  "dev.tutorialButton": "Revoir le tutoriel",
 
   "offline.badge": "Mode hors ligne",
   "offline.title": "Entraînement & groupe",
@@ -1301,9 +1376,9 @@ const fr: Record<TranslationKey, string> = {
   "summary.hitsOf": "sur {{rounds}} essais",
   "summary.home": "Retour à l'accueil",
   "summary.shareText":
-    "🎨 Color Quest — {{mode}}\nScore : {{total}}/{{max}} ({{average}}%)\n{{stars}}",
+    "🎨 Hexy — {{mode}}\nScore : {{total}}/{{max}} ({{average}}%)\n{{stars}}",
   "summary.shareTimed":
-    "🎨 Color Quest — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} réussites ({{average}}%)\n{{stars}}",
+    "🎨 Hexy — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} réussites ({{average}}%)\n{{stars}}",
 
   "daily.done.title": "Défi quotidien terminé",
   "daily.done.subtitle": "Reviens demain pour une nouvelle couleur.",
@@ -1322,9 +1397,13 @@ const fr: Record<TranslationKey, string> = {
   "validate.correct": "Correct !",
   "validate.tryAgain": "Continue d'essayer.",
 
-  "settings.title": "Réglages du son",
+  "settings.title": "Réglages",
+  "settings.sound": "Son",
   "settings.music": "Musique",
   "settings.sfx": "Effets",
+  "settings.language": "Langue",
+  "settings.languageHint":
+    "Celle de l'appareil est utilisée jusqu'à ce que tu en choisisses une autre. Le changement s'applique à la fermeture.",
 
   // --- Mode en ligne -----------------------------------------------------
   "online.session.restoring": "Restauration de ta session...",
@@ -1455,7 +1534,7 @@ const fr: Record<TranslationKey, string> = {
   "online.group.codeTitle": "Code d'invitation",
   "online.group.codeHint": "Qui l'a peut rejoindre le groupe.",
   "online.group.shareMessage":
-    "Rejoins mon groupe Color Quest « {{name}} » avec le code {{code}}",
+    "Rejoins mon groupe Hexy « {{name}} » avec le code {{code}}",
   "online.group.finishedTitle": "Cette saison est terminée",
   "online.group.finishedOwner":
     "Le classement est figé. Tu peux le relancer quand tu veux : les points repartent à zéro, mais ton XP et ton niveau ne bougent pas.",
@@ -1744,7 +1823,7 @@ const ca: Record<TranslationKey, string> = {
   "a11y.brightness": "Brillantor",
   "a11y.selectedColor": "Color seleccionat",
 
-  "landing.badge": "Color Quest",
+  "landing.badge": "Hexy",
   "landing.title": "Tria com\nvols jugar",
   "landing.subtitle":
     "Practica sol o reuneix els teus amics al voltant d'un mateix mòbil.",
@@ -1757,6 +1836,27 @@ const ca: Record<TranslationKey, string> = {
     "Mode pràctica i partides en grup en aquest dispositiu.",
   "landing.footer":
     "L'offline funciona sense connexió; l'online necessita compte.",
+
+  // --- Bienvenida y tutorial de la primera vez ---------------------------
+  "welcome.greeting": "Et dono la benvinguda a",
+  "welcome.name": "Hexy",
+  "welcome.cta": "Fes clic als cercles per continuar",
+  "welcome.continue": "Continua",
+  "tutorial.memorize": "Memoritza el color",
+  "tutorial.findLabel": "Ara",
+  "tutorial.findTitle": "Troba’l",
+  "tutorial.accuracy": "Precisió",
+  "tutorial.resultNote": "Compta com t’hi acostes.",
+  "tutorial.next": "Següent",
+  "tutorial.check": "Comprova",
+  "tutorial.start": "Comença",
+  "tutorial.skip": "Salta",
+  "tutorial.chipHole": "Buit",
+  "tutorial.chipMine": "Teu",
+  "tutorial.chipReal": "Real",
+  "dev.tutorialTitle": "Tutorial",
+  "dev.tutorialHint": "Només en desenvolupament. Marxara abans de publicar.",
+  "dev.tutorialButton": "Torna a veure el tutorial",
 
   "offline.badge": "Mode offline",
   "offline.title": "Pràctica i grup",
@@ -1874,9 +1974,9 @@ const ca: Record<TranslationKey, string> = {
   "summary.hitsOf": "de {{rounds}} intents",
   "summary.home": "Torna a l'inici",
   "summary.shareText":
-    "🎨 Color Quest — {{mode}}\nPuntuació: {{total}}/{{max}} ({{average}}%)\n{{stars}}",
+    "🎨 Hexy — {{mode}}\nPuntuació: {{total}}/{{max}} ({{average}}%)\n{{stars}}",
   "summary.shareTimed":
-    "🎨 Color Quest — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} encerts ({{average}}%)\n{{stars}}",
+    "🎨 Hexy — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} encerts ({{average}}%)\n{{stars}}",
 
   "daily.done.title": "Repte diari completat",
   "daily.done.subtitle": "Torna demà per a un color nou.",
@@ -1895,9 +1995,13 @@ const ca: Record<TranslationKey, string> = {
   "validate.correct": "Correcte!",
   "validate.tryAgain": "Continua provant.",
 
-  "settings.title": "Ajustos de so",
+  "settings.title": "Ajustos",
+  "settings.sound": "So",
   "settings.music": "Música",
   "settings.sfx": "Efectes",
+  "settings.language": "Idioma",
+  "settings.languageHint":
+    "S'usa el del dispositiu fins que en triïs un altre. El canvi s'aplica en tancar.",
 
   // --- Mode online -------------------------------------------------------
   "online.session.restoring": "Recuperant la teva sessió...",
@@ -2032,7 +2136,7 @@ const ca: Record<TranslationKey, string> = {
   "online.group.codeTitle": "Codi d'invitació",
   "online.group.codeHint": "Qui el tingui pot entrar al grup.",
   "online.group.shareMessage":
-    "Entra al meu grup «{{name}}» de Color Quest amb el codi {{code}}",
+    "Entra al meu grup «{{name}}» de Hexy amb el codi {{code}}",
   "online.group.finishedTitle": "Aquesta temporada s'ha acabat",
   "online.group.finishedOwner":
     "La classificació queda congelada. La pots reiniciar quan vulguis: els punts tornen a zero, però el teu XP i el teu nivell no es toquen.",
@@ -2297,33 +2401,102 @@ const ca: Record<TranslationKey, string> = {
   "online.error.noAttemptsLeft": "Ja has fet servir els dos intents d'avui.",
 };
 
-const resources: Record<string, Partial<Record<TranslationKey, string>>> = {
+export type Locale = "es" | "en" | "fr" | "ca";
+
+const resources: Record<Locale, Partial<Record<TranslationKey, string>>> = {
   es,
   en,
   fr,
   ca,
 };
 
-function detectLocale(): string {
+/**
+ * Los idiomas del selector de ajustes, **cada uno escrito en sí mismo**.
+ *
+ * «Français» y no «Francés»: quien busca su idioma en una lista lo busca con la
+ * palabra que conoce, y esa palabra está justamente en el idioma que todavía no
+ * puede leer. Traducir esta lista la volvería inútil para el único caso que
+ * importa —abrir la app en un idioma que no entiendes y salir de ahí—, así que
+ * estas cuatro cadenas son las únicas de todo el fichero que no pasan por `t()`.
+ *
+ * El orden es el de la lista de arriba y no el alfabético de ningún idioma
+ * concreto: alfabetizar obligaría a reordenar según el idioma activo, y ver los
+ * botones cambiar de sitio al elegir es peor que no tenerlos ordenados.
+ */
+export const LOCALES: readonly { code: Locale; label: string }[] = [
+  { code: "es", label: "Español" },
+  { code: "en", label: "English" },
+  { code: "fr", label: "Français" },
+  { code: "ca", label: "Català" },
+];
+
+export function isLocale(value: string | null | undefined): value is Locale {
+  return value != null && Object.hasOwn(resources, value);
+}
+
+function detectLocale(): Locale {
   try {
     const [primary] = getLocales();
-    const tag = primary?.languageCode ?? "es";
-    return resources[tag] ? tag : "es";
+    const tag = primary?.languageCode;
+    return isLocale(tag) ? tag : "es";
   } catch {
     return "es";
   }
 }
 
-let activeLocale = detectLocale();
+/**
+ * El idioma del teléfono, resuelto una sola vez al cargar el módulo.
+ *
+ * Es el valor de partida: mientras el jugador no elija otro en los ajustes, la
+ * app va en el idioma del dispositivo, que es como se ha comportado siempre.
+ * `_layout.tsx` lo pisa con la preferencia guardada —si la hay— antes del primer
+ * pintado.
+ */
+const activeLocaleDefault = detectLocale();
 
-export function setLocale(locale: string): void {
-  if (resources[locale]) {
-    activeLocale = locale;
+let activeLocale: Locale = activeLocaleDefault;
+
+/**
+ * Quién quiere enterarse de un cambio de idioma.
+ *
+ * `t()` es una función de módulo, no un gancho: nadie se entera de que
+ * `activeLocale` ha cambiado, y React no repinta por su cuenta lo que ya está en
+ * pantalla. Este conjunto es lo que convierte el cambio en algo observable, y
+ * `useLocale()` es la forma de observarlo desde un componente.
+ */
+const listeners = new Set<() => void>();
+
+export function setLocale(locale: Locale): void {
+  if (!isLocale(locale) || locale === activeLocale) {
+    return;
+  }
+
+  activeLocale = locale;
+  for (const listener of listeners) {
+    listener();
   }
 }
 
-export function getLocale(): string {
+export function getLocale(): Locale {
   return activeLocale;
+}
+
+function subscribe(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+/**
+ * El idioma activo, como estado de React.
+ *
+ * `useSyncExternalStore` y no un `useState` global: la fuente de verdad es
+ * `activeLocale`, que existe fuera de React porque `t()` se llama también desde
+ * sitios que no son componentes.
+ */
+export function useLocale(): Locale {
+  return useSyncExternalStore(subscribe, getLocale, getLocale);
 }
 
 function interpolate(template: string, params?: Params): string {

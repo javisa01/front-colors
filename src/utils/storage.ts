@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import { isLocale, type Locale } from "@/i18n";
 import type { GameMode, PartyMode } from "@/types/challenge";
 
 // All persisted keys live under a single namespace so they are easy to find and
@@ -34,7 +35,9 @@ const KEYS = {
   dailyResult: `${PREFIX}daily`,
   musicVolume: `${PREFIX}musicVolume`,
   sfxVolume: `${PREFIX}sfxVolume`,
+  language: `${PREFIX}language`,
   groupNotifications: (groupId: string) => `${PREFIX}groupNotify:${groupId}`,
+  tutorialSeen: `${PREFIX}tutorialSeen`,
 } as const;
 
 async function readJSON<T>(key: string): Promise<T | null> {
@@ -212,6 +215,32 @@ export async function setSfxVolume(volume: number): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// Idioma
+// ---------------------------------------------------------------------------
+
+/**
+ * El idioma **elegido a mano**, o `null` si nunca se ha tocado.
+ *
+ * La ausencia de valor es información, no un hueco que rellenar con un idioma
+ * por defecto: significa «sigue al dispositivo», que es lo que hace la app
+ * mientras nadie diga lo contrario. Por eso esto devuelve `null` y no `"es"`;
+ * quien decide el idioma de partida es `detectLocale()` en `@/i18n`, no el
+ * almacenamiento.
+ *
+ * Se valida contra la lista real de idiomas: un valor guardado por una versión
+ * anterior con más idiomas de los que hoy existen dejaría la app en un
+ * diccionario que ya no está.
+ */
+export async function getLanguage(): Promise<Locale | null> {
+  const value = await readJSON<string>(KEYS.language);
+  return isLocale(value) ? value : null;
+}
+
+export async function setLanguage(locale: Locale): Promise<void> {
+  await writeJSON(KEYS.language, locale);
+}
+
+// ---------------------------------------------------------------------------
 // Avisos de un grupo
 // ---------------------------------------------------------------------------
 
@@ -277,4 +306,47 @@ export async function getMutedGroups(groupIds: string[]): Promise<Set<string>> {
   } catch {
     return new Set();
   }
+}
+
+// ---------------------------------------------------------------------------
+// El tutorial de la primera vez
+// ---------------------------------------------------------------------------
+
+/**
+ * Si ya se ha visto la bienvenida.
+ *
+ * ## Por qué hay una copia en memoria
+ *
+ * La portada tiene que decidir **en su primer render** si se aparta para dejar
+ * paso al tutorial, y una lectura de `AsyncStorage` es asíncrona: consultarla
+ * desde la pantalla enseñaría la portada un instante antes de taparla. Ese
+ * parpadeo es justo el que el splash ya está evitando con las tipografías y el
+ * idioma.
+ *
+ * Así que el layout raíz lee el valor **antes de retirar el splash**
+ * (`loadTutorialSeen`) y lo deja aquí; a partir de ese momento la portada lo
+ * consulta de forma síncrona (`tutorialSeenSync`) y decide sin esperar a nadie.
+ *
+ * Mientras no se haya leído, la respuesta es `true` — «no molestes». Un fallo
+ * de almacenamiento debe costar un tutorial que no se enseña, nunca uno que
+ * reaparece cada vez que se abre la aplicación.
+ */
+let seenCache: boolean | null = null;
+
+export async function loadTutorialSeen(): Promise<boolean> {
+  const value = await readJSON<boolean>(KEYS.tutorialSeen);
+  seenCache = value === true;
+  return seenCache;
+}
+
+/** Solo vale después de `loadTutorialSeen`. Ver arriba. */
+export function tutorialSeenSync(): boolean {
+  return seenCache ?? true;
+}
+
+export async function setTutorialSeen(seen: boolean): Promise<void> {
+  // La copia en memoria se actualiza ANTES de escribir: quien navega justo
+  // detrás de esta llamada lee el valor nuevo aunque el disco vaya lento.
+  seenCache = seen;
+  await writeJSON(KEYS.tutorialSeen, seen);
 }

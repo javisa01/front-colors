@@ -1,11 +1,19 @@
 import Slider from "@react-native-community/slider";
-import { memo, useCallback, useEffect, useState, type ReactElement } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useState,
+  type ReactElement,
+} from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { Flag } from "@/design/Flag";
 import { Icon, type IconName } from "@/design/Icon";
 import { Sheet } from "@/design/Sheet";
-import { Color, Space, Type } from "@/design/tokens";
-import { t } from "@/i18n";
+import { Color, HIT_TARGET, Radius, Space, Type } from "@/design/tokens";
+import { getLocale, LOCALES, setLocale, t, type Locale } from "@/i18n";
+import { selectionTick } from "@/utils/haptics";
 import {
   setMusicVolume as applyMusicVolume,
   getMusicVolume,
@@ -18,17 +26,31 @@ import {
 import {
   getMusicVolume as loadMusicVolume,
   getSfxVolume as loadSfxVolume,
+  setLanguage as saveLanguage,
   setMusicVolume as saveMusicVolume,
   setSfxVolume as saveSfxVolume,
 } from "@/utils/storage";
 
 /**
- * Ajustes de audio.
+ * Ajustes de la app: sonido e idioma.
  *
  * Sustituye a `SettingsModal`. Los cambios de fondo: llega como hoja inferior en
  * lugar de como diálogo centrado —es una preferencia, no una decisión que corte
  * la partida—, los emojis 🎵 y 🔊 pasan a ser iconos del set, y el porcentaje se
  * pinta con cifras de ancho fijo para que no baile mientras se arrastra.
+ *
+ * ## Por qué el idioma se aplica al cerrar y no al tocarlo
+ *
+ * Cambiar de idioma **remonta la app entera** (ver `app/_layout.tsx`), y con
+ * ella esta hoja. Aplicándolo en el `onPress`, el jugador vería desaparecer de
+ * golpe el panel que estaba usando, sin haber pedido cerrarlo: un cambio de
+ * preferencia que se lleva por delante la pantalla se lee como un fallo.
+ *
+ * Así que el toque solo mueve la selección aquí dentro —y la guarda en el
+ * teléfono, que es lo que de verdad no puede perderse— y el idioma se aplica en
+ * `handleClose`, cuando la hoja ya se iba. El texto de la propia hoja sigue en
+ * el idioma anterior hasta ese momento; es correcto, no un descuido: mientras
+ * estás eligiendo, la lista no debe moverse bajo el dedo.
  */
 
 interface SettingsSheetProps {
@@ -82,12 +104,91 @@ function VolumeRow({
   );
 }
 
+interface LanguageOptionProps {
+  locale: Locale;
+  label: string;
+  selected: boolean;
+  onSelect: (locale: Locale) => void;
+}
+
+function LanguageOption({
+  locale,
+  label,
+  selected,
+  onSelect,
+}: LanguageOptionProps): ReactElement {
+  const handlePress = useCallback(() => {
+    if (selected) {
+      return;
+    }
+    selectionTick();
+    playTick();
+    onSelect(locale);
+  }, [locale, onSelect, selected]);
+
+  return (
+    <Pressable
+      onPress={handlePress}
+      style={({ pressed }) => [
+        styles.language,
+        selected && styles.languageSelected,
+        pressed && !selected && styles.languagePressed,
+      ]}
+      accessibilityRole="radio"
+      accessibilityLabel={label}
+      accessibilityState={{ selected }}
+    >
+      <Flag locale={locale} />
+
+      <Text
+        style={[
+          Type.bodyStrong,
+          styles.languageLabel,
+          selected && styles.languageLabelSelected,
+        ]}
+        numberOfLines={1}
+      >
+        {label}
+      </Text>
+
+      {/*
+        El hueco de la marca se reserva siempre, esté o no seleccionada: sin él,
+        la fila elegida sería 17 puntos más estrecha de contenido que las demás y
+        el texto bailaría al cambiar de idioma.
+      */}
+      <View style={styles.check}>
+        {selected ? (
+          <Icon name="check" size={17} color={Color.accent.text} />
+        ) : null}
+      </View>
+    </Pressable>
+  );
+}
+
 function SettingsSheetInner({
   visible,
   onClose,
 }: SettingsSheetProps): ReactElement {
   const [music, setMusic] = useState(getMusicVolume);
   const [sfx, setSfx] = useState(getSfxVolume);
+  const [language, setLanguage] = useState<Locale>(getLocale);
+
+  /*
+    El idioma se relee al abrir, y no solo al montar: esta hoja vive dentro de la
+    cabecera y sobrevive a varias aperturas, así que sin esto conservaría la
+    selección abandonada de la vez anterior.
+
+    Se hace durante el render y no en un efecto —el mismo patrón que usa `Sheet`
+    para montarse—: reajustar estado en un efecto provoca un render en cascada,
+    que es justo lo que desaconseja la regla de React.
+  */
+  const [openedWith, setOpenedWith] = useState(visible);
+  if (visible !== openedWith) {
+    setOpenedWith(visible);
+    if (visible) {
+      setLanguage(getLocale());
+    }
+  }
 
   useEffect(() => {
     if (!visible) {
@@ -124,6 +225,18 @@ function SettingsSheetInner({
   }, []);
 
   /**
+   * Guardar al soltar, además de al cerrar.
+   *
+   * Los volúmenes se persistían solo en `handleClose`, y ahora esta hoja puede
+   * desaparecer sin pasar por ahí: al cambiar de idioma, el árbol se remonta y
+   * la hoja se va con él. Sin esto, el volumen recién ajustado se perdería
+   * justo en esa combinación.
+   */
+  const handleMusicCommit = useCallback((next: number) => {
+    void saveMusicVolume(next);
+  }, []);
+
+  /**
    * Click de muestra **al soltar**, no en cada paso.
    *
    * Sin esto, ajustar el volumen de los efectos es la única preferencia de la
@@ -131,15 +244,26 @@ function SettingsSheetInner({
    * `onValueChange` daría veinte clicks por arrastre: sería volver a meter la
    * ráfaga de audio que se acaba de arreglar en `sound.ts`, esta vez a propósito.
    */
-  const handleSfxCommit = useCallback(() => {
+  const handleSfxCommit = useCallback((next: number) => {
+    void saveSfxVolume(next);
     playTick();
+  }, []);
+
+  const handleLanguageSelect = useCallback((next: Locale) => {
+    setLanguage(next);
+    // Se guarda ya, aunque se aplique al cerrar: si la app muere entre medias,
+    // al volver a abrirla la elección sigue siendo la del jugador.
+    void saveLanguage(next);
   }, []);
 
   const handleClose = useCallback(() => {
     void saveMusicVolume(music);
     void saveSfxVolume(sfx);
+    // No hace nada si el idioma no ha cambiado, así que cerrar la hoja sin tocar
+    // nada no remonta la app.
+    setLocale(language);
     onClose();
-  }, [music, sfx, onClose]);
+  }, [music, sfx, language, onClose]);
 
   return (
     <Sheet
@@ -148,11 +272,14 @@ function SettingsSheetInner({
       placement="bottom"
       title={t("settings.title")}
     >
+      <Text style={[Type.label, styles.section]}>{t("settings.sound")}</Text>
+
       <VolumeRow
         icon="music"
         label={t("settings.music")}
         value={music}
         onChange={handleMusicChange}
+        onCommit={handleMusicCommit}
       />
       <VolumeRow
         icon="volume"
@@ -161,6 +288,24 @@ function SettingsSheetInner({
         onChange={handleSfxChange}
         onCommit={handleSfxCommit}
       />
+
+      <Text style={[Type.label, styles.section]}>{t("settings.language")}</Text>
+
+      <View style={styles.languages} accessibilityRole="radiogroup">
+        {LOCALES.map((option) => (
+          <LanguageOption
+            key={option.code}
+            locale={option.code}
+            label={option.label}
+            selected={option.code === language}
+            onSelect={handleLanguageSelect}
+          />
+        ))}
+      </View>
+
+      <Text style={[Type.caption, styles.hint]}>
+        {t("settings.languageHint")}
+      </Text>
     </Sheet>
   );
 }
@@ -168,6 +313,9 @@ function SettingsSheetInner({
 export const SettingsSheet = memo(SettingsSheetInner);
 
 const styles = StyleSheet.create({
+  section: {
+    marginBottom: Space.md,
+  },
   row: {
     marginBottom: Space.lg,
   },
@@ -185,5 +333,46 @@ const styles = StyleSheet.create({
   slider: {
     width: "100%",
     height: 40,
+  },
+  languages: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: Space.sm,
+  },
+  language: {
+    // Dos por fila: un `flexBasis` por debajo de la mitad deja sitio al hueco
+    // entre columnas, y `flexGrow` reparte lo que sobra. Con un idioma más, la
+    // rejilla se reorganiza sola.
+    flexGrow: 1,
+    flexBasis: "45%",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Space.sm,
+    minHeight: HIT_TARGET,
+    paddingHorizontal: Space.md,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: Color.border.default,
+    backgroundColor: Color.surface.sunken,
+  },
+  languageSelected: {
+    borderColor: Color.accent.border,
+    backgroundColor: Color.accent.surface,
+  },
+  languagePressed: {
+    backgroundColor: Color.surface.interactive,
+  },
+  languageLabel: {
+    flex: 1,
+  },
+  languageLabelSelected: {
+    color: Color.accent.text,
+  },
+  check: {
+    width: 17,
+    alignItems: "center",
+  },
+  hint: {
+    marginTop: Space.md,
   },
 });

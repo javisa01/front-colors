@@ -171,6 +171,125 @@ function AmbientOrbsBase(): ReactElement {
 
 export const AmbientOrbs = memo(AmbientOrbsBase);
 
+/**
+ * Un halo redondo que se apaga hacia fuera.
+ *
+ * Es la pieza que hace posible un orbe **sin borde**. Un círculo de relleno
+ * macizo hay que sacarlo casi entero de la pantalla para que no se lea como un
+ * disco pegado encima; este se puede meter dentro del lienzo y sigue siendo
+ * atmósfera.
+ *
+ * ## Por qué son doce vistas y no un degradado radial
+ *
+ * Porque un degradado radial de `react-native-svg` **no se veía**, y sin un
+ * dispositivo delante no se puede depurar por qué. Doce discos concéntricos con
+ * poca opacidad cada uno acumulan hacia el centro y producen la misma caída
+ * suave usando solo `View` y `borderRadius`: no depende de SVG, ni de cómo
+ * resuelva cada plataforma los porcentajes de un `Defs`, ni de nada que pueda
+ * fallar en silencio.
+ *
+ * Con 0,1 de opacidad por capa, el centro llega a ~0,7 y el borde exterior se
+ * queda en 0,1. Sobre un lienzo casi negro la escalera no se percibe, y menos
+ * aún con el orbe respirando.
+ */
+export function SoftGlow({
+  color,
+  size,
+  /** Opacidad del centro, aproximadamente. Hacia el borde siempre cae a cero. */
+  intensity = 1,
+}: {
+  color: string;
+  size: number;
+  intensity?: number;
+}): ReactElement {
+  return (
+    <View style={{ width: size, height: size }} pointerEvents="none">
+      {GLOW_LAYERS.map((fraction, index) => {
+        const layer = size * fraction;
+        return (
+          <View
+            key={index}
+            pointerEvents="none"
+            style={{
+              position: "absolute",
+              top: (size - layer) / 2,
+              left: (size - layer) / 2,
+              width: layer,
+              height: layer,
+              borderRadius: layer / 2,
+              backgroundColor: color,
+              opacity: 0.1 * intensity,
+            }}
+          />
+        );
+      })}
+    </View>
+  );
+}
+
+/**
+ * La variante difuminada de los orbes. **Solo para la portada.**
+ *
+ * Dos manchas grandes y sin borde en diagonal: violeta arriba a la izquierda y
+ * magenta abajo a la derecha. La diagonal deja libre el centro, que es donde va
+ * el contenido, y las esquinas que quedan vacías son las de la cabecera y el
+ * pie.
+ *
+ * Vive **aparte** de `AmbientOrbs` en vez de sustituirlo: aquel lo comparten
+ * seis pantallas, y cambiarlo movía el fondo de toda la aplicación para
+ * arreglar una. Comparten los relojes y el vaivén, así que las dos siguen
+ * siendo reconociblemente la misma atmósfera.
+ */
+function BlurAmbientOrbsBase(): ReactElement {
+  const glow = useAmbientClock(GLOW_MS);
+  const float = useAmbientClock(FLOAT_MS);
+  const drift = useAmbientClock(DRIFT_MS);
+
+  /*
+    Bastante más opacos que los macizos, y no es contradictorio: al caer a cero
+    en el borde, solo el corazón del halo llega a esta opacidad y el resto de la
+    mancha queda muy por debajo. Con los valores de `AmbientOrbs` no se veía
+    nada.
+  */
+  const violetStyle = useAnimatedStyle(() => ({
+    opacity: 0.5 + glow.get() * 0.22,
+    transform: [
+      { translateX: 14 - drift.get() * 28 },
+      { translateY: -float.get() * 18 },
+      { scale: 1 + glow.get() * 0.08 },
+    ],
+  }));
+
+  const roseStyle = useAnimatedStyle(() => ({
+    opacity: 0.46 + (1 - glow.get()) * 0.22,
+    transform: [
+      { translateX: -12 + drift.get() * 24 },
+      { translateY: float.get() * 22 },
+      { scale: 1 + (1 - glow.get()) * 0.1 },
+    ],
+  }));
+
+  return (
+    <>
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.blurOrb, styles.blurTopLeft, violetStyle]}
+      >
+        <SoftGlow color={Color.ambient.violet[0]} size={BLUR_ORB_SIZE} />
+      </Animated.View>
+
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.blurOrb, styles.blurBottomRight, roseStyle]}
+      >
+        <SoftGlow color={Color.ambient.rose[0]} size={BLUR_ORB_SIZE} />
+      </Animated.View>
+    </>
+  );
+}
+
+export const BlurAmbientOrbs = memo(BlurAmbientOrbsBase);
+
 // ---------------------------------------------------------------------------
 // Constelación de resultados
 // ---------------------------------------------------------------------------
@@ -1364,8 +1483,19 @@ function AmbientThreadBase(): ReactElement {
 
 export const AmbientThread = memo(AmbientThreadBase);
 
+/**
+ * Los radios de los discos de `SoftGlow`, del mayor al menor. Doce capas es
+ * el punto donde la escalera deja de percibirse sin llenar el árbol de vistas.
+ */
+const GLOW_LAYERS = Array.from({ length: 12 }, (_, i) => 1 - i * 0.08);
+
 const ORB_SIZE = 320;
 const HAZE_SIZE = 420;
+/**
+ * El orbe difuminado es bastante mayor que el macizo, y a propósito: un halo
+ * sin borde solo se lee como lavado de color si su caída ocupa media pantalla.
+ */
+const BLUR_ORB_SIZE = 460;
 
 const styles = StyleSheet.create({
   band: {
@@ -1390,6 +1520,12 @@ const styles = StyleSheet.create({
     width: HAZE_SIZE,
     height: HAZE_SIZE,
     borderRadius: Radius.pill,
+  },
+  // El difuminado no lleva `borderRadius`: no tiene borde que redondear.
+  blurOrb: {
+    position: "absolute",
+    width: BLUR_ORB_SIZE,
+    height: BLUR_ORB_SIZE,
   },
   fill: {
     flex: 1,
@@ -1463,5 +1599,13 @@ const styles = StyleSheet.create({
   bottomRight: {
     bottom: -260,
     right: -180,
+  },
+  blurTopLeft: {
+    top: -170,
+    left: -180,
+  },
+  blurBottomRight: {
+    bottom: -190,
+    right: -190,
   },
 });

@@ -1,12 +1,15 @@
-import { useRouter } from "expo-router";
+import { Redirect, useFocusEffect, useRouter } from "expo-router";
 import type { ReactElement } from "react";
+import { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { DevTutorialCard } from "@/components/DevTutorialCard";
 import { SettingsButton } from "@/components/SettingsButton";
-import { AmbientOrbs } from "@/design/Ambient";
+import { BlurAmbientOrbs } from "@/design/Ambient";
 import { OptionRow, Screen } from "@/design/Layout";
 import { Space, Type } from "@/design/tokens";
 import { t } from "@/i18n";
+import { tutorialSeenSync } from "@/utils/storage";
 
 /**
  * Portada: elegir entre jugar sin conexión o en línea.
@@ -20,12 +23,37 @@ import { t } from "@/i18n";
 export default function LandingScreen(): ReactElement {
   const router = useRouter();
 
+  /**
+   * La primera vez, la portada cede el paso.
+   *
+   * El valor ya está leído —lo hace el layout raíz antes de retirar el
+   * splash—, así que esto se resuelve en el primer render y no hay ningún
+   * fotograma de portada antes del tutorial. Se vuelve a mirar al recuperar
+   * el foco porque el botón de desarrollo puede borrar la marca.
+   */
+  const [seen, setSeen] = useState(tutorialSeenSync);
+
+  useFocusEffect(
+    useCallback(() => {
+      setSeen(tutorialSeenSync());
+    }, []),
+  );
+
+  if (!seen) {
+    return <Redirect href="/welcome" />;
+  }
+
   return (
     <Screen
       eyebrow={t("landing.badge")}
       title={t("landing.title")}
       subtitle={t("landing.subtitle")}
-      backdrop={<AmbientOrbs />}
+      /*
+        La variante difuminada es solo de la portada: es la única pantalla sin
+        nada que hacer todavía, y la única donde el fondo puede ocupar tanto
+        sitio sin competir con el contenido. El resto sigue con `AmbientOrbs`.
+      */
+      backdrop={<BlurAmbientOrbs />}
       headerAction={<SettingsButton />}
       contentStyle={styles.content}
     >
@@ -56,6 +84,9 @@ export default function LandingScreen(): ReactElement {
         ya se encarga de que la portada no parezca congelada.
       */}
       <Text style={[Type.caption, styles.footer]}>{t("landing.footer")}</Text>
+
+      {/* Solo en desarrollo. Ver `components/DevTutorialCard`. */}
+      <DevTutorialCard />
     </Screen>
   );
 }

@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { OnlineTabBar } from "@/components/online/OnlineTabBar";
+import { OnlineTour, OnlineTourProvider } from "@/components/online/OnlineTour";
 import { ErrorBanner, Loading } from "@/design/Feedback";
 import { Screen } from "@/design/Layout";
 import { Color } from "@/design/tokens";
@@ -57,46 +58,70 @@ export default function OnlineLayout(): ReactElement {
         <SocialProvider>
           <SessionGate>
             {/*
-              Pestañas, no pila.
+              El recorrido de la primera vez envuelve al navegador y se pinta
+              POR ENCIMA de él, no dentro de ninguna pantalla. Es lo que le
+              permite ir cambiando de pestaña mientras explica la barra sin
+              desmontarse en el primer toque. Ver `components/online/OnlineTour`.
 
-              Los cuatro destinos permanentes —hoy, grupos, ranking, perfil— eran
-              filas dentro del menú principal, y por eso el menú no podía ser un
-              menú: la mitad de su alto la ocupaba un índice de la cuenta. Aquí
-              pasan a ser una barra, y la pantalla de inicio se queda con un solo
-              trabajo, que es decir qué hay que jugar hoy.
-
-              `href: null` saca una ruta de la barra pero la deja navegable con
-              `router.push`. La barra además se esconde sola en esas pantallas
-              —lo decide `OnlineTabBar`—, porque son sitios a los que se entra y
-              de los que se vuelve, no destinos: jugar el reto con una barra de
-              pestañas debajo es invitar a abandonar la partida a media ronda.
+              El provider solo guarda un registro de anclajes y un interruptor
+              —su valor de contexto no cambia nunca—, así que envolver aquí no
+              repinta las pestañas.
             */}
-            <Tabs
-              tabBar={(props) => <OnlineTabBar {...props} />}
-              screenOptions={{
-                headerShown: false,
-                sceneStyle: { backgroundColor: Color.surface.canvas },
-              }}
-            >
-              <Tabs.Screen name="index" />
-              {/* Grupos. La carpeta no lleva `_layout` propio: la lista es
-                  pestaña y la ficha de un grupo es una pantalla profunda. */}
-              <Tabs.Screen name="groups/index" />
-              <Tabs.Screen name="leaderboard" />
-              <Tabs.Screen name="profile" />
+            <OnlineTourProvider>
+              <View style={styles.stage}>
+                {/*
+                  Pestañas, no pila.
 
-              {/* --- Profundas: navegables, pero fuera de la barra --- */}
-              <Tabs.Screen name="auth" options={{ href: null }} />
-              <Tabs.Screen name="friends" options={{ href: null }} />
-              <Tabs.Screen name="groups/[id]/index" options={{ href: null }} />
-              <Tabs.Screen name="groups/[id]/edit" options={{ href: null }} />
-              <Tabs.Screen name="groups/[id]/chat" options={{ href: null }} />
-              {/* `daily/index` ya no es una pantalla: solo redirige a la ficha
-                  del grupo, que es donde se juega desde ella. Sigue declarada
-                  para que los enlaces guardados encuentren la redirección. */}
-              <Tabs.Screen name="daily/index" options={{ href: null }} />
-              <Tabs.Screen name="daily/play" options={{ href: null }} />
-            </Tabs>
+                  Los cuatro destinos permanentes —hoy, grupos, ranking,
+                  perfil— eran filas dentro del menú principal, y por eso el
+                  menú no podía ser un menú: la mitad de su alto la ocupaba un
+                  índice de la cuenta. Aquí pasan a ser una barra, y la pantalla
+                  de inicio se queda con un solo trabajo, que es decir qué hay
+                  que jugar hoy.
+
+                  `href: null` saca una ruta de la barra pero la deja navegable
+                  con `router.push`. La barra además se esconde sola en esas
+                  pantallas —lo decide `OnlineTabBar`—, porque son sitios a los
+                  que se entra y de los que se vuelve, no destinos: jugar el
+                  reto con una barra de pestañas debajo es invitar a abandonar
+                  la partida a media ronda.
+                */}
+                <Tabs
+                  tabBar={(props) => <OnlineTabBar {...props} />}
+                  screenOptions={{
+                    headerShown: false,
+                    sceneStyle: { backgroundColor: Color.surface.canvas },
+                  }}
+                >
+                  <Tabs.Screen name="index" />
+                  {/* Grupos. La carpeta no lleva `_layout` propio: la lista es
+                      pestaña y la ficha de un grupo es una pantalla profunda. */}
+                  <Tabs.Screen name="groups/index" />
+                  <Tabs.Screen name="leaderboard" />
+                  <Tabs.Screen name="profile" />
+
+                  {/* --- Profundas: navegables, pero fuera de la barra --- */}
+                  <Tabs.Screen name="auth" options={{ href: null }} />
+                  <Tabs.Screen name="friends" options={{ href: null }} />
+                  <Tabs.Screen name="groups/[id]/index" options={{ href: null }} />
+                  <Tabs.Screen name="groups/[id]/edit" options={{ href: null }} />
+                  <Tabs.Screen name="groups/[id]/chat" options={{ href: null }} />
+                  {/* `daily/index` ya no es una pantalla: solo redirige a la
+                      ficha del grupo, que es donde se juega desde ella. Sigue
+                      declarada para que los enlaces guardados encuentren la
+                      redirección. */}
+                  <Tabs.Screen name="daily/index" options={{ href: null }} />
+                  <Tabs.Screen name="daily/play" options={{ href: null }} />
+                </Tabs>
+
+                {/*
+                  Después de `<Tabs>` y dentro del mismo padre: el orden del
+                  árbol es lo que pone la capa del recorrido por encima de la
+                  barra flotante. Mientras no corre no pinta nada.
+                */}
+                <OnlineTour />
+              </View>
+            </OnlineTourProvider>
           </SessionGate>
         </SocialProvider>
       </SessionProvider>
@@ -156,6 +181,16 @@ function SessionGate({ children }: { children: ReactNode }): ReactElement {
 }
 
 const styles = StyleSheet.create({
+  /**
+   * El escenario del modo online: las pestañas y, encima, el recorrido.
+   *
+   * Existe solo para dar un padre común a los dos. `<Tabs>` por sí solo llena
+   * la pantalla, pero una capa absoluta necesita algo a lo que referirse, y ese
+   * algo tiene que contener también al navegador o la capa no lo taparía.
+   */
+  stage: {
+    flex: 1,
+  },
   splash: {
     flex: 1,
     justifyContent: "center",

@@ -11,6 +11,12 @@ export interface ChallengeColor {
   // user's selection. Defaults to `hex` when omitted (useful when the color to
   // guess differs from the one drawn in the SVG).
   svgColor?: string;
+  // Every literal the SVG uses to paint this color. A single guessable color can
+  // be drawn with several near-identical literals (`#000000` next to `#020202`,
+  // or the same tone written as `#fff` and `rgb(255,255,255)`); all of them have
+  // to be swapped or the logo repaints only halfway. `svgColor` is kept as the
+  // first entry so older generated data still works.
+  svgColors?: string[];
 }
 
 export interface ChallengeMetadata {

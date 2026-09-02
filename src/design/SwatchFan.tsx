@@ -48,6 +48,17 @@ import { Color, Motion, Radius, type SpectrumTone } from "@/design/tokens";
  * lo que se le está pidiendo a quien mira. Después el vaivén es de un grado y
  * medio y tarda diez segundos en ir y volver — no se percibe como animación,
  * se percibe como que la pantalla no está congelada.
+ *
+ * ## Volver a abrirlo
+ *
+ * «Al montarse» no basta donde vive esto. La pantalla de inicio del online es
+ * una pestaña, y una pestaña no se desmonta al salir de ella: quien se va al
+ * ranking y vuelve encuentra el abanico ya abierto, sin el gesto que explica
+ * qué es. Por eso `replay` — cada valor nuevo vuelve a repartir las muestras.
+ *
+ * No hay salto al reiniciar, y no por suerte: la opacidad de cada muestra **es**
+ * su apertura, así que el estado cerrado es también el invisible. Lo que se ve
+ * no es un abanico que se pliega de golpe, es uno que se reparte otra vez.
  */
 
 /** Los cinco tonos, en el orden en el que se abren. */
@@ -82,7 +93,18 @@ const SWAY_MS = 10_000;
 /** Retardo entre una muestra y la siguiente al abrirse. */
 const STAGGER_MS = 70;
 
-function SwatchFanBase(): ReactElement {
+function SwatchFanBase({
+  replay = 0,
+}: {
+  /**
+   * Cambia este número y el abanico se vuelve a abrir.
+   *
+   * Es un contador y no un booleano porque lo que se pide no es un estado
+   * —«abierto» / «cerrado»— sino un gesto, y un gesto no se puede pedir dos
+   * veces seguidas con el mismo valor.
+   */
+  replay?: number;
+}): ReactElement {
   const sway = useSharedValue(0);
 
   useEffect(() => {
@@ -103,7 +125,13 @@ function SwatchFanBase(): ReactElement {
   return (
     <View style={styles.stage} pointerEvents="none">
       {CHIPS.map((tone, index) => (
-        <Chip key={tone} tone={tone} index={index} sway={sway} />
+        <Chip
+          key={tone}
+          tone={tone}
+          index={index}
+          sway={sway}
+          replay={replay}
+        />
       ))}
     </View>
   );
@@ -115,10 +143,12 @@ function Chip({
   tone,
   index,
   sway,
+  replay,
 }: {
   tone: SpectrumTone;
   index: number;
   sway: SharedValue<number>;
+  replay: number;
 }): ReactElement {
   /** Su sitio en el abanico abierto: de −SPREAD a +SPREAD, repartido. */
   const target = -SPREAD + (index * (SPREAD * 2)) / (CHIPS.length - 1);
@@ -126,11 +156,16 @@ function Chip({
   const lift = useSharedValue(0);
 
   useEffect(() => {
+    // Cerrada y sin pintar antes de repartir. En el primer montaje no hace
+    // nada —ya vale cero—; al repetir es lo que devuelve la muestra al mazo
+    // para que el escalonado tenga de dónde salir.
+    lift.set(0);
+
     // El escalonado es lo que hace que se lea como un abanico que se abre y no
     // como cinco cosas que aparecen a la vez, y por eso cada muestra tiene su
     // propio muelle: uno compartido las abriria en bloque.
     lift.set(withDelay(index * STAGGER_MS, withSpring(1, Motion.springSoft)));
-  }, [index, lift]);
+  }, [index, lift, replay]);
 
   const chipStyle = useAnimatedStyle(() => {
     // El vaivén centrado: reparte el recorrido a los dos lados del reposo en

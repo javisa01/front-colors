@@ -191,22 +191,47 @@ export default function DailyPlayScreen(): ReactElement {
    *
    * Va aquí, colgado del resultado, y no dentro de `submit`: el hook se ocupa
    * de hablar con la API y esto es una decisión de presentación del menú.
+   *
+   * **Una vez por intento, y no una por repintado.** `status` está en las
+   * dependencias porque de él sale la jornada, y `status` cambia solo: el
+   * propio envío lo reescribe con los intentos y la mejor puntuación nuevos, y
+   * el `reload` del focus lo vuelve a traer. Sin la guarda, cada uno de esos
+   * cambios volvía a ejecutar esto con el MISMO resultado, y `addDailyXp`
+   * —que acumula— sumaba dos y tres veces el XP de un solo intento. El
+   * identificador del intento es lo que hace idempotente al efecto.
    */
+  const saved = useRef<string | null>(null);
+
   useEffect(() => {
     if (result == null || groupId == null || status == null) {
       return;
     }
+    if (saved.current === result.attempt.id) {
+      return;
+    }
+    saved.current = result.attempt.id;
+
+    const dateKey = status.challenge.challengeDate;
+
     void saveAttempt(
       groupId,
-      status.challenge.challengeDate,
-      result.attempt.rounds.map((round) => ({
-        answerHex: round.answer.hex,
-        accuracy: round.accuracy,
-      })),
+      dateKey,
+      // Por número de ronda: el anillo reparte los arcos POR POSICIÓN, así que
+      // un orden distinto del servidor pintaría cada acierto en el sector de
+      // otra ronda.
+      [...result.attempt.rounds]
+        .sort((a, b) => a.round - b.round)
+        .map((round) => ({
+          answerHex: round.answer.hex,
+          accuracy: round.accuracy,
+        })),
+      // Con qué puntuación compite por quedarse: de los dos intentos del día se
+      // guarda el mejor, que es el que enseña la cifra del centro del anillo.
+      result.attempt.score,
     );
     // Y lo que este intento ha dado de XP, que el perfil suma para poder decir
     // cuánto has subido hoy. `GET /me` solo trae el total de siempre.
-    void addDailyXp(status.challenge.challengeDate, result.xpEarned);
+    void addDailyXp(dateKey, result.xpEarned);
   }, [result, groupId, status]);
 
   /**

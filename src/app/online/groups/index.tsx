@@ -26,6 +26,7 @@ import {
   silenceMutedGroups,
   sortGroups,
 } from "@/online/groups";
+import { useFirstRunMock } from "@/online/devFirstRun";
 import { useSession } from "@/online/session";
 
 /**
@@ -45,6 +46,15 @@ export default function GroupsScreen(): ReactElement {
 
   const tabBarSpace = useOnlineTabBarSpace();
   const params = useLocalSearchParams<{ action?: string }>();
+  /**
+   * Simulador de primera vez: la lista se pinta vacía sin tocar el servidor.
+   *
+   * Es la segunda pantalla que ve quien entra sin grupos —el recorrido de la
+   * barra manda aquí en su segundo paso—, así que si esta enseñara los grupos
+   * de verdad, la simulación se rompería justo donde hay que mirarla. Fuera de
+   * desarrollo siempre es `false`. Ver `online/devFirstRun`.
+   */
+  const firstRunMock = useFirstRunMock();
 
   const [groups, setGroups] = useState<GroupSummary[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -114,6 +124,13 @@ export default function GroupsScreen(): ReactElement {
       setBusy(false);
     }
   }, [action, api, cleanCode, trimmedName, load, router]);
+
+  /*
+    Lo que se pinta. Se vacía aquí y no en `groups` para que el simulador no
+    toque nada de lo que se guarda ni de lo que se ha pedido: apagarlo devuelve
+    la lista sin volver a preguntar al servidor.
+  */
+  const shown = firstRunMock ? [] : groups;
 
   return (
     <Screen
@@ -213,9 +230,9 @@ export default function GroupsScreen(): ReactElement {
         la peor combinación posible —una pantalla que dice que ha fallado y a la
         vez que sigue trabajando—.
       */}
-      {!groups ? (
+      {!shown ? (
         error ? null : <Loading label={t("online.groups.loading")} />
-      ) : groups.length === 0 ? (
+      ) : shown.length === 0 ? (
         <Card>
           <EmptyState
             icon="users"
@@ -225,7 +242,7 @@ export default function GroupsScreen(): ReactElement {
         </Card>
       ) : (
         <View style={styles.list}>
-          {groups.map((group, index) => (
+          {shown.map((group, index) => (
             <GroupRow
               key={group.id}
               group={group}

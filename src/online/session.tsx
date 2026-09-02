@@ -13,6 +13,7 @@ import { ApiClient } from "@/api/client";
 import { createApi, type Api } from "@/api/endpoints";
 import type { PrivateProfile } from "@/api/types";
 import { clearUser, loadUser, saveUser } from "@/online/sessionStorage";
+import { clearLanding } from "@/utils/storage";
 
 /**
  * Estado de la sesión online.
@@ -142,6 +143,10 @@ export function SessionProvider({
 
   const logout = useCallback(async () => {
     await clearUser();
+    // La portada tiene que apagar la rueda al volver. Es la contrapartida de
+    // que sea el área online quien le cuenta lo que pasa: si no se borra aquí,
+    // la raíz seguiría ofreciendo «Jugar» a quien acaba de salirse.
+    await clearLanding();
     await clerk.signOut();
   }, [clerk]);
 

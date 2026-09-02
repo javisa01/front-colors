@@ -12,6 +12,10 @@
     "colors": 1
   },
   {
+    "id": "adidas",
+    "colors": 1
+  },
+  {
     "id": "adobe-premiere",
     "colors": 2
   },
@@ -24,6 +28,10 @@
     "colors": 2
   },
   {
+    "id": "allianz",
+    "colors": 1
+  },
+  {
     "id": "amazon",
     "colors": 1
   },
@@ -34,6 +42,10 @@
   {
     "id": "android",
     "colors": 1
+  },
+  {
+    "id": "angeles-lakers",
+    "colors": 2
   },
   {
     "id": "apple",
@@ -52,6 +64,10 @@
     "colors": 1
   },
   {
+    "id": "audi",
+    "colors": 1
+  },
+  {
     "id": "axa",
     "colors": 2
   },
@@ -62,6 +78,10 @@
   {
     "id": "barca",
     "colors": 5
+  },
+  {
+    "id": "bbva",
+    "colors": 1
   },
   {
     "id": "binance",
@@ -76,6 +96,18 @@
     "colors": 2
   },
   {
+    "id": "boca-juniors",
+    "colors": 2
+  },
+  {
+    "id": "bosch",
+    "colors": 1
+  },
+  {
+    "id": "brembo",
+    "colors": 1
+  },
+  {
     "id": "burger_king",
     "colors": 3
   },
@@ -88,12 +120,20 @@
     "colors": 2
   },
   {
+    "id": "caterpillar",
+    "colors": 1
+  },
+  {
     "id": "chrome",
     "colors": 1
   },
   {
     "id": "chupa_chups",
     "colors": 3
+  },
+  {
+    "id": "claude",
+    "colors": 1
   },
   {
     "id": "cocacola",
@@ -121,6 +161,10 @@
   },
   {
     "id": "disney",
+    "colors": 1
+  },
+  {
+    "id": "dji",
     "colors": 1
   },
   {
@@ -200,11 +244,19 @@
     "colors": 4
   },
   {
+    "id": "harley",
+    "colors": 1
+  },
+  {
     "id": "heineken",
     "colors": 2
   },
   {
     "id": "honda",
+    "colors": 1
+  },
+  {
+    "id": "hyundai",
     "colors": 1
   },
   {
@@ -264,6 +316,10 @@
     "colors": 3
   },
   {
+    "id": "linkedin",
+    "colors": 1
+  },
+  {
     "id": "lol",
     "colors": 1
   },
@@ -292,8 +348,16 @@
     "colors": 1
   },
   {
+    "id": "motul",
+    "colors": 1
+  },
+  {
     "id": "movistar",
     "colors": 2
+  },
+  {
+    "id": "musicaly",
+    "colors": 1
   },
   {
     "id": "nasa",
@@ -524,6 +588,14 @@
     "colors": 2
   },
   {
+    "id": "whatsapp",
+    "colors": 1
+  },
+  {
+    "id": "wizards-of-the-coast",
+    "colors": 1
+  },
+  {
     "id": "word",
     "colors": 1
   },
@@ -537,6 +609,10 @@
   },
   {
     "id": "yahoo",
+    "colors": 1
+  },
+  {
+    "id": "yamaha",
     "colors": 1
   },
   {

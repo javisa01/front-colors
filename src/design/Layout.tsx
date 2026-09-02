@@ -1,5 +1,11 @@
 import { useRouter, type Href } from "expo-router";
-import { memo, useCallback, type ReactElement, type ReactNode } from "react";
+import {
+  memo,
+  useCallback,
+  type ReactElement,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import {
   Pressable,
   RefreshControl,
@@ -82,6 +88,16 @@ interface ScreenProps {
   refreshing?: boolean;
   /** Desactiva el scroll cuando el contenido debe caber en una pantalla. */
   scrollable?: boolean;
+  /**
+   * Mando de la lista, para quien necesite moverla desde fuera.
+   *
+   * Hoy lo usa una sola cosa: el recorrido con foco de la pantalla de práctica,
+   * que tiene que subir hasta lo que va a señalar antes de medirlo. Va como
+   * `ref` opcional y no como un `scrollTo` propio a propósito — `Screen` no
+   * tiene por qué inventarse una API de scroll cuando la de `ScrollView` ya
+   * existe y todo el mundo la conoce.
+   */
+  scrollRef?: RefObject<ScrollView | null>;
   children: ReactNode;
   contentStyle?: StyleProp<ViewStyle>;
 }
@@ -97,6 +113,7 @@ function ScreenBase({
   onRefresh,
   refreshing = false,
   scrollable = true,
+  scrollRef,
   children,
   contentStyle,
 }: ScreenProps): ReactElement {
@@ -201,6 +218,7 @@ function ScreenBase({
 
       {scrollable ? (
         <ScrollView
+          ref={scrollRef}
           style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}

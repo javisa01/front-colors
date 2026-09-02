@@ -1,6 +1,7 @@
 import { memo, useEffect, type ReactElement } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, {
+  cancelAnimation,
   Easing,
   ReduceMotion,
   useAnimatedStyle,
@@ -42,6 +43,26 @@ import { Color } from "@/design/tokens";
  * combinación tarda minutos en repetirse y el parpadeo nunca cae en un compás
  * reconocible. Con tres relojes múltiplos se vería el bucle a los pocos
  * segundos.
+ *
+ * ## Por qué se veía a saltos
+ *
+ * Tres cosas a la vez, y las tres arregladas aquí:
+ *
+ *  1. **La curva.** Iba con `inOut(quad)` y en bucle de ida y vuelta, que es
+ *     una parábola: se queda casi quieta en los dos extremos y cruza el centro
+ *     de golpe. Cuatro paradas por ciclo. La sinusoide —`inOut(sin)`, que de
+ *     ida y vuelta da exactamente un seno— no tiene ni parones ni tirones: la
+ *     velocidad nunca salta, que es literalmente lo que quiere decir fluido.
+ *  2. **El recorrido, medido en píxeles.** Las amplitudes eran fijas y
+ *     diminutas —1 px de desplazamiento, 8 % de escala—, y esta llama se pinta
+ *     a 13 y 18 px. Sobre 18 px, un 8 % son 1,4 px: el redondeo al píxel
+ *     convertía un movimiento continuo en dos o tres escalones visibles. Ahora
+ *     el recorrido sale del propio `size`, así que la llama se mueve lo mismo
+ *     —en proporción— mida lo que mida.
+ *  3. **Lo que no se puede redondear.** Cuerpo y lengua modulan también su
+ *     opacidad. La opacidad no cae en una rejilla de píxeles, así que hay
+ *     cambio continuo en todos los fotogramas aunque la geometría todavía no
+ *     haya llegado al píxel siguiente. Es lo que cose el movimiento.
  */
 
 interface FlameProps {
@@ -55,11 +76,19 @@ const BODY_MS = 1_450;
 const TONGUE_MS = 1_130;
 const CORE_MS = 870;
 
+/** Cuánto tarda en posarse al apagarse. Ver `useFlicker`. */
+const SETTLE_MS = 260;
+
 /** Proporción del `viewBox`: 24 de ancho por 30 de alto. */
 const RATIO = 24 / 30;
 
 /**
- * Un reloj 0 → 1 → 0 en bucle.
+ * Un reloj 0 → 1 → 0 en bucle, con forma de seno.
+ *
+ * `inOut(sin)` no es un capricho de curva: reproducida hacia delante y hacia
+ * atrás da `(1 - cos πt) / 2`, o sea un seno exacto, y un seno es la única
+ * oscilación cuya velocidad no da ningún salto —ni en los extremos, donde una
+ * curva lineal tira, ni en el centro, donde una parábola acelera de golpe.
  *
  * `ReduceMotion.Never` por el mismo motivo que en los orbes de la portada: con
  * el movimiento reducido del sistema, `withRepeat` infinito con `reverse`
@@ -73,7 +102,17 @@ function useFlicker(durationMs: number, enabled: boolean): SharedValue<number> {
 
   useEffect(() => {
     if (!enabled) {
-      clock.set(0);
+      // Apagar no es cortar: se cancela el bucle y se vuelve al reposo con una
+      // transición corta. Con un `set(0)` seco, la llama se quedaba clavada en
+      // mitad del estiramiento el fotograma en que se apagaba.
+      cancelAnimation(clock);
+      clock.set(
+        withTiming(0, {
+          duration: SETTLE_MS,
+          easing: Easing.out(Easing.quad),
+          reduceMotion: ReduceMotion.Never,
+        }),
+      );
       return;
     }
 
@@ -81,7 +120,7 @@ function useFlicker(durationMs: number, enabled: boolean): SharedValue<number> {
       withRepeat(
         withTiming(1, {
           duration: durationMs,
-          easing: Easing.inOut(Easing.quad),
+          easing: Easing.inOut(Easing.sin),
         }),
         -1,
         true,
@@ -89,6 +128,10 @@ function useFlicker(durationMs: number, enabled: boolean): SharedValue<number> {
         ReduceMotion.Never,
       ),
     );
+
+    return () => {
+      cancelAnimation(clock);
+    };
   }, [clock, durationMs, enabled]);
 
   return clock;
@@ -105,27 +148,43 @@ function FlameBase({ size = 24, lit }: FlameProps): ReactElement {
    * El cuerpo se estira y se encoge en vertical mientras se estrecha en
    * horizontal, que es como se comporta una llama real: conserva el volumen.
    * Escalar los dos ejes a la vez la haría parecer un globo hinchándose.
+   *
+   * El desplazamiento va en proporción al tamaño —no en píxeles sueltos—, que
+   * es lo que hace que a 13 px se mueva tanto como a 24.
    */
-  const bodyStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scaleY: 1 + body.get() * 0.08 },
-      { scaleX: 1 - body.get() * 0.05 },
-      { translateY: -body.get() * 1 },
-    ],
-  }));
+  const bodyStyle = useAnimatedStyle(() => {
+    const value = body.get();
+    return {
+      // Cambio continuo que no depende de la rejilla de píxeles: es lo que
+      // impide que la llama parezca ir a escalones cuando es pequeña.
+      opacity: 0.88 + value * 0.12,
+      transform: [
+        { scaleY: 1 + value * 0.11 },
+        { scaleX: 1 - value * 0.07 },
+        { translateY: -value * size * 0.05 },
+      ],
+    };
+  });
 
-  const tongueStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scaleY: 1 - tongue.get() * 0.1 },
-      { scaleX: 1 + tongue.get() * 0.08 },
-      { translateY: tongue.get() * 1.2 },
-    ],
-  }));
+  const tongueStyle = useAnimatedStyle(() => {
+    const value = tongue.get();
+    return {
+      opacity: 0.78 + value * 0.22,
+      transform: [
+        { scaleY: 1 - value * 0.14 },
+        { scaleX: 1 + value * 0.12 },
+        { translateY: value * size * 0.055 },
+      ],
+    };
+  });
 
-  const coreStyle = useAnimatedStyle(() => ({
-    opacity: 0.55 + core.get() * 0.45,
-    transform: [{ scale: 0.82 + core.get() * 0.28 }],
-  }));
+  const coreStyle = useAnimatedStyle(() => {
+    const value = core.get();
+    return {
+      opacity: 0.45 + value * 0.55,
+      transform: [{ scale: 0.76 + value * 0.38 }],
+    };
+  });
 
   const outer = lit ? Color.ember.outer : Color.ember.dimOuter;
   const inner = lit ? Color.ember.inner : Color.ember.dimInner;

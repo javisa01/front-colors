@@ -3,10 +3,12 @@ import type { ReactElement } from "react";
 import { useCallback, useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { AmbientTable } from "@/design/Ambient";
+import { playerTint } from "@/design/Avatar";
 import { Button } from "@/design/Button";
 import { Chip, Field, Stepper } from "@/design/Form";
 import { Card, Screen, SectionHeader } from "@/design/Layout";
-import { Color, Radius, Space, Type } from "@/design/tokens";
+import { PARTY_TONE, Radius, Space, Type } from "@/design/tokens";
 import { t, type TranslationKey } from "@/i18n";
 import type { PartyMode, PartyPlayer } from "@/types/challenge";
 import {
@@ -44,6 +46,27 @@ function normalizeMode(value: string | string[] | undefined): PartyMode {
  * del propio campo: con ocho jugadores, un rótulo encima de cada uno duplicaba
  * el alto de la lista para repetir la misma palabra ocho veces. El marcador de
  * posición dice a la vez qué se espera y qué nombre se usará si se deja vacío.
+ *
+ * ## Los dos colores de la pantalla, y qué dice cada uno
+ *
+ * Era gris entera, y no por sobriedad: por descuido. El modo que acababas de
+ * elegir tenía color en el menú y lo perdía justo al elegirlo, y las ocho
+ * chapas numeradas eran ocho cuadros idénticos para ocho personas distintas.
+ *
+ * Ahora hay dos colores y cada uno responde a una pregunta:
+ *
+ *  - **El del modo** (`PARTY_TONE`) tiñe el canto de la tarjeta que abre la
+ *    pantalla, el botón que empieza la partida y la mesa del fondo. Contesta
+ *    «¿a qué vamos a jugar?», y es el mismo rosa, ámbar, verde o verde azulado
+ *    que llevaba la fila del menú.
+ *  - **El de cada jugador** (`playerTint`) tiñe su chapa. Contesta «¿quién es
+ *    quién?», y es el mismo color que esa persona lleva en el resto de la
+ *    aplicación, porque sale de la misma fórmula.
+ *
+ * Que la chapa cambie de color mientras se escribe no es un efecto: el tono se
+ * deriva del nombre, así que es literalmente el color que te va a tocar, en
+ * cuanto lo hay. Antes de escribir nada ya tienes uno, el de «Jugador N», que
+ * es el nombre con el que vas a jugar si dejas el campo vacío.
  */
 export default function PartySetupScreen(): ReactElement {
   const params = useLocalSearchParams<{ mode?: string }>();
@@ -52,6 +75,8 @@ export default function PartySetupScreen(): ReactElement {
 
   const timed = isTimedMode(mode);
   const cooperative = isCooperativeMode(mode);
+  /** El color del modo, el mismo que llevaba su fila en el menú. */
+  const modeTone = PARTY_TONE[mode];
 
   const [count, setCount] = useState(MIN_PLAYERS);
   const [names, setNames] = useState<string[]>([]);
@@ -104,6 +129,12 @@ export default function PartySetupScreen(): ReactElement {
       eyebrow={t(`party.mode.${mode}.title` as TranslationKey)}
       title={t("party.setup.title")}
       subtitle={infoText}
+      /*
+        La mesa, teñida del color del modo. Es el fondo de las dos pantallas que
+        pasan antes de jugar —esta y la del turno—, y la luz que recorre sus
+        asientos cuenta la mecánica sin escribirla. Ver `design/Ambient`.
+      */
+      backdrop={<AmbientTable tone={modeTone} />}
     >
       <SectionHeader
         title={t("party.setup.playersLabel")}
@@ -113,7 +144,13 @@ export default function PartySetupScreen(): ReactElement {
         })}
       />
 
-      <Card style={styles.block}>
+      {/*
+        El canto de color va solo en esta, la que abre la pantalla: es la regla
+        de `Card`. La lista de nombres de más abajo no lo repite —ahí el color
+        ya lo lleva cada chapa, y dos sistemas de color en la misma tarjeta no
+        distinguen nada.
+      */}
+      <Card tone={modeTone} style={styles.block}>
         <Stepper
           value={count}
           min={MIN_PLAYERS}
@@ -141,32 +178,53 @@ export default function PartySetupScreen(): ReactElement {
       />
 
       <Card style={styles.block}>
-        {Array.from({ length: count }, (_, index) => (
-          <Field
-            key={index}
-            value={names[index] ?? ""}
-            onChangeText={(value) => setName(index, value)}
-            placeholder={t("party.playerN", { n: index + 1 })}
-            leading={
-              <View style={styles.nameBadge}>
-                <Text style={[Type.metricSmall, styles.nameBadgeText]}>
-                  {index + 1}
-                </Text>
-              </View>
-            }
-            autoCapitalize="words"
-            maxLength={20}
-            returnKeyType="done"
-            style={
-              index === count - 1 ? styles.lastNameField : styles.nameField
-            }
-          />
-        ))}
+        {Array.from({ length: count }, (_, index) => {
+          /*
+            El nombre con el que va a jugar: el escrito, o el de reserva. Es la
+            misma cuenta que hace `handleStart`, y tiene que serlo — el color de
+            la chapa sale de aquí, así que si las dos discreparan, el jugador
+            cambiaría de color al empezar la partida.
+          */
+          const typed = names[index]?.trim();
+          const playing =
+            typed != null && typed.length > 0
+              ? typed
+              : t("party.playerN", { n: index + 1 });
+          const tint = playerTint(playing);
+
+          return (
+            <Field
+              key={index}
+              value={names[index] ?? ""}
+              onChangeText={(value) => setName(index, value)}
+              placeholder={t("party.playerN", { n: index + 1 })}
+              leading={
+                <View
+                  style={[
+                    styles.nameBadge,
+                    { backgroundColor: tint.fill, borderColor: tint.border },
+                  ]}
+                >
+                  <Text style={[Type.metricSmall, { color: tint.text }]}>
+                    {index + 1}
+                  </Text>
+                </View>
+              }
+              autoCapitalize="words"
+              maxLength={20}
+              returnKeyType="done"
+              style={
+                index === count - 1 ? styles.lastNameField : styles.nameField
+              }
+            />
+          );
+        })}
       </Card>
 
       <Button
         label={t("party.setup.start")}
         icon="play"
+        tone={modeTone}
         onPress={handleStart}
       />
     </Screen>
@@ -196,11 +254,8 @@ const styles = StyleSheet.create({
     borderRadius: Radius.sm,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Color.surface.raised,
+    // El relleno y el borde los pone `playerTint`: es el color de esa persona,
+    // no un estilo de la chapa.
     borderWidth: 1,
-    borderColor: Color.border.subtle,
-  },
-  nameBadgeText: {
-    color: Color.text.muted,
   },
 });

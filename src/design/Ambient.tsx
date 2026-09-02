@@ -30,7 +30,12 @@ import Animated, {
   type SharedValue,
 } from "react-native-reanimated";
 
-import { Color, HAIRLINE, Radius } from "@/design/tokens";
+import {
+  Color,
+  HAIRLINE,
+  Radius,
+  type SpectrumTone,
+} from "@/design/tokens";
 
 /**
  * Los orbes que respiran detrás de la portada.
@@ -1483,6 +1488,265 @@ function AmbientThreadBase(): ReactElement {
 
 export const AmbientThread = memo(AmbientThreadBase);
 
+// ---------------------------------------------------------------------------
+// La mesa
+// ---------------------------------------------------------------------------
+
+/**
+ * El fondo de una partida en grupo: **la mesa y los asientos**.
+ *
+ * Séptimo miembro de la familia, y el primero cuyo movimiento **significa algo**
+ * en vez de solo respirar. La regla de la familia es que cada pantalla tiene su
+ * forma y que esa forma dice algo de la pantalla —manchas desbordadas en la
+ * portada, anillos concéntricos en un menú, franjas paralelas bajo una lista,
+ * un haz de luz en el perfil—. Aquí la pantalla es literalmente **gente sentada
+ * alrededor de una mesa pasándose un móvil**, así que el fondo es eso: un halo
+ * ancho desbordado por abajo, con seis muestras posadas en su borde y una luz
+ * que va de una a la siguiente.
+ *
+ * Esa luz **es el turno**. Es la única animación de toda la familia que no es
+ * atmósfera: las demás laten o se desplazan para que la pantalla no parezca
+ * congelada, y esta cuenta la mecánica del juego antes de que nadie la lea. Se
+ * puede permitir el gesto porque es la mecánica de estas dos pantallas y de
+ * ninguna otra — configurar la partida y anunciar a quién le toca.
+ *
+ * ## Por qué aquí sí hay seis pigmentos
+ *
+ * Va contra la regla de la casa —lo único saturado en pantalla debe ser el color
+ * del juego— y se permite por el mismo motivo que el abanico del estado vacío
+ * del online: **en estas dos pantallas todavía no hay color de juego**. No se ha
+ * repartido ninguna imagen, así que no hay nada con lo que competir. En cuanto
+ * empieza el turno, esta mesa desaparece y aparece el color de verdad.
+ *
+ * Aun así se queda muy por debajo del umbral de «elemento»: los asientos van al
+ * 16 % y solo el encendido llega a la mitad. Lo que se ve es un lavado, no seis
+ * puntos de colores.
+ *
+ * ## El tono
+ *
+ * La mesa toma el color del **modo** —ver `PARTY_TONE`—; los asientos, cada uno
+ * el suyo. Son dos cosas distintas y por eso llevan colores distintos: la mesa
+ * es a qué se juega, los asientos son quiénes juegan.
+ */
+
+/**
+ * Una vuelta entera de la luz a la mesa: dos segundos y medio por asiento.
+ *
+ * Estuvo en 9,2 s —1,5 s por asiento— y se veía a saltos. El motivo no era la
+ * velocidad en sí, sino que a ese ritmo cada asiento recorría todo su brillo en
+ * medio segundo: el ojo no seguía una luz, veía seis cosas encendiéndose por
+ * turnos. Al ralentizarlo, el mismo recorrido pasa a leerse como una sola cosa
+ * que se desplaza, que es lo que tenía que decir desde el principio.
+ */
+const RELAY_MS = 15_000;
+/** Latido de la mesa. Lento, como todos los de la familia. */
+const TABLE_MS = 5200;
+
+/**
+ * Cómo de lejos alcanza la luz, medido en asientos.
+ *
+ * Por encima de 1 los vecinos se solapan, y eso es lo que hace que la luz
+ * **viaje** en vez de encenderse y apagarse en seis sitios: cuando uno empieza a
+ * bajar el siguiente ya está subiendo. A 0,6 se veían seis parpadeos; a 1,35
+ * seguían distinguiéndose los relevos. A 1,5 hay siempre tres asientos con algo
+ * de luz, y el conjunto se lee como una onda.
+ */
+const RELAY_REACH = 1.5;
+
+interface SeatSpec {
+  /** Posición horizontal, en porcentaje del ancho de la pantalla. */
+  left: DimensionValue;
+  /** Altura sobre el borde inferior. */
+  bottom: number;
+  size: number;
+  tone: SpectrumTone;
+}
+
+/**
+ * Seis asientos formando un arco sobre el borde de la mesa.
+ *
+ * Seis y no ocho porque son los seis pigmentos del espectro: con un séptimo
+ * habría que repetir uno, y dos asientos del mismo color en la misma mesa se
+ * leen como un error. El arco es simétrico y los de los extremos son más
+ * pequeños —los de en medio quedan más cerca de quien mira—, que es lo que
+ * convierte una fila de puntos en una mesa vista desde arriba.
+ *
+ * Van abajo porque abajo es donde estas dos pantallas tienen sitio: la de
+ * configuración termina en un botón y la del turno es una sola tarjeta corta,
+ * con media pantalla libre debajo.
+ */
+const SEATS: SeatSpec[] = [
+  { left: "5%", bottom: 92, size: 20, tone: "rose" },
+  { left: "21%", bottom: 146, size: 26, tone: "amber" },
+  { left: "39%", bottom: 176, size: 32, tone: "green" },
+  { left: "59%", bottom: 176, size: 32, tone: "teal" },
+  { left: "77%", bottom: 146, size: 26, tone: "blue" },
+  { left: "92%", bottom: 92, size: 20, tone: "violet" },
+];
+
+/**
+ * Un reloj 0 → 1 que **no vuelve atrás**.
+ *
+ * `useAmbientClock` va y vuelve, que es lo correcto para algo que respira; una
+ * luz que da la vuelta a una mesa no puede desandar el camino, porque entonces
+ * el turno iría hacia atrás la mitad del tiempo. El salto de 1 a 0 no se ve: la
+ * distancia entre la luz y cada asiento se mide por el camino más corto de los
+ * dos, así que el final del recorrido ya está iluminando el primer asiento.
+ */
+function useRelayClock(): SharedValue<number> {
+  const clock = useSharedValue(0);
+
+  useEffect(() => {
+    clock.set(
+      withRepeat(
+        withTiming(1, { duration: RELAY_MS, easing: Easing.linear }),
+        -1,
+        false,
+        undefined,
+        // Mismo motivo que en `useAmbientClock`: es un lavado de fondo, no algo
+        // que se pueda perder por no mirarlo.
+        ReduceMotion.Never,
+      ),
+    );
+  }, [clock]);
+
+  return clock;
+}
+
+function AmbientTableBase({ tone }: { tone?: SpectrumTone }): ReactElement {
+  const relay = useRelayClock();
+  const breath = useAmbientClock(TABLE_MS);
+
+  const pigment =
+    tone != null ? Color.spectrum[tone].pigment : Color.ambient.ringCool;
+
+  /**
+   * La mesa solo cambia de opacidad, y esto es una corrección, no una
+   * simplificación estética.
+   *
+   * Llevaba además un `scaleX` del 2 %, y esos dos puntos porcentuales salían
+   * carísimos: es una vista tan ancha como la pantalla, con un radio de cápsula
+   * y un degradado dentro, así que escalarla obliga a **recalcular su recorte
+   * redondeado en cada fotograma**. El coste no se notaba en la mesa —que
+   * apenas se mueve— sino en todo lo demás: los fotogramas que se perdían ahí
+   * eran los que hacían que la luz de los asientos avanzara a tirones.
+   *
+   * Por lo mismo se ha quitado el `overflow: hidden` que tenía: era redundante,
+   * porque el degradado ya lleva el mismo radio que su contenedor, y era una
+   * capa de recorte más en la vista más grande de la pantalla.
+   */
+  const tableStyle = useAnimatedStyle(() => ({
+    opacity: 0.16 + breath.get() * 0.1,
+  }));
+
+  return (
+    <>
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.table, { borderColor: pigment }, tableStyle]}
+      >
+        {/*
+          El degradado sube desde abajo: la mesa está iluminada por su propio
+          borde inferior, que es el que queda fuera de la pantalla. Relleno
+          plano, un óvalo de 420 puntos se leía como una forma pegada encima.
+        */}
+        <LinearGradient
+          colors={["transparent", pigment]}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={styles.fill}
+        />
+      </Animated.View>
+
+      {SEATS.map((seat, index) => (
+        <Seat key={seat.tone} spec={seat} index={index} relay={relay} />
+      ))}
+    </>
+  );
+}
+
+export const AmbientTable = memo(AmbientTableBase);
+
+function Seat({
+  spec,
+  index,
+  relay,
+}: {
+  spec: SeatSpec;
+  index: number;
+  relay: SharedValue<number>;
+}): ReactElement {
+  const seatStyle = useAnimatedStyle(() => {
+    // Dónde está la luz ahora mismo, en asientos.
+    const at = relay.get() * SEATS.length;
+
+    // Por el camino más corto: sin esto, la luz tendría que recorrer la mesa
+    // entera hacia atrás para volver del último asiento al primero.
+    const straight = Math.abs(at - index);
+    const distance = Math.min(straight, SEATS.length - straight);
+
+    /*
+      La caída del brillo es una campana, no una rampa, y aquí estaba el motivo
+      principal de que la luz avanzara a tirones.
+
+      Antes era `1 - distancia / alcance`: una recta, y por tanto un triángulo
+      —el brillo subía a ritmo constante, **giraba en seco** justo en el máximo,
+      y volvía a cortarse en seco al llegar al límite del alcance—. Esas dos
+      esquinas son cambios instantáneos de velocidad, y el ojo las lee
+      exactamente como lo que son: un salto. No importaba cuántos fotogramas por
+      segundo hubiera; la curva ya era angulosa antes de dibujarse.
+
+      El coseno alzado vale 1 en el centro y 0 en el borde igual que la recta,
+      pero **llega a los dos extremos con pendiente cero**: la luz frena al
+      llegar al asiento y arranca al salir, sin ninguna esquina en medio. Es la
+      misma curva que `Easing.inOut` aplica al tiempo, aplicada aquí al espacio.
+    */
+    const reach = Math.min(1, distance / RELAY_REACH);
+    const lit = (1 + Math.cos(Math.PI * reach)) / 2;
+
+    /*
+      Los asientos **se encienden, no crecen**, y esto es lo que hace que el
+      recorrido se vea fluido.
+
+      Antes cambiaban de tamaño con un `scale` de hasta 1,35, y ese era el gesto
+      que iba a tirones. Un asiento de 32 puntos creciendo hasta 43 cambia once
+      píxeles a lo largo de casi cuatro segundos: el borde redondeado tiene que
+      volver a resolverse en cada fotograma para un desplazamiento de una
+      centésima de píxel, y lo que se ve no es una bola creciendo sino su canto
+      temblando. Suavizar la curva no lo arregló, y no podía: el problema no
+      estaba en cuándo cambiaba el tamaño, sino en que cambiara.
+
+      La opacidad no tiene ese problema. No cambia ninguna geometría —no hay
+      borde que recalcular, ni textura que reescalar—, así que va suave a
+      cualquier velocidad y a cualquier tamaño. Y para lo que esta pantalla
+      tiene que decir sirve igual o mejor: un asiento que se ilumina al llegarle
+      el turno es más literal que uno que engorda.
+
+      El recorrido va de 0,10 a 0,72 en vez del 0,16-0,56 de antes. Al perder el
+      tamaño hay que recuperar la presencia por algún lado, y el sitio correcto
+      es el contraste entre el asiento encendido y los demás.
+    */
+    return { opacity: 0.1 + lit * 0.62 };
+  });
+
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={[
+        styles.piece,
+        {
+          left: spec.left,
+          bottom: spec.bottom,
+          width: spec.size,
+          height: spec.size,
+          backgroundColor: Color.spectrum[spec.tone].pigment,
+        },
+        seatStyle,
+      ]}
+    />
+  );
+}
+
 /**
  * Los radios de los discos de `SoftGlow`, del mayor al menor. Doce capas es
  * el punto donde la escalera deja de percibirse sin llenar el árbol de vistas.
@@ -1504,6 +1768,20 @@ const styles = StyleSheet.create({
     // dejaría las dos esquinas sin cubrir.
     left: -140,
     right: -140,
+  },
+  table: {
+    position: "absolute",
+    // Desbordada por los tres lados: de la mesa solo entra su borde de arriba,
+    // que es justo lo que hace que se lea como una mesa y no como un óvalo.
+    left: "-20%",
+    right: "-20%",
+    bottom: -230,
+    height: 420,
+    borderRadius: Radius.pill,
+    borderWidth: HAIRLINE,
+    // Sin `overflow: hidden`: el degradado de dentro ya lleva este mismo radio,
+    // así que el recorte sobraba — y era una capa más que recalcular en la
+    // vista más grande de la pantalla. Ver la nota de `tableStyle`.
   },
   piece: {
     position: "absolute",

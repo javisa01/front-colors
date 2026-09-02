@@ -6,7 +6,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { Button } from "@/design/Button";
 import { Space, Type } from "@/design/tokens";
 import { t } from "@/i18n";
-import { setTutorialSeen } from "@/utils/storage";
+import { setPracticeTourSeen, setTutorialSeen } from "@/utils/storage";
 
 /**
  * Atajo para volver a ver la bienvenida. **Solo en desarrollo.**
@@ -46,6 +46,19 @@ function Card(): ReactElement {
     router.push("/welcome");
   }, [router]);
 
+  /**
+   * El recorrido con foco de la pantalla de práctica también se enseña una
+   * sola vez, así que sin esto probarlo obliga a borrar los datos de la
+   * aplicación entre intento e intento. Se borra la marca y se entra: el
+   * recorrido arranca solo al montarse la pantalla.
+   */
+  const replayTour = useCallback(async () => {
+    setBusy(true);
+    await setPracticeTourSeen(false);
+    setBusy(false);
+    router.push("/offline");
+  }, [router]);
+
   return (
     <View style={styles.card}>
       <Text style={Type.label}>{t("dev.tutorialTitle")}</Text>
@@ -58,6 +71,15 @@ function Card(): ReactElement {
         size="md"
         loading={busy}
         onPress={() => void replay()}
+      />
+
+      <Button
+        label={t("dev.tourButton")}
+        icon="retry"
+        variant="secondary"
+        size="md"
+        loading={busy}
+        onPress={() => void replayTour()}
       />
     </View>
   );

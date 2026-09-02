@@ -37,6 +37,7 @@ import {
   Radius,
   Space,
   Type,
+  type SpectrumTone,
 } from "@/design/tokens";
 import { selectionTick } from "@/utils/haptics";
 import { playTick } from "@/utils/sound";
@@ -191,6 +192,16 @@ interface SegmentedControlProps<T extends string> {
   options: SegmentOption<T>[];
   value: T;
   onChange: (value: T) => void;
+  /**
+   * Pigmento de la pastilla activa. Sin tono, la pastilla es la gris de
+   * siempre — y esa sigue siendo la opción por defecto.
+   *
+   * Con tono, la pastilla se rellena con el pigmento de la sección y la
+   * etiqueta pasa a su tinta. Es el mismo mecanismo que el botón primario, y
+   * se usa con la misma avaricia: en el control que abre una sección, no en
+   * los tres de la pantalla.
+   */
+  tone?: SpectrumTone;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -206,6 +217,7 @@ function SegmentedControlInner<T extends string>({
   options,
   value,
   onChange,
+  tone,
   style,
 }: SegmentedControlProps<T>): ReactElement {
   const [trackWidth, setTrackWidth] = useState(0);
@@ -241,7 +253,16 @@ function SegmentedControlInner<T extends string>({
       accessibilityRole="tablist"
     >
       {segmentWidth > 0 ? (
-        <Animated.View style={[styles.segmentThumb, thumbStyle]} />
+        <Animated.View
+          style={[
+            styles.segmentThumb,
+            tone != null && {
+              backgroundColor: Color.spectrum[tone].pigment,
+              borderColor: Color.spectrum[tone].pigment,
+            },
+            thumbStyle,
+          ]}
+        />
       ) : null}
 
       {options.map((option) => {
@@ -268,6 +289,8 @@ function SegmentedControlInner<T extends string>({
                 Type.bodyStrong,
                 styles.segmentLabel,
                 active && styles.segmentLabelActive,
+                active &&
+                  tone != null && { color: Color.spectrum[tone].ink },
               ]}
               numberOfLines={1}
             >

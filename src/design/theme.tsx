@@ -157,6 +157,22 @@ export const lightPalette: Palette = {
       pigmentPressed: "#A32B5C",
       ink: "#FFFFFF",
     },
+    orange: {
+      surface: "#FDEFE3",
+      border: "#F2CFA9",
+      icon: "#9C4E0A",
+      pigment: "#9C4E0A",
+      pigmentPressed: "#823F06",
+      ink: "#FFFFFF",
+    },
+    lime: {
+      surface: "#F1F6E0",
+      border: "#D2E0A4",
+      icon: "#5A6E0C",
+      pigment: "#5A6E0C",
+      pigmentPressed: "#485907",
+      ink: "#FFFFFF",
+    },
   },
   /*
     En claro el mismo cálculo con la luminosidad invertida: papel muy claro

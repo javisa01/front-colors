@@ -41,6 +41,31 @@ La única excepción declarada son los componentes de `src/design/` y
 `src/components/`: los usan los dos árboles, y por eso ninguno de ellos importa
 nada de `src/api/` ni de `src/online/`.
 
+### La pista de portada: lo único que cruza la frontera
+
+La portada (`app/index.tsx`) es la rueda de color, y enseña tres pantallas
+distintas según haya sesión y grupos. Necesita saberlo **sin poder preguntarlo**:
+está en la raíz, y la raíz no monta Clerk.
+
+Así que la frontera se cruza en una sola dirección y con un solo dato. El área
+online **deja escrito** lo que sabe y la portada lo lee:
+
+- `LandingHint` vive en `utils/storage.ts`, en el namespace **offline**
+  (`colorquest:v1:landing`). Sin tokens: si hay sesión, cuántos grupos, la racha
+  y el nombre de jugador.
+- Lo escribe `app/online/index.tsx` en un efecto derivado de sus propios datos,
+  y se recarga en cada focus, con lo que se mantiene fresca sola.
+- Lo borra `logout()` en `online/session.tsx`. Sin eso, la portada seguiría
+  ofreciendo «Jugar» a quien acaba de salirse.
+- La raíz lo lee antes de retirar el splash (`loadLanding`), junto a la marca del
+  tutorial y por el mismo motivo: la portada elige su estado en el primer render.
+
+**Es una pista, no una verdad.** Puede estar caducada, y da igual: la portada no
+decide nada con ella más allá de a dónde apunta el eje del dial. Quien comprueba
+la sesión de verdad sigue siendo la guarda de `app/online/_layout.tsx`, que
+rebota a `/online/auth` cuando no la hay. Lo peor que puede pasar es un rótulo
+optimista durante un toque.
+
 ---
 
 ## Qué es la parte online, en una frase

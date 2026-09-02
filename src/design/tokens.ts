@@ -145,11 +145,31 @@ const semantic = {
  * que ocurre **fuera** de una ronda. Dentro, el único color saturado sigue
  * siendo el del juego y el botón vuelve a ser claro sobre oscuro.
  *
- * Los seis pigmentos van a la misma luminosidad —igual que los iconos— para
- * que ninguna sección grite más que otra, y esa luminosidad está elegida para
- * que la tinta casi negra de encima pase de 8:1 en los seis. `ink` no es negro
+ * Los pigmentos van todos a la misma banda de luminosidad —igual que los
+ * iconos— para que ninguna sección grite más que otra, y esa banda está elegida
+ * para que la tinta casi negra de encima pase de 7:1 en todos. `ink` no es negro
  * puro sino el mismo tono llevado casi al negro: es lo que hace que la etiqueta
  * parezca impresa sobre la pintura en vez de pegada encima.
+ *
+ * ## Por qué son ocho y no seis
+ *
+ * Empezaron siendo seis y el menú de juego sin conexión tiene **ocho** modos,
+ * cuatro en solitario y cuatro en grupo. La regla que se aplicó entonces fue
+ * «que no se repita ninguno dentro de una misma sección», aceptando que sí se
+ * repitieran entre las dos porque un encabezado las separa. En la pantalla no
+ * funcionó: «Colaborativo contrarreloj» y «Multicolor» acababan siendo el mismo
+ * verde azulado, y como cada uno es el último de su bloque, quedaban a la misma
+ * altura óptica y se leían como la misma cosa repetida.
+ *
+ * Con ocho pigmentos cada modo tiene el suyo y la regla deja de necesitar
+ * excepciones. Los dos nuevos ocupan los dos huecos reales del círculo:
+ *
+ *  - **`orange`** entre el ámbar y el rosa. El ámbar hacía de amarillo y de
+ *    naranja a la vez, y «Batalla contrarreloj» pedía calor de verdad.
+ *  - **`lime`** entre el ámbar y el verde. Es el hueco más grande que quedaba,
+ *    y es el que le toca a «Multicolor»: sus vecinos en la lista son el violeta
+ *    de arriba y el rosa de abajo, así que necesitaba justo el tono más lejano
+ *    de los dos.
  */
 const spectrum = {
   violet: {
@@ -199,6 +219,31 @@ const spectrum = {
     pigment: "#EE8CB2",
     pigmentPressed: "#DA779E",
     ink: "#2A0C18",
+  },
+  // Naranja de verdad, no el ámbar tirando a amarillo: es el calor que pedía
+  // el modo contrarreloj en grupo.
+  orange: {
+    surface: "#2A1508",
+    border: "#5B2E12",
+    icon: "#F5A868",
+    pigment: "#F2954E",
+    pigmentPressed: "#DB8039",
+    ink: "#240F04",
+  },
+  // Verde amarillento. Es el tono más alejado del violeta y del rosa, que son
+  // sus dos vecinos en el menú de modos. Ver la nota de arriba.
+  //
+  // El pigmento está bajado respecto al amarillo verdoso obvio: a plena
+  // luminosidad era el más claro de los ocho con diferencia, y un solo tono más
+  // brillante que el resto rompe justo lo que la escala intenta conseguir, que
+  // es que ninguna fila grite más que sus vecinas.
+  lime: {
+    surface: "#1B2109",
+    border: "#3B4A15",
+    icon: "#BCD86E",
+    pigment: "#A9C94E",
+    pigmentPressed: "#94B23C",
+    ink: "#1A2006",
   },
 } as const;
 
@@ -389,6 +434,30 @@ export const SECTION_TONE = {
   groups: "teal",
   ranking: "amber",
   account: "violet",
+} as const satisfies Record<string, SpectrumTone>;
+
+/**
+ * El color de cada modo en grupo.
+ *
+ * Vive aquí por lo mismo que `SECTION_TONE`: el menú de modos es solo el primer
+ * sitio donde se ve. Estaba escrito dentro de la lista de `app/offline.tsx`, y
+ * la consecuencia era que el color **se perdía al elegir**: tocabas la fila
+ * rosa de «Batalla de adivinar» y la pantalla de configuración salía gris, sin
+ * nada que dijera a qué habías entrado. Un color que solo aparece mientras
+ * eliges no identifica un modo, decora una lista.
+ *
+ * Ahora acompaña al modo hasta el final: tiñe el canto de su tarjeta de
+ * configuración, el botón que empieza la partida y la mesa del fondo.
+ *
+ * Los cuatro son los que ya tenían las filas: no se ha elegido ninguno nuevo.
+ */
+export const PARTY_TONE = {
+  battle: "rose",
+  // Naranja y no ámbar: el ámbar tira a amarillo y este modo es el que va con
+  // prisa. Ver la nota de los pigmentos, arriba.
+  "battle-timed": "orange",
+  coop: "green",
+  "coop-timed": "teal",
 } as const satisfies Record<string, SpectrumTone>;
 
 export type GroupTone = keyof typeof groupTint;

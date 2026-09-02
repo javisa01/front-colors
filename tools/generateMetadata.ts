@@ -27,11 +27,16 @@ interface OutputColor {
   // Original literal as written in the SVG, kept only when it differs from
   // `hex` so the in-app color swap can find and replace it verbatim.
   svgColor?: string;
+  // Every literal that paints this color. Near-identical tones are merged into a
+  // single guessable color, so a logo can draw it as `#000000` in one shape and
+  // `#020202` in the next: the app has to swap all of them or the logo repaints
+  // only halfway.
+  svgColors?: string[];
 }
 
 interface CollectedColor {
   hex: string; // #RRGGBB uppercase — canonical value used for scoring.
-  literal: string; // exact literal as found in the SVG (for replacement).
+  literals: string[]; // every literal found in the SVG for this color.
   rgb: [number, number, number];
   count: number; // how many shapes use it (rough prominence heuristic).
 }
@@ -49,6 +54,16 @@ const DUPLICATE_RGB_DISTANCE = 16;
 // white) from being tagged as multicolor when only the yellow matters.
 const BLACK_V_THRESHOLD = 12; // HSV value ≤ 12 → near-black
 const WHITE_SV_THRESHOLD_S = 10; // HSV saturation ≤ 10 AND value > 90 → near-white
+
+// Los grises intermedios son el mismo caso que el negro y el blanco: relleno,
+// sombras o degradados falsos (el Audi son ochenta grises casi iguales fingiendo
+// un metal). En un juego de color no se pueden adivinar ni distinguir, así que
+// se descartan mientras quede algún color de verdad en el logo.
+const GREY_S_THRESHOLD = 8;
+
+// Por debajo de esta saturación un color no sirve como color «principal» a
+// adivinar: se elige antes uno vivo aunque pinte menos formas.
+const PRIMARY_MIN_SATURATION = 25;
 
 const parser = new XMLParser({
   ignoreAttributes: false,
@@ -228,7 +243,10 @@ function parseStyleClasses(
       }
 
       for (const selector of selectors) {
-        const cls = selector.match(/\.([a-zA-Z0-9_-]+)/)?.[1];
+        // Anchored on purpose: the app inlines a class rule only when the class
+        // is the last thing in the selector, so accepting `.a .b { fill }` here
+        // would report a color the player can never repaint.
+        const cls = selector.trim().match(/\.([a-zA-Z_][\w-]*)$/)?.[1];
         if (!cls) {
           continue;
         }
@@ -296,13 +314,16 @@ function addColor(
   for (const existing of collected.values()) {
     if (rgbDistance(existing.rgb, rgb) <= DUPLICATE_RGB_DISTANCE) {
       existing.count += 1;
+      if (!existing.literals.includes(parsed.literal)) {
+        existing.literals.push(parsed.literal);
+      }
       return;
     }
   }
 
   collected.set(parsed.hex, {
     hex: parsed.hex,
-    literal: parsed.literal,
+    literals: [parsed.literal],
     rgb,
     count: 1,
   });
@@ -349,7 +370,12 @@ function visit(
     }
   }
 
-  for (const value of Object.values(current)) {
+  for (const [key, value] of Object.entries(current)) {
+    // Clip paths and masks are geometry, never paint: their fills would add
+    // colors the player cannot see anywhere in the logo.
+    if (key === "clipPath" || key === "mask") {
+      continue;
+    }
     visit(value, classes, collected);
   }
 }
@@ -374,7 +400,17 @@ function pickPrimaryIndex(colors: CollectedColor[]): number {
   const chromatic = entries.filter(
     ({ hsv }) => hsv[2] >= 12 && !(hsv[2] > 90 && hsv[1] < 10),
   );
-  const pool = chromatic.length > 0 ? chromatic : entries;
+  // Preferimos un color saturado aunque pinte menos formas: adivinar el gris de
+  // un contorno solo porque se repite más no es una jugada, es una lotería.
+  const saturated = chromatic.filter(
+    ({ hsv }) => hsv[1] >= PRIMARY_MIN_SATURATION,
+  );
+  const pool =
+    saturated.length > 0
+      ? saturated
+      : chromatic.length > 0
+        ? chromatic
+        : entries;
 
   pool.sort((a, b) => b.count - a.count || b.hsv[1] - a.hsv[1]);
   return pool[0].index;
@@ -384,10 +420,16 @@ function toOutputColor(color: CollectedColor): OutputColor {
   const [h, s, v] = convert.hex.hsv(color.hex.replace("#", ""));
   const output: OutputColor = { hex: color.hex, hsv: { h, s, v } };
 
-  // Keep the raw literal only when the app couldn't re-derive it from `hex`
-  // (short hex, rgb(), named color, ...), so the in-SVG replacement still works.
-  if (color.literal.replace(/\s+/g, "").toUpperCase() !== color.hex) {
-    output.svgColor = color.literal;
+  // Keep the raw literals only when the app couldn't re-derive them from `hex`
+  // (short hex, rgb(), named color, several merged tones...), so the in-SVG
+  // replacement still works. `svgColor` stays as the first one for older readers.
+  const needsLiterals =
+    color.literals.length > 1 ||
+    color.literals[0].replace(/\s+/g, "").toUpperCase() !== color.hex;
+
+  if (needsLiterals) {
+    output.svgColor = color.literals[0];
+    output.svgColors = [...color.literals];
   }
   return output;
 }
@@ -410,12 +452,19 @@ function processSVG(file: string): ProcessResult {
 
   // Drop near-black and near-white colors — they're backgrounds/outlines, not
   // meaningful brand colors, and would inflate the count for multicolor mode.
-  const colorList = [...collected.values()].filter((color) => {
+  const visible = [...collected.values()].filter((color) => {
     const [, s, v] = convert.rgb.hsv(color.rgb);
     if (v <= BLACK_V_THRESHOLD) return false;
     if (s <= WHITE_SV_THRESHOLD_S && v > 90) return false;
     return true;
   });
+
+  // Fuera los grises, pero solo si al logo le queda algún color con el que
+  // jugar: si es gris entero, mejor un reto malo que ninguno.
+  const withColor = visible.filter(
+    (color) => convert.rgb.hsv(color.rgb)[1] > GREY_S_THRESHOLD,
+  );
+  const colorList = withColor.length > 0 ? withColor : visible;
   const editableColorIndex = pickPrimaryIndex(colorList);
   const colors: OutputColor[] = colorList.map(toOutputColor);
 

@@ -61,6 +61,8 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "generate": "tsx tools/generateMetadata.ts",
+    "check-logos": "tsx tools/checkLogos.ts",
+    "preview-logos": "tsx tools/previewLogos.ts",
     "test": "tsx --test tests/color.test.ts tests/colorScore.test.ts tests/hsvGeometry.test.ts"
   },
   "private": true

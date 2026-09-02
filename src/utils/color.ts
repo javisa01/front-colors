@@ -88,8 +88,43 @@ export function relativeLuminance(hex: string): number {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
+// Formas que pintan algo. Una sin `fill` se dibuja negra: es el valor por
+// defecto de SVG, no un descuido del que la exportó.
+const SHAPE_REGEX =
+  /<(?:path|circle|ellipse|rect|polygon|polyline|text)\b([^>]*)>/gi;
+
+/**
+ * ¿Podemos dar por hecho que una forma sin `fill` sale negra?
+ *
+ * Solo si nadie por encima declara el color: en cuanto un `<svg>` o un `<g>`
+ * trae `fill`, las formas de dentro lo heredan y suponer negro sería inventar.
+ */
+function inheritsDefaultBlack(svgXml: string): boolean {
+  return (
+    !/<(?:svg|g)\b[^>]*\bfill\s*=/i.test(svgXml) &&
+    !/<(?:svg|g)\b[^>]*\bstyle="[^"]*\bfill\s*:/i.test(svgXml)
+  );
+}
+
 function extractSvgColors(svgXml: string): string[] {
   const colors: string[] = [];
+
+  // El emblema de Bosch es una forma sin `fill`: se pinta negra, pero no hay
+  // ni un `#000000` en el archivo. Sin contarla, el logo parecía todo rojo y le
+  // tocaba tarjeta oscura, donde el emblema desaparecía.
+  if (inheritsDefaultBlack(svgXml)) {
+    let shape: RegExpExecArray | null;
+    while ((shape = SHAPE_REGEX.exec(svgXml)) !== null) {
+      const attrs = shape[1];
+      const paints =
+        /\bfill\s*=/i.test(attrs) ||
+        /\bstyle="[^"]*\bfill\s*:/i.test(attrs) ||
+        /\bclass\s*=/i.test(attrs);
+      if (!paints) {
+        colors.push("#000000");
+      }
+    }
+  }
 
   // fill / stroke attributes and their inline-style equivalents.
   const attrRegex =
@@ -201,16 +236,17 @@ export function getChallengeBackgroundTheme(
   }
 
   const editable = challenge.colors?.[challenge.editableColorIndex ?? 0];
-  const sourceColor = editable?.svgColor ?? editable?.hex;
+  const sourceColors =
+    editable?.svgColors ?? (editable?.svgColor ? [editable.svgColor] : []);
   const targetColor = editable?.hex;
 
   let svgXml = challenge.svgXml;
-  if (
-    sourceColor &&
-    targetColor &&
-    sourceColor.toLowerCase() !== targetColor.toLowerCase()
-  ) {
-    svgXml = replaceColorLiteral(svgXml, sourceColor, targetColor);
+  if (targetColor) {
+    for (const sourceColor of sourceColors) {
+      if (sourceColor.toLowerCase() !== targetColor.toLowerCase()) {
+        svgXml = replaceColorLiteral(svgXml, sourceColor, targetColor);
+      }
+    }
   }
 
   return getSvgBackgroundTheme(svgXml);

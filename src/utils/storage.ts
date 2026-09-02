@@ -38,6 +38,9 @@ const KEYS = {
   language: `${PREFIX}language`,
   groupNotifications: (groupId: string) => `${PREFIX}groupNotify:${groupId}`,
   tutorialSeen: `${PREFIX}tutorialSeen`,
+  practiceTourSeen: `${PREFIX}practiceTourSeen`,
+  onlineTourSeen: `${PREFIX}onlineTourSeen`,
+  landing: `${PREFIX}landing`,
 } as const;
 
 async function readJSON<T>(key: string): Promise<T | null> {
@@ -349,4 +352,148 @@ export async function setTutorialSeen(seen: boolean): Promise<void> {
   // detrás de esta llamada lee el valor nuevo aunque el disco vaya lento.
   seenCache = seen;
   await writeJSON(KEYS.tutorialSeen, seen);
+}
+
+// ---------------------------------------------------------------------------
+// Pista de portada
+// ---------------------------------------------------------------------------
+
+/**
+ * Lo que la portada necesita saber del modo online **sin poder preguntárselo**.
+ *
+ * ## Por qué existe
+ *
+ * La portada es la raíz de la aplicación, y la raíz no monta `ClerkProvider` ni
+ * `SessionProvider` — esa es la frontera que mantiene el modo offline offline
+ * (ver `docs/ONLINE.md`). Así que la portada no puede preguntar si hay sesión ni
+ * cuántos grupos hay: importar `@/online` desde aquí arrancaría el cliente de
+ * Clerk al abrir la app para jugar sin conexión, que es exactamente lo que la
+ * arquitectura evita.
+ *
+ * La salida es invertir quién habla: el área online **deja escrito** lo que sabe
+ * y la portada lo lee. Es una clave del almacenamiento offline, sin tokens y sin
+ * nada personal más allá del nombre, y la escribe el hub online cada vez que
+ * carga su día.
+ *
+ * ## Es una pista, no una verdad
+ *
+ * Puede estar caducada: si la sesión expira en el servidor, la portada seguirá
+ * enseñando el estado de la última vez hasta que se entre en el área online y
+ * esta se corrija. Y da igual, porque **la portada no decide nada con esto**:
+ * solo elige qué enseñar y a dónde apunta el dial. Quien manda sigue siendo el
+ * área online, que comprueba la sesión de verdad al entrar. Lo peor que puede
+ * pasar es un rótulo optimista durante un toque.
+ *
+ * Se lee antes de retirar el splash, igual que la marca del tutorial y por el
+ * mismo motivo: la portada tiene que elegir su estado en el primer render o se
+ * vería cambiar la pantalla debajo del dedo.
+ */
+export interface LandingHint {
+  /** Había sesión la última vez que el área online miró. */
+  signedIn: boolean;
+  /** Cuántos grupos tenía. Sin grupos no hay reto que jugar. */
+  groups: number;
+  /** Jornadas seguidas, para la cinta de la portada. */
+  streak: number;
+  /** Si la racha de hoy ya está asegurada. */
+  streakSecured: boolean;
+  /** Nombre de jugador, para saludar. Vacío si no se sabe. */
+  username: string;
+}
+
+const NO_SESSION: LandingHint = {
+  signedIn: false,
+  groups: 0,
+  streak: 0,
+  streakSecured: false,
+  username: "",
+};
+
+function isHint(value: unknown): value is LandingHint {
+  const hint = value as LandingHint | null;
+  return (
+    !!hint &&
+    typeof hint.signedIn === "boolean" &&
+    typeof hint.groups === "number" &&
+    typeof hint.streak === "number" &&
+    typeof hint.streakSecured === "boolean" &&
+    typeof hint.username === "string"
+  );
+}
+
+let landingCache: LandingHint | null = null;
+
+export async function loadLanding(): Promise<LandingHint> {
+  const value = await readJSON<unknown>(KEYS.landing);
+  landingCache = isHint(value) ? value : NO_SESSION;
+  return landingCache;
+}
+
+/**
+ * Solo vale después de `loadLanding`. Mientras tanto responde «nadie»: una
+ * portada que empieza pidiendo cuenta y se corrige es mejor que una que saluda
+ * por su nombre a quien no ha entrado nunca.
+ */
+export function landingSync(): LandingHint {
+  return landingCache ?? NO_SESSION;
+}
+
+export async function setLanding(hint: LandingHint): Promise<void> {
+  // La copia en memoria primero, igual que en la marca del tutorial: quien
+  // vuelva a la portada justo detrás de esto lee ya el valor nuevo.
+  landingCache = hint;
+  await writeJSON(KEYS.landing, hint);
+}
+
+/** Al cerrar sesión. La portada vuelve a su estado de invitado. */
+export async function clearLanding(): Promise<void> {
+  landingCache = NO_SESSION;
+  await writeJSON(KEYS.landing, NO_SESSION);
+}
+
+// ---------------------------------------------------------------------------
+// Recorrido de la pantalla de práctica
+// ---------------------------------------------------------------------------
+
+/**
+ * Si ya se ha visto el foco que explica el menú de práctica.
+ *
+ * A diferencia de la marca del tutorial, esta **no** se lee antes de retirar el
+ * splash ni tiene copia síncrona, y es deliberado: el recorrido no aparece en el
+ * primer fotograma —espera a que la pantalla termine de entrar para poder
+ * medirla— así que una lectura asíncrona llega de sobra. Meterla en la espera
+ * del arranque sería pagar en el tiempo de apertura de la aplicación por algo
+ * que solo hace falta medio segundo más tarde y solo dentro de una pantalla.
+ *
+ * Sin marca guardada la respuesta es `false`, que es lo que hace que el
+ * recorrido salga la primera vez. Es la misma regla que `loadTutorialSeen`.
+ */
+export async function loadPracticeTourSeen(): Promise<boolean> {
+  return (await readJSON<boolean>(KEYS.practiceTourSeen)) === true;
+}
+
+export async function setPracticeTourSeen(seen: boolean): Promise<void> {
+  await writeJSON(KEYS.practiceTourSeen, seen);
+}
+
+/**
+ * Si ya se ha visto el recorrido de la barra de pestañas del modo online.
+ *
+ * Es una marca **aparte** de la de práctica, y no un contador de «tutoriales
+ * vistos», porque los dos modos se estrenan en momentos distintos: se puede
+ * llevar semanas jugando sin conexión y entrar hoy por primera vez en el
+ * online. Compartir marca dejaría a esa persona sin la explicación de la única
+ * parte de la app que no ha visto nunca.
+ *
+ * Vive en el almacenamiento **del dispositivo** y no en la cuenta, igual que
+ * las otras dos. Es lo correcto para lo que es: no se explica una cuenta, se
+ * explica una pantalla, y quien cambia de teléfono se encuentra una barra que
+ * no ha usado en ese teléfono.
+ */
+export async function loadOnlineTourSeen(): Promise<boolean> {
+  return (await readJSON<boolean>(KEYS.onlineTourSeen)) === true;
+}
+
+export async function setOnlineTourSeen(seen: boolean): Promise<void> {
+  await writeJSON(KEYS.onlineTourSeen, seen);
 }

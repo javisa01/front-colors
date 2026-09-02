@@ -1,17 +1,27 @@
 import { useSignIn, useSignUp } from "@clerk/expo";
-import { AmbientOrbs } from "@/design/Ambient";
 import { useSSO } from "@clerk/expo/experimental";
+import { LinearGradient } from "expo-linear-gradient";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 import type { ReactElement } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
+
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { Button } from "@/design/Button";
+import { DialRing } from "@/design/Dial";
 import { ErrorBanner } from "@/design/Feedback";
 import { Field, Notice, OrDivider, SegmentedControl } from "@/design/Form";
 import { Card, Screen } from "@/design/Layout";
-import { Color, SECTION_TONE, Space, Type } from "@/design/tokens";
+import { Color, Duration, SECTION_TONE, Space, Type } from "@/design/tokens";
 import { t } from "@/i18n";
 import { describeClerkError, type ClerkField } from "@/online/clerkErrors";
 
@@ -44,10 +54,63 @@ const CODE_LENGTH = 6;
 
 type FieldErrors = Partial<Record<ClerkField, string>>;
 
+/**
+ * El aro de la portada, en el mismo sitio donde estaba.
+ *
+ * Al pulsar el eje del dial la rueda se enciende y arranca; esta pantalla es
+ * donde aterriza ese gesto, asi que trae la misma rueda, ya encendida y en la
+ * misma esquina de la pantalla: desbordada por abajo. El formulario aparece por
+ * encima de ella. Las dos pantallas comparten anclaje, y eso es lo que hace que
+ * se lean como un solo movimiento y no como dos sitios distintos.
+ *
+ * ## Por que abajo y no arriba
+ *
+ * Arriba se probo primero y no funciona, y el motivo no es de gusto: la mitad
+ * superior es el unico hueco sin superficies de esta pantalla, y es justamente
+ * donde viven la flecha de volver, el rotulo de seccion, el titular y su
+ * subtitulo. Cualquier aro con color suficiente para verse dejaba el subtitulo
+ * —texto secundario, gris medio— por debajo de 3:1 de contraste. Y taparlo
+ * hasta que el texto se leyera lo dejaba invisible, que era peor: color que no
+ * se ve no es color, es coste.
+ *
+ * Abajo no hay ese problema. Ahi solo cae la nota de que el modo offline sigue
+ * funcionando, y esa se protege con un velo corto.
+ *
+ * ## La excepcion cromatica
+ *
+ * Cinco rellenos saturados a la vez van en contra de la regla de la casa —lo
+ * unico saturado en pantalla debe ser el color del juego—, y aqui valen por el
+ * mismo motivo que valen en el estado vacio del online: en esta pantalla no hay
+ * color de juego. No hay reto, ni logo, ni muestra que comparar, asi que el aro
+ * no le quita protagonismo a nada.
+ */
+const RING_RATIO = 1.45;
+const RING_MAX = 600;
+/** Cuanto del aro queda por debajo del borde. Solo asoma su arco de arriba. */
+const RING_HIDDEN = 0.8;
+/**
+ * A media luz larga. A plena opacidad el aro vuelve a ser el objeto principal,
+ * y aqui lo principal es un formulario.
+ */
+const RING_OPACITY = 0.72;
+/**
+ * Velo sobre el BORDE SUPERIOR del arco, no sobre el inferior.
+ *
+ * La pantalla hace scroll sobre un fondo fijo, asi que no hay forma de saber
+ * que texto acabara encima del arco: hoy es la nota del pie, con el teclado
+ * abierto puede ser otra cosa. El velo entra en lienzo opaco por donde el arco
+ * empieza y se abre hacia abajo, de modo que lo que caiga sobre el se lee
+ * siempre y el color solo llena la franja del borde, donde ya no hay nada.
+ */
+const SCRIM_HEIGHT = 210;
+
 export default function AuthScreen(): ReactElement {
   const { signIn } = useSignIn();
   const { signUp } = useSignUp();
   const { startSSOFlow } = useSSO();
+  const { width } = useWindowDimensions();
+
+  const ringSize = Math.min(width * RING_RATIO, RING_MAX);
 
   const [step, setStep] = useState<Step>("login");
   const [email, setEmail] = useState("");
@@ -304,7 +367,22 @@ export default function AuthScreen(): ReactElement {
       title={headings.title}
       subtitle={headings.subtitle}
       backTo="/"
-      backdrop={<AmbientOrbs />}
+      backdrop={
+        <View style={styles.ring} pointerEvents="none">
+          <View style={styles.ringInk}>
+            <DialRing
+              size={ringSize}
+              style={{ marginBottom: -ringSize * RING_HIDDEN }}
+            />
+          </View>
+          <LinearGradient
+            colors={[Color.surface.canvas, "transparent"]}
+            locations={[0, 0.62]}
+            style={styles.scrim}
+            pointerEvents="none"
+          />
+        </View>
+      }
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -317,6 +395,7 @@ export default function AuthScreen(): ReactElement {
             ]}
             value={step}
             onChange={switchStep}
+            tone={SECTION_TONE.account}
           />
         )}
 
@@ -365,7 +444,7 @@ export default function AuthScreen(): ReactElement {
           </Card>
         ) : (
           <>
-            <Card>
+            <Card tone={SECTION_TONE.account}>
               {step === "register" ? (
                 <Field
                   label={t("online.auth.username")}
@@ -422,7 +501,16 @@ export default function AuthScreen(): ReactElement {
 
             <OrDivider label={t("online.auth.or")} />
 
-            <View style={styles.social}>
+            {/*
+              Los accesos con Google y Apple entran un poco después que la
+              tarjeta: son la vía rápida, y verlos aparecer detrás del
+              formulario es lo que dice que son una alternativa a lo de arriba
+              y no un paso siguiente.
+            */}
+            <Animated.View
+              style={styles.social}
+              entering={FadeIn.delay(120).duration(Duration.base)}
+            >
               <Button
                 label={
                   ssoBusy === "oauth_google"
@@ -453,7 +541,7 @@ export default function AuthScreen(): ReactElement {
                   onPress={() => void signInWith("oauth_apple")}
                 />
               ) : null}
-            </View>
+            </Animated.View>
 
             <View style={styles.footer}>
               <Text style={Type.caption}>
@@ -487,6 +575,24 @@ export default function AuthScreen(): ReactElement {
 }
 
 const styles = StyleSheet.create({
+  ring: {
+    // El aro se centra en horizontal y se baja con un margen negativo, asi que
+    // de la rueda entera solo entra en pantalla su arco de arriba.
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "flex-end",
+    overflow: "hidden",
+  },
+  ringInk: {
+    opacity: RING_OPACITY,
+  },
+  scrim: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: SCRIM_HEIGHT,
+  },
   actions: {
     gap: Space.sm,
     marginTop: Space.sm,

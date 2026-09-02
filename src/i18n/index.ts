@@ -46,17 +46,38 @@ const es = {
   "a11y.selectedColor": "Color seleccionado",
 
   "landing.badge": "Hexy",
-  "landing.title": "Elige cómo\nquieres jugar",
-  "landing.subtitle":
-    "Practica en solitario o reúne a tus amigos alrededor de un mismo móvil.",
-  "landing.online.title": "Online",
-  "landing.online.description":
-    "Compite contra otros jugadores en tiempo real.",
-  "landing.online.locked": "Necesita conexión a internet",
-  "landing.offline.title": "Offline",
-  "landing.offline.description":
-    "Modo práctica y partidas en grupo en este dispositivo.",
-  "landing.footer": "Offline funciona sin conexión; online necesita cuenta.",
+
+  // --- La portada: el dial ----------------------------------------------
+  // La rueda de color ES la portada y se entra por su eje. Lo que cambia
+  // entre estados no es el adorno: sin grupo no hay reto que jugar, así que
+  // la rueda está literalmente apagada hasta que hay con quién.
+  "dial.streak": "{{count}} jornadas seguidas",
+  "dial.streakOne": "1 jornada seguida",
+  "dial.noGroups": "{{name}} · sin grupos",
+  "dial.open.label": "Nuevo reto cada día a las 15:00 h",
+  "dial.open.title": "Gira, mira,\ny acierta el color.",
+  "dial.open.body":
+    "Cinco imágenes nuevas cada día y dos intentos para conseguir la mayor puntuación.",
+  "dial.open.action": "Jugar",
+  "dial.open.hint": "Abre el reto de hoy",
+  "dial.off.label": "La rueda está apagada",
+  "dial.empty.title": "Te falta\ncon quién.",
+  "dial.empty.body":
+    "Crea un grupo y se enciende: cinco imágenes cada día, dos intentos, y una clasificación que solo veis vosotros.",
+  "dial.empty.kicker": "Enciéndela",
+  "dial.empty.action": "Crear\nun grupo",
+  "dial.empty.note": "abre a las 15:00",
+  "dial.empty.hint": "Abre la pantalla de grupos",
+  "dial.guest.title": "El color\nllega con la gente.",
+  "dial.guest.body":
+    "Cinco imágenes cada día a las 15:00 h, dos intentos, y solo compites con quien invites.",
+  "dial.guest.kicker": "Empieza aquí",
+  "dial.guest.action": "Entrar o\nregistrarte",
+  "dial.guest.note": "y se enciende",
+  "dial.guest.hint": "Abre el acceso a tu cuenta",
+  "dial.code": "¿Te han pasado un código? Entra con él",
+  "dial.practice.title": "El Taller",
+  "dial.practice.body": "Practica sin conexión · solo o en grupo",
 
   // --- Bienvenida y tutorial de la primera vez ---------------------------
   "welcome.greeting": "Te doy la bienvenida a",
@@ -78,14 +99,34 @@ const es = {
   "dev.tutorialTitle": "Tutorial",
   "dev.tutorialHint": "Solo en desarrollo. Se quita antes de publicar.",
   "dev.tutorialButton": "Ver el tutorial otra vez",
+  "dev.tourButton": "Repetir el recorrido del Taller",
 
-  "offline.badge": "Modo offline",
-  "offline.title": "Práctica y grupo",
+  "offline.badge": "El Taller",
+  "offline.title": "Solo o en grupo",
   "offline.subtitle": "Juega tú solo o pásate el móvil entre varias personas.",
   "offline.solo.section": "Solitario",
-  "offline.solo.hint": "Modos de práctica para un jugador.",
+  "offline.solo.hint": "Modos para un jugador.",
   "offline.group.section": "En grupo · mismo móvil",
   "offline.group.hint": "Hasta 99 jugadores por turnos.",
+
+  // --- El recorrido con foco de la pantalla de practica ------------------
+  // Cuatro pasos, y solo la primera vez. Explica lo que no se deduce mirando:
+  // que hay dos listas y no una, como se lee una fila, y donde se silencia.
+  "tour.solo.title": "Jugar en solitario",
+  "tour.solo.body":
+    "Cuatro formas de afinar el ojo, cada una con sus reglas. Si es tu primera vez, empieza por {{mode}}.",
+  "tour.row.title": "Esto es un modo de juego",
+  "tour.row.body":
+    "Cada fila es un modo distinto: debajo del nombre te dice de qué va y cómo se juega. Tu récord aparecerá a la derecha.",
+  "tour.party.title": "Un móvil, varias personas",
+  "tour.party.body":
+    "Aquí no hace falta que haya nadie más conectado: os pasáis el teléfono y juega cada uno el suyo. Hasta 99 personas en un mismo dispositivo.",
+  "tour.settings.title": "Música, efectos e idioma",
+  "tour.settings.body":
+    "Puedes configurar el volumen de música y efectos de sonido, y cambiar de idioma en esta pestaña de configuración.",
+  "tour.next": "Siguiente",
+  "tour.finish": "Entendido",
+  "tour.skip": "Saltar",
 
   "party.mode.battle.title": "Batalla de adivinar",
   "party.mode.battle.description":
@@ -228,7 +269,7 @@ const es = {
   "online.level": "Nivel {{level}}",
   "online.xp": "{{xp}} XP",
 
-  "online.auth.badge": "Modo online",
+  "online.auth.badge": "Hexy",
   "online.auth.title": "Entra en tu cuenta",
   "online.auth.titleRegister": "Crea tu cuenta",
   "online.auth.subtitle":
@@ -250,7 +291,7 @@ const es = {
   "online.auth.switchToRegister": "¿Aún no tienes cuenta?",
   "online.auth.switchToLogin": "¿Ya tienes cuenta?",
   "online.auth.offlineNote":
-    "El modo offline sigue funcionando sin cuenta ni conexión: tus récords locales no se tocan.",
+    "El Taller sigue funcionando sin cuenta ni conexión: tus récords locales no se tocan.",
   "online.auth.error.passwordRequired": "Escribe tu contraseña.",
   "online.auth.error.passwordShort": "Mínimo {{min}} caracteres.",
   "online.auth.error.usernameLength": "Entre 3 y 24 caracteres.",
@@ -262,7 +303,7 @@ const es = {
   "online.auth.apple": "Continuar con Apple",
   "online.auth.connecting": "Conectando...",
   "online.auth.unavailable":
-    "El modo online no está configurado en esta versión de la app. El resto del juego funciona igual.",
+    "Hexy no está configurado en esta versión de la app. El Taller funciona igual.",
   "online.auth.verify.title": "Confirma tu email",
   "online.auth.verify.subtitle":
     "Te hemos enviado un código de 6 dígitos a {{email}}.",
@@ -301,6 +342,41 @@ const es = {
   "online.tabs.groups": "Grupos",
   "online.tabs.ranking": "Ranking",
   "online.tabs.profile": "Perfil",
+
+  // --- El recorrido de la barra, la primera vez que se entra al online ---
+  // Seis pasos: la barra, sus cuatro pestañas en orden de urgencia, y el
+  // botón de crear grupo. Los botones nunca dicen «Siguiente»: dicen lo que
+  // van a hacer, porque lo que hacen es navegar.
+  "online.tour.bar.title": "Lo más importante",
+  "online.tour.bar.body":
+    "En esta sección está todo lo que necesitas: el reto de cada día, tus grupos, el ranking y la gestión de tu cuenta. ¡Echemos un vistazo!",
+  "online.tour.bar.action": "Vamos",
+  "online.tour.groups.title": "Empieza por Grupos",
+  "online.tour.groups.body":
+    "Sin un grupo no hay retos: cada día aparece uno nuevo con 5 imágenes. Crea el tuyo con tus amigos y competid por ver quién tiene mejor ojo para el color.",
+  "online.tour.groups.action": "Ir a Grupos",
+  "online.tour.ranking.title": "Ranking",
+  "online.tour.ranking.body":
+    "Tu puesto en el mundo y entre tus amigos. Está vacío hasta que juegues tu primer reto.",
+  "online.tour.ranking.action": "Ir a Ranking",
+  "online.tour.profile.title": "Perfil",
+  "online.tour.profile.body":
+    "Tu cuenta, tu racha y tus amigos. Cuando alguien te mande una solicitud, aparece un punto rojo sobre este icono.",
+  "online.tour.profile.action": "Ir a Perfil",
+  "online.tour.today.title": "Hoy",
+  "online.tour.today.body":
+    "Aquí vuelves cada tarde: a las 15:00 hay un logo nuevo y dos intentos para acertar su color.",
+  "online.tour.today.action": "Volver a Hoy",
+  "online.tour.create.title": "Solo falta con quién",
+  "online.tour.create.body":
+    "Crea un grupo, invita a quien quieras y mañana a las 15:00 tendréis el mismo reto.",
+  "online.tour.create.action": "Crear un grupo",
+  "online.hub.tour": "Ver cómo funciona",
+  "dev.firstRunTitle": "Primera vez en Hexy",
+  "dev.firstRunHint":
+    "Solo en desarrollo. Finge que acabas de registrarte y no tienes ningún grupo.",
+  "dev.firstRunButton": "Simular primera vez y ver el recorrido",
+  "dev.firstRunOff": "Volver a mis grupos de verdad",
 
   // --- El reto de hoy, en el menú ---
   "online.hub.queueDone": "Todo jugado · {{total}} grupos",
@@ -545,7 +621,7 @@ const es = {
   "online.profile.saved": "Nombre actualizado.",
   "online.profile.session": "Sesión",
   "online.profile.sessionHint":
-    "Al salir se borra la sesión de este dispositivo. El modo offline no se ve afectado.",
+    "Al salir se borra la sesión de este dispositivo. El Taller no se ve afectado.",
   "online.profile.logout": "Cerrar sesión",
 
   "online.friends.badge": "Amigos",
@@ -642,16 +718,34 @@ const en: Record<TranslationKey, string> = {
   "a11y.selectedColor": "Selected colour",
 
   "landing.badge": "Hexy",
-  "landing.title": "Choose how\nyou want to play",
-  "landing.subtitle":
-    "Practise on your own or gather your friends around a single phone.",
-  "landing.online.title": "Online",
-  "landing.online.description": "Compete against other players in real time.",
-  "landing.online.locked": "Needs an internet connection",
-  "landing.offline.title": "Offline",
-  "landing.offline.description":
-    "Practice mode and group matches on this device.",
-  "landing.footer": "Offline works with no connection; online needs an account.",
+
+  "dial.streak": "{{count}} days in a row",
+  "dial.streakOne": "1 day in a row",
+  "dial.noGroups": "{{name}} · no groups yet",
+  "dial.open.label": "New challenge every day at 15:00",
+  "dial.open.title": "Spin, look,\nand match the colour.",
+  "dial.open.body":
+    "Five new images every day, and two tries to get the highest score.",
+  "dial.open.action": "Play",
+  "dial.open.hint": "Opens today's challenge",
+  "dial.off.label": "The wheel is off",
+  "dial.empty.title": "You need\nsomeone to beat.",
+  "dial.empty.body":
+    "Create a group and it lights up: five images a day, two tries, and a ranking only you lot can see.",
+  "dial.empty.kicker": "Light it up",
+  "dial.empty.action": "Create\na group",
+  "dial.empty.note": "opens at 15:00",
+  "dial.empty.hint": "Opens the groups screen",
+  "dial.guest.title": "Colour arrives\nwith the people.",
+  "dial.guest.body":
+    "Five images a day at 15:00, two tries, and you only compete with the people you invite.",
+  "dial.guest.kicker": "Start here",
+  "dial.guest.action": "Sign in or\nsign up",
+  "dial.guest.note": "and it lights up",
+  "dial.guest.hint": "Opens account access",
+  "dial.code": "Got an invite code? Use it here",
+  "dial.practice.title": "The Studio",
+  "dial.practice.body": "Practise offline · solo or in a group",
 
   // --- Bienvenida y tutorial de la primera vez ---------------------------
   "welcome.greeting": "Welcome to",
@@ -673,14 +767,31 @@ const en: Record<TranslationKey, string> = {
   "dev.tutorialTitle": "Tutorial",
   "dev.tutorialHint": "Development only. It goes before release.",
   "dev.tutorialButton": "Show the tutorial again",
+  "dev.tourButton": "Replay the Studio tour",
 
-  "offline.badge": "Offline mode",
-  "offline.title": "Practice & group",
+  "offline.badge": "The Studio",
+  "offline.title": "Solo or in a group",
   "offline.subtitle": "Play solo or pass the phone around several people.",
   "offline.solo.section": "Single player",
-  "offline.solo.hint": "Single-player practice modes.",
+  "offline.solo.hint": "Single-player modes.",
   "offline.group.section": "Group · same phone",
   "offline.group.hint": "Up to 99 players, taking turns.",
+
+  "tour.solo.title": "Playing solo",
+  "tour.solo.body":
+    "Four ways to sharpen your eye, each with its own rules. First time? Start with {{mode}}.",
+  "tour.row.title": "This is a game mode",
+  "tour.row.body":
+    "Each row is a different mode: under the name it tells you what it is and how to play it. Your record will show up on the right.",
+  "tour.party.title": "One phone, several people",
+  "tour.party.body":
+    "Nobody else needs to be online here: pass the phone around and everyone plays their own. Up to 99 people on the same device.",
+  "tour.settings.title": "Music, effects and language",
+  "tour.settings.body":
+    "You can set the music and sound effects volume, and change the language, in this settings panel.",
+  "tour.next": "Next",
+  "tour.finish": "Got it",
+  "tour.skip": "Skip",
 
   "party.mode.battle.title": "Guessing battle",
   "party.mode.battle.description":
@@ -821,7 +932,7 @@ const en: Record<TranslationKey, string> = {
   "online.level": "Level {{level}}",
   "online.xp": "{{xp}} XP",
 
-  "online.auth.badge": "Online mode",
+  "online.auth.badge": "Hexy",
   "online.auth.title": "Sign in",
   "online.auth.titleRegister": "Create your account",
   "online.auth.subtitle":
@@ -843,7 +954,7 @@ const en: Record<TranslationKey, string> = {
   "online.auth.switchToRegister": "No account yet?",
   "online.auth.switchToLogin": "Already have an account?",
   "online.auth.offlineNote":
-    "Offline mode keeps working with no account and no connection: your local records stay untouched.",
+    "The Studio keeps working with no account and no connection: your local records stay untouched.",
   "online.auth.error.passwordRequired": "Enter your password.",
   "online.auth.error.passwordShort": "At least {{min}} characters.",
   "online.auth.error.usernameLength": "Between 3 and 24 characters.",
@@ -855,7 +966,7 @@ const en: Record<TranslationKey, string> = {
   "online.auth.apple": "Continue with Apple",
   "online.auth.connecting": "Connecting...",
   "online.auth.unavailable":
-    "Online mode is not configured in this build. The rest of the game works as usual.",
+    "Hexy is not configured in this build. The Studio works as usual.",
   "online.auth.verify.title": "Confirm your email",
   "online.auth.verify.subtitle": "We sent a 6-digit code to {{email}}.",
   "online.auth.verify.code": "Verification code",
@@ -892,6 +1003,37 @@ const en: Record<TranslationKey, string> = {
   "online.tabs.groups": "Groups",
   "online.tabs.ranking": "Ranking",
   "online.tabs.profile": "Profile",
+
+  "online.tour.bar.title": "What matters most",
+  "online.tour.bar.body":
+    "This section holds everything you need: the daily challenge, your groups, the ranking and your account settings. Let's take a look!",
+  "online.tour.bar.action": "Let's go",
+  "online.tour.groups.title": "Start with Groups",
+  "online.tour.groups.body":
+    "No group, no challenges: a new one shows up every day with 5 images. Create yours with your friends and see who has the best eye for color.",
+  "online.tour.groups.action": "Go to Groups",
+  "online.tour.ranking.title": "Ranking",
+  "online.tour.ranking.body":
+    "Your place in the world and among your friends. It stays empty until you play your first challenge.",
+  "online.tour.ranking.action": "Go to Ranking",
+  "online.tour.profile.title": "Profile",
+  "online.tour.profile.body":
+    "Your account, your streak and your friends. When someone sends you a request, a red dot shows up on this icon.",
+  "online.tour.profile.action": "Go to Profile",
+  "online.tour.today.title": "Today",
+  "online.tour.today.body":
+    "This is where you come back every afternoon: at 15:00 there is a new logo and two tries to match its color.",
+  "online.tour.today.action": "Back to Today",
+  "online.tour.create.title": "All that is missing is people",
+  "online.tour.create.body":
+    "Create a group, invite whoever you like, and tomorrow at 15:00 you all get the same challenge.",
+  "online.tour.create.action": "Create a group",
+  "online.hub.tour": "See how it works",
+  "dev.firstRunTitle": "First time in Hexy",
+  "dev.firstRunHint":
+    "Development only. Pretends you just signed up and have no groups.",
+  "dev.firstRunButton": "Simulate first run and replay the tour",
+  "dev.firstRunOff": "Back to my real groups",
 
   "online.hub.queueDone": "All played · {{total}} groups",
   "online.hub.allDoneHint": "You have played in every group. The next challenge opens at 15:00.",
@@ -1134,7 +1276,7 @@ const en: Record<TranslationKey, string> = {
   "online.profile.saved": "Name updated.",
   "online.profile.session": "Session",
   "online.profile.sessionHint":
-    "Signing out clears the session on this device. Offline mode is unaffected.",
+    "Signing out clears the session on this device. The Studio is unaffected.",
   "online.profile.logout": "Sign out",
 
   "online.friends.badge": "Friends",
@@ -1228,16 +1370,34 @@ const fr: Record<TranslationKey, string> = {
   "a11y.selectedColor": "Couleur sélectionnée",
 
   "landing.badge": "Hexy",
-  "landing.title": "Choisis comment\ntu veux jouer",
-  "landing.subtitle":
-    "Entraîne-toi en solo ou rassemble tes amis autour d'un même téléphone.",
-  "landing.online.title": "En ligne",
-  "landing.online.description": "Affronte d'autres joueurs en temps réel.",
-  "landing.online.locked": "Nécessite une connexion · en développement",
-  "landing.offline.title": "Hors ligne",
-  "landing.offline.description":
-    "Mode entraînement et parties de groupe sur cet appareil.",
-  "landing.footer": "Le mode en ligne arrivera avec la prochaine mise à jour.",
+
+  "dial.streak": "{{count}} jours d'affilée",
+  "dial.streakOne": "1 jour d'affilée",
+  "dial.noGroups": "{{name}} · aucun groupe",
+  "dial.open.label": "Nouveau défi chaque jour à 15h00",
+  "dial.open.title": "Tourne, regarde,\net trouve la couleur.",
+  "dial.open.body":
+    "Cinq nouvelles images chaque jour et deux essais pour faire le meilleur score.",
+  "dial.open.action": "Jouer",
+  "dial.open.hint": "Ouvre le défi du jour",
+  "dial.off.label": "La roue est éteinte",
+  "dial.empty.title": "Il te manque\ndes adversaires.",
+  "dial.empty.body":
+    "Crée un groupe et elle s'allume : cinq images par jour, deux essais, et un classement que vous seuls voyez.",
+  "dial.empty.kicker": "Allume-la",
+  "dial.empty.action": "Créer\nun groupe",
+  "dial.empty.note": "ouvre à 15h00",
+  "dial.empty.hint": "Ouvre l'écran des groupes",
+  "dial.guest.title": "La couleur arrive\navec les autres.",
+  "dial.guest.body":
+    "Cinq images par jour à 15h00, deux essais, et tu affrontes uniquement ceux que tu invites.",
+  "dial.guest.kicker": "Commence ici",
+  "dial.guest.action": "Se connecter\nou s'inscrire",
+  "dial.guest.note": "et elle s'allume",
+  "dial.guest.hint": "Ouvre l'accès à ton compte",
+  "dial.code": "On t'a passé un code ? Entre avec",
+  "dial.practice.title": "L'Atelier",
+  "dial.practice.body": "Entraîne-toi hors ligne · seul ou en groupe",
 
   // --- Bienvenida y tutorial de la primera vez ---------------------------
   "welcome.greeting": "Bienvenue sur",
@@ -1259,15 +1419,32 @@ const fr: Record<TranslationKey, string> = {
   "dev.tutorialTitle": "Tutoriel",
   "dev.tutorialHint": "Développement uniquement. Il partira avant la sortie.",
   "dev.tutorialButton": "Revoir le tutoriel",
+  "dev.tourButton": "Revoir le parcours de l'Atelier",
 
-  "offline.badge": "Mode hors ligne",
-  "offline.title": "Entraînement & groupe",
+  "offline.badge": "L'Atelier",
+  "offline.title": "Seul ou en groupe",
   "offline.subtitle":
     "Joue seul ou fais passer le téléphone entre plusieurs personnes.",
   "offline.solo.section": "Un joueur",
-  "offline.solo.hint": "Modes d'entraînement pour un joueur.",
+  "offline.solo.hint": "Modes pour un joueur.",
   "offline.group.section": "En groupe · même téléphone",
   "offline.group.hint": "Jusqu'à 99 joueurs, chacun son tour.",
+
+  "tour.solo.title": "Jouer en solo",
+  "tour.solo.body":
+    "Quatre façons d'affiner ton œil, chacune avec ses règles. Première fois ? Commence par {{mode}}.",
+  "tour.row.title": "Ceci est un mode de jeu",
+  "tour.row.body":
+    "Chaque ligne est un mode différent : sous le nom, on t'explique de quoi il s'agit et comment y jouer. Ton record apparaîtra à droite.",
+  "tour.party.title": "Un téléphone, plusieurs personnes",
+  "tour.party.body":
+    "Ici personne d'autre n'a besoin d'être connecté : passez-vous le téléphone et chacun joue le sien. Jusqu'à 99 personnes sur un même appareil.",
+  "tour.settings.title": "Musique, effets et langue",
+  "tour.settings.body":
+    "Tu peux régler le volume de la musique et des effets sonores, et changer de langue, dans ce panneau de réglages.",
+  "tour.next": "Suivant",
+  "tour.finish": "C'est compris",
+  "tour.skip": "Passer",
 
   "party.mode.battle.title": "Bataille de devinettes",
   "party.mode.battle.description":
@@ -1410,7 +1587,7 @@ const fr: Record<TranslationKey, string> = {
   "online.level": "Niveau {{level}}",
   "online.xp": "{{xp}} XP",
 
-  "online.auth.badge": "Mode en ligne",
+  "online.auth.badge": "Hexy",
   "online.auth.title": "Connexion",
   "online.auth.titleRegister": "Crée ton compte",
   "online.auth.subtitle":
@@ -1432,7 +1609,7 @@ const fr: Record<TranslationKey, string> = {
   "online.auth.switchToRegister": "Pas encore de compte ?",
   "online.auth.switchToLogin": "Déjà un compte ?",
   "online.auth.offlineNote":
-    "Le mode hors ligne fonctionne toujours sans compte ni connexion : tes records locaux ne bougent pas.",
+    "L'Atelier fonctionne toujours sans compte ni connexion : tes records locaux ne bougent pas.",
   "online.auth.error.passwordRequired": "Saisis ton mot de passe.",
   "online.auth.error.passwordShort": "{{min}} caractères minimum.",
   "online.auth.error.usernameLength": "Entre 3 et 24 caractères.",
@@ -1444,7 +1621,7 @@ const fr: Record<TranslationKey, string> = {
   "online.auth.apple": "Continuer avec Apple",
   "online.auth.connecting": "Connexion...",
   "online.auth.unavailable":
-    "Le mode en ligne n'est pas configuré dans cette version. Le reste du jeu fonctionne normalement.",
+    "Hexy n'est pas configuré dans cette version. L'Atelier fonctionne normalement.",
   "online.auth.verify.title": "Confirme ton email",
   "online.auth.verify.subtitle":
     "Nous avons envoyé un code à 6 chiffres à {{email}}.",
@@ -1483,6 +1660,37 @@ const fr: Record<TranslationKey, string> = {
   "online.tabs.groups": "Groupes",
   "online.tabs.ranking": "Classement",
   "online.tabs.profile": "Profil",
+
+  "online.tour.bar.title": "L'essentiel",
+  "online.tour.bar.body":
+    "Cette section contient tout ce qu'il te faut : le défi de chaque jour, tes groupes, le classement et la gestion de ton compte. Allons y jeter un œil !",
+  "online.tour.bar.action": "C'est parti",
+  "online.tour.groups.title": "Commence par Groupes",
+  "online.tour.groups.body":
+    "Sans groupe, pas de défis : il en arrive un nouveau chaque jour, avec 5 images. Crée le tien avec tes amis et voyez qui a le meilleur œil pour la couleur.",
+  "online.tour.groups.action": "Aller à Groupes",
+  "online.tour.ranking.title": "Classement",
+  "online.tour.ranking.body":
+    "Ta place dans le monde et parmi tes amis. Il reste vide tant que tu n'as pas joué ton premier défi.",
+  "online.tour.ranking.action": "Aller au Classement",
+  "online.tour.profile.title": "Profil",
+  "online.tour.profile.body":
+    "Ton compte, ta série et tes amis. Quand quelqu'un t'envoie une demande, un point rouge apparaît sur cette icône.",
+  "online.tour.profile.action": "Aller au Profil",
+  "online.tour.today.title": "Aujourd'hui",
+  "online.tour.today.body":
+    "C'est ici que tu reviens chaque après-midi : à 15h00 il y a un nouveau logo et deux essais pour trouver sa couleur.",
+  "online.tour.today.action": "Revenir à Aujourd'hui",
+  "online.tour.create.title": "Il ne manque que les gens",
+  "online.tour.create.body":
+    "Crée un groupe, invite qui tu veux, et demain à 15h00 vous aurez tous le même défi.",
+  "online.tour.create.action": "Créer un groupe",
+  "online.hub.tour": "Voir comment ça marche",
+  "dev.firstRunTitle": "Première fois sur Hexy",
+  "dev.firstRunHint":
+    "Développement uniquement. Fait comme si tu venais de t'inscrire, sans aucun groupe.",
+  "dev.firstRunButton": "Simuler la première fois et revoir le parcours",
+  "dev.firstRunOff": "Revenir à mes vrais groupes",
 
   "online.hub.queueDone": "Tout joué · {{total}} groupes",
   "online.hub.allDoneHint": "Tu as joué dans tous tes groupes. Le prochain défi ouvre à 15h00.",
@@ -1729,7 +1937,7 @@ const fr: Record<TranslationKey, string> = {
   "online.profile.saved": "Nom mis à jour.",
   "online.profile.session": "Session",
   "online.profile.sessionHint":
-    "La déconnexion efface la session de cet appareil. Le mode hors ligne n'est pas touché.",
+    "La déconnexion efface la session de cet appareil. L'Atelier n'est pas touché.",
   "online.profile.logout": "Se déconnecter",
 
   "online.friends.badge": "Amis",
@@ -1824,18 +2032,34 @@ const ca: Record<TranslationKey, string> = {
   "a11y.selectedColor": "Color seleccionat",
 
   "landing.badge": "Hexy",
-  "landing.title": "Tria com\nvols jugar",
-  "landing.subtitle":
-    "Practica sol o reuneix els teus amics al voltant d'un mateix mòbil.",
-  "landing.online.title": "Online",
-  "landing.online.description":
-    "Competeix contra altres jugadors en temps real.",
-  "landing.online.locked": "Necessita connexió a internet",
-  "landing.offline.title": "Offline",
-  "landing.offline.description":
-    "Mode pràctica i partides en grup en aquest dispositiu.",
-  "landing.footer":
-    "L'offline funciona sense connexió; l'online necessita compte.",
+
+  "dial.streak": "{{count}} jornades seguides",
+  "dial.streakOne": "1 jornada seguida",
+  "dial.noGroups": "{{name}} · sense grups",
+  "dial.open.label": "Nou repte cada dia a les 15:00 h",
+  "dial.open.title": "Gira, mira,\ni encerta el color.",
+  "dial.open.body":
+    "Cinc imatges noves cada dia i dos intents per aconseguir la màxima puntuació.",
+  "dial.open.action": "Jugar",
+  "dial.open.hint": "Obre el repte d'avui",
+  "dial.off.label": "La roda està apagada",
+  "dial.empty.title": "Et falta\namb qui.",
+  "dial.empty.body":
+    "Crea un grup i s'encén: cinc imatges cada dia, dos intents, i una classificació que només veieu vosaltres.",
+  "dial.empty.kicker": "Encén-la",
+  "dial.empty.action": "Crear\nun grup",
+  "dial.empty.note": "obre a les 15:00",
+  "dial.empty.hint": "Obre la pantalla de grups",
+  "dial.guest.title": "El color\narriba amb la gent.",
+  "dial.guest.body":
+    "Cinc imatges cada dia a les 15:00 h, dos intents, i només competeixes amb qui convidis.",
+  "dial.guest.kicker": "Comença aquí",
+  "dial.guest.action": "Entrar o\nregistrar-te",
+  "dial.guest.note": "i s'encén",
+  "dial.guest.hint": "Obre l'accés al teu compte",
+  "dial.code": "T'han passat un codi? Entra-hi",
+  "dial.practice.title": "El Taller",
+  "dial.practice.body": "Practica sense connexió · sol o en grup",
 
   // --- Bienvenida y tutorial de la primera vez ---------------------------
   "welcome.greeting": "Et dono la benvinguda a",
@@ -1857,15 +2081,32 @@ const ca: Record<TranslationKey, string> = {
   "dev.tutorialTitle": "Tutorial",
   "dev.tutorialHint": "Només en desenvolupament. Marxara abans de publicar.",
   "dev.tutorialButton": "Torna a veure el tutorial",
+  "dev.tourButton": "Repeteix el recorregut del Taller",
 
-  "offline.badge": "Mode offline",
-  "offline.title": "Pràctica i grup",
+  "offline.badge": "El Taller",
+  "offline.title": "Sol o en grup",
   "offline.subtitle":
     "Juga tu sol o passeu-vos el mòbil entre diverses persones.",
   "offline.solo.section": "En solitari",
-  "offline.solo.hint": "Modes de pràctica per a un jugador.",
+  "offline.solo.hint": "Modes per a un jugador.",
   "offline.group.section": "En grup · mateix mòbil",
   "offline.group.hint": "Fins a 99 jugadors per torns.",
+
+  "tour.solo.title": "Jugar en solitari",
+  "tour.solo.body":
+    "Quatre maneres d'afinar l'ull, cadascuna amb les seves regles. Si és el primer cop, comença pel {{mode}}.",
+  "tour.row.title": "Això és un mode de joc",
+  "tour.row.body":
+    "Cada fila és un mode diferent: sota el nom t'explica de què va i com s'hi juga. El teu rècord apareixerà a la dreta.",
+  "tour.party.title": "Un mòbil, diverses persones",
+  "tour.party.body":
+    "Aquí no cal que hi hagi ningú més connectat: us passeu el telèfon i cadascú juga el seu. Fins a 99 persones en un mateix dispositiu.",
+  "tour.settings.title": "Música, efectes i idioma",
+  "tour.settings.body":
+    "Pots configurar el volum de la música i dels efectes de so, i canviar d'idioma, en aquesta pestanya de configuració.",
+  "tour.next": "Següent",
+  "tour.finish": "Entesos",
+  "tour.skip": "Ometre",
 
   "party.mode.battle.title": "Batalla d'endevinar",
   "party.mode.battle.description":
@@ -2008,7 +2249,7 @@ const ca: Record<TranslationKey, string> = {
   "online.level": "Nivell {{level}}",
   "online.xp": "{{xp}} XP",
 
-  "online.auth.badge": "Mode online",
+  "online.auth.badge": "Hexy",
   "online.auth.title": "Entra al teu compte",
   "online.auth.titleRegister": "Crea el teu compte",
   "online.auth.subtitle":
@@ -2030,7 +2271,7 @@ const ca: Record<TranslationKey, string> = {
   "online.auth.switchToRegister": "Encara no tens compte?",
   "online.auth.switchToLogin": "Ja tens compte?",
   "online.auth.offlineNote":
-    "El mode offline continua funcionant sense compte ni connexió: els teus rècords locals no es toquen.",
+    "El Taller continua funcionant sense compte ni connexió: els teus rècords locals no es toquen.",
   "online.auth.error.passwordRequired": "Escriu la teva contrasenya.",
   "online.auth.error.passwordShort": "Mínim {{min}} caràcters.",
   "online.auth.error.usernameLength": "Entre 3 i 24 caràcters.",
@@ -2042,7 +2283,7 @@ const ca: Record<TranslationKey, string> = {
   "online.auth.apple": "Continua amb Apple",
   "online.auth.connecting": "Connectant...",
   "online.auth.unavailable":
-    "El mode online no està configurat en aquesta versió de l'app. La resta del joc funciona igual.",
+    "Hexy no està configurat en aquesta versió de l'app. El Taller funciona igual.",
   "online.auth.verify.title": "Confirma el teu email",
   "online.auth.verify.subtitle":
     "T'hem enviat un codi de 6 dígits a {{email}}.",
@@ -2082,6 +2323,37 @@ const ca: Record<TranslationKey, string> = {
   "online.tabs.groups": "Grups",
   "online.tabs.ranking": "Rànquing",
   "online.tabs.profile": "Perfil",
+
+  "online.tour.bar.title": "El més important",
+  "online.tour.bar.body":
+    "En aquesta secció hi ha tot el que necessites: el repte de cada dia, els teus grups, el rànquing i la gestió del teu compte. Fem-hi una ullada!",
+  "online.tour.bar.action": "Som-hi",
+  "online.tour.groups.title": "Comença pels Grups",
+  "online.tour.groups.body":
+    "Sense un grup no hi ha reptes: cada dia n'apareix un de nou amb 5 imatges. Crea el teu amb els teus amics i competiu per veure qui té millor ull per al color.",
+  "online.tour.groups.action": "Ves a Grups",
+  "online.tour.ranking.title": "Rànquing",
+  "online.tour.ranking.body":
+    "El teu lloc al món i entre els teus amics. Es queda buit fins que juguis el primer repte.",
+  "online.tour.ranking.action": "Ves al Rànquing",
+  "online.tour.profile.title": "Perfil",
+  "online.tour.profile.body":
+    "El teu compte, la teva ratxa i els teus amics. Quan algú t'enviï una sol·licitud, apareix un punt vermell sobre aquesta icona.",
+  "online.tour.profile.action": "Ves al Perfil",
+  "online.tour.today.title": "Avui",
+  "online.tour.today.body":
+    "Aquí tornes cada tarda: a les 15:00 hi ha un logotip nou i dos intents per encertar-ne el color.",
+  "online.tour.today.action": "Torna a Avui",
+  "online.tour.create.title": "Només falta amb qui",
+  "online.tour.create.body":
+    "Crea un grup, convida qui vulguis i demà a les 15:00 tindreu el mateix repte.",
+  "online.tour.create.action": "Crea un grup",
+  "online.hub.tour": "Mira com funciona",
+  "dev.firstRunTitle": "Primera vegada a Hexy",
+  "dev.firstRunHint":
+    "Només en desenvolupament. Fa veure que t'acabes de registrar i no tens cap grup.",
+  "dev.firstRunButton": "Simula la primera vegada i mira el recorregut",
+  "dev.firstRunOff": "Torna als meus grups de debò",
 
   // --- El repte d'avui, al menú ---
   "online.hub.queueDone": "Tot jugat · {{total}} grups",
@@ -2327,7 +2599,7 @@ const ca: Record<TranslationKey, string> = {
   "online.profile.saved": "Nom actualitzat.",
   "online.profile.session": "Sessió",
   "online.profile.sessionHint":
-    "En sortir s'esborra la sessió d'aquest dispositiu. El mode offline no es veu afectat.",
+    "En sortir s'esborra la sessió d'aquest dispositiu. El Taller no es veu afectat.",
   "online.profile.logout": "Tanca la sessió",
 
   "online.friends.badge": "Amics",

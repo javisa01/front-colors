@@ -31,6 +31,7 @@ import {
   getLanguage as loadLanguage,
   getMusicVolume as loadMusicVolume,
   getSfxVolume as loadSfxVolume,
+  loadLanding,
   loadTutorialSeen,
 } from "@/utils/storage";
 
@@ -118,7 +119,17 @@ export default function RootLayout() {
 
   useEffect(() => {
     (async () => {
-      await loadTutorialSeen();
+      /*
+        La pista de portada viaja con la marca del tutorial, y no por
+        comodidad: la portada elige entre tres pantallas distintas —rueda
+        encendida, apagada con grupo que crear, o apagada sin cuenta— y tiene
+        que hacerlo en su primer render. Leerla desde la pantalla enseñaría el
+        estado de invitado un instante a quien lleva doce jornadas seguidas.
+
+        Las dos van en la misma espera porque las dos son lecturas de disco de
+        la misma pantalla, y ninguna de las dos puede llegar tarde.
+      */
+      await Promise.all([loadTutorialSeen(), loadLanding()]);
       setTutorialReady(true);
     })();
   }, []);

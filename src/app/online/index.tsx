@@ -1,6 +1,6 @@
 import { useFocusEffect, useRouter } from "expo-router";
 import type { ReactElement } from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { SettingsButton } from "@/components/SettingsButton";
@@ -11,14 +11,16 @@ import type {
   GroupSummary,
 } from "@/api/types";
 import { ChallengeWall, type WallItem } from "@/components/online/ChallengeWall";
+import { DevFirstRunPanel } from "@/components/online/DevFirstRunPanel";
 import { useOnlineTabBarSpace } from "@/components/online/OnlineTabBar";
+import { useTour, useTourAnchor } from "@/components/online/OnlineTour";
 import { UnreadDot } from "@/components/online/UnreadDot";
 import { StreakRibbon } from "@/components/online/StreakRibbon";
 import { AmbientOrbs } from "@/design/Ambient";
 import { Button } from "@/design/Button";
 import { ErrorBanner, Loading } from "@/design/Feedback";
 import { GlowBorder } from "@/design/Glow";
-import { OptionRow, Screen, SectionHeader, TextLink } from "@/design/Layout";
+import { Divider, OptionRow, Screen, SectionHeader, TextLink } from "@/design/Layout";
 import { SwatchFan } from "@/design/SwatchFan";
 import { Radius, SECTION_TONE, Space, Type } from "@/design/tokens";
 import { getLocale, t } from "@/i18n";
@@ -28,7 +30,9 @@ import {
   silenceMutedGroups,
   sortGroups,
 } from "@/online/groups";
+import { useFirstRunMock } from "@/online/devFirstRun";
 import { useSession } from "@/online/session";
+import { setLanding } from "@/utils/storage";
 import { readAttempt, type StoredRound } from "@/online/attempts";
 import {
   markPlayed,
@@ -132,9 +136,21 @@ interface ChallengeDay {
 }
 
 export default function OnlineHubScreen(): ReactElement {
-  const { api, reloadUser } = useSession();
+  const { api, reloadUser, user } = useSession();
   const router = useRouter();
   const tabBarSpace = useOnlineTabBarSpace();
+
+  /**
+   * El recorrido de la barra de pestañas.
+   *
+   * Lo arranca esta pantalla y no el layout porque la condición de «primera
+   * vez» es **no tener ningún grupo**, y quien pide los grupos es esta. El
+   * layout solo sabe que hay sesión, que no es lo mismo: con esa sola señal se
+   * le explicaría la barra a quien lleva un año jugando.
+   */
+  const { start: startTour, startOnce } = useTour();
+  /** Simulador de primera vez. Fuera de desarrollo siempre es `false`. */
+  const firstRunMock = useFirstRunMock();
 
   const [groups, setGroups] = useState<GroupSummary[] | null>(null);
   const [daily, setDaily] = useState<DailyOverview | null>(null);
@@ -236,9 +252,24 @@ export default function OnlineHubScreen(): ReactElement {
     }
   }, [api, reloadUser]);
 
+  /**
+   * Cuántas veces se ha entrado en esta pantalla.
+   *
+   * Sirve para una sola cosa: volver a repartir el abanico de muestras del
+   * estado vacío. Esta pantalla es una pestaña y no se desmonta al salir de
+   * ella, así que sin esto el abanico solo se abre la primera vez y quien
+   * vuelve del ranking se lo encuentra ya desplegado, sin el gesto que dice de
+   * qué va el juego — que es justamente lo único que esa pantalla enseña.
+   *
+   * Es un contador y no un booleano porque lo que se pide es un gesto, no un
+   * estado: dos entradas seguidas tienen que poder pedir lo mismo dos veces.
+   */
+  const [visit, setVisit] = useState(0);
+
   useFocusEffect(
     useCallback(() => {
       void load();
+      setVisit((count) => count + 1);
     }, [load]),
   );
 
@@ -248,11 +279,71 @@ export default function OnlineHubScreen(): ReactElement {
     setRefreshing(false);
   }, [load]);
 
+  /**
+   * La pista para la portada.
+   *
+   * La raíz de la aplicación no puede preguntar por la sesión —no monta Clerk,
+   * esa es la frontera que mantiene el modo offline sin red—, así que quien
+   * sabe algo lo deja escrito y ella lo lee. Esta pantalla es el único sitio
+   * donde constan a la vez la sesión, los grupos y la racha, y se recarga en
+   * cada focus, con lo que la pista se mantiene fresca sola.
+   *
+   * Va en su propio efecto y no dentro de `load` por un motivo concreto: el
+   * nombre sale de `user`, y `user` cambia de identidad cada vez que `load`
+   * llama a `reloadUser`. Metido en las dependencias de `load`, el efecto de
+   * focus que lo dispara se relanzaría en bucle. Como pista es estado
+   * derivado, aquí se deriva.
+   *
+   * Sin `await`: es una escritura de mejor esfuerzo para la próxima vez que se
+   * abra la aplicación, y nada de esta pantalla depende de ella.
+   */
+  useEffect(() => {
+    if (groups == null) {
+      // Todavía cargando. Escribir ahora diría «cero grupos» y apagaría la
+      // rueda de la portada por un instante de red.
+      return;
+    }
+
+    void setLanding({
+      signedIn: true,
+      groups: groups.length,
+      streak: streak.count,
+      streakSecured:
+        daily?.groups.some((entry) => entry.bestScore != null) ?? false,
+      username: user?.username ?? "",
+    });
+  }, [daily, groups, streak, user]);
+
   const dailyByGroup = new Map<string, DailyGroupStatus>(
     (daily?.groups ?? []).map((entry) => [entry.groupId, entry]),
   );
 
-  const ordered = groups ? sortGroups(groups) : null;
+  /*
+    El simulador de primera vez vacía la lista **aquí**, en lo que se pinta, y
+    no en `groups`. La diferencia importa: `groups` es lo que alimenta la pista
+    que se guarda para la portada, y falsearlo dejaría la rueda apagada al
+    apagar el simulador. Ver `online/devFirstRun`.
+  */
+  const ordered = firstRunMock ? [] : groups ? sortGroups(groups) : null;
+
+  /**
+   * La primera vez, y solo entonces: sesión abierta y ningún grupo.
+   *
+   * Se espera a que la lista haya llegado —`null` es «todavía no lo sé», no
+   * «no hay»— porque arrancar antes explicaría la barra sobre una pantalla que
+   * un segundo después se llena de retos.
+   *
+   * `startOnce` se encarga del resto: mira la marca guardada y no vuelve a
+   * preguntar en toda la sesión, así que da igual que esta pantalla se recargue
+   * en cada focus.
+   */
+  const noGroups = ordered != null && ordered.length === 0;
+
+  useEffect(() => {
+    if (noGroups) {
+      startOnce();
+    }
+  }, [noGroups, startOnce]);
   /** Todo lo que todavía admite un intento, con lo no jugado delante. */
   const queue = ordered ? buildQueue(ordered, dailyByGroup) : [];
   /** Los que van al carrusel: los retos vivos, como mucho `MAX_CAROUSEL`. */
@@ -360,6 +451,7 @@ export default function OnlineHubScreen(): ReactElement {
         error ? null : <Loading label={t("online.hub.loading")} />
       ) : ordered.length === 0 ? (
         <FirstGroup
+          visit={visit}
           onCreate={() =>
             router.push({
               pathname: "/online/groups",
@@ -481,6 +573,25 @@ export default function OnlineHubScreen(): ReactElement {
           onPress={() => router.push("/online/groups")}
         />
       ) : null}
+
+      {/*
+        La puerta de vuelta al recorrido de la barra.
+
+        Existe por lo mismo que el atajo de la bienvenida: un tutorial que solo
+        se enseña una vez y no se puede repetir acaba pidiéndose por soporte. Y
+        va **aquí abajo y como enlace**, no como tarjeta ni como botón: quien lo
+        necesita lo busca, y quien no, no debería tropezarse cada día con una
+        oferta de explicarle una barra que ya sabe usar.
+
+        La raya de arriba es lo que lo separa del contenido: sin ella, un enlace
+        suelto tras la lista se lee como una fila más de la lista.
+      */}
+      <Divider />
+
+      <TextLink label={t("online.hub.tour")} onPress={startTour} />
+
+      {/* Simulador de primera vez. Devuelve `null` fuera de `__DEV__`. */}
+      <DevFirstRunPanel />
     </Screen>
   );
 }
@@ -515,19 +626,32 @@ export default function OnlineHubScreen(): ReactElement {
  * de siempre, la tarjeta del reto de hoy.
  */
 function FirstGroup({
+  visit,
   onCreate,
   onJoin,
 }: {
+  /** Sube cada vez que se entra en la pantalla; reparte el abanico otra vez. */
+  visit: number;
   onCreate: () => void;
   onJoin: () => void;
 }): ReactElement {
+  /*
+    El último paso del recorrido de la primera vez señala este botón, que es lo
+    único que se puede hacer sin grupos. Va sobre un envoltorio y no sobre el
+    botón porque `Button` está memoizado y no reenvía `ref`: darle esa capacidad
+    por una necesidad de esta pantalla sería tocar el componente que usa media
+    aplicación. Un `View` sin estilo no mueve la maquetación —el margen sigue
+    siendo del botón—, así que se queda aquí.
+  */
+  const createAnchor = useTourAnchor("firstGroup");
+
   return (
     <GlowBorder
       radius={Radius.xl}
       padding={Space.xxl}
       style={styles.firstGroup}
     >
-      <SwatchFan />
+      <SwatchFan replay={visit} />
 
       <Text style={[Type.title, styles.firstGroupTitle]}>
         {t("online.hub.groupsEmpty")}
@@ -536,15 +660,18 @@ function FirstGroup({
         {t("online.hub.groupsEmptyHint")}
       </Text>
 
-      <Button
-        label={t("online.hub.quickCreate")}
-        icon="plus"
-        // Teal: es una acción de la sección «grupos», y ese es su pigmento en
-        // toda la aplicación — empezando por su pestaña.
-        tone={SECTION_TONE.groups}
-        onPress={onCreate}
-        style={styles.emptyAction}
-      />
+      <View ref={createAnchor} collapsable={false}>
+        <Button
+          label={t("online.hub.quickCreate")}
+          icon="plus"
+          // Teal: es una acción de la sección «grupos», y ese es su pigmento en
+          // toda la aplicación — empezando por su pestaña.
+          tone={SECTION_TONE.groups}
+          onPress={onCreate}
+          style={styles.emptyAction}
+        />
+      </View>
+
       <Button
         label={t("online.hub.quickJoin")}
         icon="users"

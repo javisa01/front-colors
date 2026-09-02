@@ -22,6 +22,16 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
  * crece nunca y no hay que barrer claves viejas. Leer una jornada que no es la
  * guardada devuelve `null`, que es exactamente lo que significa —de hoy no hay
  * nada—, en vez de enseñar los colores de ayer.
+ *
+ * ## Por qué se queda el MEJOR intento y no el último
+ *
+ * Porque en el centro del anillo va `bestScore`, que lo dice el servidor y es
+ * **el mejor de los dos**. Guardando el último, un segundo intento peor dejaba
+ * los arcos contando una jornada y la cifra del medio contando otra: el dial se
+ * rellenaba con unos colores que no eran los de la puntuación que enseñaba.
+ *
+ * Por eso cada entrada lleva su puntuación y una nueva solo entra si mejora —
+ * el anillo y la cifra hablan siempre del mismo intento.
  */
 
 const KEY = "colorquest:v1:dailyrounds";
@@ -38,10 +48,21 @@ export interface StoredRound {
   accuracy: number;
 }
 
+/**
+ * El intento guardado de un grupo: sus rondas y lo que puntuó.
+ *
+ * La puntuación no se enseña desde aquí —esa la manda el servidor— y existe
+ * solo para decidir cuál de los dos intentos del día se queda.
+ */
+interface StoredGroupAttempt {
+  score: number;
+  rounds: StoredRound[];
+}
+
 interface Stored {
   /** Jornada `YYYY-MM-DD` a la que pertenece todo lo de dentro. */
   dateKey: string;
-  byGroup: Record<string, StoredRound[]>;
+  byGroup: Record<string, StoredGroupAttempt>;
   /**
    * XP ganado hoy con el reto, sumando todos los grupos.
    *
@@ -58,16 +79,100 @@ interface Stored {
   xp?: number;
 }
 
-function isValid(value: unknown): value is Stored {
-  if (typeof value !== "object" || value === null) {
-    return false;
+// ---------------------------------------------------------------------------
+// La cola de escritura
+// ---------------------------------------------------------------------------
+
+/**
+ * Todo lo que toca la clave pasa por aquí, de una en una.
+ *
+ * Esto era **un fallo de verdad, no una precaución**. Al cerrar un intento se
+ * disparaban a la vez `saveAttempt` y `addDailyXp`, y las dos hacen lo mismo:
+ * leer la clave entera, cambiarle un campo y volver a escribirla. Salían en
+ * paralelo, así que las dos leían el estado de antes y la última en escribir
+ * pisaba a la otra — normalmente `addDailyXp`, que guardaba el `byGroup` viejo
+ * y **borraba el desglose recién guardado**.
+ *
+ * De ahí que el dial apareciera vacío justo después de jugar: el intento se
+ * había guardado, y un milisegundo después algo lo machacaba. Se notaba sobre
+ * todo en el primer intento del día, que es el que concede XP; en el segundo,
+ * `xpEarned` suele ser cero y `addDailyXp` ni llega a escribir.
+ *
+ * Con la cola, leer-modificar-escribir es atómico respecto a este módulo: cada
+ * tarea ve lo que dejó la anterior. Es la garantía que hacía falta y que no da
+ * `AsyncStorage`, que solo promete que cada escritura suelta llega entera.
+ *
+ * Las lecturas entran también: no cuestan nada y así nunca observan el estado
+ * de mitad de una escritura pendiente.
+ */
+let chain: Promise<unknown> = Promise.resolve();
+
+function serialize<T>(task: () => Promise<T>): Promise<T> {
+  // Se encadena al anterior haya ido como haya ido: una tarea que falle no
+  // puede dejar la cola colgada para siempre.
+  const run = chain.then(task, task);
+  chain = run.catch(() => undefined);
+  return run;
+}
+
+// ---------------------------------------------------------------------------
+// El bruto
+// ---------------------------------------------------------------------------
+
+/**
+ * Normaliza una entrada de grupo.
+ *
+ * La versión anterior guardaba el desglose como un array pelado, sin
+ * puntuación. Quien actualice la app a media jornada tiene una de esas en el
+ * disco y hay que poder pintarla: se lee con puntuación `-1`, que significa «no
+ * se sabe» y hace que cualquier intento posterior la sustituya. Es la decisión
+ * segura de las dos — al revés dejaría clavado para siempre un intento del que
+ * se desconoce el valor.
+ */
+function normalizeGroup(value: unknown): StoredGroupAttempt | null {
+  if (Array.isArray(value)) {
+    return { score: -1, rounds: value as StoredRound[] };
   }
-  const stored = value as Partial<Stored>;
-  return (
-    typeof stored.dateKey === "string" &&
-    typeof stored.byGroup === "object" &&
-    stored.byGroup !== null
-  );
+  if (typeof value === "object" && value !== null) {
+    const entry = value as Partial<StoredGroupAttempt>;
+    if (Array.isArray(entry.rounds)) {
+      return {
+        score: typeof entry.score === "number" ? entry.score : -1,
+        rounds: entry.rounds,
+      };
+    }
+  }
+  return null;
+}
+
+function normalize(value: unknown): Stored | null {
+  if (typeof value !== "object" || value === null) {
+    return null;
+  }
+  const stored = value as Partial<Stored> & { byGroup?: unknown };
+  if (
+    typeof stored.dateKey !== "string" ||
+    typeof stored.byGroup !== "object" ||
+    stored.byGroup === null
+  ) {
+    return null;
+  }
+
+  const byGroup: Record<string, StoredGroupAttempt> = {};
+  for (const [groupId, raw] of Object.entries(
+    stored.byGroup as Record<string, unknown>,
+  )) {
+    const entry = normalizeGroup(raw);
+    if (entry != null) {
+      byGroup[groupId] = entry;
+    }
+  }
+
+  return {
+    dateKey: stored.dateKey,
+    byGroup,
+    xp: typeof stored.xp === "number" ? stored.xp : undefined,
+  };
 }
 
 async function read(): Promise<Stored | null> {
@@ -76,24 +181,49 @@ async function read(): Promise<Stored | null> {
     if (!raw) {
       return null;
     }
-    const parsed: unknown = JSON.parse(raw);
-    return isValid(parsed) ? parsed : null;
+    return normalize(JSON.parse(raw) as unknown);
   } catch {
     return null;
   }
 }
+
+/**
+ * Lo guardado de esta jornada, o un almacén vacío si lo de dentro es de otro
+ * día: al cambiar el día no se acumula, se empieza de cero.
+ */
+async function readForDay(dateKey: string): Promise<Stored> {
+  const stored = await read();
+  return stored != null && stored.dateKey === dateKey
+    ? stored
+    : { dateKey, byGroup: {} };
+}
+
+async function write(stored: Stored): Promise<void> {
+  try {
+    await AsyncStorage.setItem(KEY, JSON.stringify(stored));
+  } catch {
+    // Es un adorno del menú: si no se puede guardar, el anillo sale vacío.
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Intentos
+// ---------------------------------------------------------------------------
 
 /** El desglose de este grupo en esta jornada, o `null` si no hay. */
 export async function readAttempt(
   groupId: string,
   dateKey: string,
 ): Promise<StoredRound[] | null> {
-  const stored = await read();
-  if (stored == null || stored.dateKey !== dateKey) {
-    return null;
-  }
-  return stored.byGroup[groupId] ?? null;
+  return serialize(async () => {
+    const stored = await read();
+    if (stored == null || stored.dateKey !== dateKey) {
+      return null;
+    }
+    return stored.byGroup[groupId]?.rounds ?? null;
+  });
 }
+
 /**
  * Lo mismo, pero **sin saber todavía de qué jornada es**: devuelve el desglose
  * junto a la jornada a la que pertenece, para que quien llama decida.
@@ -117,48 +247,47 @@ export interface StoredAttempt {
 export async function readLatestAttempt(
   groupId: string,
 ): Promise<StoredAttempt | null> {
-  const stored = await read();
-  const rounds = stored?.byGroup[groupId];
-  if (stored == null || rounds == null) {
-    return null;
-  }
-  return { dateKey: stored.dateKey, rounds };
+  return serialize(async () => {
+    const stored = await read();
+    const entry = stored?.byGroup[groupId];
+    if (stored == null || entry == null) {
+      return null;
+    }
+    return { dateKey: stored.dateKey, rounds: entry.rounds };
+  });
 }
 
 /**
- * Guarda el desglose de un intento.
+ * Guarda el desglose de un intento, **si es el mejor del día**.
  *
- * Si ya había uno de este grupo hoy —el segundo intento— se sobrescribe: el
- * anillo enseña lo último que hiciste, que es lo que el jugador espera ver
- * después de volver a jugar.
+ * Los dos intentos de una jornada compiten por un solo sitio y gana el de más
+ * puntos: es el que el servidor cuenta en la clasificación y el que enseña la
+ * cifra del centro del anillo. Un segundo intento peor no toca nada, así que el
+ * dial sigue enseñando los colores de la puntuación que tiene escrita dentro.
+ *
+ * En empate se queda el que ya estaba: la cifra en pantalla no cambia, y así se
+ * ahorra un viaje al disco.
  */
 export async function saveAttempt(
   groupId: string,
   dateKey: string,
   rounds: StoredRound[],
+  score: number,
 ): Promise<void> {
-  const stored = await read();
+  return serialize(async () => {
+    const base = await readForDay(dateKey);
+    const previous = base.byGroup[groupId];
 
-  // Jornada distinta —o nada guardado—: se empieza de cero en vez de acumular.
-  const base: Stored =
-    stored != null && stored.dateKey === dateKey
-      ? stored
-      : { dateKey, byGroup: {} };
+    if (previous != null && previous.score >= score) {
+      return;
+    }
 
-  try {
-    await AsyncStorage.setItem(
-      KEY,
-      JSON.stringify({
-        dateKey,
-        byGroup: { ...base.byGroup, [groupId]: rounds },
-        // Se arrastra: guardar el desglose de un intento no puede borrar el XP
-        // del día, que vive en la misma clave.
-        xp: base.xp,
-      } satisfies Stored),
-    );
-  } catch {
-    // Es un adorno del menú: si no se puede guardar, el anillo sale vacío.
-  }
+    await write({
+      ...base,
+      dateKey,
+      byGroup: { ...base.byGroup, [groupId]: { score, rounds } },
+    });
+  });
 }
 
 /**
@@ -177,25 +306,10 @@ export async function addDailyXp(dateKey: string, xp: number): Promise<void> {
     return;
   }
 
-  const stored = await read();
-  const base: Stored =
-    stored != null && stored.dateKey === dateKey
-      ? stored
-      : { dateKey, byGroup: {} };
-
-  try {
-    await AsyncStorage.setItem(
-      KEY,
-      JSON.stringify({
-        ...base,
-        dateKey,
-        xp: (base.xp ?? 0) + xp,
-      } satisfies Stored),
-    );
-  } catch {
-    // El perfil se queda sin la línea de «hoy». El total y el nivel, que son lo
-    // que manda, siguen llegando de `GET /me`.
-  }
+  return serialize(async () => {
+    const base = await readForDay(dateKey);
+    await write({ ...base, dateKey, xp: (base.xp ?? 0) + xp });
+  });
 }
 
 /**
@@ -210,9 +324,11 @@ export async function readDailyXp(): Promise<{
   dateKey: string;
   xp: number;
 } | null> {
-  const stored = await read();
-  if (stored == null) {
-    return null;
-  }
-  return { dateKey: stored.dateKey, xp: stored.xp ?? 0 };
+  return serialize(async () => {
+    const stored = await read();
+    if (stored == null) {
+      return null;
+    }
+    return { dateKey: stored.dateKey, xp: stored.xp ?? 0 };
+  });
 }

@@ -6,7 +6,8 @@ import Animated, { FadeIn } from "react-native-reanimated";
 
 import { ColorWheel, type ColorWheelHandle } from "@/components/ColorWheel";
 import SVGChallenge from "@/components/SVGChallenge";
-import { ResultConstellation } from "@/design/Ambient";
+import { AmbientTable, ResultConstellation } from "@/design/Ambient";
+import { playerTint } from "@/design/Avatar";
 import { Button } from "@/design/Button";
 import { Pill, StatPill, scoreTone } from "@/design/Feedback";
 import { Icon } from "@/design/Icon";
@@ -17,7 +18,14 @@ import {
   SectionHeader,
   useIsTablet,
 } from "@/design/Layout";
-import { Color, Duration, Radius, Space, Type } from "@/design/tokens";
+import {
+  Color,
+  Duration,
+  PARTY_TONE,
+  Radius,
+  Space,
+  Type,
+} from "@/design/tokens";
 import { INITIAL_HSV } from "@/hooks/useChallenge";
 import { useParty } from "@/hooks/useParty";
 import { t, type TranslationKey } from "@/i18n";
@@ -312,20 +320,47 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
   }, [config.cooperative, config.mode, phase, teamAverage]);
 
   const modeTitle = t(`party.mode.${config.mode}.title` as TranslationKey);
+  /** El color del modo, el mismo desde la fila del menú. Ver `PARTY_TONE`. */
+  const modeTone = PARTY_TONE[config.mode];
 
   // ---- Fases ------------------------------------------------------------
 
   if (phase === "handoff") {
+    /*
+      El color de quien tiene el turno. Sale de su nombre con la misma fórmula
+      que usan su chapa en la configuración y su fila en la clasificación de un
+      grupo online, así que una persona lleva un solo color en toda la
+      aplicación. Ver `design/Avatar`.
+    */
+    const tint = playerTint(currentPlayer.name);
+
     return (
       <Screen
         backTo={backHref}
         eyebrow={modeTitle}
         title={t("party.handoff.title", { name: currentPlayer.name })}
         subtitle={t("party.handoff.subtitle")}
+        backdrop={<AmbientTable tone={modeTone} />}
       >
         <Card>
-          <View style={styles.handoffMark}>
-            <Icon name="users" size={24} color={Color.text.secondary} />
+          {/*
+            La chapa del jugador, a tamaño grande.
+
+            Antes era un icono de dos muñecos en un cuadro gris, y decía justo lo
+            contrario de lo que la pantalla necesita decir: esto no va de «un
+            grupo», va de **una** persona, la que tiene que coger el móvil ahora.
+            El número es el mismo con el que escribió su nombre hace un minuto, y
+            el color es el suyo, así que se reconoce sin llegar a leer el título.
+          */}
+          <View
+            style={[
+              styles.handoffMark,
+              { backgroundColor: tint.fill, borderColor: tint.border },
+            ]}
+          >
+            <Text style={[Type.metricHero, { color: tint.text }]}>
+              {playerIndex + 1}
+            </Text>
           </View>
 
           <View style={styles.handoffMeta}>
@@ -351,6 +386,7 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
           <Button
             label={t("party.handoff.start")}
             icon="play"
+            tone={modeTone}
             onPress={beginTurn}
             style={styles.cardAction}
           />
@@ -685,14 +721,15 @@ const styles = StyleSheet.create({
   },
   handoffMark: {
     alignSelf: "center",
-    width: 48,
-    height: 48,
-    borderRadius: Radius.md,
+    // Más grande que la chapa de 26 de la configuración, y con el mismo radio
+    // proporcional: es la misma cosa vista de cerca, no otra distinta.
+    width: 76,
+    height: 76,
+    borderRadius: Radius.lg,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Color.surface.sunken,
+    // Relleno y borde los pone `playerTint`: son de esa persona.
     borderWidth: 1,
-    borderColor: Color.border.subtle,
   },
   handoffMeta: {
     flexDirection: "row",

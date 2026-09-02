@@ -14,6 +14,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useTourAnchor, type TourAnchor } from "@/components/online/OnlineTour";
 import { UnreadDot } from "@/components/online/UnreadDot";
 import { Icon, type IconName } from "@/design/Icon";
 import { useColors, useThemedStyles } from "@/design/theme";
@@ -84,6 +85,15 @@ interface TabDef {
    * cosas se separarían en cuanto alguien retocase una.
    */
   tone: SpectrumTone;
+  /**
+   * El nombre con el que el recorrido de la primera vez señala esta pestaña.
+   *
+   * Va aquí y no en el guion del recorrido porque el nombre de la ruta —
+   * `groups/index`— es un detalle del árbol de ficheros: si mañana la lista de
+   * grupos cambia de sitio, lo que el recorrido señala sigue siendo «la pestaña
+   * de grupos». Ver `components/online/OnlineTour`.
+   */
+  anchor: TourAnchor;
 }
 
 /**
@@ -127,24 +137,28 @@ const TABS: TabDef[] = [
     icon: "target",
     labelKey: "online.tabs.today",
     tone: SECTION_TONE.today,
+    anchor: "tab.today",
   },
   {
     name: "groups/index",
     icon: "users",
     labelKey: "online.tabs.groups",
     tone: SECTION_TONE.groups,
+    anchor: "tab.groups",
   },
   {
     name: "leaderboard",
     icon: "trophy",
     labelKey: "online.tabs.ranking",
     tone: SECTION_TONE.ranking,
+    anchor: "tab.ranking",
   },
   {
     name: "profile",
     icon: "user",
     labelKey: "online.tabs.profile",
     tone: SECTION_TONE.account,
+    anchor: "tab.profile",
   },
 ];
 
@@ -185,6 +199,13 @@ function OnlineTabBarBase({
 }: TabBarProps): ReactElement | null {
   const styles = useThemedStyles(tabBarStyles);
   const colors = useColors();
+
+  /*
+    La pastilla entera, para el primer paso del recorrido de la primera vez:
+    antes de explicar las pestañas de una en una hay que decir que esto de aquí
+    abajo es un mando. Ver `components/online/OnlineTour`.
+  */
+  const barAnchor = useTourAnchor("bar");
 
   const activeName = state.routes[state.index]?.name;
   const activeIndex = TABS.findIndex((tab) => tab.name === activeName);
@@ -295,7 +316,12 @@ function OnlineTabBarBase({
         { paddingBottom: Math.max(insets.bottom, Space.md) },
       ]}
     >
-      <View style={styles.pill}>
+      {/*
+        `collapsable={false}` para que Android no funda esta vista con su hijo:
+        una vista fundida no existe en el árbol nativo y `measureInWindow` no
+        devuelve nada, así que el recorrido no podría señalar la barra.
+      */}
+      <View ref={barAnchor} collapsable={false} style={styles.pill}>
         {/*
           El carril no lleva relleno propio, y eso es justo lo que permite que
           el indicador cuadre: la `x` que devuelve `onLayout` de cada pestaña y
@@ -379,6 +405,8 @@ function Tab({
 }): ReactElement {
   const label = t(tab.labelKey);
   const lit = useSharedValue(focused ? 1 : 0);
+  /* El objetivo del recorrido: la pestaña, no su icono. */
+  const anchor = useTourAnchor(tab.anchor);
 
   useEffect(() => {
     lit.set(withTiming(focused ? 1 : 0, { duration: Duration.base }));
@@ -396,6 +424,7 @@ function Tab({
 
   return (
     <Pressable
+      ref={anchor}
       onPress={onPress}
       onLayout={handleLayout}
       style={styles.tab}

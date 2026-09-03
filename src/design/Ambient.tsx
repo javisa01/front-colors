@@ -1134,6 +1134,123 @@ function AscentColumn({
 export const AmbientAscent = memo(AmbientAscentBase);
 
 // ---------------------------------------------------------------------------
+// El corro
+// ---------------------------------------------------------------------------
+
+/**
+ * El fondo de la pantalla de amigos: **círculos que se buscan**.
+ *
+ * Antes usaba los orbes de la portada, y ese era el problema: los orbes son la
+ * forma de «la aplicación» —salen en el menú offline y en el hub— y aquí
+ * dejaban la pantalla sin identidad, como si fuese una sub-pantalla de otra
+ * cosa. Amigos es un destino con su propio contenido, y en esta familia cada
+ * destino tiene su forma.
+ *
+ * La suya son tres aros grandes solapándose. No es decoración con forma de
+ * círculo: un diagrama de dos conjuntos que se cortan es la manera más antigua
+ * que hay de dibujar «esto que tenemos en común», y de eso va exactamente la
+ * pantalla — buscar a alguien, cruzar una solicitud, quedar en la misma lista.
+ *
+ * ## Por qué se acercan y se separan
+ *
+ * Es el único movimiento, y significa: los aros se aproximan hasta solaparse
+ * más y vuelven a abrirse, muy despacio, en un ciclo de dieciocho segundos. Un
+ * latido de opacidad —lo que hacen los orbes— habría sido respirar por
+ * respirar; aquí lo que se mueve es la **distancia**, que es el dato del que
+ * habla la pantalla.
+ *
+ * Solo contorno y desbordados por su borde, como el resto de la familia: a
+ * este tamaño un aro macizo sería un objeto y no atmósfera, y uno entero
+ * dentro de la pantalla se leería como un elemento de la interfaz.
+ */
+
+/** Un acercamiento completo, ida y vuelta. Lentísimo: es fondo, no espera. */
+const CIRCLE_MS = 18_000;
+
+interface CircleSpec {
+  size: number;
+  top: DimensionValue;
+  /** Posición en reposo, desde el borde izquierdo. */
+  left: number;
+  /**
+   * Cuánto se desplaza en horizontal durante el ciclo. Con signos opuestos
+   * entre vecinos, que es lo que hace que se busquen en vez de deslizarse
+   * todos hacia el mismo lado.
+   */
+  drift: number;
+  cool: boolean;
+  opacity: number;
+}
+
+/**
+ * Tres, y no dos.
+ *
+ * Con dos el dibujo es un diagrama de Venn de manual y se lee como un icono;
+ * el tercero rompe la simetría y lo devuelve a ser un fondo. Los tamaños son
+ * desiguales por lo mismo que en el resto de la familia: tres iguales serían
+ * un patrón, y un patrón es papel pintado.
+ */
+const CIRCLES: CircleSpec[] = [
+  // El grande, arriba a la izquierda y desbordado por los dos bordes: es el
+  // que cae detrás del aire de la cabecera, antes del campo de búsqueda.
+  { size: 300, top: -104, left: -128, drift: 26, cool: true, opacity: 0.3 },
+  // Su pareja, cortándolo por la derecha. Va en sentido contrario, así que la
+  // zona común crece y mengua.
+  { size: 244, top: -46, left: 118, drift: -30, cool: false, opacity: 0.26 },
+  // El tercero, abajo y a la izquierda, detrás de la lista de amigos. Más
+  // tenue: ahí el contenido es denso y el fondo tiene que pesar menos.
+  { size: 268, top: "62%", left: -96, drift: 20, cool: true, opacity: 0.2 },
+];
+
+function AmbientCirclesBase(): ReactElement {
+  const clock = useAmbientClock(CIRCLE_MS);
+
+  return (
+    <>
+      {CIRCLES.map((circle, index) => (
+        <Circle key={index} spec={circle} clock={clock} />
+      ))}
+    </>
+  );
+}
+
+function Circle({
+  spec,
+  clock,
+}: {
+  spec: CircleSpec;
+  clock: SharedValue<number>;
+}): ReactElement {
+  const circleStyle = useAnimatedStyle(() => ({
+    // El reloj va de 0 a 1 y vuelve, así que basta multiplicar: el aro sale de
+    // su sitio, llega al tope y regresa sin ningún tirón en los extremos.
+    transform: [{ translateX: spec.drift * clock.get() }],
+  }));
+
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={[
+        styles.circle,
+        {
+          width: spec.size,
+          height: spec.size,
+          top: spec.top,
+          left: spec.left,
+          borderColor: spec.cool
+            ? Color.ambient.ringCool
+            : Color.ambient.ringWarm,
+          opacity: spec.opacity,
+        },
+        circleStyle,
+      ]}
+    />
+  );
+}
+
+export const AmbientCircles = memo(AmbientCirclesBase);
+
+// ---------------------------------------------------------------------------
 // Trama
 // ---------------------------------------------------------------------------
 
@@ -1853,6 +1970,13 @@ const styles = StyleSheet.create({
   },
   threadTailRight: {
     borderBottomRightRadius: Radius.sm / 2,
+  },
+  circle: {
+    position: "absolute",
+    // Solo contorno, y del más fino que dibuja la plataforma: es lo que deja
+    // que una forma de 300 puntos siga siendo fondo y no un objeto.
+    borderWidth: HAIRLINE,
+    borderRadius: Radius.pill,
   },
   column: {
     position: "absolute",

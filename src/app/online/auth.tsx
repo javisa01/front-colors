@@ -1,6 +1,7 @@
 import { useSignIn, useSignUp } from "@clerk/expo";
 import { useSSO } from "@clerk/expo/experimental";
 import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 import type { ReactElement } from "react";
@@ -21,7 +22,15 @@ import { DialRing } from "@/design/Dial";
 import { ErrorBanner } from "@/design/Feedback";
 import { Field, Notice, OrDivider, SegmentedControl } from "@/design/Form";
 import { Card, Screen } from "@/design/Layout";
-import { Color, Duration, SECTION_TONE, Space, Type } from "@/design/tokens";
+import {
+  Color,
+  Duration,
+  HAIRLINE,
+  Radius,
+  SECTION_TONE,
+  Space,
+  Type,
+} from "@/design/tokens";
 import { t } from "@/i18n";
 import { describeClerkError, type ClerkField } from "@/online/clerkErrors";
 
@@ -73,8 +82,11 @@ type FieldErrors = Partial<Record<ClerkField, string>>;
  * hasta que el texto se leyera lo dejaba invisible, que era peor: color que no
  * se ve no es color, es coste.
  *
- * Abajo no hay ese problema. Ahi solo cae la nota de que el modo offline sigue
- * funcionando, y esa se protege con un velo corto.
+ * Abajo no hay ese problema. Ahi solo cae el pie —el cambio entre acceso y
+ * alta, y la nota de que el modo offline sigue funcionando—, y el velo protege
+ * la franja del borde. Lo que el velo no alcanza, porque en una pantalla corta
+ * el pie sube por encima de el, lo resuelve el panel translucido del propio
+ * pie: ver `groundPanel`.
  *
  * ## La excepcion cromatica
  *
@@ -108,6 +120,7 @@ export default function AuthScreen(): ReactElement {
   const { signIn } = useSignIn();
   const { signUp } = useSignUp();
   const { startSSOFlow } = useSSO();
+  const router = useRouter();
   const { width } = useWindowDimensions();
 
   const ringSize = Math.min(width * RING_RATIO, RING_MAX);
@@ -367,6 +380,17 @@ export default function AuthScreen(): ReactElement {
       title={headings.title}
       subtitle={headings.subtitle}
       backTo="/"
+      /*
+        La flecha vuelve a la portada **siempre**, y no al «atrás» del sistema.
+
+        Esta pantalla se abre desde la portada pero vive dentro del navegador
+        de pestañas del online, así que `back()` retrocede a la pestaña
+        anterior — donde sin sesión no se puede estar. La guarda del layout la
+        devuelve aquí de inmediato y el resultado es una flecha que parece
+        rota. `dismissTo` sale del área online entera, que es lo que el gesto
+        significa. Ver `onBack` en `design/Layout`.
+      */
+      onBack={() => router.dismissTo("/")}
       backdrop={
         <View style={styles.ring} pointerEvents="none">
           <View style={styles.ringInk}>
@@ -543,30 +567,47 @@ export default function AuthScreen(): ReactElement {
               ) : null}
             </Animated.View>
 
-            <View style={styles.footer}>
-              <Text style={Type.caption}>
-                {step === "login"
-                  ? t("online.auth.switchToRegister")
-                  : t("online.auth.switchToLogin")}
-              </Text>
-              <Button
-                label={
-                  step === "login"
-                    ? t("online.auth.register")
-                    : t("online.auth.login")
-                }
-                variant="ghost"
-                size="md"
-                fullWidth={false}
-                onPress={() =>
-                  switchStep(step === "login" ? "register" : "login")
-                }
-              />
-            </View>
+            {/*
+              El pie va sobre suelo propio.
 
-            <Text style={[Type.caption, styles.offlineNote]}>
-              {t("online.auth.offlineNote")}
-            </Text>
+              Estas dos cosas —el cambio de acceso a alta y la nota del
+              Taller— son las que caen encima del arco de la rueda, y en una
+              pantalla corta caen encima de su parte con más color: texto gris
+              de 13 puntos sobre un degradado que además gira. El velo del
+              fondo protege la franja del borde, no lo que quede a media
+              altura, así que lo que hace falta aquí es una superficie.
+
+              Es la misma de la fila de práctica de la portada —translúcida,
+              con canto de un píxel— y por el mismo motivo: lo que hay debajo
+              es la rueda y no se quiere tapar del todo, solo lo justo para
+              poder leer.
+            */}
+            <View style={styles.groundPanel}>
+              <View style={styles.footer}>
+                <Text style={Type.caption}>
+                  {step === "login"
+                    ? t("online.auth.switchToRegister")
+                    : t("online.auth.switchToLogin")}
+                </Text>
+                <Button
+                  label={
+                    step === "login"
+                      ? t("online.auth.register")
+                      : t("online.auth.login")
+                  }
+                  variant="ghost"
+                  size="md"
+                  fullWidth={false}
+                  onPress={() =>
+                    switchStep(step === "login" ? "register" : "login")
+                  }
+                />
+              </View>
+
+              <Text style={[Type.caption, styles.offlineNote]}>
+                {t("online.auth.offlineNote")}
+              </Text>
+            </View>
           </>
         )}
       </KeyboardAvoidingView>
@@ -600,16 +641,29 @@ const styles = StyleSheet.create({
   social: {
     gap: Space.sm,
   },
+  groundPanel: {
+    marginTop: Space.lg,
+    paddingHorizontal: Space.lg,
+    paddingVertical: Space.md,
+    borderRadius: Radius.lg,
+    borderWidth: HAIRLINE,
+    borderColor: Color.border.default,
+    // La única superficie translúcida de la aplicación, junto con la fila de
+    // práctica de la portada y la pastilla de pestañas del online — y las tres
+    // por lo mismo: debajo hay rueda.
+    backgroundColor: Color.surface.floating,
+  },
   footer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: Space.xs,
-    marginTop: Space.lg,
   },
   offlineNote: {
-    marginTop: Space.lg,
+    marginTop: Space.sm,
     textAlign: "center",
-    color: Color.text.faint,
+    // Sobre el panel ya hay contraste de sobra, así que el gris más apagado
+    // dejaba de ser una elección y pasaba a ser el problema. Sube un peldaño.
+    color: Color.text.muted,
   },
 });

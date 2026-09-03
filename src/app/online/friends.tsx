@@ -1,5 +1,5 @@
-import { useFocusEffect } from "expo-router";
-import { AmbientOrbs } from "@/design/Ambient";
+import { useFocusEffect, useRouter } from "expo-router";
+import { AmbientCircles } from "@/design/Ambient";
 import type { ReactElement, ReactNode } from "react";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
@@ -39,6 +39,7 @@ const SEARCH_DEBOUNCE_MS = 350;
 export default function FriendsScreen(): ReactElement {
   const { api, user } = useSession();
   const { apply: applySocial } = useSocial();
+  const router = useRouter();
 
   const [overview, setOverview] = useState<FriendsOverview | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -198,8 +199,14 @@ export default function FriendsScreen(): ReactElement {
       eyebrow={t("online.friends.badge")}
       title={t("online.friends.title")}
       subtitle={t("online.friends.subtitle")}
-      backTo="/online"
-      backdrop={<AmbientOrbs />}
+      backTo="/online/profile"
+      /*
+        Amigos es una pantalla profunda del perfil: se entra desde ahi y volver
+        tiene que devolver ahi, aunque por el camino se haya pasado por otra
+        pestana. Ver `onBack` en `design/Layout`.
+      */
+      onBack={() => router.navigate("/online/profile")}
+      backdrop={<AmbientCircles />}
       headerAction={<SettingsButton />}
       onRefresh={refresh}
       refreshing={refreshing}

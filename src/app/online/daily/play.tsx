@@ -348,6 +348,10 @@ export default function DailyPlayScreen(): ReactElement {
         eyebrow={t("online.daily.badge")}
         title={t("online.daily.title")}
         backTo={dailyHref}
+        // Al grupo donde puntúa este reto, no al menú de Hoy: dentro de las
+        // pestañas del online `back()` va siempre a la primera. Ver `onBack`
+        // en `design/Layout`.
+        onBack={back}
         scrollable={false}
         contentStyle={styles.centered}
       >
@@ -398,6 +402,10 @@ export default function DailyPlayScreen(): ReactElement {
         eyebrow={t("online.daily.badge")}
         title={t("online.daily.title")}
         backTo={dailyHref}
+        // Al grupo donde puntúa este reto, no al menú de Hoy: dentro de las
+        // pestañas del online `back()` va siempre a la primera. Ver `onBack`
+        // en `design/Layout`.
+        onBack={back}
         scrollable={false}
         contentStyle={styles.centered}
       >
@@ -435,6 +443,10 @@ export default function DailyPlayScreen(): ReactElement {
         eyebrow={t("online.daily.badge")}
         title={t("online.daily.title")}
         backTo={dailyHref}
+        // Al grupo donde puntúa este reto, no al menú de Hoy: dentro de las
+        // pestañas del online `back()` va siempre a la primera. Ver `onBack`
+        // en `design/Layout`.
+        onBack={back}
         scrollable={false}
         contentStyle={styles.centered}
       >
@@ -470,6 +482,7 @@ export default function DailyPlayScreen(): ReactElement {
     <>
       <PlayBoard
         backHref={dailyHref}
+        onBack={back}
         round={currentRound}
         roundIndex={roundIndex}
         totalRounds={rounds.length}
@@ -523,6 +536,8 @@ function clamp(value: number, min: number, max: number): number {
 interface PlayBoardProps {
   /** Destino de reserva de la flecha, con el grupo puesto. Ver `dailyHref`. */
   backHref: Href;
+  /** Lo que hace la flecha de verdad. Ver `onBack` en `design/Layout`. */
+  onBack: () => void;
   round: DailyRoundView;
   roundIndex: number;
   totalRounds: number;
@@ -544,6 +559,7 @@ interface PlayBoardProps {
  */
 function PlayBoard({
   backHref,
+  onBack,
   round,
   roundIndex,
   totalRounds,
@@ -580,6 +596,7 @@ function PlayBoard({
   return (
     <Screen
       backTo={backHref}
+      onBack={onBack}
       headerAction={
         <StatPill
           label={t("online.daily.attemptLabel")}

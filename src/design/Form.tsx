@@ -610,9 +610,17 @@ function InfoRowBase({
 export const InfoRow = memo(InfoRowBase);
 
 /** Nota breve de confirmación, con marca de verificación. */
-function NoticeBase({ message }: { message: string }): ReactElement {
+function NoticeBase({
+  message,
+  /** Para colocarla donde haga falta: su margen por defecto es solo el de
+      arriba, así que quien la ponga entre dos cosas tiene que dar el de abajo. */
+  style,
+}: {
+  message: string;
+  style?: StyleProp<ViewStyle>;
+}): ReactElement {
   return (
-    <View style={styles.notice} accessibilityRole="alert">
+    <View style={[styles.notice, style]} accessibilityRole="alert">
       <Icon name="check" size={16} color={Color.success.text} />
       <Text style={[Type.caption, styles.noticeText]}>{message}</Text>
     </View>

@@ -29,6 +29,7 @@ export type IconName =
   | "settings"
   | "gear"
   | "share"
+  | "copy"
   | "send"
   | "retry"
   | "play"
@@ -145,6 +146,19 @@ const ICONS: Record<IconName, (c: string, filled: boolean) => ReactNode> = {
       <Path d="M12 15.5V3" />
       <Path d="M8 7l4-4 4 4" />
       <Path d="M5 12v7.5a1.5 1.5 0 0 0 1.5 1.5h11a1.5 1.5 0 0 0 1.5-1.5V12" />
+    </>
+  ),
+  /**
+   * Dos hojas, la de detrás asomando por arriba y por la izquierda.
+   *
+   * Solo asoma por dos lados y no por los cuatro: con el marco completo las
+   * dos siluetas quedan concéntricas y el dibujo se lee como un rectángulo
+   * dentro de otro. Lo que dice «copia» es el desplazamiento.
+   */
+  copy: () => (
+    <>
+      <Path d="M9.5 8.5h9a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 8 19v-9a1.5 1.5 0 0 1 1.5-1.5Z" />
+      <Path d="M5 15.5A1.5 1.5 0 0 1 3.5 14V5A1.5 1.5 0 0 1 5 3.5h9A1.5 1.5 0 0 1 15.5 5" />
     </>
   ),
   /**

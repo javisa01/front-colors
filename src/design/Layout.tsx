@@ -67,6 +67,37 @@ interface ScreenProps {
    * entrada por enlace directo, o una recarga en web.
    */
   backTo?: Href;
+  /**
+   * Sustituye lo que hace la flecha. Con esto, `backTo` solo sirve ya para
+   * decir que hay flecha.
+   *
+   * La regla de la casa es que la flecha haga lo mismo que el «atrás» del
+   * sistema, y para las pantallas que viven en una **pila** es la correcta.
+   *
+   * ## Dónde no vale, y por qué
+   *
+   * Todo el área online cuelga de un navegador de **pestañas**, y ahí
+   * `router.back()` no significa «la pantalla anterior»: el `TabRouter` de
+   * React Navigation trae `backBehavior: "firstRoute"` de fábrica, así que
+   * volver desde cualquier pestaña lleva a la **primera** —el menú de Hoy— sin
+   * mirar de dónde vienes. Las pantallas profundas de esa zona están
+   * declaradas también como pestañas (con `href: null`, para quedar fuera de
+   * la barra pero seguir siendo navegables), así que les pasa lo mismo: los
+   * ajustes de un grupo volvían al menú en vez de a su grupo.
+   *
+   * No se arregla poniendo `backBehavior: "history"` en las pestañas porque
+   * eso cambiaría también el botón «atrás» de Android en toda el área, y
+   * porque estas pantallas no quieren el historial: quieren **su sitio**. Los
+   * ajustes de un grupo vuelven a ese grupo, el chat de un grupo vuelve a ese
+   * grupo y el tablero del reto vuelve al grupo donde puntúa. Eso es un
+   * destino, no una pila.
+   *
+   * La otra excepción es de otra clase: **la pantalla de cuenta** se abre desde
+   * la portada, pero vive dentro de estas mismas pestañas, y sin sesión la
+   * primera está prohibida — la guarda del layout devuelve a la cuenta al
+   * instante y la flecha parece no hacer nada.
+   */
+  onBack?: () => void;
   /** Acción al vuelo a la derecha de la barra superior (ajustes, contador...). */
   headerAction?: ReactNode;
   /**
@@ -107,6 +138,7 @@ function ScreenBase({
   subtitle,
   eyebrow,
   backTo,
+  onBack,
   headerAction,
   titleAction,
   backdrop,
@@ -155,9 +187,16 @@ function ScreenBase({
                * `backTo` queda como reserva para cuando no hay historial —un
                * enlace directo, una recarga en web—, donde `back()` no tendría
                * a dónde ir y la flecha se quedaría muerta.
+               *
+               * `onBack` se salta todo esto, y por qué hace falta está en su
+               * nota de arriba.
                */
               onPress={() =>
-                router.canGoBack() ? router.back() : router.dismissTo(backTo)
+                onBack != null
+                  ? onBack()
+                  : router.canGoBack()
+                    ? router.back()
+                    : router.dismissTo(backTo)
               }
               accessibilityLabel={t("a11y.back")}
               // Sangrado negativo: el objetivo táctil de 44pt es mayor que el

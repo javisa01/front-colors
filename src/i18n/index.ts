@@ -60,29 +60,28 @@ const es = {
     "Cinco imágenes nuevas cada día y dos intentos para conseguir la mayor puntuación.",
   "dial.open.action": "Jugar",
   "dial.open.hint": "Abre el reto de hoy",
-  "dial.off.label": "La rueda está apagada",
-  "dial.empty.title": "Te falta\ncon quién.",
+  "dial.off.label": "Aún no hay reto",
+  "dial.empty.title": "No estás en\nningún grupo.",
   "dial.empty.body":
-    "Crea un grupo y se enciende: cinco imágenes cada día, dos intentos, y una clasificación que solo veis vosotros.",
-  "dial.empty.kicker": "Enciéndela",
+    "Crea uno, invita a quien quieras y cada día tendréis cinco imágenes, dos intentos y una clasificación que solo veis vosotros.",
+  "dial.empty.kicker": "Solo falta esto",
   "dial.empty.action": "Crear\nun grupo",
   "dial.empty.note": "abre a las 15:00",
   "dial.empty.hint": "Abre la pantalla de grupos",
-  "dial.guest.title": "El color\nllega con la gente.",
+  "dial.guest.title": "Esto se juega\ncon amigos.",
   "dial.guest.body":
     "Cinco imágenes cada día a las 15:00 h, dos intentos, y solo compites con quien invites.",
   "dial.guest.kicker": "Empieza aquí",
   "dial.guest.action": "Entrar o\nregistrarte",
-  "dial.guest.note": "y se enciende",
+  "dial.guest.note": "en un minuto",
   "dial.guest.hint": "Abre el acceso a tu cuenta",
-  "dial.code": "¿Te han pasado un código? Entra con él",
   "dial.practice.title": "El Taller",
   "dial.practice.body": "Practica sin conexión · solo o en grupo",
 
   // --- Bienvenida y tutorial de la primera vez ---------------------------
   "welcome.greeting": "Te doy la bienvenida a",
   "welcome.name": "Hexy",
-  "welcome.cta": "Haz clic en los círculos para continuar",
+  "welcome.cta": "Toca los círculos para continuar",
   "welcome.continue": "Continuar",
   "tutorial.memorize": "Memoriza el color",
   "tutorial.findLabel": "Ahora",
@@ -103,7 +102,7 @@ const es = {
 
   "offline.badge": "El Taller",
   "offline.title": "Solo o en grupo",
-  "offline.subtitle": "Juega tú solo o pásate el móvil entre varias personas.",
+  "offline.subtitle": "Juega tú solo o dale el móvil a los demás por turnos.",
   "offline.solo.section": "Solitario",
   "offline.solo.hint": "Modos para un jugador.",
   "offline.group.section": "En grupo · mismo móvil",
@@ -120,7 +119,7 @@ const es = {
     "Cada fila es un modo distinto: debajo del nombre te dice de qué va y cómo se juega. Tu récord aparecerá a la derecha.",
   "tour.party.title": "Un móvil, varias personas",
   "tour.party.body":
-    "Aquí no hace falta que haya nadie más conectado: os pasáis el teléfono y juega cada uno el suyo. Hasta 99 personas en un mismo dispositivo.",
+    "Aquí no hace falta que haya nadie más conectado: le das el móvil al siguiente y juega cada uno el suyo. Hasta 99 personas en un mismo dispositivo.",
   "tour.settings.title": "Música, efectos e idioma",
   "tour.settings.body":
     "Puedes configurar el volumen de música y efectos de sonido, y cambiar de idioma en esta pestaña de configuración.",
@@ -154,7 +153,7 @@ const es = {
   "party.playerN": "Jugador {{n}}",
 
   "party.handoff.title": "Turno de {{name}}",
-  "party.handoff.subtitle": "Pasa el móvil a este jugador.",
+  "party.handoff.subtitle": "Dale el móvil a este jugador.",
   "party.handoff.image": "Imagen {{current}} de {{total}}",
   "party.handoff.timed": "Tienes {{seconds}} segundos.",
   "party.handoff.start": "Estoy listo",
@@ -164,7 +163,7 @@ const es = {
   "party.play.check": "Comprobar",
 
   "party.guess.title": "¡Guardado!",
-  "party.guess.hidden": "Pasa el móvil sin mirar el color correcto.",
+  "party.guess.hidden": "Dale el móvil sin mirar el color correcto.",
 
   "party.round.title": "Resultado de la imagen",
   "party.round.correct": "Color correcto",
@@ -291,7 +290,7 @@ const es = {
   "online.auth.switchToRegister": "¿Aún no tienes cuenta?",
   "online.auth.switchToLogin": "¿Ya tienes cuenta?",
   "online.auth.offlineNote":
-    "El Taller sigue funcionando sin cuenta ni conexión: tus récords locales no se tocan.",
+    "El Taller sigue funcionando sin cuenta ni conexión: tus récords no desaparecen.",
   "online.auth.error.passwordRequired": "Escribe tu contraseña.",
   "online.auth.error.passwordShort": "Mínimo {{min}} caracteres.",
   "online.auth.error.usernameLength": "Entre 3 y 24 caracteres.",
@@ -332,9 +331,9 @@ const es = {
   "online.hub.quickCreate": "Crear grupo",
   "online.hub.quickJoin": "Tengo un código",
   "online.hub.seeAllGroups": "Ver todos mis grupos",
-  "online.hub.groupsEmpty": "Crea tu grupo y reta a quien quieras",
+  "online.hub.groupsEmpty": "Crea un grupo y reta a tus amigos",
   "online.hub.groupsEmptyHint":
-    "Cada día, un logo y un color que acertar. Compites solo con la gente que invites.",
+    "Cada día, cinco imágenes nuevas y dos intentos para acertar sus colores. Compites solo con la gente que invites.",
   "online.hub.unranked": "—",
 
   // --- Barra de pestañas del modo online ---
@@ -365,9 +364,9 @@ const es = {
   "online.tour.profile.action": "Ir a Perfil",
   "online.tour.today.title": "Hoy",
   "online.tour.today.body":
-    "Aquí vuelves cada tarde: a las 15:00 hay un logo nuevo y dos intentos para acertar su color.",
+    "Aquí vuelves cada tarde: a las 15:00 hay cinco imágenes nuevas y dos intentos para acertar sus colores.",
   "online.tour.today.action": "Volver a Hoy",
-  "online.tour.create.title": "Solo falta con quién",
+  "online.tour.create.title": "Ya solo faltan tus amigos",
   "online.tour.create.body":
     "Crea un grupo, invita a quien quieras y mañana a las 15:00 tendréis el mismo reto.",
   "online.tour.create.action": "Crear un grupo",
@@ -432,7 +431,7 @@ const es = {
     "Entra en mi grupo «{{name}}» de Hexy con el código {{code}}",
   "online.group.finishedTitle": "Esta temporada ha terminado",
   "online.group.finishedOwner":
-    "La clasificación queda congelada. Puedes reiniciarla cuando quieras: los puntos vuelven a cero, pero tu XP y tu nivel no se tocan.",
+    "La clasificación queda congelada. Puedes reiniciarla cuando quieras: los puntos vuelven a cero, pero tu XP y tu nivel no se pierden.",
   "online.group.finishedMember":
     "La clasificación queda congelada. Solo {{owner}}, que creó el grupo, puede empezar una temporada nueva.",
   "online.group.chatStillOpen": "El chat sigue abierto.",
@@ -476,15 +475,17 @@ const es = {
   "online.group.settings.renamed": "Nombre cambiado.",
   "online.group.settings.ownerOnly":
     "Solo quien creó el grupo puede cambiarle el nombre.",
-  "online.group.settings.notifications": "Avisos de este grupo",
+  "online.group.settings.notifications": "Avisos del grupo",
   "online.group.settings.notificationsHint":
-    "Enciende el punto rojo cuando pasa algo aquí, como una temporada nueva. Apagado, el grupo no te llama la atención.",
+    "Actívalo para enterarte de las novedades de este grupo, como el comienzo de una temporada nueva. Apagado, el grupo deja de avisarte en la lista.",
   "online.group.settings.seasons": "Temporadas",
   "online.group.settings.seasonsHint":
     "Cuántas lleva el grupo, y desde cuándo.",
   "online.group.settings.membersHint": "Puntos y jornadas de esta temporada.",
   "online.group.settings.addFriend": "Añadir a {{name}} como amigo",
   "online.group.settings.shareCode": "Compartir el código",
+  "online.group.settings.copyCode": "Copiar el código",
+  "online.group.settings.codeCopied": "Código copiado.",
   "online.group.settings.leaveHint":
     "Puedes volver a entrar con el código.",
 
@@ -728,22 +729,21 @@ const en: Record<TranslationKey, string> = {
     "Five new images every day, and two tries to get the highest score.",
   "dial.open.action": "Play",
   "dial.open.hint": "Opens today's challenge",
-  "dial.off.label": "The wheel is off",
-  "dial.empty.title": "You need\nsomeone to beat.",
+  "dial.off.label": "Nothing to play yet",
+  "dial.empty.title": "You are not in\nany group.",
   "dial.empty.body":
-    "Create a group and it lights up: five images a day, two tries, and a ranking only you lot can see.",
-  "dial.empty.kicker": "Light it up",
+    "Create one, invite whoever you want, and every day you get five images, two tries and a ranking only you can see.",
+  "dial.empty.kicker": "One thing left",
   "dial.empty.action": "Create\na group",
   "dial.empty.note": "opens at 15:00",
   "dial.empty.hint": "Opens the groups screen",
-  "dial.guest.title": "Colour arrives\nwith the people.",
+  "dial.guest.title": "You play this\nwith friends.",
   "dial.guest.body":
     "Five images a day at 15:00, two tries, and you only compete with the people you invite.",
   "dial.guest.kicker": "Start here",
   "dial.guest.action": "Sign in or\nsign up",
-  "dial.guest.note": "and it lights up",
+  "dial.guest.note": "takes a minute",
   "dial.guest.hint": "Opens account access",
-  "dial.code": "Got an invite code? Use it here",
   "dial.practice.title": "The Studio",
   "dial.practice.body": "Practise offline · solo or in a group",
 
@@ -771,7 +771,7 @@ const en: Record<TranslationKey, string> = {
 
   "offline.badge": "The Studio",
   "offline.title": "Solo or in a group",
-  "offline.subtitle": "Play solo or pass the phone around several people.",
+  "offline.subtitle": "Play on your own or hand the phone to the others in turns.",
   "offline.solo.section": "Single player",
   "offline.solo.hint": "Single-player modes.",
   "offline.group.section": "Group · same phone",
@@ -785,7 +785,7 @@ const en: Record<TranslationKey, string> = {
     "Each row is a different mode: under the name it tells you what it is and how to play it. Your record will show up on the right.",
   "tour.party.title": "One phone, several people",
   "tour.party.body":
-    "Nobody else needs to be online here: pass the phone around and everyone plays their own. Up to 99 people on the same device.",
+    "Nobody else needs to be online here: hand the phone to the next player and everyone plays their own. Up to 99 people on the same device.",
   "tour.settings.title": "Music, effects and language",
   "tour.settings.body":
     "You can set the music and sound effects volume, and change the language, in this settings panel.",
@@ -818,7 +818,7 @@ const en: Record<TranslationKey, string> = {
   "party.playerN": "Player {{n}}",
 
   "party.handoff.title": "{{name}}'s turn",
-  "party.handoff.subtitle": "Pass the phone to this player.",
+  "party.handoff.subtitle": "Hand the phone to this player.",
   "party.handoff.image": "Image {{current}} of {{total}}",
   "party.handoff.timed": "You have {{seconds}} seconds.",
   "party.handoff.start": "I'm ready",
@@ -828,7 +828,7 @@ const en: Record<TranslationKey, string> = {
   "party.play.check": "Check",
 
   "party.guess.title": "Saved!",
-  "party.guess.hidden": "Pass the phone without looking at the correct color.",
+  "party.guess.hidden": "Hand the phone over without looking at the correct color.",
 
   "party.round.title": "Image result",
   "party.round.correct": "Correct color",
@@ -954,7 +954,7 @@ const en: Record<TranslationKey, string> = {
   "online.auth.switchToRegister": "No account yet?",
   "online.auth.switchToLogin": "Already have an account?",
   "online.auth.offlineNote":
-    "The Studio keeps working with no account and no connection: your local records stay untouched.",
+    "The Studio keeps working with no account and no connection: your records are not going anywhere.",
   "online.auth.error.passwordRequired": "Enter your password.",
   "online.auth.error.passwordShort": "At least {{min}} characters.",
   "online.auth.error.usernameLength": "Between 3 and 24 characters.",
@@ -994,9 +994,9 @@ const en: Record<TranslationKey, string> = {
   "online.hub.quickCreate": "Create group",
   "online.hub.quickJoin": "I have a code",
   "online.hub.seeAllGroups": "See all my groups",
-  "online.hub.groupsEmpty": "Create a group and challenge whoever you like",
+  "online.hub.groupsEmpty": "Create a group and challenge your friends",
   "online.hub.groupsEmptyHint":
-    "One logo, one color to match, every day. You only compete with the people you invite.",
+    "Five new images every day and two tries to match their colors. You only compete with the people you invite.",
   "online.hub.unranked": "—",
 
   "online.tabs.today": "Today",
@@ -1022,9 +1022,9 @@ const en: Record<TranslationKey, string> = {
   "online.tour.profile.action": "Go to Profile",
   "online.tour.today.title": "Today",
   "online.tour.today.body":
-    "This is where you come back every afternoon: at 15:00 there is a new logo and two tries to match its color.",
+    "This is where you come back every afternoon: at 15:00 there are five new images and two tries to match their colors.",
   "online.tour.today.action": "Back to Today",
-  "online.tour.create.title": "All that is missing is people",
+  "online.tour.create.title": "All that is missing is your friends",
   "online.tour.create.body":
     "Create a group, invite whoever you like, and tomorrow at 15:00 you all get the same challenge.",
   "online.tour.create.action": "Create a group",
@@ -1088,7 +1088,7 @@ const en: Record<TranslationKey, string> = {
     "Join my Hexy group \"{{name}}\" with the code {{code}}",
   "online.group.finishedTitle": "This season has ended",
   "online.group.finishedOwner":
-    "The ranking is frozen. You can restart it whenever you want: points go back to zero, but your XP and level are untouched.",
+    "The ranking is frozen. You can restart it whenever you want: points go back to zero, but your XP and level stay as they are.",
   "online.group.finishedMember":
     "The ranking is frozen. Only {{owner}}, who created the group, can start a new season.",
   "online.group.chatStillOpen": "The chat stays open.",
@@ -1131,15 +1131,17 @@ const en: Record<TranslationKey, string> = {
   "online.group.settings.renamed": "Name changed.",
   "online.group.settings.ownerOnly":
     "Only whoever created the group can change its name.",
-  "online.group.settings.notifications": "Alerts from this group",
+  "online.group.settings.notifications": "Group alerts",
   "online.group.settings.notificationsHint":
-    "Turns on the red dot when something happens here, like a new season. Off, the group stays quiet.",
+    "Turn it on to hear about this group's news, such as the start of a new season. Off, the group stops flagging itself in the list.",
   "online.group.settings.seasons": "Seasons",
   "online.group.settings.seasonsHint":
     "How many the group has played, and since when.",
   "online.group.settings.membersHint": "Points and days played this season.",
   "online.group.settings.addFriend": "Add {{name}} as a friend",
   "online.group.settings.shareCode": "Share the code",
+  "online.group.settings.copyCode": "Copy the code",
+  "online.group.settings.codeCopied": "Code copied.",
   "online.group.settings.leaveHint": "You can join again with the code.",
 
   "online.chat.badge": "Chat",
@@ -1380,22 +1382,21 @@ const fr: Record<TranslationKey, string> = {
     "Cinq nouvelles images chaque jour et deux essais pour faire le meilleur score.",
   "dial.open.action": "Jouer",
   "dial.open.hint": "Ouvre le défi du jour",
-  "dial.off.label": "La roue est éteinte",
-  "dial.empty.title": "Il te manque\ndes adversaires.",
+  "dial.off.label": "Pas encore de défi",
+  "dial.empty.title": "Tu n'es dans\naucun groupe.",
   "dial.empty.body":
-    "Crée un groupe et elle s'allume : cinq images par jour, deux essais, et un classement que vous seuls voyez.",
-  "dial.empty.kicker": "Allume-la",
+    "Crées-en un, invite qui tu veux, et chaque jour vous aurez cinq images, deux essais et un classement que vous seuls voyez.",
+  "dial.empty.kicker": "Il ne manque que ça",
   "dial.empty.action": "Créer\nun groupe",
   "dial.empty.note": "ouvre à 15h00",
   "dial.empty.hint": "Ouvre l'écran des groupes",
-  "dial.guest.title": "La couleur arrive\navec les autres.",
+  "dial.guest.title": "Ça se joue\nentre amis.",
   "dial.guest.body":
     "Cinq images par jour à 15h00, deux essais, et tu affrontes uniquement ceux que tu invites.",
   "dial.guest.kicker": "Commence ici",
   "dial.guest.action": "Se connecter\nou s'inscrire",
-  "dial.guest.note": "et elle s'allume",
+  "dial.guest.note": "en une minute",
   "dial.guest.hint": "Ouvre l'accès à ton compte",
-  "dial.code": "On t'a passé un code ? Entre avec",
   "dial.practice.title": "L'Atelier",
   "dial.practice.body": "Entraîne-toi hors ligne · seul ou en groupe",
 
@@ -1424,7 +1425,7 @@ const fr: Record<TranslationKey, string> = {
   "offline.badge": "L'Atelier",
   "offline.title": "Seul ou en groupe",
   "offline.subtitle":
-    "Joue seul ou fais passer le téléphone entre plusieurs personnes.",
+    "Joue seul ou donne le téléphone aux autres, chacun son tour.",
   "offline.solo.section": "Un joueur",
   "offline.solo.hint": "Modes pour un joueur.",
   "offline.group.section": "En groupe · même téléphone",
@@ -1438,7 +1439,7 @@ const fr: Record<TranslationKey, string> = {
     "Chaque ligne est un mode différent : sous le nom, on t'explique de quoi il s'agit et comment y jouer. Ton record apparaîtra à droite.",
   "tour.party.title": "Un téléphone, plusieurs personnes",
   "tour.party.body":
-    "Ici personne d'autre n'a besoin d'être connecté : passez-vous le téléphone et chacun joue le sien. Jusqu'à 99 personnes sur un même appareil.",
+    "Ici personne d'autre n'a besoin d'être connecté : tu donnes le téléphone au suivant et chacun joue le sien. Jusqu'à 99 personnes sur un même appareil.",
   "tour.settings.title": "Musique, effets et langue",
   "tour.settings.body":
     "Tu peux régler le volume de la musique et des effets sonores, et changer de langue, dans ce panneau de réglages.",
@@ -1472,7 +1473,7 @@ const fr: Record<TranslationKey, string> = {
   "party.playerN": "Joueur {{n}}",
 
   "party.handoff.title": "Au tour de {{name}}",
-  "party.handoff.subtitle": "Passe le téléphone à ce joueur.",
+  "party.handoff.subtitle": "Donne le téléphone à ce joueur.",
   "party.handoff.image": "Image {{current}} sur {{total}}",
   "party.handoff.timed": "Tu as {{seconds}} secondes.",
   "party.handoff.start": "Je suis prêt",
@@ -1482,7 +1483,7 @@ const fr: Record<TranslationKey, string> = {
   "party.play.check": "Vérifier",
 
   "party.guess.title": "Enregistré !",
-  "party.guess.hidden": "Passe le téléphone sans regarder la bonne couleur.",
+  "party.guess.hidden": "Donne le téléphone sans regarder la bonne couleur.",
 
   "party.round.title": "Résultat de l'image",
   "party.round.correct": "Bonne couleur",
@@ -1609,7 +1610,7 @@ const fr: Record<TranslationKey, string> = {
   "online.auth.switchToRegister": "Pas encore de compte ?",
   "online.auth.switchToLogin": "Déjà un compte ?",
   "online.auth.offlineNote":
-    "L'Atelier fonctionne toujours sans compte ni connexion : tes records locaux ne bougent pas.",
+    "L'Atelier fonctionne toujours sans compte ni connexion : tes records ne disparaissent pas.",
   "online.auth.error.passwordRequired": "Saisis ton mot de passe.",
   "online.auth.error.passwordShort": "{{min}} caractères minimum.",
   "online.auth.error.usernameLength": "Entre 3 et 24 caractères.",
@@ -1651,9 +1652,9 @@ const fr: Record<TranslationKey, string> = {
   "online.hub.quickCreate": "Créer un groupe",
   "online.hub.quickJoin": "J'ai un code",
   "online.hub.seeAllGroups": "Voir tous mes groupes",
-  "online.hub.groupsEmpty": "Crée ton groupe et défie qui tu veux",
+  "online.hub.groupsEmpty": "Crée un groupe et défie tes amis",
   "online.hub.groupsEmptyHint":
-    "Chaque jour, un logo et une couleur à trouver. Tu joues seulement contre les gens que tu invites.",
+    "Chaque jour, cinq nouvelles images et deux essais pour trouver leurs couleurs. Tu joues seulement contre les gens que tu invites.",
   "online.hub.unranked": "—",
 
   "online.tabs.today": "Aujourd'hui",
@@ -1679,9 +1680,9 @@ const fr: Record<TranslationKey, string> = {
   "online.tour.profile.action": "Aller au Profil",
   "online.tour.today.title": "Aujourd'hui",
   "online.tour.today.body":
-    "C'est ici que tu reviens chaque après-midi : à 15h00 il y a un nouveau logo et deux essais pour trouver sa couleur.",
+    "C'est ici que tu reviens chaque après-midi : à 15h00 il y a cinq nouvelles images et deux essais pour trouver leurs couleurs.",
   "online.tour.today.action": "Revenir à Aujourd'hui",
-  "online.tour.create.title": "Il ne manque que les gens",
+  "online.tour.create.title": "Il ne manque plus que tes amis",
   "online.tour.create.body":
     "Crée un groupe, invite qui tu veux, et demain à 15h00 vous aurez tous le même défi.",
   "online.tour.create.action": "Créer un groupe",
@@ -1745,7 +1746,7 @@ const fr: Record<TranslationKey, string> = {
     "Rejoins mon groupe Hexy « {{name}} » avec le code {{code}}",
   "online.group.finishedTitle": "Cette saison est terminée",
   "online.group.finishedOwner":
-    "Le classement est figé. Tu peux le relancer quand tu veux : les points repartent à zéro, mais ton XP et ton niveau ne bougent pas.",
+    "Le classement est figé. Tu peux le relancer quand tu veux : les points repartent à zéro, mais ton XP et ton niveau ne disparaissent pas.",
   "online.group.finishedMember":
     "Le classement est figé. Seul {{owner}}, qui a créé le groupe, peut lancer une nouvelle saison.",
   "online.group.chatStillOpen": "Le chat reste ouvert.",
@@ -1789,15 +1790,17 @@ const fr: Record<TranslationKey, string> = {
   "online.group.settings.renamed": "Nom modifié.",
   "online.group.settings.ownerOnly":
     "Seule la personne qui a créé le groupe peut en changer le nom.",
-  "online.group.settings.notifications": "Alertes de ce groupe",
+  "online.group.settings.notifications": "Alertes du groupe",
   "online.group.settings.notificationsHint":
-    "Allume le point rouge quand il se passe quelque chose ici, une nouvelle saison par exemple. Éteint, le groupe ne te sollicite pas.",
+    "Active-le pour suivre les nouveautés de ce groupe, comme le début d'une nouvelle saison. Désactivé, le groupe ne te signale plus rien dans la liste.",
   "online.group.settings.seasons": "Saisons",
   "online.group.settings.seasonsHint":
     "Combien le groupe en a jouées, et depuis quand.",
   "online.group.settings.membersHint": "Points et journées de cette saison.",
   "online.group.settings.addFriend": "Ajouter {{name}} en ami",
   "online.group.settings.shareCode": "Partager le code",
+  "online.group.settings.copyCode": "Copier le code",
+  "online.group.settings.codeCopied": "Code copié.",
   "online.group.settings.leaveHint": "Tu peux revenir avec le code.",
 
   "online.chat.badge": "Chat",
@@ -2042,29 +2045,28 @@ const ca: Record<TranslationKey, string> = {
     "Cinc imatges noves cada dia i dos intents per aconseguir la màxima puntuació.",
   "dial.open.action": "Jugar",
   "dial.open.hint": "Obre el repte d'avui",
-  "dial.off.label": "La roda està apagada",
-  "dial.empty.title": "Et falta\namb qui.",
+  "dial.off.label": "Encara no hi ha repte",
+  "dial.empty.title": "No ets a\ncap grup.",
   "dial.empty.body":
-    "Crea un grup i s'encén: cinc imatges cada dia, dos intents, i una classificació que només veieu vosaltres.",
-  "dial.empty.kicker": "Encén-la",
+    "Crea'n un, convida qui vulguis i cada dia tindreu cinc imatges, dos intents i una classificació que només veieu vosaltres.",
+  "dial.empty.kicker": "Només falta això",
   "dial.empty.action": "Crear\nun grup",
   "dial.empty.note": "obre a les 15:00",
   "dial.empty.hint": "Obre la pantalla de grups",
-  "dial.guest.title": "El color\narriba amb la gent.",
+  "dial.guest.title": "Això es juga\namb amics.",
   "dial.guest.body":
     "Cinc imatges cada dia a les 15:00 h, dos intents, i només competeixes amb qui convidis.",
   "dial.guest.kicker": "Comença aquí",
   "dial.guest.action": "Entrar o\nregistrar-te",
-  "dial.guest.note": "i s'encén",
+  "dial.guest.note": "en un minut",
   "dial.guest.hint": "Obre l'accés al teu compte",
-  "dial.code": "T'han passat un codi? Entra-hi",
   "dial.practice.title": "El Taller",
   "dial.practice.body": "Practica sense connexió · sol o en grup",
 
   // --- Bienvenida y tutorial de la primera vez ---------------------------
   "welcome.greeting": "Et dono la benvinguda a",
   "welcome.name": "Hexy",
-  "welcome.cta": "Fes clic als cercles per continuar",
+  "welcome.cta": "Toca els cercles per continuar",
   "welcome.continue": "Continua",
   "tutorial.memorize": "Memoritza el color",
   "tutorial.findLabel": "Ara",
@@ -2086,7 +2088,7 @@ const ca: Record<TranslationKey, string> = {
   "offline.badge": "El Taller",
   "offline.title": "Sol o en grup",
   "offline.subtitle":
-    "Juga tu sol o passeu-vos el mòbil entre diverses persones.",
+    "Juga tu sol o dona el mòbil als altres per torns.",
   "offline.solo.section": "En solitari",
   "offline.solo.hint": "Modes per a un jugador.",
   "offline.group.section": "En grup · mateix mòbil",
@@ -2100,7 +2102,7 @@ const ca: Record<TranslationKey, string> = {
     "Cada fila és un mode diferent: sota el nom t'explica de què va i com s'hi juga. El teu rècord apareixerà a la dreta.",
   "tour.party.title": "Un mòbil, diverses persones",
   "tour.party.body":
-    "Aquí no cal que hi hagi ningú més connectat: us passeu el telèfon i cadascú juga el seu. Fins a 99 persones en un mateix dispositiu.",
+    "Aquí no cal que hi hagi ningú més connectat: dones el mòbil al següent i cadascú juga el seu. Fins a 99 persones en un mateix dispositiu.",
   "tour.settings.title": "Música, efectes i idioma",
   "tour.settings.body":
     "Pots configurar el volum de la música i dels efectes de so, i canviar d'idioma, en aquesta pestanya de configuració.",
@@ -2134,7 +2136,7 @@ const ca: Record<TranslationKey, string> = {
   "party.playerN": "Jugador {{n}}",
 
   "party.handoff.title": "Torn de {{name}}",
-  "party.handoff.subtitle": "Passa el mòbil a aquest jugador.",
+  "party.handoff.subtitle": "Dona el mòbil a aquest jugador.",
   "party.handoff.image": "Imatge {{current}} de {{total}}",
   "party.handoff.timed": "Tens {{seconds}} segons.",
   "party.handoff.start": "Estic a punt",
@@ -2144,7 +2146,7 @@ const ca: Record<TranslationKey, string> = {
   "party.play.check": "Comprova",
 
   "party.guess.title": "Desat!",
-  "party.guess.hidden": "Passa el mòbil sense mirar el color correcte.",
+  "party.guess.hidden": "Dona el mòbil sense mirar el color correcte.",
 
   "party.round.title": "Resultat de la imatge",
   "party.round.correct": "Color correcte",
@@ -2271,7 +2273,7 @@ const ca: Record<TranslationKey, string> = {
   "online.auth.switchToRegister": "Encara no tens compte?",
   "online.auth.switchToLogin": "Ja tens compte?",
   "online.auth.offlineNote":
-    "El Taller continua funcionant sense compte ni connexió: els teus rècords locals no es toquen.",
+    "El Taller continua funcionant sense compte ni connexió: els teus rècords no desapareixen.",
   "online.auth.error.passwordRequired": "Escriu la teva contrasenya.",
   "online.auth.error.passwordShort": "Mínim {{min}} caràcters.",
   "online.auth.error.usernameLength": "Entre 3 i 24 caràcters.",
@@ -2313,9 +2315,9 @@ const ca: Record<TranslationKey, string> = {
   "online.hub.quickCreate": "Crea un grup",
   "online.hub.quickJoin": "Tinc un codi",
   "online.hub.seeAllGroups": "Mostra tots els meus grups",
-  "online.hub.groupsEmpty": "Crea el teu grup i repta qui vulguis",
+  "online.hub.groupsEmpty": "Crea un grup i repta els teus amics",
   "online.hub.groupsEmptyHint":
-    "Cada dia, un logotip i un color per encertar. Competeixes només amb la gent que convidis.",
+    "Cada dia, cinc imatges noves i dos intents per encertar-ne els colors. Competeixes només amb la gent que convidis.",
   "online.hub.unranked": "—",
 
   // --- Barra de pestanyes del mode online ---
@@ -2342,9 +2344,9 @@ const ca: Record<TranslationKey, string> = {
   "online.tour.profile.action": "Ves al Perfil",
   "online.tour.today.title": "Avui",
   "online.tour.today.body":
-    "Aquí tornes cada tarda: a les 15:00 hi ha un logotip nou i dos intents per encertar-ne el color.",
+    "Aquí tornes cada tarda: a les 15:00 hi ha cinc imatges noves i dos intents per encertar-ne els colors.",
   "online.tour.today.action": "Torna a Avui",
-  "online.tour.create.title": "Només falta amb qui",
+  "online.tour.create.title": "Ja només falten els teus amics",
   "online.tour.create.body":
     "Crea un grup, convida qui vulguis i demà a les 15:00 tindreu el mateix repte.",
   "online.tour.create.action": "Crea un grup",
@@ -2411,7 +2413,7 @@ const ca: Record<TranslationKey, string> = {
     "Entra al meu grup «{{name}}» de Hexy amb el codi {{code}}",
   "online.group.finishedTitle": "Aquesta temporada s'ha acabat",
   "online.group.finishedOwner":
-    "La classificació queda congelada. La pots reiniciar quan vulguis: els punts tornen a zero, però el teu XP i el teu nivell no es toquen.",
+    "La classificació queda congelada. La pots reiniciar quan vulguis: els punts tornen a zero, però el teu XP i el teu nivell no es perden.",
   "online.group.finishedMember":
     "La classificació queda congelada. Només {{owner}}, que va crear el grup, pot començar una temporada nova.",
   "online.group.chatStillOpen": "El xat continua obert.",
@@ -2455,15 +2457,17 @@ const ca: Record<TranslationKey, string> = {
   "online.group.settings.renamed": "Nom canviat.",
   "online.group.settings.ownerOnly":
     "Només qui va crear el grup en pot canviar el nom.",
-  "online.group.settings.notifications": "Avisos d'aquest grup",
+  "online.group.settings.notifications": "Avisos del grup",
   "online.group.settings.notificationsHint":
-    "Encén el punt vermell quan passa alguna cosa aquí, com una temporada nova. Apagat, el grup no et reclama l'atenció.",
+    "Activa'l per assabentar-te de les novetats d'aquest grup, com l'inici d'una temporada nova. Apagat, el grup deixa d'avisar-te a la llista.",
   "online.group.settings.seasons": "Temporades",
   "online.group.settings.seasonsHint":
     "Quantes en porta el grup, i des de quan.",
   "online.group.settings.membersHint": "Punts i jornades d'aquesta temporada.",
   "online.group.settings.addFriend": "Afegeix {{name}} com a amic",
   "online.group.settings.shareCode": "Comparteix el codi",
+  "online.group.settings.copyCode": "Copiar el codi",
+  "online.group.settings.codeCopied": "Codi copiat.",
   "online.group.settings.leaveHint": "Hi pots tornar a entrar amb el codi.",
 
   "online.chat.badge": "Xat",

@@ -1,4 +1,4 @@
-import { useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import type { ReactElement } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -79,6 +79,7 @@ import { useSession } from "@/online/session";
 export default function GroupChatScreen(): ReactElement {
   const { api, user } = useSession();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const groupId = Array.isArray(id) ? id[0] : (id ?? null);
 
@@ -179,6 +180,17 @@ export default function GroupChatScreen(): ReactElement {
   return (
     <Screen
       backTo={{ pathname: "/online/groups/[id]", params: { id: groupId ?? "" } }}
+      /*
+        Al grupo del que es este chat, siempre. Con `back()` se salía al menú
+        de Hoy: ver `onBack` en `design/Layout`.
+      */
+      onBack={() =>
+        router.navigate(
+          groupId
+            ? { pathname: "/online/groups/[id]", params: { id: groupId } }
+            : "/online/groups",
+        )
+      }
       scrollable={false}
       backdrop={<AmbientThread />}
       contentStyle={styles.shell}

@@ -86,6 +86,16 @@ export default function GroupsScreen(): ReactElement {
     }, [load]),
   );
 
+  /**
+   * El aviso dura lo que dura la visita.
+   *
+   * «Grupo creado» confirma lo que se acaba de pulsar, y crear un grupo lleva
+   * derecho a su ficha: al volver aquí días después, el cartel seguía puesto
+   * anunciando algo que ya no acaba de pasar. La pantalla es una pestaña y no
+   * se desmonta, así que hay que limpiarlo a mano al perder el foco.
+   */
+  useFocusEffect(useCallback(() => () => setNotice(null), []));
+
   const refresh = useCallback(async () => {
     setRefreshing(true);
     await load();

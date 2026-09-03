@@ -1,7 +1,15 @@
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import type { ReactElement, ReactNode } from "react";
-import { useCallback, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import Animated, {
+  Easing,
+  ReduceMotion,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
 
 import { describeError } from "@/api/errors";
 import type {
@@ -30,6 +38,7 @@ import {
   Color,
   DISABLED_OPACITY,
   HIT_SLOP,
+  HIT_TARGET,
   Radius,
   SECTION_TONE,
   Space,
@@ -301,6 +310,17 @@ export default function GroupDetailScreen(): ReactElement {
     }, [consumeGroupNotices, load]),
   );
 
+  /**
+   * El aviso dura lo que dura la visita.
+   *
+   * «Temporada 3 en marcha» confirma algo que se acaba de pulsar; no es un
+   * estado del grupo, y la pantalla no se desmonta al salir porque vive en el
+   * navegador de pestañas. Sin esto, el cartel seguía puesto días después. Va
+   * en su propio efecto y sin dependencias para que solo se dispare al perder
+   * el foco.
+   */
+  useFocusEffect(useCallback(() => () => setNotice(null), []));
+
   const refresh = useCallback(async () => {
     setRefreshing(true);
     await load();
@@ -364,6 +384,9 @@ export default function GroupDetailScreen(): ReactElement {
         eyebrow={t("online.group.badge")}
         title={t("online.groups.title")}
         backTo="/online/groups"
+        // A la lista de grupos, que es de donde cuelga esta ficha. Ver
+        // `onBack` en `design/Layout`.
+        onBack={() => router.navigate("/online/groups")}
         backdrop={<AmbientMesh />}
       >
         {error ? (
@@ -420,10 +443,7 @@ export default function GroupDetailScreen(): ReactElement {
       })}
       title={group.name}
       titleAction={
-        <IconButton
-          name="gear"
-          variant="surface"
-          accessibilityLabel={t("online.group.edit")}
+        <SettingsGear
           onPress={() =>
             router.push({
               pathname: "/online/groups/[id]/edit",
@@ -433,6 +453,15 @@ export default function GroupDetailScreen(): ReactElement {
         />
       }
       backTo="/online/groups"
+      /*
+        A la lista de grupos, siempre.
+
+        Dentro de las pestañas del online `back()` lleva a la primera —el
+        menú de Hoy—, se venga de donde se venga, así que la flecha nunca
+        llegaba al sitio que ella misma declara. Ver `onBack` en
+        `design/Layout`.
+      */
+      onBack={() => router.navigate("/online/groups")}
       backdrop={<AmbientMesh />}
       headerAction={<SettingsButton />}
       onRefresh={refresh}
@@ -736,6 +765,84 @@ export default function GroupDetailScreen(): ReactElement {
 }
 
 // ---------------------------------------------------------------------------
+// La tuerca de ajustes
+// ---------------------------------------------------------------------------
+
+/** Un latido completo del anillo: sale del borde de la tuerca y se apaga. */
+const HALO_MS = 2600;
+
+/**
+ * La tuerca que abre los ajustes del grupo, anunciandose.
+ *
+ * Era un `IconButton` gris junto al nombre y practicamente nadie lo
+ * encontraba: es el unico camino al codigo de invitacion, a la lista de
+ * miembros y a la salida del grupo, y estaba pintado como la decoracion de una
+ * cabecera. El problema no era de tamano —ya tiene sus 44 puntos de area
+ * tactil— sino de que **nada decia que fuera pulsable**.
+ *
+ * Se arregla con dos cosas a la vez, porque una sola no basta:
+ *
+ *  - **Color.** El icono y su superficie llevan el pigmento de la seccion de
+ *    grupos, el mismo de su pestana y el de su boton de crear. Deja de ser un
+ *    gris entre grises y pasa a leerse como un control de esta pantalla.
+ *  - **Un anillo que respira.** Sale del borde de la tuerca, crece un poco y
+ *    se apaga, cada dos segundos y medio. Es el mismo recurso que el halo del
+ *    eje de la portada y significa lo mismo: aqui hay algo que pulsar.
+ *
+ * ## Por que no el borde de aurora
+ *
+ * Porque esta pantalla ya gasta el suyo en la tarjeta del reto de hoy, y la
+ * regla es una superficie brillante por pantalla: con dos, ninguna es la
+ * principal — y la principal aqui es jugar, no los ajustes. El anillo es otra
+ * cosa: no es un borde permanente, es un pulso que aparece y desaparece, asi
+ * que no compite por ser «lo que hay que mirar», solo dice «esto se toca».
+ */
+function SettingsGearBase({ onPress }: { onPress: () => void }): ReactElement {
+  const pulse = useSharedValue(0);
+
+  useEffect(() => {
+    pulse.set(
+      withRepeat(
+        withTiming(1, { duration: HALO_MS, easing: Easing.out(Easing.quad) }),
+        -1,
+        false,
+        undefined,
+        // Igual que los orbes del fondo y el borde de aurora: esto no desplaza
+        // contenido ni parpadea, y sin el la tuerca vuelve a ser invisible,
+        // que es justo el problema que resuelve.
+        ReduceMotion.Never,
+      ),
+    );
+  }, [pulse]);
+
+  const haloStyle = useAnimatedStyle(() => ({
+    // Se apaga antes de llegar al final del recorrido: asi el anillo se ha
+    // desvanecido del todo cuando el ciclo salta a cero y no se ve el corte.
+    opacity: 0.55 * (1 - pulse.get()),
+    transform: [{ scale: 1 + pulse.get() * 0.35 }],
+  }));
+
+  return (
+    <View style={styles.gearWrap}>
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.gearHalo, haloStyle]}
+      />
+      <IconButton
+        name="gear"
+        variant="surface"
+        color={Color.spectrum[SECTION_TONE.groups].icon}
+        accessibilityLabel={t("online.group.edit")}
+        onPress={onPress}
+        style={styles.gearButton}
+      />
+    </View>
+  );
+}
+
+const SettingsGear = memo(SettingsGearBase);
+
+// ---------------------------------------------------------------------------
 // El reto de hoy
 // ---------------------------------------------------------------------------
 
@@ -1030,6 +1137,26 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: Space.sm,
     marginBottom: Space.xl,
+  },
+
+  // -- La tuerca ------------------------------------------------------------
+  gearWrap: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  gearHalo: {
+    position: "absolute",
+    width: HIT_TARGET,
+    height: HIT_TARGET,
+    borderRadius: Radius.md,
+    borderWidth: 1.5,
+    borderColor: Color.spectrum[SECTION_TONE.groups].icon,
+  },
+  gearButton: {
+    // Tenido, no gris: junto al color del icono es la mitad de lo que hace que
+    // se lea como un control y no como un adorno de la cabecera.
+    backgroundColor: Color.spectrum[SECTION_TONE.groups].surface,
+    borderRadius: Radius.md,
   },
 
   // -- Fin de temporada -----------------------------------------------------

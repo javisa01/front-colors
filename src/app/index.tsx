@@ -23,7 +23,6 @@ import {
   Color,
   Duration,
   HAIRLINE,
-  HIT_SLOP,
   Radius,
   Space,
   Type,
@@ -195,9 +194,8 @@ export default function LandingScreen(): ReactElement {
    *
    * Se mide en vez de fijarse porque el bloque no mide lo mismo en los tres
    * estados: el titular tiene dos líneas siempre, pero el subtítulo puede
-   * ocupar dos o tres, y en dos de los tres estados hay además el enlace del
-   * código de invitación debajo. Un alto escrito a mano protegería una de las
-   * tres pantallas y dejaría las otras dos a medias.
+   * ocupar dos o tres. Un alto escrito a mano protegería una de las tres
+   * pantallas y dejaría las otras dos a medias.
    */
   const [headingBottom, setHeadingBottom] = useState(0);
 
@@ -295,17 +293,6 @@ export default function LandingScreen(): ReactElement {
     router.push(dial.href);
   }, [dial.href, router]);
 
-  /**
-   * El código de invitación lleva a sitios distintos según haya cuenta o no:
-   * sin ella hay que crearla primero, y mandar a la pantalla de grupos a quien
-   * no ha entrado sería enseñarle un formulario que va a rebotar.
-   */
-  const enterCode = useCallback(() => {
-    selectionTick();
-    playTick();
-    router.push(state === "guest" ? "/online/auth" : "/online/groups");
-  }, [router, state]);
-
   const enterPractice = useCallback(() => {
     selectionTick();
     playTick();
@@ -381,20 +368,6 @@ export default function LandingScreen(): ReactElement {
           <Text style={Type.label}>{heading.label}</Text>
           <Text style={[Type.display, styles.title]}>{heading.title}</Text>
           <Text style={[Type.body, styles.body]}>{heading.body}</Text>
-
-          {state === "member" ? null : (
-            <Pressable
-              onPress={enterCode}
-              hitSlop={HIT_SLOP}
-              style={styles.code}
-              accessibilityRole="button"
-            >
-              <Text style={[Type.bodyStrong, styles.codeText]}>
-                {t("dial.code")}
-              </Text>
-              <Icon name="chevronRight" size={15} color={Color.accent.text} />
-            </Pressable>
-          )}
         </Animated.View>
 
         {/*
@@ -514,16 +487,6 @@ const styles = StyleSheet.create({
   body: {
     marginTop: Space.md,
     maxWidth: 300,
-  },
-  code: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Space.xs,
-    marginTop: Space.lg,
-    alignSelf: "flex-start",
-  },
-  codeText: {
-    color: Color.accent.text,
   },
   free: {
     flex: 1,

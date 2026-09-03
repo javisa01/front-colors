@@ -128,6 +128,20 @@ export default function ProfileScreen(): ReactElement {
     }, [loadFriends, loadProgress]),
   );
 
+  /**
+   * El aviso de «nombre actualizado» dura lo que dura la visita.
+   *
+   * Es la confirmación de algo que se acaba de hacer, no un estado de la
+   * cuenta: al volver al perfil dos días después seguía ahí, colgado encima
+   * del botón de cambiar el nombre, diciendo que algo ha pasado ahora mismo
+   * cuando no ha pasado nada. Se limpia al salir de la pantalla.
+   *
+   * Va en su propio efecto y con dependencias vacías a propósito: metido en el
+   * de arriba, cualquier cambio de `loadFriends` lo borraría estando la
+   * pantalla delante — justo el fotograma en el que hay que verlo.
+   */
+  useFocusEffect(useCallback(() => () => setSaved(false), []));
+
   const answer = useCallback(
     async (userId: string, action: () => Promise<unknown>) => {
       setAnswering(userId);

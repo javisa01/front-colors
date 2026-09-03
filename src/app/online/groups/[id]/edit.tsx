@@ -1,6 +1,7 @@
+import * as Clipboard from "expo-clipboard";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import type { ReactElement } from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ScrollView, Share, StyleSheet, Text, View } from "react-native";
 
 import { describeError } from "@/api/errors";
@@ -28,7 +29,11 @@ import {
 import { relationOf, type Relation } from "@/online/friends";
 import { useSession } from "@/online/session";
 import { useSocial } from "@/online/social";
+import { selectionTick } from "@/utils/haptics";
 import { getGroupNotifications, setGroupNotifications } from "@/utils/storage";
+
+/** Lo que el botón de copiar se queda diciendo «copiado». */
+const COPIED_MS = 2000;
 
 /**
  * Ajustes del grupo: quién está, cómo se llama, cómo se invita y cómo se sale.
@@ -88,6 +93,18 @@ export default function GroupSettingsScreen(): ReactElement {
   const [notify, setNotify] = useState(true);
   /** Id de la persona cuya solicitud de amistad está en vuelo. */
   const [pendingFriend, setPendingFriend] = useState<string | null>(null);
+  /** El botón de copiar, mientras dura su acuse de recibo. */
+  const [copied, setCopied] = useState(false);
+  const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (copyTimer.current != null) {
+        clearTimeout(copyTimer.current);
+      }
+    },
+    [],
+  );
 
   const load = useCallback(async () => {
     if (!groupId) return;
@@ -122,6 +139,17 @@ export default function GroupSettingsScreen(): ReactElement {
       void load();
     }, [load]),
   );
+
+  /**
+   * El aviso dura lo que dura la visita.
+   *
+   * «Nombre cambiado» es la confirmación de algo que se acaba de hacer, no un
+   * estado del grupo: la pantalla vive dentro del navegador de pestañas y no
+   * se desmonta al salir, así que sin esto el cartel seguía puesto al volver
+   * una semana después. Efecto propio y sin dependencias para que solo se
+   * dispare al perder el foco y nunca con la pantalla delante.
+   */
+  useFocusEffect(useCallback(() => () => setNotice(null), []));
 
   useEffect(() => {
     if (!groupId) return;
@@ -176,6 +204,27 @@ export default function GroupSettingsScreen(): ReactElement {
     },
     [api],
   );
+
+  /**
+   * Copiar el código, con acuse de recibo.
+   *
+   * El temporizador se guarda para poder cancelarlo: sin eso, salir de la
+   * pantalla antes de los dos segundos deja un `setState` apuntando a un
+   * componente que ya no está.
+   */
+  const copyCode = useCallback(async () => {
+    if (!group) return;
+    await Clipboard.setStringAsync(group.joinCode);
+    selectionTick();
+    setCopied(true);
+    if (copyTimer.current != null) {
+      clearTimeout(copyTimer.current);
+    }
+    copyTimer.current = setTimeout(() => {
+      copyTimer.current = null;
+      setCopied(false);
+    }, COPIED_MS);
+  }, [group]);
 
   const share = useCallback(async () => {
     if (!group) return;
@@ -236,6 +285,9 @@ export default function GroupSettingsScreen(): ReactElement {
         eyebrow={t("online.group.badge")}
         title={t("online.group.settings.title")}
         backTo="/online/groups"
+        // Aquí no hay grupo que leer todavía —o no se ha podido—, así que la
+        // vuelta es a la lista y no a una ficha que puede no existir.
+        onBack={() => router.navigate("/online/groups")}
         backdrop={<AmbientMesh />}
       >
         {error ? (
@@ -263,6 +315,20 @@ export default function GroupSettingsScreen(): ReactElement {
       eyebrow={group.name}
       title={t("online.group.settings.title")}
       backTo={{ pathname: "/online/groups/[id]", params: { id: group.id } }}
+      /*
+        A la ficha del grupo, siempre.
+
+        Estos ajustes solo se abren desde la tuerca de ese grupo, así que su
+        vuelta no tiene ninguna ambigüedad — y `back()` la tenía toda: dentro
+        de las pestañas del online salía al menú de Hoy. Ver `onBack` en
+        `design/Layout`.
+      */
+      onBack={() =>
+        router.navigate({
+          pathname: "/online/groups/[id]",
+          params: { id: group.id },
+        })
+      }
       backdrop={<AmbientMesh />}
       onRefresh={refresh}
       refreshing={refreshing}
@@ -276,7 +342,6 @@ export default function GroupSettingsScreen(): ReactElement {
       {error ? (
         <ErrorBanner message={error} onRetry={() => void load()} />
       ) : null}
-      {notice ? <Notice message={notice} /> : null}
 
       <Rosette members={rosette} youId={user?.id} total={group.memberCount} />
 
@@ -292,6 +357,18 @@ export default function GroupSettingsScreen(): ReactElement {
             maxLength={GROUP_NAME_MAX}
             returnKeyType="done"
           />
+          {/*
+            El aviso, justo encima del boton que lo produce y no arriba del
+            todo.
+
+            Estaba en la cabecera de la pantalla, a un scroll de distancia del
+            sitio donde se acaba de pulsar: quien renombraba el grupo veia el
+            campo quedarse quieto y nada mas. Aqui aparece donde esta mirando,
+            y con aire a los dos lados para que no se lea como parte del
+            formulario ni del boton.
+          */}
+          {notice ? <Notice message={notice} style={styles.renameNotice} /> : null}
+
           <Button
             label={t("online.group.settings.saveName")}
             icon="check"
@@ -301,7 +378,7 @@ export default function GroupSettingsScreen(): ReactElement {
             disabled={!canSave}
             loading={saving}
             onPress={() => void rename()}
-            style={styles.saveButton}
+            style={notice ? undefined : styles.saveButton}
           />
         </Card>
       ) : (
@@ -372,10 +449,31 @@ export default function GroupSettingsScreen(): ReactElement {
         <Text style={[Type.caption, styles.codeHint]}>
           {t("online.group.codeHint")}
         </Text>
+        {/*
+          Copiar y compartir, en ese orden.
+
+          Compartir abre la hoja del sistema, que es el camino largo cuando lo
+          único que se quiere es pegar el código en la conversación que ya se
+          tiene abierta. Copiar es el gesto corto y por eso va primero; el
+          botón se queda diciendo «copiado» un par de segundos, porque el
+          portapapeles no da ninguna señal por su cuenta y sin eso no hay forma
+          de saber si el toque ha hecho algo.
+        */}
+        <Button
+          label={
+            copied
+              ? t("online.group.settings.codeCopied")
+              : t("online.group.settings.copyCode")
+          }
+          icon={copied ? "check" : "copy"}
+          variant="accent"
+          onPress={() => void copyCode()}
+          style={styles.codeButton}
+        />
         <Button
           label={t("online.group.settings.shareCode")}
           icon="share"
-          variant="accent"
+          variant="secondary"
           onPress={() => void share()}
         />
       </View>
@@ -644,6 +742,12 @@ const styles = StyleSheet.create({
   saveButton: {
     marginTop: Space.lg,
   },
+  renameNotice: {
+    // Aire arriba y abajo: el aviso se mete entre el campo y el botón, y sin
+    // el de abajo se leería como la etiqueta de lo que hay que pulsar.
+    marginTop: Space.lg,
+    marginBottom: Space.lg,
+  },
   readOnlyName: {
     marginTop: Space.sm,
     marginBottom: Space.xs,
@@ -696,6 +800,9 @@ const styles = StyleSheet.create({
     marginTop: Space.xs,
     marginBottom: Space.lg,
     textAlign: "center",
+  },
+  codeButton: {
+    marginBottom: Space.sm,
   },
 
   // -- Salir ----------------------------------------------------------------

@@ -25,7 +25,8 @@ import { loadPracticeTourSeen, setPracticeTourSeen } from "@/utils/storage";
  *
  * Cuatro cosas, que son las cuatro que no se deducen mirando: que **hay dos
  * listas y no una**, que una fila **dice lo que pide y guarda tu récord**, que
- * la segunda lista es **para pasarse el móvil**, y dónde se silencia la música.
+ * la segunda lista es **para darle el móvil al de al lado**, y dónde se
+ * silencia la música.
  * Los ocho modos no se explican de uno en uno a propósito: cada fila ya trae su
  * descripción debajo del título, y repetirla en una tarjeta sería leerle al
  * jugador lo que tiene delante.

@@ -27,8 +27,8 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { Icon, type IconName } from "@/design/Icon";
+import { useColors, useThemedStyles } from "@/design/theme";
 import {
-  Color,
   DISABLED_OPACITY,
   Duration,
   HIT_SLOP,
@@ -37,6 +37,7 @@ import {
   Radius,
   Space,
   Type,
+  type Palette,
   type SpectrumTone,
 } from "@/design/tokens";
 import { selectionTick } from "@/utils/haptics";
@@ -112,16 +113,18 @@ function FieldBase({
   returnKeyType = "next",
   style,
 }: FieldProps): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const focus = useSharedValue(0);
   const invalid = error != null;
 
   const borderStyle = useAnimatedStyle(() => ({
     borderColor: invalid
-      ? Color.danger.border
+      ? colors.danger.border
       : interpolateColor(
           focus.get(),
           [0, 1],
-          [Color.border.default, Color.accent.default],
+          [colors.border.default, colors.accent.default],
         ),
   }));
 
@@ -142,7 +145,7 @@ function FieldBase({
       <Animated.View style={[styles.inputShell, borderStyle]}>
         {leading ??
           (icon != null ? (
-            <Icon name={icon} size={18} color={Color.text.muted} />
+            <Icon name={icon} size={18} color={colors.text.muted} />
           ) : null)}
         <TextInput
           value={value}
@@ -150,7 +153,7 @@ function FieldBase({
           onFocus={onFocus}
           onBlur={onBlur}
           placeholder={placeholder}
-          placeholderTextColor={Color.text.faint}
+          placeholderTextColor={colors.text.faint}
           style={[Type.body, styles.input]}
           secureTextEntry={secure}
           keyboardType={keyboardType}
@@ -220,6 +223,8 @@ function SegmentedControlInner<T extends string>({
   tone,
   style,
 }: SegmentedControlProps<T>): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const [trackWidth, setTrackWidth] = useState(0);
   const index = Math.max(
     0,
@@ -257,8 +262,8 @@ function SegmentedControlInner<T extends string>({
           style={[
             styles.segmentThumb,
             tone != null && {
-              backgroundColor: Color.spectrum[tone].pigment,
-              borderColor: Color.spectrum[tone].pigment,
+              backgroundColor: colors.spectrum[tone].pigment,
+              borderColor: colors.spectrum[tone].pigment,
             },
             thumbStyle,
           ]}
@@ -290,7 +295,7 @@ function SegmentedControlInner<T extends string>({
                 styles.segmentLabel,
                 active && styles.segmentLabelActive,
                 active &&
-                  tone != null && { color: Color.spectrum[tone].ink },
+                  tone != null && { color: colors.spectrum[tone].ink },
               ]}
               numberOfLines={1}
             >
@@ -330,6 +335,7 @@ function ChipBase({
   onPress: () => void;
   accessibilityLabel?: string;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   return (
     <Pressable
       onPress={() => {
@@ -392,6 +398,7 @@ function StepperBase({
   decreaseLabel,
   increaseLabel,
 }: StepperProps): ReactElement {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.stepper}>
       <StepperButton
@@ -424,6 +431,8 @@ function StepperButton({
   disabled: boolean;
   onPress: () => void;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -460,7 +469,7 @@ function StepperButton({
         accessibilityLabel={label}
         accessibilityState={{ disabled }}
       >
-        <Icon name={icon} size={20} color={Color.text.primary} />
+        <Icon name={icon} size={20} color={colors.text.primary} />
       </Pressable>
     </Animated.View>
   );
@@ -511,6 +520,8 @@ function ToggleBase({
   disabled = false,
   style,
 }: ToggleProps): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const progress = useSharedValue(value ? 1 : 0);
 
   useEffect(() => {
@@ -521,12 +532,12 @@ function ToggleBase({
     backgroundColor: interpolateColor(
       progress.get(),
       [0, 1],
-      [Color.surface.sunken, Color.accent.default],
+      [colors.surface.sunken, colors.accent.default],
     ),
     borderColor: interpolateColor(
       progress.get(),
       [0, 1],
-      [Color.border.default, Color.accent.default],
+      [colors.border.default, colors.accent.default],
     ),
   }));
 
@@ -561,7 +572,7 @@ function ToggleBase({
           <Icon
             name={icon}
             size={18}
-            color={value ? Color.accent.text : Color.text.muted}
+            color={value ? colors.accent.text : colors.text.muted}
           />
         </View>
       ) : null}
@@ -597,6 +608,7 @@ function InfoRowBase({
   /** La última fila de un bloque no lleva línea inferior. */
   last?: boolean;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={[styles.infoRow, last && styles.infoRowLast]}>
       <Text style={Type.caption}>{label}</Text>
@@ -619,9 +631,11 @@ function NoticeBase({
   message: string;
   style?: StyleProp<ViewStyle>;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   return (
     <View style={[styles.notice, style]} accessibilityRole="alert">
-      <Icon name="check" size={16} color={Color.success.text} />
+      <Icon name="check" size={16} color={colors.success.text} />
       <Text style={[Type.caption, styles.noticeText]}>{message}</Text>
     </View>
   );
@@ -631,6 +645,7 @@ export const Notice = memo(NoticeBase);
 
 /** Separador con una palabra en medio («o»). */
 function OrDividerBase({ label }: { label: string }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.orDivider}>
       <View style={styles.orLine} />
@@ -644,12 +659,14 @@ export const OrDivider = memo(OrDividerBase);
 
 /** Envoltorio de una fila de acciones alineadas a la derecha. */
 export function RowActions({ children }: { children: ReactNode }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   return <View style={styles.rowActions}>{children}</View>;
 }
 
 const SEGMENT_PADDING = 4;
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   field: {
     marginBottom: Space.lg,
   },
@@ -664,29 +681,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: Space.md,
     borderRadius: Radius.md,
     borderWidth: 1,
-    backgroundColor: Color.surface.sunken,
+    backgroundColor: c.surface.sunken,
   },
   input: {
     flex: 1,
     // El campo ya centra su contenido; sin esto Android reserva su propio
     // relleno vertical y el texto queda descolgado respecto al icono.
     paddingVertical: 0,
-    color: Color.text.primary,
+    color: c.text.primary,
   },
   fieldHint: {
     marginTop: Space.sm,
   },
   fieldError: {
     marginTop: Space.sm,
-    color: Color.danger.text,
+    color: c.danger.text,
   },
   segmented: {
     flexDirection: "row",
     padding: SEGMENT_PADDING,
     borderRadius: Radius.md,
-    backgroundColor: Color.surface.sunken,
+    backgroundColor: c.surface.sunken,
     borderWidth: 1,
-    borderColor: Color.border.subtle,
+    borderColor: c.border.subtle,
     marginBottom: Space.lg,
   },
   segmentThumb: {
@@ -695,9 +712,9 @@ const styles = StyleSheet.create({
     left: SEGMENT_PADDING,
     bottom: SEGMENT_PADDING,
     borderRadius: Radius.sm,
-    backgroundColor: Color.surface.raised,
+    backgroundColor: c.surface.raised,
     borderWidth: 1,
-    borderColor: Color.border.default,
+    borderColor: c.border.default,
   },
   segment: {
     flex: 1,
@@ -707,10 +724,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: Space.sm,
   },
   segmentLabel: {
-    color: Color.text.muted,
+    color: c.text.muted,
   },
   segmentLabelActive: {
-    color: Color.text.primary,
+    color: c.text.primary,
   },
   chip: {
     minWidth: HIT_TARGET,
@@ -719,24 +736,24 @@ const styles = StyleSheet.create({
     borderRadius: Radius.sm,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Color.surface.raised,
+    backgroundColor: c.surface.raised,
     borderWidth: 1,
-    borderColor: Color.border.default,
+    borderColor: c.border.default,
   },
   chipSelected: {
-    backgroundColor: Color.accent.surface,
-    borderColor: Color.accent.border,
+    backgroundColor: c.accent.surface,
+    borderColor: c.accent.border,
   },
   chipPressed: {
-    backgroundColor: Color.surface.interactive,
-    borderColor: Color.border.strong,
+    backgroundColor: c.surface.interactive,
+    borderColor: c.border.strong,
   },
   chipLabel: {
-    color: Color.text.secondary,
+    color: c.text.secondary,
     fontVariant: ["tabular-nums"],
   },
   chipLabelSelected: {
-    color: Color.accent.text,
+    color: c.accent.text,
   },
   stepper: {
     flexDirection: "row",
@@ -750,13 +767,13 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Color.surface.raised,
+    backgroundColor: c.surface.raised,
     borderWidth: 1,
-    borderColor: Color.border.default,
+    borderColor: c.border.default,
   },
   stepperButtonPressed: {
-    backgroundColor: Color.surface.interactive,
-    borderColor: Color.border.strong,
+    backgroundColor: c.surface.interactive,
+    borderColor: c.border.strong,
   },
   stepperValue: {
     minWidth: 72,
@@ -773,7 +790,7 @@ const styles = StyleSheet.create({
     gap: Space.lg,
     paddingVertical: Space.md,
     borderBottomWidth: 1,
-    borderBottomColor: Color.border.subtle,
+    borderBottomColor: c.border.subtle,
   },
   infoRowLast: {
     borderBottomWidth: 0,
@@ -789,7 +806,7 @@ const styles = StyleSheet.create({
     marginTop: Space.lg,
   },
   noticeText: {
-    color: Color.success.text,
+    color: c.success.text,
   },
   orDivider: {
     flexDirection: "row",
@@ -800,7 +817,7 @@ const styles = StyleSheet.create({
   orLine: {
     flex: 1,
     height: 1,
-    backgroundColor: Color.border.subtle,
+    backgroundColor: c.border.subtle,
   },
   toggleRow: {
     flexDirection: "row",
@@ -818,9 +835,9 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Color.surface.sunken,
+    backgroundColor: c.surface.sunken,
     borderWidth: 1,
-    borderColor: Color.border.subtle,
+    borderColor: c.border.subtle,
   },
   toggleBody: {
     flex: 1,
@@ -840,11 +857,11 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
     borderRadius: Radius.pill,
-    backgroundColor: Color.text.primary,
+    backgroundColor: c.text.primary,
   },
   rowActions: {
     flexDirection: "row",
     alignItems: "center",
     gap: Space.sm,
   },
-});
+  });

@@ -22,8 +22,13 @@ import { StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { ThemeProvider } from "@/design/theme";
-import { Color } from "@/design/tokens";
+import {
+  darkPalette,
+  lightPalette,
+  setThemeMode,
+  ThemeProvider,
+  useThemeMode,
+} from "@/design/theme";
 import { setLocale, useLocale } from "@/i18n";
 import { setMusicVolume, startMusic } from "@/utils/music";
 import { setSfxVolume } from "@/utils/sound";
@@ -31,6 +36,7 @@ import {
   getLanguage as loadLanguage,
   getMusicVolume as loadMusicVolume,
   getSfxVolume as loadSfxVolume,
+  getThemeMode as loadThemeMode,
   loadLanding,
   loadTutorialSeen,
 } from "@/utils/storage";
@@ -77,6 +83,7 @@ export default function RootLayout() {
   });
 
   const locale = useLocale();
+  const themeMode = useThemeMode();
 
   /**
    * El idioma guardado se aplica ANTES del primer pintado, no después.
@@ -109,9 +116,22 @@ export default function RootLayout() {
 
   useEffect(() => {
     (async () => {
-      const stored = await loadLanguage();
-      if (stored) {
-        setLocale(stored);
+      /*
+        El tema viaja con el idioma y por la misma razón: los dos se aplican
+        ANTES del primer pintado o hay un fotograma en oscuro que acto seguido
+        se vuelve claro. Comparten espera porque comparten destino —la `key`
+        del navegador— y porque las dos son lecturas de disco que ya terminan
+        antes que las tipografías.
+      */
+      const [storedLocale, storedTheme] = await Promise.all([
+        loadLanguage(),
+        loadThemeMode(),
+      ]);
+      if (storedLocale) {
+        setLocale(storedLocale);
+      }
+      if (storedTheme) {
+        setThemeMode(storedTheme);
       }
       setLocaleReady(true);
     })();
@@ -162,6 +182,13 @@ export default function RootLayout() {
     return null;
   }
 
+  /*
+    La paleta, a mano y no por `useColors`: este componente RENDERIZA el
+    proveedor, así que está fuera de su contexto. El modo sí es observable desde
+    aquí porque vive en el almacén de módulo, no en el proveedor.
+  */
+  const palette = themeMode === "dark" ? darkPalette : lightPalette;
+
   return (
     /*
       El proveedor de tema envuelve toda la app desde el primer dia, aunque
@@ -175,14 +202,20 @@ export default function RootLayout() {
     <ThemeProvider>
       <GestureHandlerRootView style={styles.flex}>
         <SafeAreaProvider>
-          <View style={styles.shell}>
+          <View
+            style={[styles.shell, { backgroundColor: palette.surface.canvas }]}
+          >
             {/*
               `translucent` dejó de existir en el StatusBar de Expo 57 y estaba
               provocando un error de TypeScript en `main`. El fondo lo pinta ya el
               contenedor, así que la barra solo necesita declarar que sus iconos
               van en claro.
             */}
-            <StatusBar style="light" />
+            {/*
+              Los iconos de la barra, a contraluz del tema: claros sobre el
+              lienzo oscuro, oscuros sobre el papel claro.
+            */}
+            <StatusBar style={themeMode === "dark" ? "light" : "dark"} />
             {/*
               La `key` con el idioma es lo que hace efectivo un cambio de idioma
               en lo que ya está en pantalla.
@@ -204,12 +237,20 @@ export default function RootLayout() {
 
               El precio se paga una vez, y solo cuando alguien cambia de idioma
               a propósito.
+
+              El TEMA va en la misma `key` y por el mismo mecanismo. Dos cosas
+              del tema no se arreglan con un re-render: la tinta de `Type`, que
+              se reescribe en caliente sobre los mismos objetos (ver
+              `applyTypeColors` en `design/theme.tsx`), y cualquier hoja de
+              estilos que quede sin migrar a `useThemedStyles`. Remontar deja
+              cada pantalla recién pintada con la paleta nueva, y pasa tan a
+              menudo como alguien cambia de tema: casi nunca.
             */}
             <Stack
-              key={locale}
+              key={`${locale}:${themeMode}`}
               screenOptions={{
                 headerShown: false,
-                contentStyle: { backgroundColor: Color.surface.canvas },
+                contentStyle: { backgroundColor: palette.surface.canvas },
                 animation: "slide_from_right",
               }}
             >
@@ -236,8 +277,9 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
+  // El fondo no está aquí: lo pone la paleta activa en el render, porque este
+  // objeto se evalúa una vez y se quedaría con el del arranque.
   shell: {
     flex: 1,
-    backgroundColor: Color.surface.canvas,
   },
 });

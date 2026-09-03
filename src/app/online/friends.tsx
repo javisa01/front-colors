@@ -13,7 +13,13 @@ import { IconButton } from "@/design/Button";
 import { EmptyState, ErrorBanner, Loading, Pill } from "@/design/Feedback";
 import { Field, RowActions } from "@/design/Form";
 import { Card, Divider, Screen, SectionHeader } from "@/design/Layout";
-import { Color, Duration, Space, Type } from "@/design/tokens";
+import { useColors, useThemedStyles } from "@/design/theme";
+import {
+  Duration,
+  Space,
+  Type,
+  type Palette,
+} from "@/design/tokens";
 import { t } from "@/i18n";
 import { useSession } from "@/online/session";
 import { useSocial } from "@/online/social";
@@ -37,6 +43,8 @@ const SEARCH_DEBOUNCE_MS = 350;
  * tenía más de ocho letras.
  */
 export default function FriendsScreen(): ReactElement {
+  const colors = useColors();
+  const styles = useThemedStyles(createStyles);
   const { api, user } = useSession();
   const { apply: applySocial } = useSocial();
   const router = useRouter();
@@ -234,7 +242,7 @@ export default function FriendsScreen(): ReactElement {
 
         {searching ? (
           <View style={styles.searchStatus}>
-            <ActivityIndicator color={Color.text.muted} size="small" />
+            <ActivityIndicator color={colors.text.muted} size="small" />
             <Text style={Type.caption}>{t("online.friends.searching")}</Text>
           </View>
         ) : null}
@@ -322,7 +330,7 @@ export default function FriendsScreen(): ReactElement {
                 <IconButton
                   name="check"
                   variant="surface"
-                  color={Color.success.text}
+                  color={colors.success.text}
                   accessibilityLabel={t("online.friends.accept")}
                   onPress={() =>
                     void act(entry.user.id, () =>
@@ -409,7 +417,7 @@ export default function FriendsScreen(): ReactElement {
               <IconButton
                 name="trash"
                 variant="surface"
-                color={Color.danger.text}
+                color={colors.danger.text}
                 accessibilityLabel={t("online.friends.remove")}
                 onPress={() =>
                   void act(entry.user.id, () => api.friends.remove(entry.user.id))
@@ -445,6 +453,7 @@ function PlayerRow({
   last: boolean;
   children: ReactNode;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   return (
     <Animated.View
       entering={FadeIn.delay(Math.min(index, 12) * 35).duration(Duration.base)}
@@ -478,6 +487,8 @@ function RequestRow({
   busy: boolean;
   children: ReactNode;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   return (
     <PlayerRow
       username={entry.user.username}
@@ -490,7 +501,7 @@ function RequestRow({
         // Ocupa el sitio de los botones para que la fila no cambie de alto al
         // pasar a «en curso».
         <View style={styles.rowBusy}>
-          <ActivityIndicator color={Color.accent.default} size="small" />
+          <ActivityIndicator color={colors.accent.default} size="small" />
         </View>
       ) : (
         children
@@ -499,7 +510,8 @@ function RequestRow({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   block: {
     marginBottom: Space.xxl,
   },
@@ -524,7 +536,7 @@ const styles = StyleSheet.create({
     gap: Space.md,
     paddingVertical: Space.md,
     borderBottomWidth: 1,
-    borderBottomColor: Color.border.subtle,
+    borderBottomColor: c.border.subtle,
   },
   rowLast: {
     borderBottomWidth: 0,
@@ -540,4 +552,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-});
+  });

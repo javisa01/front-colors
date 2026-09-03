@@ -6,7 +6,14 @@ import { Button } from "@/design/Button";
 import { scoreTone } from "@/design/Feedback";
 import { Divider } from "@/design/Layout";
 import { Sheet } from "@/design/Sheet";
-import { Color, Duration, Radius, Space, Type } from "@/design/tokens";
+import { useColors, useThemedStyles } from "@/design/theme";
+import {
+  Duration,
+  Radius,
+  Space,
+  Type,
+  type Palette,
+} from "@/design/tokens";
 import { t } from "@/i18n";
 import type { HSVDelta } from "@/utils/colorScore";
 
@@ -40,6 +47,7 @@ function Swatch({
   color: string;
   label: string;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.swatchGroup}>
       <Text style={Type.label}>{label}</Text>
@@ -64,6 +72,7 @@ function DeltaRow({
   value: number;
   unit: string;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.deltaRow}>
       <Text style={Type.body}>{label}</Text>
@@ -85,6 +94,8 @@ function ResultSheetBase({
   onNext,
   nextLabel,
 }: ResultSheetProps): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   return (
     <Sheet visible={visible} onClose={onNext} dismissible={false}>
       <Animated.View
@@ -92,7 +103,7 @@ function ResultSheetBase({
         style={styles.head}
       >
         <Text style={Type.label}>{t("result.kicker")}</Text>
-        <Text style={[Type.metricHero, { color: scoreTone(score) }]}>
+        <Text style={[Type.metricHero, { color: scoreTone(colors, score) }]}>
           {score}%
         </Text>
         <Text style={[Type.bodyStrong, styles.message]}>{message}</Text>
@@ -123,7 +134,8 @@ function ResultSheetBase({
 
 export const ResultSheet = memo(ResultSheetBase);
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   head: {
     alignItems: "center",
   },
@@ -163,9 +175,9 @@ const styles = StyleSheet.create({
     paddingVertical: Space.xs + 1,
   },
   deltaValue: {
-    color: Color.text.primary,
+    color: c.text.primary,
   },
   action: {
     marginTop: Space.xxl,
   },
-});
+  });

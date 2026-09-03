@@ -1,6 +1,5 @@
 import type { AppNotification, GroupSeason, GroupSummary } from "@/api/types";
 import { getLocale, t } from "@/i18n";
-import { getMutedGroups } from "@/utils/storage";
 
 /**
  * Lo que la UI necesita saber de una temporada, en un solo sitio.
@@ -93,9 +92,20 @@ export function noticeLabel(notification: AppNotification): string {
  * Deja a cero el contador de avisos de los grupos silenciados.
  *
  * El punto rojo se pinta en tres sitios —la lista, el menú y la ficha— a partir
- * de `unreadCount`, que lo cuenta el servidor y no sabe nada de la preferencia
- * del teléfono. Apagarlo en cada sitio serían tres reglas que se pueden
+ * de `unreadCount`. Apagarlo en cada sitio serían tres reglas que se pueden
  * desincronizar; hacerlo aquí, nada más recibir la lista, deja una sola.
+ *
+ * ## Antes leía el teléfono; ahora lee el servidor
+ *
+ * La preferencia vivía en `AsyncStorage` porque no había push y el servidor no
+ * tenía ninguna decisión que tomar con ella. Ahora sí la tiene —es él quien
+ * manda los avisos—, así que la fuente de verdad es `notificationsEnabled`, que
+ * viene con cada grupo. Es lo que hace que apagar los avisos en el móvil los
+ * apague también en la tableta, que es lo que la gente espera de un interruptor
+ * que dice «Avisos del grupo».
+ *
+ * Con el interruptor apagado el servidor ya no crea avisos nuevos para ese
+ * grupo, así que esto solo redondea: pone a cero los que quedaran de antes.
  *
  * **No se pierde nada.** Los avisos siguen existiendo y se siguen marcando
  * leídos al abrir el grupo: lo único que cambia es que el grupo no interrumpe.
@@ -103,15 +113,9 @@ export function noticeLabel(notification: AppNotification): string {
  * Se aplica a la lista, no al detalle: dentro del grupo ya has entrado, y ahí
  * la línea que cuenta qué pasó es contenido, no una llamada de atención.
  */
-export async function silenceMutedGroups(
-  groups: GroupSummary[],
-): Promise<GroupSummary[]> {
-  const muted = await getMutedGroups(groups.map((group) => group.id));
-  if (muted.size === 0) {
-    return groups;
-  }
+export function silenceMutedGroups(groups: GroupSummary[]): GroupSummary[] {
   return groups.map((group) =>
-    muted.has(group.id) ? { ...group, unreadCount: 0 } : group,
+    group.notificationsEnabled ? group : { ...group, unreadCount: 0 },
   );
 }
 

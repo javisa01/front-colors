@@ -22,8 +22,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { IconButton, usePressScale } from "@/design/Button";
 import { Icon, type IconName } from "@/design/Icon";
+import { useColors, useThemedStyles } from "@/design/theme";
 import {
-  Color,
   CONTENT_MAX_WIDTH,
   Duration,
   Elevation,
@@ -33,6 +33,7 @@ import {
   Space,
   TABLET_BREAKPOINT,
   Type,
+  type Palette,
   type SpectrumTone,
 } from "@/design/tokens";
 import { t } from "@/i18n";
@@ -149,6 +150,8 @@ function ScreenBase({
   children,
   contentStyle,
 }: ScreenProps): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const router = useRouter();
   const hasHeaderBar = backTo != null || headerAction != null;
 
@@ -267,9 +270,9 @@ function ScreenBase({
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={onRefresh}
-                tintColor={Color.text.muted}
-                colors={[Color.accent.default]}
-                progressBackgroundColor={Color.surface.raised}
+                tintColor={colors.text.muted}
+                colors={[colors.accent.default]}
+                progressBackgroundColor={colors.surface.raised}
               />
             ) : undefined
           }
@@ -338,6 +341,8 @@ function CardBase({
   enterDelay,
   style,
 }: CardProps): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const content = (
     <View
       style={[
@@ -345,7 +350,7 @@ function CardBase({
         variant === "raised" && Elevation.raised,
         tone != null && {
           borderTopWidth: 2,
-          borderTopColor: Color.spectrum[tone].pigment,
+          borderTopColor: colors.spectrum[tone].pigment,
         },
         style,
       ]}
@@ -375,6 +380,7 @@ function SectionHeaderBase({
   title: string;
   hint?: string;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.sectionHeader}>
       <Text style={Type.label}>{title}</Text>
@@ -438,6 +444,8 @@ function OptionRowBase({
   disabled = false,
   enterDelay,
 }: OptionRowProps): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const press = usePressScale(0.985);
 
   const handlePress = useCallback((): void => {
@@ -470,15 +478,15 @@ function OptionRowBase({
           style={[
             styles.optionIcon,
             tone != null && {
-              backgroundColor: Color.spectrum[tone].surface,
-              borderColor: Color.spectrum[tone].border,
+              backgroundColor: colors.spectrum[tone].surface,
+              borderColor: colors.spectrum[tone].border,
             },
           ]}
         >
           <Icon
             name={icon}
             size={20}
-            color={tone != null ? Color.spectrum[tone].icon : Color.text.primary}
+            color={tone != null ? colors.spectrum[tone].icon : colors.text.primary}
           />
         </View>
 
@@ -507,7 +515,7 @@ function OptionRowBase({
           ) : null}
         </View>
 
-        <Icon name="chevronRight" size={18} color={Color.text.faint} />
+        <Icon name="chevronRight" size={18} color={colors.text.faint} />
       </Pressable>
     </Animated.View>
   );
@@ -548,6 +556,8 @@ function TextLinkBase({
   label: string;
   onPress: () => void;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const handlePress = useCallback((): void => {
     selectionTick();
     playTick();
@@ -563,7 +573,7 @@ function TextLinkBase({
       accessibilityLabel={label}
     >
       <Text style={[Type.bodyStrong, styles.textLinkLabel]}>{label}</Text>
-      <Icon name="chevronRight" size={16} color={Color.accent.text} />
+      <Icon name="chevronRight" size={16} color={colors.accent.text} />
     </Pressable>
   );
 }
@@ -607,9 +617,11 @@ function NoticePanelBase({
   icon = "alert",
   style,
 }: NoticePanelProps): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   return (
     <View style={[styles.notice, style]} accessibilityRole="summary">
-      <Icon name={icon} size={18} color={Color.accent.text} />
+      <Icon name={icon} size={18} color={colors.accent.text} />
 
       <View style={styles.noticeBody}>
         <Text style={[Type.label, styles.noticeTitle]}>{title}</Text>
@@ -635,6 +647,7 @@ export const Divider = memo(function Divider({
 }: {
   style?: StyleProp<ViewStyle>;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   return <View style={[styles.divider, style]} />;
 });
 
@@ -644,10 +657,11 @@ export function useIsTablet(): boolean {
   return width >= TABLET_BREAKPOINT;
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Color.surface.canvas,
+    backgroundColor: c.surface.canvas,
   },
   backdrop: {
     ...StyleSheet.absoluteFill,
@@ -695,7 +709,7 @@ const styles = StyleSheet.create({
     // interfaz no se lea como puro blanco y negro. Los encabezados de sección
     // siguen en gris a propósito: si también fuesen de color, dejaría de
     // señalar nada.
-    color: Color.accent.text,
+    color: c.accent.text,
   },
   titleRow: {
     flexDirection: "row",
@@ -712,9 +726,9 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: Radius.lg,
     padding: Space.lg,
-    backgroundColor: Color.surface.raised,
+    backgroundColor: c.surface.raised,
     borderWidth: 1,
-    borderColor: Color.border.default,
+    borderColor: c.border.default,
   },
   sectionHeader: {
     marginBottom: Space.md,
@@ -731,7 +745,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   textLinkLabel: {
-    color: Color.accent.text,
+    color: c.accent.text,
   },
   notice: {
     flexDirection: "row",
@@ -739,18 +753,18 @@ const styles = StyleSheet.create({
     padding: Space.lg,
     // Radio menor que el de una tarjeta y sin sombra: se hunde, no flota.
     borderRadius: Radius.md,
-    backgroundColor: Color.accent.surface,
+    backgroundColor: c.accent.surface,
     // El riel. Va solo a la izquierda a propósito: un borde completo lo
     // devolvería al aspecto de tarjeta, que es de lo que hay que separarlo.
     borderLeftWidth: 3,
-    borderLeftColor: Color.accent.default,
+    borderLeftColor: c.accent.default,
   },
   noticeBody: {
     flex: 1,
     gap: Space.sm,
   },
   noticeTitle: {
-    color: Color.accent.text,
+    color: c.accent.text,
   },
   noticeItem: {
     flexDirection: "row",
@@ -760,7 +774,7 @@ const styles = StyleSheet.create({
     width: 3,
     height: 3,
     borderRadius: Radius.pill,
-    backgroundColor: Color.text.muted,
+    backgroundColor: c.text.muted,
     // Centrado ópticamente con la primera línea de texto (13/18).
     marginTop: 8,
   },
@@ -772,7 +786,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: Color.border.subtle,
+    backgroundColor: c.border.subtle,
   },
   optionRow: {
     flexDirection: "row",
@@ -780,13 +794,13 @@ const styles = StyleSheet.create({
     gap: Space.md,
     padding: Space.lg,
     borderRadius: Radius.lg,
-    backgroundColor: Color.surface.raised,
+    backgroundColor: c.surface.raised,
     borderWidth: 1,
-    borderColor: Color.border.default,
+    borderColor: c.border.default,
   },
   optionRowPressed: {
-    backgroundColor: Color.surface.interactive,
-    borderColor: Color.accent.border,
+    backgroundColor: c.surface.interactive,
+    borderColor: c.accent.border,
   },
   optionRowDisabled: {
     opacity: 0.45,
@@ -797,9 +811,9 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Color.surface.sunken,
+    backgroundColor: c.surface.sunken,
     borderWidth: 1,
-    borderColor: Color.border.subtle,
+    borderColor: c.border.subtle,
   },
   optionBody: {
     flex: 1,
@@ -818,6 +832,6 @@ const styles = StyleSheet.create({
   },
   optionNote: {
     marginTop: Space.sm,
-    color: Color.text.faint,
+    color: c.text.faint,
   },
-});
+  });

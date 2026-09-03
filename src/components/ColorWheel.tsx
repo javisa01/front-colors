@@ -19,7 +19,14 @@ import Animated, {
 } from "react-native-reanimated";
 import Svg, { Circle, Defs, Path, RadialGradient, Stop } from "react-native-svg";
 
-import { Color, Duration, Radius, Space, Type } from "@/design/tokens";
+import { useThemedStyles } from "@/design/theme";
+import {
+  Duration,
+  Radius,
+  Space,
+  Type,
+  type Palette,
+} from "@/design/tokens";
 import { t } from "@/i18n";
 import type { HSVColor } from "@/types/challenge";
 import { hsvToHexWorklet } from "@/utils/colorWorklets";
@@ -198,6 +205,7 @@ function ColorWheelBase(
   { initialColor, onChange, onChangeComplete, size }: ColorWheelProps,
   ref: React.Ref<ColorWheelHandle>,
 ): ReactElement {
+  const styles = useThemedStyles(createStyles);
   // El estado del selector: tres números en coma flotante, y nada más. No hay
   // ningún hexadecimal guardado del que se pueda re-derivar el tono.
   const hue = useSharedValue(initialColor.h);
@@ -465,7 +473,8 @@ function ColorWheelBase(
 
 export const ColorWheel = memo(forwardRef(ColorWheelBase));
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   container: {
     alignItems: "center",
   },
@@ -519,7 +528,7 @@ const styles = StyleSheet.create({
     borderRadius: SLIDER_WIDTH / 2,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: Color.border.default,
+    borderColor: c.border.default,
   },
   readout: {
     flexDirection: "row",
@@ -529,9 +538,9 @@ const styles = StyleSheet.create({
     paddingVertical: Space.sm,
     paddingHorizontal: Space.md,
     borderRadius: Radius.pill,
-    backgroundColor: Color.surface.raised,
+    backgroundColor: c.surface.raised,
     borderWidth: 1,
-    borderColor: Color.border.default,
+    borderColor: c.border.default,
   },
   swatch: {
     width: 18,
@@ -541,8 +550,8 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255,255,255,0.2)",
   },
   hex: {
-    color: Color.text.primary,
+    color: c.text.primary,
     padding: 0,
     minWidth: 74,
   },
-});
+  });

@@ -605,6 +605,12 @@ type TypeToken = TextStyle;
 /**
  * Seis escalones con saltos claros. Si dos textos deben verse distintos, se
  * eligen escalones no contiguos; nunca se inventa un tamaño intermedio.
+ *
+ * OJO con el `color` de cada escalón: aquí está escrito el del tema oscuro,
+ * pero NO es fijo. `applyTypeColors` (`design/theme.tsx`) lo reescribe sobre
+ * estos mismos objetos al cambiar de tema, y el remontado de la app es lo que
+ * hace visible el cambio. Si se añade un escalón, hay que darlo de alta también
+ * en `TYPE_INK` allí, o su tinta se quedará en oscuro para siempre.
  */
 export const Type = {
   /** 34 — título principal de una pantalla. Uno por pantalla, como mucho. */

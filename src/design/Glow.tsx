@@ -16,7 +16,11 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { Color, Radius } from "@/design/tokens";
+import { useColors, useThemedStyles } from "@/design/theme";
+import {
+  Radius,
+  type Palette,
+} from "@/design/tokens";
 
 /**
  * Borde de aurora: un degradado azul→violeta→magenta que gira despacio
@@ -83,11 +87,16 @@ function GlowBorderBase({
   radius = Radius.xl,
   width = 1.5,
   durationMs = SPIN_MS,
-  surface = Color.surface.raised,
+  surface,
   still = false,
   padding,
   style,
 }: GlowBorderProps): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
+  // El relleno por defecto depende de la paleta, así que no puede ser un valor
+  // por defecto de la firma: los parámetros se evalúan antes que los ganchos.
+  const surfaceColor = surface ?? colors.surface.raised;
   const [size, setSize] = useState({ width: 0, height: 0 });
   const spin = useSharedValue(0);
 
@@ -165,7 +174,7 @@ function GlowBorderBase({
           ]}
         >
           <LinearGradient
-            colors={Color.glow.stops}
+            colors={colors.glow.stops}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={StyleSheet.absoluteFill}
@@ -178,7 +187,7 @@ function GlowBorderBase({
           styles.surface,
           {
             borderRadius: Math.max(0, radius - width),
-            backgroundColor: surface,
+            backgroundColor: surfaceColor,
             padding,
           },
         ]}
@@ -191,14 +200,15 @@ function GlowBorderBase({
 
 export const GlowBorder = memo(GlowBorderBase);
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   frame: {
     // Recorta el cuadro que gira al radio del marco. Sin esto se ven las
     // esquinas del degradado sobresaliendo por fuera de la tarjeta.
     overflow: "hidden",
     // Lo que se ve antes de que `onLayout` mida, y lo que queda si el
     // degradado no llega a montarse: un borde normal, no un hueco.
-    backgroundColor: Color.border.default,
+    backgroundColor: c.border.default,
   },
   spinner: {
     position: "absolute",
@@ -209,4 +219,4 @@ const styles = StyleSheet.create({
     // por las esquinas redondeadas.
     overflow: "hidden",
   },
-});
+  });

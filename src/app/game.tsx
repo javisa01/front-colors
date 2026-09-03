@@ -16,7 +16,12 @@ import SVGChallenge from "@/components/SVGChallenge";
 import { Button } from "@/design/Button";
 import { Loading, Stat, StatPill, StarRating } from "@/design/Feedback";
 import { Card, Divider, Screen, useIsTablet } from "@/design/Layout";
-import { Color, Space, Type } from "@/design/tokens";
+import { useThemedStyles } from "@/design/theme";
+import {
+  Space,
+  Type,
+  type Palette,
+} from "@/design/tokens";
 import { INITIAL_HSV, useChallenge } from "@/hooks/useChallenge";
 import { t, type TranslationKey } from "@/i18n";
 import type { GameMode, HSVColor } from "@/types/challenge";
@@ -80,6 +85,7 @@ function starString(stars: number): string {
 }
 
 export default function GameScreen(): ReactElement {
+  const styles = useThemedStyles(createStyles);
   const params = useLocalSearchParams<{ mode?: string }>();
   const mode = normalizeMode(params.mode);
   const seed = mode === "daily" ? dailySeed() : undefined;
@@ -133,6 +139,7 @@ export default function GameScreen(): ReactElement {
 }
 
 function DailyDoneScreen({ result }: { result: DailyResult }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   const router = useRouter();
 
   return (
@@ -167,6 +174,7 @@ interface GamePlayProps {
 }
 
 function GamePlay({ mode, seed, resume }: GamePlayProps): ReactElement {
+  const styles = useThemedStyles(createStyles);
   const { width, height } = useWindowDimensions();
   const router = useRouter();
   const isTablet = useIsTablet();
@@ -689,7 +697,8 @@ function GamePlay({ mode, seed, resume }: GamePlayProps): ReactElement {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   centered: {
     justifyContent: "center",
   },
@@ -775,10 +784,10 @@ const styles = StyleSheet.create({
    * estadísticas que tiene justo encima.
    */
   record: {
-    color: Color.accent.text,
+    color: c.accent.text,
   },
   summaryActions: {
     marginTop: Space.xxl,
     gap: Space.sm,
   },
-});
+  });

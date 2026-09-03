@@ -1,7 +1,16 @@
 import { memo, useMemo, type ReactElement } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Color, Radius } from "@/design/tokens";
+import {
+  getThemeMode,
+  useColors,
+  useThemedStyles,
+  type ThemeMode,
+} from "@/design/theme";
+import {
+  Radius,
+  type Palette,
+} from "@/design/tokens";
 import { hsvToHex } from "@/utils/color";
 
 /**
@@ -62,14 +71,30 @@ export interface PlayerTint {
 /**
  * El color de un jugador, para pintar algo suyo que no sea su avatar.
  *
+ * El modo por defecto es el activo, leído del almacén: vale para todos los
+ * usos actuales porque el cambio de tema remonta la app entera y con ella
+ * cualquier cosa que hubiera calculado un tinte. Solo haría falta pasarlo a
+ * mano desde algo que sobreviviera al remontado, y no hay nada así.
+ *
  * Lo usa la clasificación del grupo para teñir cada fila con el tono de quien
  * la ocupa. Se exporta —en vez de recalcularlo allí— porque el compromiso es
  * que un jugador tenga **un** color en toda la app: si la fila y el avatar
  * salieran de dos fórmulas distintas, dejarían de identificar a la misma
  * persona.
  */
-export function playerTint(username: string): PlayerTint {
+export function playerTint(username: string, mode: ThemeMode = getThemeMode()): PlayerTint {
   const hue = hueFor(username);
+  if (mode === "light") {
+    // La misma inversión de papel que la paleta clara hace con `groupTint`:
+    // lavado muy claro, borde un paso por debajo y la tinta bajada hasta
+    // contrastar. El TONO no cambia: la persona sigue siendo la misma en los
+    // dos temas.
+    return {
+      fill: hsvToHex(hue, 14, 95),
+      border: hsvToHex(hue, 18, 84),
+      text: hsvToHex(hue, 46, 46),
+    };
+  }
   return {
     // Saturación baja y valor bajo: se apoya en el fondo casi negro en lugar
     // de perforarlo.
@@ -91,6 +116,8 @@ function AvatarBase({
   letters = 1,
   ring = false,
 }: AvatarProps): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const palette = useMemo(() => playerTint(username), [username]);
 
   return (
@@ -111,7 +138,7 @@ function AvatarBase({
           backgroundColor: palette.fill,
           // El aro va en el claro del texto y no en el tono del jugador: tiene
           // que decir «este» dentro de una fila donde todos llevan color.
-          borderColor: ring ? Color.text.primary : palette.border,
+          borderColor: ring ? colors.text.primary : palette.border,
           borderWidth: ring ? 2 : 1,
         },
       ]}
@@ -136,7 +163,8 @@ function AvatarBase({
 
 export const Avatar = memo(AvatarBase);
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   avatar: {
     alignItems: "center",
     justifyContent: "center",
@@ -145,4 +173,4 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: -0.2,
   },
-});
+  });

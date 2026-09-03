@@ -9,9 +9,17 @@ import {
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Flag } from "@/design/Flag";
+import { Toggle } from "@/design/Form";
 import { Icon, type IconName } from "@/design/Icon";
 import { Sheet } from "@/design/Sheet";
-import { Color, HIT_TARGET, Radius, Space, Type } from "@/design/tokens";
+import { getThemeMode, setThemeMode, type ThemeMode, useColors, useThemedStyles } from "@/design/theme";
+import {
+  HIT_TARGET,
+  Radius,
+  Space,
+  Type,
+  type Palette,
+} from "@/design/tokens";
 import { getLocale, LOCALES, setLocale, t, type Locale } from "@/i18n";
 import { selectionTick } from "@/utils/haptics";
 import {
@@ -29,10 +37,11 @@ import {
   setLanguage as saveLanguage,
   setMusicVolume as saveMusicVolume,
   setSfxVolume as saveSfxVolume,
+  setThemeMode as saveThemeMode,
 } from "@/utils/storage";
 
 /**
- * Ajustes de la app: sonido e idioma.
+ * Ajustes de la app: sonido, aspecto e idioma.
  *
  * Sustituye a `SettingsModal`. Los cambios de fondo: llega como hoja inferior en
  * lugar de como diálogo centrado —es una preferencia, no una decisión que corte
@@ -51,6 +60,12 @@ import {
  * `handleClose`, cuando la hoja ya se iba. El texto de la propia hoja sigue en
  * el idioma anterior hasta ese momento; es correcto, no un descuido: mientras
  * estás eligiendo, la lista no debe moverse bajo el dedo.
+ *
+ * **El tema funciona exactamente igual, y por la misma razón**: aplicarlo
+ * también remonta la app entera (comparte la `key` del navegador con el
+ * idioma; ver `design/theme.tsx`). El interruptor mueve la selección y la
+ * guarda; el tema de verdad cambia al cerrar. La pista debajo del interruptor
+ * lo dice, para que nadie lo tome por un interruptor roto.
  */
 
 interface SettingsSheetProps {
@@ -74,13 +89,15 @@ function VolumeRow({
   onChange,
   onCommit,
 }: VolumeRowProps): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const percent = Math.round(value * 100);
 
   return (
     <View style={styles.row}>
       <View style={styles.rowHeader}>
         <View style={styles.rowLabel}>
-          <Icon name={icon} size={17} color={Color.text.secondary} />
+          <Icon name={icon} size={17} color={colors.text.secondary} />
           <Text style={Type.bodyStrong}>{label}</Text>
         </View>
         <Text style={Type.metricSmall}>{percent}%</Text>
@@ -94,9 +111,9 @@ function VolumeRow({
         value={value}
         onValueChange={onChange}
         onSlidingComplete={onCommit}
-        minimumTrackTintColor={Color.accent.default}
-        maximumTrackTintColor={Color.surface.sunken}
-        thumbTintColor={Color.text.primary}
+        minimumTrackTintColor={colors.accent.default}
+        maximumTrackTintColor={colors.surface.sunken}
+        thumbTintColor={colors.text.primary}
         accessibilityLabel={label}
         accessibilityValue={{ min: 0, max: 100, now: percent }}
       />
@@ -117,6 +134,8 @@ function LanguageOption({
   selected,
   onSelect,
 }: LanguageOptionProps): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const handlePress = useCallback(() => {
     if (selected) {
       return;
@@ -158,7 +177,7 @@ function LanguageOption({
       */}
       <View style={styles.check}>
         {selected ? (
-          <Icon name="check" size={17} color={Color.accent.text} />
+          <Icon name="check" size={17} color={colors.accent.text} />
         ) : null}
       </View>
     </Pressable>
@@ -169,9 +188,11 @@ function SettingsSheetInner({
   visible,
   onClose,
 }: SettingsSheetProps): ReactElement {
+  const styles = useThemedStyles(createStyles);
   const [music, setMusic] = useState(getMusicVolume);
   const [sfx, setSfx] = useState(getSfxVolume);
   const [language, setLanguage] = useState<Locale>(getLocale);
+  const [theme, setTheme] = useState<ThemeMode>(getThemeMode);
 
   /*
     El idioma se relee al abrir, y no solo al montar: esta hoja vive dentro de la
@@ -187,6 +208,9 @@ function SettingsSheetInner({
     setOpenedWith(visible);
     if (visible) {
       setLanguage(getLocale());
+      // El tema, por lo mismo que el idioma: la hoja sobrevive a varias
+      // aperturas y sin releerlo conservaría una selección abandonada.
+      setTheme(getThemeMode());
     }
   }
 
@@ -256,14 +280,23 @@ function SettingsSheetInner({
     void saveLanguage(next);
   }, []);
 
+  const handleThemeToggle = useCallback((light: boolean) => {
+    const next: ThemeMode = light ? "light" : "dark";
+    setTheme(next);
+    // Igual que el idioma: guardado al tocar, aplicado al cerrar.
+    void saveThemeMode(next);
+  }, []);
+
   const handleClose = useCallback(() => {
     void saveMusicVolume(music);
     void saveSfxVolume(sfx);
-    // No hace nada si el idioma no ha cambiado, así que cerrar la hoja sin tocar
-    // nada no remonta la app.
+    // Ninguno de los dos hace nada si no ha cambiado, así que cerrar la hoja
+    // sin tocar nada no remonta la app. El orden no importa: los dos acaban en
+    // la misma `key` del navegador y el remontado es uno.
     setLocale(language);
+    setThemeMode(theme);
     onClose();
-  }, [music, sfx, language, onClose]);
+  }, [music, sfx, language, theme, onClose]);
 
   return (
     <Sheet
@@ -289,6 +322,19 @@ function SettingsSheetInner({
         onCommit={handleSfxCommit}
       />
 
+      <Text style={[Type.label, styles.section]}>
+        {t("settings.appearance")}
+      </Text>
+
+      <Toggle
+        icon="sun"
+        label={t("settings.lightMode")}
+        description={t("settings.themeHint")}
+        value={theme === "light"}
+        onValueChange={handleThemeToggle}
+        style={styles.themeToggle}
+      />
+
       <Text style={[Type.label, styles.section]}>{t("settings.language")}</Text>
 
       <View style={styles.languages} accessibilityRole="radiogroup">
@@ -312,7 +358,8 @@ function SettingsSheetInner({
 
 export const SettingsSheet = memo(SettingsSheetInner);
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   section: {
     marginBottom: Space.md,
   },
@@ -334,6 +381,10 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 40,
   },
+  themeToggle: {
+    // El mismo aire que deja una fila de volumen antes del siguiente epígrafe.
+    marginBottom: Space.lg,
+  },
   languages: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -352,21 +403,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: Space.md,
     borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: Color.border.default,
-    backgroundColor: Color.surface.sunken,
+    borderColor: c.border.default,
+    backgroundColor: c.surface.sunken,
   },
   languageSelected: {
-    borderColor: Color.accent.border,
-    backgroundColor: Color.accent.surface,
+    borderColor: c.accent.border,
+    backgroundColor: c.accent.surface,
   },
   languagePressed: {
-    backgroundColor: Color.surface.interactive,
+    backgroundColor: c.surface.interactive,
   },
   languageLabel: {
     flex: 1,
   },
   languageLabelSelected: {
-    color: Color.accent.text,
+    color: c.accent.text,
   },
   check: {
     width: 17,
@@ -375,4 +426,4 @@ const styles = StyleSheet.create({
   hint: {
     marginTop: Space.md,
   },
-});
+  });

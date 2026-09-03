@@ -1,7 +1,7 @@
 import { memo, type ReactElement, type ReactNode } from "react";
 import Svg, { Circle, Path } from "react-native-svg";
 
-import { Color } from "@/design/tokens";
+import { useColors } from "@/design/theme";
 
 /**
  * Set de iconos de la aplicación.
@@ -64,6 +64,7 @@ export type IconName =
   | "message"
   | "bell"
   // Ajustes de audio
+  | "sun"
   | "music"
   | "volume"
   // Marcas de terceros
@@ -356,6 +357,21 @@ const ICONS: Record<IconName, (c: string, filled: boolean) => ReactNode> = {
   ),
 
   // -- Ajustes de audio ----------------------------------------------------
+  sun: () => (
+    <>
+      <Circle cx={12} cy={12} r={4.25} />
+      {/* Ocho rayos cortos, separados del disco: es lo que lo distingue de una
+          diana al tamaño de 17 puntos al que se usa en los ajustes. */}
+      <Path d="M12 2.5v2.5" />
+      <Path d="M12 19v2.5" />
+      <Path d="M2.5 12H5" />
+      <Path d="M19 12h2.5" />
+      <Path d="m5.3 5.3 1.8 1.8" />
+      <Path d="m16.9 16.9 1.8 1.8" />
+      <Path d="m18.7 5.3-1.8 1.8" />
+      <Path d="m7.1 16.9-1.8 1.8" />
+    </>
+  ),
   music: () => (
     <>
       <Path d="M9 17.5V4.8l11-2v12.7" />
@@ -403,21 +419,29 @@ const ICONS: Record<IconName, (c: string, filled: boolean) => ReactNode> = {
 function IconBase({
   name,
   size = 20,
-  color = Color.text.secondary,
+  color,
   filled = false,
 }: IconProps): ReactElement {
+  const colors = useColors();
+  /*
+    El valor por defecto se resuelve aquí y no en la firma: depende de la
+    paleta activa, y la lista de parámetros se evalúa antes de poder llamar al
+    gancho. Sin `color` explícito, el icono va en la tinta secundaria del tema,
+    que es lo que siempre había significado el por defecto.
+  */
+  const stroke = color ?? colors.text.secondary;
   return (
     <Svg
       width={size}
       height={size}
       viewBox="0 0 24 24"
       fill="none"
-      stroke={color}
+      stroke={stroke}
       strokeWidth={1.75}
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      {ICONS[name](color, filled)}
+      {ICONS[name](stroke, filled)}
     </Svg>
   );
 }

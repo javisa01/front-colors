@@ -22,14 +22,15 @@ import { DialRing } from "@/design/Dial";
 import { ErrorBanner } from "@/design/Feedback";
 import { Field, Notice, OrDivider, SegmentedControl } from "@/design/Form";
 import { Card, Screen } from "@/design/Layout";
+import { useColors, useThemedStyles } from "@/design/theme";
 import {
-  Color,
   Duration,
   HAIRLINE,
   Radius,
   SECTION_TONE,
   Space,
   Type,
+  type Palette,
 } from "@/design/tokens";
 import { t } from "@/i18n";
 import { describeClerkError, type ClerkField } from "@/online/clerkErrors";
@@ -117,6 +118,8 @@ const RING_OPACITY = 0.72;
 const SCRIM_HEIGHT = 210;
 
 export default function AuthScreen(): ReactElement {
+  const colors = useColors();
+  const styles = useThemedStyles(createStyles);
   const { signIn } = useSignIn();
   const { signUp } = useSignUp();
   const { startSSOFlow } = useSSO();
@@ -400,7 +403,7 @@ export default function AuthScreen(): ReactElement {
             />
           </View>
           <LinearGradient
-            colors={[Color.surface.canvas, "transparent"]}
+            colors={[colors.surface.canvas, "transparent"]}
             locations={[0, 0.62]}
             style={styles.scrim}
             pointerEvents="none"
@@ -615,7 +618,8 @@ export default function AuthScreen(): ReactElement {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   ring: {
     // El aro se centra en horizontal y se baja con un margen negativo, asi que
     // de la rueda entera solo entra en pantalla su arco de arriba.
@@ -647,11 +651,11 @@ const styles = StyleSheet.create({
     paddingVertical: Space.md,
     borderRadius: Radius.lg,
     borderWidth: HAIRLINE,
-    borderColor: Color.border.default,
+    borderColor: c.border.default,
     // La única superficie translúcida de la aplicación, junto con la fila de
     // práctica de la portada y la pastilla de pestañas del online — y las tres
     // por lo mismo: debajo hay rueda.
-    backgroundColor: Color.surface.floating,
+    backgroundColor: c.surface.floating,
   },
   footer: {
     flexDirection: "row",
@@ -664,6 +668,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     // Sobre el panel ya hay contraste de sobra, así que el gris más apagado
     // dejaba de ser una elección y pasaba a ser el problema. Sube un peldaño.
-    color: Color.text.muted,
+    color: c.text.muted,
   },
-});
+  });

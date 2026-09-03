@@ -24,8 +24,8 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { IconButton } from "@/design/Button";
+import { useThemedStyles } from "@/design/theme";
 import {
-  Color,
   CONTENT_MAX_WIDTH,
   Duration,
   Elevation,
@@ -33,6 +33,7 @@ import {
   Radius,
   Space,
   Type,
+  type Palette,
 } from "@/design/tokens";
 import { t } from "@/i18n";
 
@@ -73,6 +74,7 @@ function SheetBase({
   dismissible = true,
   children,
 }: SheetProps): ReactElement | null {
+  const styles = useThemedStyles(createStyles);
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
 
@@ -205,7 +207,8 @@ function SheetBase({
 
 export const Sheet = memo(SheetBase);
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   root: {
     flex: 1,
   },
@@ -223,9 +226,9 @@ const styles = StyleSheet.create({
   },
   panel: {
     width: "100%",
-    backgroundColor: Color.surface.elevated,
+    backgroundColor: c.surface.elevated,
     borderWidth: 1,
-    borderColor: Color.border.default,
+    borderColor: c.border.default,
   },
   panelCenter: {
     maxWidth: 400,
@@ -246,7 +249,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: Radius.pill,
-    backgroundColor: Color.border.strong,
+    backgroundColor: c.border.strong,
     marginBottom: Space.lg,
   },
   header: {
@@ -262,4 +265,4 @@ const styles = StyleSheet.create({
     // del panel y no flotando hacia dentro.
     marginRight: -Space.md,
   },
-});
+  });

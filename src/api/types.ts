@@ -151,6 +151,15 @@ export interface GroupSummary {
   role: GroupRole;
   /** Avisos de este grupo sin leer: el punto rojo de la fila. */
   unreadCount: number;
+  /**
+   * El interruptor de «Avisos del grupo» **de quien consulta**, no del grupo.
+   *
+   * Vive en el servidor porque es el servidor quien manda los avisos al
+   * teléfono: guardado solo en el móvil, apagarlo no callaría nada. Viaja con
+   * el grupo para que la pantalla de ajustes no necesite una segunda petición
+   * para pintar un interruptor.
+   */
+  notificationsEnabled: boolean;
   currentSeason: GroupSeason;
 }
 
@@ -177,9 +186,16 @@ export interface GroupLeaderboard {
 // Avisos
 // ---------------------------------------------------------------------------
 
+/**
+ * Un aviso **de bandeja**.
+ *
+ * Los recordatorios del reto diario (`daily_opened`, `daily_closing_soon`,
+ * `daily_last_call`) no salen por aquí: son solo empujones al teléfono, los
+ * escribe el servidor y llegan por `expo-notifications`. Ver `@/online/push`.
+ */
 export interface AppNotification {
   id: string;
-  /** `season_renewed` es el único que existe de momento. */
+  /** `season_renewed` es el único de bandeja que existe de momento. */
   type: string;
   groupId: string | null;
   payload: Record<string, unknown>;

@@ -192,7 +192,7 @@ export default function OnlineHubScreen(): ReactElement {
       ]);
 
       // El punto rojo de un grupo silenciado no se pinta (ajustes del grupo).
-      setGroups(await silenceMutedGroups(groupsResult.groups));
+      setGroups(silenceMutedGroups(groupsResult.groups));
       setDaily(dailyResult);
 
       // --- La racha ------------------------------------------------------

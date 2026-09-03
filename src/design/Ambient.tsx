@@ -30,10 +30,11 @@ import Animated, {
   type SharedValue,
 } from "react-native-reanimated";
 
+import { useColors, useThemedStyles } from "@/design/theme";
 import {
-  Color,
   HAIRLINE,
   Radius,
+  type Palette,
   type SpectrumTone,
 } from "@/design/tokens";
 
@@ -111,6 +112,8 @@ function useAmbientClock(durationMs: number): SharedValue<number> {
 }
 
 function AmbientOrbsBase(): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const glow = useAmbientClock(GLOW_MS);
   const float = useAmbientClock(FLOAT_MS);
   const drift = useAmbientClock(DRIFT_MS);
@@ -154,21 +157,21 @@ function AmbientOrbsBase(): ReactElement {
         pointerEvents="none"
         style={[styles.orb, styles.topRight, violetStyle]}
       >
-        <LinearGradient colors={Color.ambient.violet} style={styles.fill} />
+        <LinearGradient colors={colors.ambient.violet} style={styles.fill} />
       </Animated.View>
 
       <Animated.View
         pointerEvents="none"
         style={[styles.orb, styles.bottomLeft, roseStyle]}
       >
-        <LinearGradient colors={Color.ambient.rose} style={styles.fill} />
+        <LinearGradient colors={colors.ambient.rose} style={styles.fill} />
       </Animated.View>
 
       <Animated.View
         pointerEvents="none"
         style={[styles.haze, styles.bottomRight, hazeStyle]}
       >
-        <LinearGradient colors={Color.ambient.violet} style={styles.fill} />
+        <LinearGradient colors={colors.ambient.violet} style={styles.fill} />
       </Animated.View>
     </>
   );
@@ -246,6 +249,8 @@ export function SoftGlow({
  * siendo reconociblemente la misma atmósfera.
  */
 function BlurAmbientOrbsBase(): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const glow = useAmbientClock(GLOW_MS);
   const float = useAmbientClock(FLOAT_MS);
   const drift = useAmbientClock(DRIFT_MS);
@@ -280,14 +285,14 @@ function BlurAmbientOrbsBase(): ReactElement {
         pointerEvents="none"
         style={[styles.blurOrb, styles.blurTopLeft, violetStyle]}
       >
-        <SoftGlow color={Color.ambient.violet[0]} size={BLUR_ORB_SIZE} />
+        <SoftGlow color={colors.ambient.violet[0]} size={BLUR_ORB_SIZE} />
       </Animated.View>
 
       <Animated.View
         pointerEvents="none"
         style={[styles.blurOrb, styles.blurBottomRight, roseStyle]}
       >
-        <SoftGlow color={Color.ambient.rose[0]} size={BLUR_ORB_SIZE} />
+        <SoftGlow color={colors.ambient.rose[0]} size={BLUR_ORB_SIZE} />
       </Animated.View>
     </>
   );
@@ -416,6 +421,8 @@ function ConstellationCircle({
 }: {
   piece: ConstellationPiece;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const clock = useAmbientClock(piece.durationMs);
 
   // Los dos valores que necesita el worklet se sacan del objeto aquí fuera:
@@ -441,7 +448,7 @@ function ConstellationCircle({
     };
   });
 
-  const color = piece.cool ? Color.ambient.ringCool : Color.ambient.ringWarm;
+  const color = piece.cool ? colors.ambient.ringCool : colors.ambient.ringWarm;
 
   return (
     <Animated.View
@@ -550,6 +557,8 @@ const SATELLITE_ANGLE = (215 * Math.PI) / 180;
 const SATELLITE_RING_INDEX = 1;
 
 function OrbitSatellite({ clock }: { clock: SharedValue<number> }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const ringSize = ORBIT_SIZES[SATELLITE_RING_INDEX];
   const radius = ringSize / 2;
   const cos = Math.cos(SATELLITE_ANGLE);
@@ -590,7 +599,7 @@ function OrbitSatellite({ clock }: { clock: SharedValue<number> }): ReactElement
           height: SATELLITE_SIZE,
           top: centerTop - radius * sin - SATELLITE_SIZE / 2,
           right: centerRight - radius * cos - SATELLITE_SIZE / 2,
-          backgroundColor: Color.ambient.ringCool,
+          backgroundColor: colors.ambient.ringCool,
         },
         satelliteStyle,
       ]}
@@ -620,6 +629,8 @@ function OrbitRing({
   index: number;
   clock: SharedValue<number>;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   // El anillo de fuera es el más tenue: si los tres pesaran igual, el conjunto
   // se leería como una diana en lugar de como algo que se desvanece.
   const opacity = 0.34 - index * 0.09;
@@ -646,7 +657,7 @@ function OrbitRing({
           top: ORBIT_TOP - (size - ORBIT_SIZES[0]) / 2,
           right: ORBIT_RIGHT - (size - ORBIT_SIZES[0]) / 2,
           borderWidth: 1,
-          borderColor: Color.ambient.ringCool,
+          borderColor: colors.ambient.ringCool,
         },
         ringStyle,
       ]}
@@ -781,6 +792,8 @@ function Band({
   spec: BandSpec;
   clock: SharedValue<number>;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const bandStyle = useAnimatedStyle(() => ({
     // Centrado en el recorrido: la banda se mueve a los dos lados de su
     // posición de reposo en vez de quedarse siempre desplazada a un lado.
@@ -809,7 +822,7 @@ function Band({
       <LinearGradient
         colors={[
           "transparent",
-          spec.cool ? Color.ambient.ringCool : Color.ambient.ringWarm,
+          spec.cool ? colors.ambient.ringCool : colors.ambient.ringWarm,
           "transparent",
         ]}
         start={{ x: 0, y: 0.5 }}
@@ -895,6 +908,8 @@ const SWING_DEG = 10;
 const POOL_DEPTH = 0.42;
 
 function AmbientSpotlightBase(): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const beat = useAmbientClock(BEAM_MS);
   const sway = useAmbientClock(SWAY_MS);
 
@@ -977,12 +992,12 @@ function AmbientSpotlightBase(): ReactElement {
             <SvgGradient id="beamFade" x1="0" y1="0" x2="0" y2="1">
               <Stop
                 offset="0"
-                stopColor={Color.ambient.ringCool}
+                stopColor={colors.ambient.ringCool}
                 stopOpacity="0.9"
               />
               <Stop
                 offset="1"
-                stopColor={Color.ambient.ringCool}
+                stopColor={colors.ambient.ringCool}
                 stopOpacity="0"
               />
             </SvgGradient>
@@ -1001,7 +1016,7 @@ function AmbientSpotlightBase(): ReactElement {
 
       <Animated.View pointerEvents="none" style={[styles.pool, poolStyle]}>
         <LinearGradient
-          colors={["transparent", Color.ambient.ringCool, "transparent"]}
+          colors={["transparent", colors.ambient.ringCool, "transparent"]}
           style={styles.fill}
         />
       </Animated.View>
@@ -1028,7 +1043,7 @@ export const AmbientSpotlight = memo(AmbientSpotlightBase);
  * poner tres barras bonitas: quien mira una clasificación está buscando un
  * orden, y el fondo repite ese orden sin decir nada.
  *
- * Los tonos salen de `Color.podium` —oro, plata y bronce—, que ya existían para
+ * Los tonos salen de `colors.podium` —oro, plata y bronce—, que ya existían para
  * marcar los tres primeros puestos de la lista. Reutilizarlos en vez de inventar
  * tres tonos nuevos hace que el fondo y las filas hablen del mismo podio, y de
  * paso es la única parte de la familia donde los colores **no** están a la misma
@@ -1050,12 +1065,13 @@ interface ColumnSpec {
   phase: number;
 }
 
-const COLUMNS: ColumnSpec[] = [
+// Función de la paleta, no constante: los tonos del podio cambian con el tema.
+const columnsFor = (c: Palette): ColumnSpec[] => [
   // Plata a la izquierda, oro en el centro, bronce a la derecha: el orden en el
   // que se colocan de verdad tres personas en un podio.
-  { height: 46, center: 22, color: Color.podium.silver.text, opacity: 0.1, phase: 0.35 },
-  { height: 68, center: 50, color: Color.podium.gold.text, opacity: 0.16, phase: 0 },
-  { height: 34, center: 79, color: Color.podium.bronze.text, opacity: 0.11, phase: 0.7 },
+  { height: 46, center: 22, color: c.podium.silver.text, opacity: 0.1, phase: 0.35 },
+  { height: 68, center: 50, color: c.podium.gold.text, opacity: 0.16, phase: 0 },
+  { height: 34, center: 79, color: c.podium.bronze.text, opacity: 0.11, phase: 0.7 },
 ];
 
 /** Ancho de una columna, en porcentaje del ancho de la pantalla. */
@@ -1063,10 +1079,11 @@ const COLUMN_WIDTH = 30;
 
 function AmbientAscentBase(): ReactElement {
   const clock = useAmbientClock(ASCENT_MS);
+  const colors = useColors();
 
   return (
     <>
-      {COLUMNS.map((column, index) => (
+      {columnsFor(colors).map((column, index) => (
         <AscentColumn key={index} spec={column} clock={clock} />
       ))}
     </>
@@ -1080,6 +1097,7 @@ function AscentColumn({
   spec: ColumnSpec;
   clock: SharedValue<number>;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   const columnStyle = useAnimatedStyle(() => {
     /**
      * Un solo reloj para las tres, desfasadas.
@@ -1221,6 +1239,8 @@ function Circle({
   spec: CircleSpec;
   clock: SharedValue<number>;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const circleStyle = useAnimatedStyle(() => ({
     // El reloj va de 0 a 1 y vuelve, así que basta multiplicar: el aro sale de
     // su sitio, llega al tope y regresa sin ningún tirón en los extremos.
@@ -1238,8 +1258,8 @@ function Circle({
           top: spec.top,
           left: spec.left,
           borderColor: spec.cool
-            ? Color.ambient.ringCool
-            : Color.ambient.ringWarm,
+            ? colors.ambient.ringCool
+            : colors.ambient.ringWarm,
           opacity: spec.opacity,
         },
         circleStyle,
@@ -1427,6 +1447,8 @@ function AmbientMeshBase(): ReactElement {
 export const AmbientMesh = memo(AmbientMeshBase);
 
 function MeshBlock({ spec }: { spec: MeshCluster }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   return (
     <View
       pointerEvents="none"
@@ -1478,13 +1500,13 @@ function MeshBlock({ spec }: { spec: MeshCluster }): ReactElement {
               kind === "pending"
                 ? {
                     borderWidth: 1,
-                    borderColor: Color.ambient.ringCool,
+                    borderColor: colors.ambient.ringCool,
                   }
                 : {
                     backgroundColor:
                       kind === "lit"
-                        ? Color.ambient.ringWarm
-                        : Color.ambient.ringCool,
+                        ? colors.ambient.ringWarm
+                        : colors.ambient.ringCool,
                   },
             ]}
           />
@@ -1575,6 +1597,8 @@ const THREAD_BUBBLES: BubbleSpec[] = [
 ];
 
 function AmbientThreadBase(): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   return (
     <>
       {THREAD_BUBBLES.map((bubble, index) => (
@@ -1592,8 +1616,8 @@ function AmbientThreadBase(): ReactElement {
               width: bubble.width,
               height: bubble.height,
               borderColor: bubble.cool
-                ? Color.ambient.ringCool
-                : Color.ambient.ringWarm,
+                ? colors.ambient.ringCool
+                : colors.ambient.ringWarm,
               opacity: bubble.opacity,
             },
           ]}
@@ -1731,11 +1755,13 @@ function useRelayClock(): SharedValue<number> {
 }
 
 function AmbientTableBase({ tone }: { tone?: SpectrumTone }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const relay = useRelayClock();
   const breath = useAmbientClock(TABLE_MS);
 
   const pigment =
-    tone != null ? Color.spectrum[tone].pigment : Color.ambient.ringCool;
+    tone != null ? colors.spectrum[tone].pigment : colors.ambient.ringCool;
 
   /**
    * La mesa solo cambia de opacidad, y esto es una corrección, no una
@@ -1793,6 +1819,8 @@ function Seat({
   index: number;
   relay: SharedValue<number>;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const seatStyle = useAnimatedStyle(() => {
     // Dónde está la luz ahora mismo, en asientos.
     const at = relay.get() * SEATS.length;
@@ -1856,7 +1884,7 @@ function Seat({
           bottom: spec.bottom,
           width: spec.size,
           height: spec.size,
-          backgroundColor: Color.spectrum[spec.tone].pigment,
+          backgroundColor: colors.spectrum[spec.tone].pigment,
         },
         seatStyle,
       ]}
@@ -1878,7 +1906,8 @@ const HAZE_SIZE = 420;
  */
 const BLUR_ORB_SIZE = 460;
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   band: {
     position: "absolute",
     // Más anchas que la pantalla: giradas 22 grados, una banda del ancho justo
@@ -2010,4 +2039,4 @@ const styles = StyleSheet.create({
     bottom: -190,
     right: -190,
   },
-});
+  });

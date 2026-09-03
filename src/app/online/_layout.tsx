@@ -9,9 +9,13 @@ import { OnlineTabBar } from "@/components/online/OnlineTabBar";
 import { OnlineTour, OnlineTourProvider } from "@/components/online/OnlineTour";
 import { ErrorBanner, Loading } from "@/design/Feedback";
 import { Screen } from "@/design/Layout";
-import { Color } from "@/design/tokens";
+import { useColors, useThemedStyles } from "@/design/theme";
+import {
+  type Palette,
+} from "@/design/tokens";
 import { t } from "@/i18n";
 import { CLERK_PUBLISHABLE_KEY } from "@/online/clerk";
+import { PushBridge } from "@/online/pushBridge";
 import { SessionProvider, useSession } from "@/online/session";
 import { SocialProvider } from "@/online/social";
 
@@ -28,6 +32,8 @@ import { SocialProvider } from "@/online/social";
  * cerrar la app.
  */
 export default function OnlineLayout(): ReactElement {
+  const colors = useColors();
+  const styles = useThemedStyles(createStyles);
   if (!CLERK_PUBLISHABLE_KEY) {
     // Sin clave no hay online, pero el resto del juego debe seguir abriendo:
     // por eso se avisa aquí en vez de reventar al importar el módulo.
@@ -90,7 +96,7 @@ export default function OnlineLayout(): ReactElement {
                   tabBar={(props) => <OnlineTabBar {...props} />}
                   screenOptions={{
                     headerShown: false,
-                    sceneStyle: { backgroundColor: Color.surface.canvas },
+                    sceneStyle: { backgroundColor: colors.surface.canvas },
                   }}
                 >
                   <Tabs.Screen name="index" />
@@ -120,6 +126,15 @@ export default function OnlineLayout(): ReactElement {
                   barra flotante. Mientras no corre no pinta nada.
                 */}
                 <OnlineTour />
+
+                {/*
+                  Los avisos del teléfono. No pinta nada: da de alta el
+                  dispositivo y, cuando alguien toca un aviso, abre el grupo del
+                  que iba. Va aquí dentro porque necesita las dos cosas que solo
+                  hay en este árbol —el cliente autenticado y el navegador— y
+                  porque tiene que seguir escuchando en cualquier pestaña.
+                */}
+                <PushBridge />
               </View>
             </OnlineTourProvider>
           </SessionGate>
@@ -135,6 +150,7 @@ export default function OnlineLayout(): ReactElement {
  * que el botón «atrás» no devuelva al usuario a un sitio donde no puede estar.
  */
 function SessionGate({ children }: { children: ReactNode }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   const { status } = useSession();
   const segments = useSegments();
   const router = useRouter();
@@ -180,7 +196,8 @@ function SessionGate({ children }: { children: ReactNode }): ReactElement {
   return <>{children}</>;
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   /**
    * El escenario del modo online: las pestañas y, encima, el recorrido.
    *
@@ -194,6 +211,6 @@ const styles = StyleSheet.create({
   splash: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: Color.surface.canvas,
+    backgroundColor: c.surface.canvas,
   },
-});
+  });

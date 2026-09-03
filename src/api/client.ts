@@ -1,7 +1,7 @@
 import { API_BASE_URL, API_PREFIX, REQUEST_TIMEOUT_MS } from "./config";
 import { ApiError, type ApiErrorDetail } from "./errors";
 
-type Method = "GET" | "POST" | "PATCH" | "DELETE";
+type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 interface RequestOptions {
   method?: Method;

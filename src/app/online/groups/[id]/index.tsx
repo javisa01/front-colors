@@ -34,8 +34,8 @@ import { Notice } from "@/design/Form";
 import { Card, Screen, SectionHeader } from "@/design/Layout";
 import { RoundRing, type SolvedRound } from "@/design/RoundRing";
 import SVGChallenge from "@/components/SVGChallenge";
+import { useColors, useThemedStyles } from "@/design/theme";
 import {
-  Color,
   DISABLED_OPACITY,
   HIT_SLOP,
   HIT_TARGET,
@@ -43,6 +43,7 @@ import {
   SECTION_TONE,
   Space,
   Type,
+  type Palette,
 } from "@/design/tokens";
 import { useCountdown, useDailyChallenge } from "@/hooks/useDailyChallenge";
 import { t } from "@/i18n";
@@ -94,6 +95,8 @@ import { readStreak, visibleStreak, type Streak } from "@/online/streak";
  * si además se tiñeran las tarjetas, el color dejaría de señalar a nadie.
  */
 export default function GroupDetailScreen(): ReactElement {
+  const colors = useColors();
+  const styles = useThemedStyles(createStyles);
   const { api, user } = useSession();
   const { apply: applySocial } = useSocial();
   const router = useRouter();
@@ -615,13 +618,13 @@ export default function GroupDetailScreen(): ReactElement {
                   challenge={heroAsset}
                   // Gris: el dibujo se conoce, el color es lo que hay que
                   // acertar. Es el mismo trato que hace el menú.
-                  editableColor={Color.text.faint}
+                  editableColor={colors.text.faint}
                   editableColorIndex={rounds[0]?.colorIndex ?? 0}
                   size={106}
                   animationToken={0}
                 />
               ) : (
-                <Icon name="palette" size={38} color={Color.text.faint} />
+                <Icon name="palette" size={38} color={colors.text.faint} />
               )}
             </RoundRing>
           </View>
@@ -782,7 +785,7 @@ const HALO_MS = 2600;
  *
  * Se arregla con dos cosas a la vez, porque una sola no basta:
  *
- *  - **Color.** El icono y su superficie llevan el pigmento de la seccion de
+ *  - **colors.** El icono y su superficie llevan el pigmento de la seccion de
  *    grupos, el mismo de su pestana y el de su boton de crear. Deja de ser un
  *    gris entre grises y pasa a leerse como un control de esta pantalla.
  *  - **Un anillo que respira.** Sale del borde de la tuerca, crece un poco y
@@ -798,6 +801,8 @@ const HALO_MS = 2600;
  * que no compite por ser «lo que hay que mirar», solo dice «esto se toca».
  */
 function SettingsGearBase({ onPress }: { onPress: () => void }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const pulse = useSharedValue(0);
 
   useEffect(() => {
@@ -831,7 +836,7 @@ function SettingsGearBase({ onPress }: { onPress: () => void }): ReactElement {
       <IconButton
         name="gear"
         variant="surface"
-        color={Color.spectrum[SECTION_TONE.groups].icon}
+        color={colors.spectrum[SECTION_TONE.groups].icon}
         accessibilityLabel={t("online.group.edit")}
         onPress={onPress}
         style={styles.gearButton}
@@ -860,6 +865,7 @@ function AttemptTrack({
   used: number;
   best: number | null;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.attempts}>
       <View style={styles.attemptDots}>
@@ -906,6 +912,7 @@ function TodaySurface({
   glow: boolean;
   children: ReactNode;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   if (!glow) {
     return <Card style={styles.block}>{children}</Card>;
   }
@@ -922,10 +929,13 @@ function TodaySurface({
 // ---------------------------------------------------------------------------
 
 /** El metal de un puesto. Del cuarto en adelante no hay metal: hay puesto. */
-function medalFor(position: number): (typeof Color.podium)[keyof typeof Color.podium] | null {
-  if (position === 1) return Color.podium.gold;
-  if (position === 2) return Color.podium.silver;
-  if (position === 3) return Color.podium.bronze;
+function medalFor(
+  c: Palette,
+  position: number,
+): Palette["podium"][keyof Palette["podium"]] | null {
+  if (position === 1) return c.podium.gold;
+  if (position === 2) return c.podium.silver;
+  if (position === 3) return c.podium.bronze;
   return null;
 }
 
@@ -956,7 +966,9 @@ function StandingRow({
   busy: boolean;
   onAdd: () => void;
 }): ReactElement {
-  const medal = entry.playedDays > 0 ? medalFor(entry.position) : null;
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
+  const medal = entry.playedDays > 0 ? medalFor(colors, entry.position) : null;
   const tint = playerTint(entry.username);
 
   return (
@@ -969,7 +981,7 @@ function StandingRow({
           // Es la única maciza de la lista, así que se encuentra sin leer, y
           // sigue siendo tu color: un violeta genérico aquí diría «seleccionado»
           // en vez de «tú».
-          backgroundColor: you ? tint.fill : Color.surface.raised,
+          backgroundColor: you ? tint.fill : colors.surface.raised,
         },
       ]}
     >
@@ -1072,6 +1084,8 @@ function ChatEntry({
   unread: boolean;
   onPress: () => void;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   return (
     <Pressable
       onPress={onPress}
@@ -1092,7 +1106,7 @@ function ChatEntry({
       */}
       <View>
         <View style={styles.chatIcon}>
-          <Icon name="message" size={20} color={Color.spectrum.violet.ink} />
+          <Icon name="message" size={20} color={colors.spectrum.violet.ink} />
         </View>
         {/*
           El punto rojo, en la esquina del cuadro y con el mismo rojo que el de
@@ -1123,12 +1137,13 @@ function ChatEntry({
           {line}
         </Text>
       </View>
-      <Icon name="chevronRight" size={18} color={Color.text.faint} />
+      <Icon name="chevronRight" size={18} color={colors.text.faint} />
     </Pressable>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   block: {
     marginBottom: Space.xxl,
   },
@@ -1150,12 +1165,12 @@ const styles = StyleSheet.create({
     height: HIT_TARGET,
     borderRadius: Radius.md,
     borderWidth: 1.5,
-    borderColor: Color.spectrum[SECTION_TONE.groups].icon,
+    borderColor: c.spectrum[SECTION_TONE.groups].icon,
   },
   gearButton: {
     // Tenido, no gris: junto al color del icono es la mitad de lo que hace que
     // se lea como un control y no como un adorno de la cabecera.
-    backgroundColor: Color.spectrum[SECTION_TONE.groups].surface,
+    backgroundColor: c.spectrum[SECTION_TONE.groups].surface,
     borderRadius: Radius.md,
   },
 
@@ -1165,7 +1180,7 @@ const styles = StyleSheet.create({
   },
   finishedChat: {
     marginTop: Space.sm,
-    color: Color.text.secondary,
+    color: c.text.secondary,
   },
   renewButton: {
     marginTop: Space.lg,
@@ -1179,7 +1194,7 @@ const styles = StyleSheet.create({
     gap: Space.sm,
   },
   countdown: {
-    color: Color.text.muted,
+    color: c.text.muted,
   },
   todayMeta: {
     flexDirection: "row",
@@ -1192,7 +1207,7 @@ const styles = StyleSheet.create({
     gap: Space.xxs,
   },
   streakCount: {
-    color: Color.ember.text,
+    color: c.ember.text,
   },
   todayRing: {
     alignItems: "center",
@@ -1222,18 +1237,18 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: Radius.pill,
-    backgroundColor: Color.accent.default,
+    backgroundColor: c.accent.default,
   },
   attemptDotUsed: {
-    backgroundColor: Color.surface.interactive,
+    backgroundColor: c.surface.interactive,
   },
   attemptSeparator: {
     width: 1,
     height: 12,
-    backgroundColor: Color.border.default,
+    backgroundColor: c.border.default,
   },
   attemptBest: {
-    color: Color.text.primary,
+    color: c.text.primary,
   },
   playButton: {
     // El botón más alto de la aplicación. Es el único sitio donde se rompe la
@@ -1267,12 +1282,12 @@ const styles = StyleSheet.create({
     borderRadius: Radius.pill,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Color.surface.sunken,
+    backgroundColor: c.surface.sunken,
     borderWidth: 1,
-    borderColor: Color.border.subtle,
+    borderColor: c.border.subtle,
   },
   positionText: {
-    color: Color.text.muted,
+    color: c.text.muted,
   },
   standingBody: {
     flex: 1,
@@ -1300,12 +1315,12 @@ const styles = StyleSheet.create({
     gap: Space.md,
     padding: Space.lg,
     marginBottom: Space.xxl,
-    backgroundColor: Color.surface.raised,
+    backgroundColor: c.surface.raised,
     borderWidth: 1,
     // Violeta de verdad, no el canto apagado de antes. El acento es el color
     // de «esto lleva a alguna parte», y hasta ahora esta fila lo llevaba tan
     // bajado que no lo decía.
-    borderColor: Color.accent.default,
+    borderColor: c.accent.default,
     // El bocadillo. La esquina viva es la de abajo a la izquierda.
     borderTopLeftRadius: Radius.xl,
     borderTopRightRadius: Radius.xl,
@@ -1313,7 +1328,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: Radius.sm / 2,
   },
   chatPressed: {
-    backgroundColor: Color.surface.interactive,
+    backgroundColor: c.surface.interactive,
   },
   chatIcon: {
     width: 40,
@@ -1321,7 +1336,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.pill,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Color.spectrum.violet.pigment,
+    backgroundColor: c.spectrum.violet.pigment,
   },
   chatBody: {
     flex: 1,
@@ -1335,6 +1350,6 @@ const styles = StyleSheet.create({
     marginTop: Space.xxs,
   },
   chatDescriptionUnread: {
-    color: Color.text.primary,
+    color: c.text.primary,
   },
-});
+  });

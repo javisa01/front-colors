@@ -22,7 +22,8 @@
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS",
         "android.permission.FOREGROUND_SERVICE",
-        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+        "android.permission.POST_NOTIFICATIONS"
       ],
       "package": "com.javisa01.colorsapp"
     },
@@ -42,6 +43,17 @@
       ],
       "expo-localization",
       "expo-audio",
+      [
+        "expo-notifications",
+        {
+          "_icon": "96x96 blanco sobre transparente: Android descarta el color y solo usa el alfa. Se deriva del icono de la app (los dos circulos) en assets/images/notification-icon.png.",
+          "icon": "./assets/images/notification-icon.png",
+          "_color": "Tinte del icono en la bandeja. El teal del juego.",
+          "color": "#6FD3C8",
+          "_defaultChannel": "Tiene que coincidir con PUSH_ANDROID_CHANNEL del backend y con ANDROID_CHANNEL de src/online/push.ts.",
+          "defaultChannel": "default"
+        }
+      ],
       "expo-secure-store",
       "@clerk/expo",
       "expo-web-browser"

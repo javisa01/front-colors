@@ -14,13 +14,14 @@ import { EmptyState, ErrorBanner, Loading } from "@/design/Feedback";
 import { SegmentedControl } from "@/design/Form";
 import { Icon } from "@/design/Icon";
 import { Card, Screen, SectionHeader } from "@/design/Layout";
+import { useColors, useThemedStyles } from "@/design/theme";
 import {
-  Color,
   Duration,
   Radius,
   SECTION_TONE,
   Space,
   Type,
+  type Palette,
 } from "@/design/tokens";
 import { t } from "@/i18n";
 import { useSession } from "@/online/session";
@@ -39,6 +40,7 @@ const PAGE_SIZE = 20;
  * jerarquía se lee igual y todo cae en la misma rejilla.
  */
 export default function LeaderboardScreen(): ReactElement {
+  const styles = useThemedStyles(createStyles);
   const { api, user } = useSession();
   const tabBarSpace = useOnlineTabBarSpace();
 
@@ -244,6 +246,8 @@ function Row({
   last: boolean;
   isMe: boolean;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const leader = entry.position === 1;
   const podium = entry.position <= 3;
 
@@ -268,7 +272,7 @@ function Row({
           accessibilityLabel={t("a11y.rank", { position: entry.position })}
         >
           {leader ? (
-            <Icon name="trophy" size={18} color={Color.warning.default} />
+            <Icon name="trophy" size={18} color={colors.warning.default} />
           ) : (
             <Text
               style={[Type.metricSmall, podium && styles.positionPodium]}
@@ -301,14 +305,15 @@ function Row({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
     gap: Space.md,
     paddingVertical: Space.md,
     borderBottomWidth: 1,
-    borderBottomColor: Color.border.subtle,
+    borderBottomColor: c.border.subtle,
   },
   rowLast: {
     borderBottomWidth: 0,
@@ -326,26 +331,26 @@ const styles = StyleSheet.create({
     paddingVertical: Space.md,
     borderRadius: Radius.md,
     borderBottomColor: "transparent",
-    backgroundColor: Color.accent.surface,
+    backgroundColor: c.accent.surface,
   },
   position: {
     width: 26,
     alignItems: "center",
   },
   positionPodium: {
-    color: Color.text.primary,
+    color: c.text.primary,
   },
   rowText: {
     flex: 1,
     gap: Space.xxs,
   },
   nameMe: {
-    color: Color.accent.text,
+    color: c.accent.text,
   },
   xp: {
-    color: Color.text.primary,
+    color: c.text.primary,
   },
   more: {
     marginTop: Space.lg,
   },
-});
+  });

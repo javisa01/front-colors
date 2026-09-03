@@ -29,7 +29,7 @@ const es = {
   "common.next": "Siguiente",
   "common.retry": "Reintentar",
   "common.share": "Compartir",
-  "common.loading": "Cargando juego...",
+  "common.loading": "Cargando el juego...",
   "common.continue": "Continuar",
   "challenge.imageMissing": "Imagen no disponible",
 
@@ -79,7 +79,7 @@ const es = {
   "dial.practice.body": "Practica sin conexión · solo o en grupo",
 
   // --- Bienvenida y tutorial de la primera vez ---------------------------
-  "welcome.greeting": "Te doy la bienvenida a",
+  "welcome.greeting": "Te damos la bienvenida a",
   "welcome.name": "Hexy",
   "welcome.cta": "Toca los círculos para continuar",
   "welcome.continue": "Continuar",
@@ -108,9 +108,9 @@ const es = {
   "offline.group.section": "En grupo · mismo móvil",
   "offline.group.hint": "Hasta 99 jugadores por turnos.",
 
-  // --- El recorrido con foco de la pantalla de practica ------------------
+  // --- El recorrido con foco de la pantalla de práctica ------------------
   // Cuatro pasos, y solo la primera vez. Explica lo que no se deduce mirando:
-  // que hay dos listas y no una, como se lee una fila, y donde se silencia.
+  // que hay dos listas y no una, cómo se lee una fila, y dónde se silencia.
   "tour.solo.title": "Jugar en solitario",
   "tour.solo.body":
     "Cuatro formas de afinar el ojo, cada una con sus reglas. Si es tu primera vez, empieza por {{mode}}.",
@@ -259,6 +259,10 @@ const es = {
   "settings.sound": "Sonido",
   "settings.music": "Música",
   "settings.sfx": "Efectos",
+  "settings.appearance": "Aspecto",
+  "settings.lightMode": "Modo claro",
+  "settings.themeHint":
+    "Apagado, la interfaz va en oscuro. El cambio se aplica al cerrar.",
   "settings.language": "Idioma",
   "settings.languageHint":
     "Se usa el del dispositivo hasta que elijas otro. El cambio se aplica al cerrar.",
@@ -477,7 +481,9 @@ const es = {
     "Solo quien creó el grupo puede cambiarle el nombre.",
   "online.group.settings.notifications": "Avisos del grupo",
   "online.group.settings.notificationsHint":
-    "Actívalo para enterarte de las novedades de este grupo, como el comienzo de una temporada nueva. Apagado, el grupo deja de avisarte en la lista.",
+    "Avisos en el móvil cuando hay reto nuevo, cuando se está acabando el día y cuando empieza una temporada. Apagado, este grupo deja de escribirte y de marcarse en la lista.",
+  "online.group.settings.notificationsBlocked":
+    "Tu teléfono tiene los avisos de Hexy bloqueados: actívalos en los ajustes del sistema para recibirlos.",
   "online.group.settings.seasons": "Temporadas",
   "online.group.settings.seasonsHint":
     "Cuántas lleva el grupo, y desde cuándo.",
@@ -637,7 +643,7 @@ const es = {
   "online.friends.you": "Eres tú",
   "online.friends.alreadyFriend": "Ya sois amigos",
   "online.friends.requestSent": "Solicitud enviada",
-  "online.friends.requestReceived": "Te ha escrito",
+  "online.friends.requestReceived": "Te ha enviado una solicitud",
   "online.friends.incoming": "Solicitudes recibidas",
   "online.friends.incomingHint": "Acepta para veros en la clasificación de amigos.",
   "online.friends.outgoing": "Solicitudes enviadas",
@@ -704,7 +710,7 @@ const en: Record<TranslationKey, string> = {
   "common.next": "Next",
   "common.retry": "Retry",
   "common.share": "Share",
-  "common.loading": "Loading game...",
+  "common.loading": "Loading the game...",
   "common.continue": "Continue",
   "challenge.imageMissing": "Image unavailable",
 
@@ -716,7 +722,7 @@ const en: Record<TranslationKey, string> = {
   "a11y.playersIncrease": "Add a player",
   "a11y.wheel": "Hue and saturation wheel",
   "a11y.brightness": "Brightness",
-  "a11y.selectedColor": "Selected colour",
+  "a11y.selectedColor": "Selected color",
 
   "landing.badge": "Hexy",
 
@@ -724,13 +730,13 @@ const en: Record<TranslationKey, string> = {
   "dial.streakOne": "1 day in a row",
   "dial.noGroups": "{{name}} · no groups yet",
   "dial.open.label": "New challenge every day at 15:00",
-  "dial.open.title": "Spin, look,\nand match the colour.",
+  "dial.open.title": "Spin, look,\nand match the color.",
   "dial.open.body":
     "Five new images every day, and two tries to get the highest score.",
   "dial.open.action": "Play",
   "dial.open.hint": "Opens today's challenge",
   "dial.off.label": "Nothing to play yet",
-  "dial.empty.title": "You are not in\nany group.",
+  "dial.empty.title": "You're not in\nany group.",
   "dial.empty.body":
     "Create one, invite whoever you want, and every day you get five images, two tries and a ranking only you can see.",
   "dial.empty.kicker": "One thing left",
@@ -745,7 +751,7 @@ const en: Record<TranslationKey, string> = {
   "dial.guest.note": "takes a minute",
   "dial.guest.hint": "Opens account access",
   "dial.practice.title": "The Studio",
-  "dial.practice.body": "Practise offline · solo or in a group",
+  "dial.practice.body": "Practice offline · solo or in a group",
 
   // --- Bienvenida y tutorial de la primera vez ---------------------------
   "welcome.greeting": "Welcome to",
@@ -765,7 +771,7 @@ const en: Record<TranslationKey, string> = {
   "tutorial.chipMine": "Yours",
   "tutorial.chipReal": "Real",
   "dev.tutorialTitle": "Tutorial",
-  "dev.tutorialHint": "Development only. It goes before release.",
+  "dev.tutorialHint": "Development only. It'll be removed before release.",
   "dev.tutorialButton": "Show the tutorial again",
   "dev.tourButton": "Replay the Studio tour",
 
@@ -914,7 +920,7 @@ const en: Record<TranslationKey, string> = {
   "run.artist": "Artist's eye!",
   "run.great": "Great aim!",
   "run.good": "Good job",
-  "run.practice": "Keep practising",
+  "run.practice": "Keep practicing",
 
   "validate.correct": "Correct!",
   "validate.tryAgain": "Keep trying.",
@@ -923,9 +929,13 @@ const en: Record<TranslationKey, string> = {
   "settings.sound": "Sound",
   "settings.music": "Music",
   "settings.sfx": "Effects",
+  "settings.appearance": "Appearance",
+  "settings.lightMode": "Light mode",
+  "settings.themeHint":
+    "When off, the interface stays dark. The change applies when you close.",
   "settings.language": "Language",
   "settings.languageHint":
-    "Your device language is used until you pick another. The change applies when you close this.",
+    "Your device language is used until you pick another. The change applies when you close.",
 
   // --- Online mode -------------------------------------------------------
   "online.session.restoring": "Restoring your session...",
@@ -954,19 +964,19 @@ const en: Record<TranslationKey, string> = {
   "online.auth.switchToRegister": "No account yet?",
   "online.auth.switchToLogin": "Already have an account?",
   "online.auth.offlineNote":
-    "The Studio keeps working with no account and no connection: your records are not going anywhere.",
+    "The Studio keeps working with no account and no connection: your records aren't going anywhere.",
   "online.auth.error.passwordRequired": "Enter your password.",
   "online.auth.error.passwordShort": "At least {{min}} characters.",
   "online.auth.error.usernameLength": "Between 3 and 24 characters.",
   "online.auth.error.usernameChars": "Only letters, numbers and . _ -",
-  "online.auth.error.email": "That email does not look valid.",
+  "online.auth.error.email": "That email doesn't look valid.",
   "online.auth.error.code": "The code has {{length}} digits.",
   "online.auth.or": "or",
   "online.auth.google": "Continue with Google",
   "online.auth.apple": "Continue with Apple",
   "online.auth.connecting": "Connecting...",
   "online.auth.unavailable":
-    "Hexy is not configured in this build. The Studio works as usual.",
+    "Hexy isn't configured in this build. The Studio works as usual.",
   "online.auth.verify.title": "Confirm your email",
   "online.auth.verify.subtitle": "We sent a 6-digit code to {{email}}.",
   "online.auth.verify.code": "Verification code",
@@ -978,7 +988,7 @@ const en: Record<TranslationKey, string> = {
   "online.auth.verify.back": "Use another email",
 
   "online.hub.playSection": "Play",
-  "online.hub.playHintDone": "You have played today's challenge in every group.",
+  "online.hub.playHintDone": "You've played today's challenge in every group.",
   "online.hub.group.played": "Today's challenge played · best {{score}}",
   "online.hub.todayPoints": "Points today",
 
@@ -987,7 +997,7 @@ const en: Record<TranslationKey, string> = {
   "online.hub.dayDone": "Day complete",
   "online.hub.streakDays": "{{count}} days in a row",
   "online.hub.streakToday": "Today counts",
-  "online.hub.streakPending": "Today does not count yet",
+  "online.hub.streakPending": "Today doesn't count yet",
   "online.hub.tileDone": "Challenge done",
   "online.hub.tileClosed": "Closed for today",
   "online.hub.tileOpenHint": "Opens the group and its standings",
@@ -1024,7 +1034,7 @@ const en: Record<TranslationKey, string> = {
   "online.tour.today.body":
     "This is where you come back every afternoon: at 15:00 there are five new images and two tries to match their colors.",
   "online.tour.today.action": "Back to Today",
-  "online.tour.create.title": "All that is missing is your friends",
+  "online.tour.create.title": "All that's missing is your friends",
   "online.tour.create.body":
     "Create a group, invite whoever you like, and tomorrow at 15:00 you all get the same challenge.",
   "online.tour.create.action": "Create a group",
@@ -1036,20 +1046,20 @@ const en: Record<TranslationKey, string> = {
   "dev.firstRunOff": "Back to my real groups",
 
   "online.hub.queueDone": "All played · {{total}} groups",
-  "online.hub.allDoneHint": "You have played in every group. The next challenge opens at 15:00.",
+  "online.hub.allDoneHint": "You've played in every group. The next challenge opens at 15:00.",
   "online.hub.attempts": "{{count}} attempts left",
   "online.hub.attemptsOne": "1 attempt left",
-  "online.hub.streakSecured": "{{count}} day streak, secured today",
-  "online.hub.streakAtRisk": "{{count}} day streak. You have not played today",
+  "online.hub.streakSecured": "{{count}}-day streak, secured today",
+  "online.hub.streakAtRisk": "{{count}}-day streak. You haven't played today",
 
-  "online.hub.loading": "Looking up what you have to play today...",
+  "online.hub.loading": "Checking what you still have to play today...",
 
   "online.groups.badge": "Groups",
   "online.groups.title": "Your groups",
   "online.groups.subtitle":
     "Each group competes for 10 days. Once it ends, only its creator can restart it.",
   "online.groups.loading": "Loading your groups...",
-  "online.groups.emptyTitle": "You are not in any group yet",
+  "online.groups.emptyTitle": "You're not in any group yet",
   "online.groups.emptyHint":
     "Create one and invite your friends with the code, or join with the one you were given.",
   "online.groups.tabCreate": "Create",
@@ -1060,10 +1070,10 @@ const en: Record<TranslationKey, string> = {
   "online.groups.createSubmit": "Create group",
   "online.groups.codeLabel": "Invite code",
   "online.groups.codePlaceholder": "K7QMBN",
-  "online.groups.codeHint": "6 characters. Upper or lower case, it does not matter.",
+  "online.groups.codeHint": "6 characters. Upper or lower case, it doesn't matter.",
   "online.groups.joinSubmit": "Join the group",
   "online.groups.created": "Group created. Share the code to invite people.",
-  "online.groups.joined": "You are in.",
+  "online.groups.joined": "You're in.",
   "online.groups.mine": "My groups",
   "online.groups.members": "{{count}} members",
   "online.groups.membersOne": "1 member",
@@ -1121,7 +1131,7 @@ const en: Record<TranslationKey, string> = {
   "online.group.chat.unread": "Unread",
   "online.group.notice.seasonRenewed":
     "Season {{season}} is under way. The standings start from zero.",
-  "online.group.notice.generic": "There is something new in this group.",
+  "online.group.notice.generic": "There's something new in this group.",
   "online.group.leave": "Leave group",
   "online.group.leaveOwnerHint":
     "If you leave, the group passes to the oldest member.",
@@ -1133,7 +1143,9 @@ const en: Record<TranslationKey, string> = {
     "Only whoever created the group can change its name.",
   "online.group.settings.notifications": "Group alerts",
   "online.group.settings.notificationsHint":
-    "Turn it on to hear about this group's news, such as the start of a new season. Off, the group stops flagging itself in the list.",
+    "Phone alerts when there's a new challenge, when the day is running out and when a season begins. When off, this group stops notifying you and getting flagged in the list.",
+  "online.group.settings.notificationsBlocked":
+    "Your phone has Hexy's notifications blocked: turn them on in your system settings to get them.",
   "online.group.settings.seasons": "Seasons",
   "online.group.settings.seasonsHint":
     "How many the group has played, and since when.",
@@ -1158,7 +1170,7 @@ const en: Record<TranslationKey, string> = {
   "online.chat.retry": "Try again",
   "online.chat.discard": "Discard",
   "online.chat.stale":
-    "New messages are not coming through. They will appear once the connection is back.",
+    "New messages aren't coming through. They'll appear once the connection is back.",
   "online.chat.remaining": "{{count}} left",
   "online.chat.tooLong": "{{count}} too many",
   "online.chat.today": "Today",
@@ -1196,7 +1208,7 @@ const en: Record<TranslationKey, string> = {
   "online.daily.noAttemptsTitle": "You already played today",
   "online.daily.noAttemptsHint":
     "Two attempts a day. Come back when the next challenge opens.",
-  "online.daily.noActiveGroups": "It does not count in any ranking",
+  "online.daily.noActiveGroups": "Doesn't count in any ranking",
   "online.daily.countsOne": "Counts in 1 ranking",
   "online.daily.countsMany": "Counts in {{count}} rankings",
   "online.daily.noGroupTitle": "This challenge belongs to a group",
@@ -1212,7 +1224,7 @@ const en: Record<TranslationKey, string> = {
   "online.daily.check": "Check",
   "online.daily.finish": "Send attempt",
   "online.daily.submitting": "Sending your attempt...",
-  "online.daily.submitFailed": "The attempt could not be sent",
+  "online.daily.submitFailed": "The attempt couldn't be sent",
   "online.daily.submitRetry": "Try sending it again",
   "online.daily.attemptLabel": "Attempt",
   "online.daily.attemptValue": "{{number}} of 2",
@@ -1247,12 +1259,12 @@ const en: Record<TranslationKey, string> = {
   "online.dev.offset": "Offset: {{days}} d {{hours}} h",
   "online.dev.realTime": "Real time",
 
-  "online.error.groupNotFound": "That group does not exist, or you are no longer in it.",
-  "online.error.groupCodeInvalid": "That code does not exist.",
-  "online.error.alreadyMember": "You are already in that group.",
+  "online.error.groupNotFound": "That group doesn't exist, or you're no longer in it.",
+  "online.error.groupCodeInvalid": "That code doesn't exist.",
+  "online.error.alreadyMember": "You're already in that group.",
   "online.error.notGroupOwner": "Only the group creator can do that.",
   "online.error.seasonStillActive":
-    "The season is still running: it cannot be restarted yet.",
+    "The season is still running: it can't be restarted yet.",
 
   "online.profile.badge": "Profile",
   "online.profile.title": "Your profile",
@@ -1261,7 +1273,7 @@ const en: Record<TranslationKey, string> = {
   "online.profile.friendsHint": "Your requests and your list.",
   "online.profile.friendsWaiting": "{{count}} waiting for an answer",
   "online.profile.friendsLoading": "Loading your friends...",
-  "online.profile.friendsUnknown": "We could not find out who is waiting for you.",
+  "online.profile.friendsUnknown": "We couldn't find out who's waiting for you.",
   "online.profile.friendsNone": "No requests waiting.",
   "online.profile.friendsOpen": "See friends and search players",
   "online.profile.wantsToBeFriends": "Wants to be your friend",
@@ -1290,10 +1302,10 @@ const en: Record<TranslationKey, string> = {
   "online.friends.searching": "Searching...",
   "online.friends.noResults": "Nobody matches \u201c{{query}}\u201d.",
   "online.friends.add": "Add",
-  "online.friends.you": "That is you",
+  "online.friends.you": "That's you",
   "online.friends.alreadyFriend": "Already friends",
   "online.friends.requestSent": "Request sent",
-  "online.friends.requestReceived": "They wrote to you",
+  "online.friends.requestReceived": "Sent you a request",
   "online.friends.incoming": "Incoming requests",
   "online.friends.incomingHint": "Accept to appear in each other's friends ranking.",
   "online.friends.outgoing": "Sent requests",
@@ -1328,23 +1340,23 @@ const en: Record<TranslationKey, string> = {
 
   "online.error.generic": "The server returned an unexpected error.",
   "online.error.network":
-    "We could not reach the server. Check your connection.",
+    "We couldn't reach the server. Check your connection.",
   "online.error.credentials": "Wrong email or password.",
   "online.error.passwordPwned":
     "That password has shown up in known breaches. Pick another one.",
   "online.error.passwordWeak": "That password is too weak.",
-  "online.error.codeIncorrect": "That code is not correct.",
+  "online.error.codeIncorrect": "That code isn't correct.",
   "online.error.codeExpired": "The code expired. Ask for a new one.",
-  "online.error.captcha": "We could not verify that you are a human.",
-  "online.error.sessionExists": "You are already signed in.",
+  "online.error.captcha": "We couldn't verify that you're human.",
+  "online.error.sessionExists": "You're already signed in.",
   "online.error.emailUsed": "There is already an account with that email.",
   "online.error.usernameUsed": "That username is taken.",
-  "online.error.userNotFound": "We could not find that player.",
+  "online.error.userNotFound": "We couldn't find that player.",
   "online.error.rateLimited": "Too many attempts. Wait a moment.",
   "online.error.validation": "Check the details you entered.",
   "online.error.sessionExpired": "Your session expired. Sign in again.",
   "online.error.friendExists": "There is already a request with that player.",
-  "online.error.friendSelf": "You cannot add yourself.",
+  "online.error.friendSelf": "You can't add yourself.",
   "online.error.friendNotFound": "That request no longer exists.",
   "online.error.dailyClosed":
     "The challenge you were playing has closed. Reload to see today's one.",
@@ -1409,7 +1421,7 @@ const fr: Record<TranslationKey, string> = {
   "tutorial.findLabel": "Maintenant",
   "tutorial.findTitle": "Trouve-la",
   "tutorial.accuracy": "Précision",
-  "tutorial.resultNote": "Ce qui compte, c’est à quel point tu t’approches.",
+  "tutorial.resultNote": "Ce qui compte, c'est à quel point tu t'approches.",
   "tutorial.next": "Suivant",
   "tutorial.check": "Vérifier",
   "tutorial.start": "Commencer",
@@ -1495,8 +1507,8 @@ const fr: Record<TranslationKey, string> = {
   "party.final.points": "{{score}} pts",
   "party.final.rounds": "{{count}} réussites",
   "party.final.teamScore": "{{score}} / {{max}} pts",
-  "party.final.teamAverage": "Moyenne de l'équipe : {{average}}%",
-  "party.final.teamRecord": "Meilleure moyenne de l'équipe : {{average}}%",
+  "party.final.teamAverage": "Moyenne de l'équipe : {{average}} %",
+  "party.final.teamRecord": "Meilleure moyenne de l'équipe : {{average}} %",
   "party.final.teamRecordNew": "Nouveau record de l'équipe !",
   "party.final.contributions": "Contributions",
   "party.final.replay": "Rejouer",
@@ -1560,7 +1572,7 @@ const fr: Record<TranslationKey, string> = {
 
   "daily.done.title": "Défi quotidien terminé",
   "daily.done.subtitle": "Reviens demain pour une nouvelle couleur.",
-  "daily.score": "Ton résultat d'aujourd'hui : {{score}}%",
+  "daily.score": "Ton résultat d'aujourd'hui : {{score}} %",
 
   "score.perfect": "Parfait !",
   "score.close": "Très proche !",
@@ -1579,6 +1591,10 @@ const fr: Record<TranslationKey, string> = {
   "settings.sound": "Son",
   "settings.music": "Musique",
   "settings.sfx": "Effets",
+  "settings.appearance": "Apparence",
+  "settings.lightMode": "Mode clair",
+  "settings.themeHint":
+    "Désactivé, l'interface reste sombre. Le changement s'applique à la fermeture.",
   "settings.language": "Langue",
   "settings.languageHint":
     "Celle de l'appareil est utilisée jusqu'à ce que tu en choisisses une autre. Le changement s'applique à la fermeture.",
@@ -1709,7 +1725,7 @@ const fr: Record<TranslationKey, string> = {
   "online.groups.loading": "Chargement de tes groupes...",
   "online.groups.emptyTitle": "Tu n'es encore dans aucun groupe",
   "online.groups.emptyHint":
-    "Crée-en un et invite tes amis avec le code, ou rejoins avec celui qu'on t'a donné.",
+    "Crées-en un et invite tes amis avec le code, ou rejoins avec celui qu'on t'a donné.",
   "online.groups.tabCreate": "Créer",
   "online.groups.tabJoin": "Rejoindre",
   "online.groups.nameLabel": "Nom du groupe",
@@ -1741,7 +1757,7 @@ const fr: Record<TranslationKey, string> = {
   "online.group.seasonRange": "{{from}} – {{to}}",
   "online.group.seasonCurrent": "En cours",
   "online.group.codeTitle": "Code d'invitation",
-  "online.group.codeHint": "Qui l'a peut rejoindre le groupe.",
+  "online.group.codeHint": "Quiconque l'a peut rejoindre le groupe.",
   "online.group.shareMessage":
     "Rejoins mon groupe Hexy « {{name}} » avec le code {{code}}",
   "online.group.finishedTitle": "Cette saison est terminée",
@@ -1792,7 +1808,9 @@ const fr: Record<TranslationKey, string> = {
     "Seule la personne qui a créé le groupe peut en changer le nom.",
   "online.group.settings.notifications": "Alertes du groupe",
   "online.group.settings.notificationsHint":
-    "Active-le pour suivre les nouveautés de ce groupe, comme le début d'une nouvelle saison. Désactivé, le groupe ne te signale plus rien dans la liste.",
+    "Alertes sur ton téléphone quand un nouveau défi arrive, quand la journée se termine et quand une saison commence. Désactivé, ce groupe ne t'écrit plus et ne se signale plus dans la liste.",
+  "online.group.settings.notificationsBlocked":
+    "Ton téléphone bloque les notifications de Hexy : active-les dans les réglages du système pour les recevoir.",
   "online.group.settings.seasons": "Saisons",
   "online.group.settings.seasonsHint":
     "Combien le groupe en a jouées, et depuis quand.",
@@ -1955,7 +1973,7 @@ const fr: Record<TranslationKey, string> = {
   "online.friends.you": "C'est toi",
   "online.friends.alreadyFriend": "Déjà amis",
   "online.friends.requestSent": "Demande envoyée",
-  "online.friends.requestReceived": "T'a écrit",
+  "online.friends.requestReceived": "T'a envoyé une demande",
   "online.friends.incoming": "Demandes reçues",
   "online.friends.incomingHint":
     "Accepte pour apparaître dans vos classements d'amis.",
@@ -2064,15 +2082,15 @@ const ca: Record<TranslationKey, string> = {
   "dial.practice.body": "Practica sense connexió · sol o en grup",
 
   // --- Bienvenida y tutorial de la primera vez ---------------------------
-  "welcome.greeting": "Et dono la benvinguda a",
+  "welcome.greeting": "Et donem la benvinguda a",
   "welcome.name": "Hexy",
   "welcome.cta": "Toca els cercles per continuar",
   "welcome.continue": "Continua",
   "tutorial.memorize": "Memoritza el color",
   "tutorial.findLabel": "Ara",
-  "tutorial.findTitle": "Troba’l",
+  "tutorial.findTitle": "Troba'l",
   "tutorial.accuracy": "Precisió",
-  "tutorial.resultNote": "Compta com t’hi acostes.",
+  "tutorial.resultNote": "Compta com t'hi acostes.",
   "tutorial.next": "Següent",
   "tutorial.check": "Comprova",
   "tutorial.start": "Comença",
@@ -2081,7 +2099,7 @@ const ca: Record<TranslationKey, string> = {
   "tutorial.chipMine": "Teu",
   "tutorial.chipReal": "Real",
   "dev.tutorialTitle": "Tutorial",
-  "dev.tutorialHint": "Només en desenvolupament. Marxara abans de publicar.",
+  "dev.tutorialHint": "Només en desenvolupament. Es treu abans de publicar.",
   "dev.tutorialButton": "Torna a veure el tutorial",
   "dev.tourButton": "Repeteix el recorregut del Taller",
 
@@ -2108,7 +2126,7 @@ const ca: Record<TranslationKey, string> = {
     "Pots configurar el volum de la música i dels efectes de so, i canviar d'idioma, en aquesta pestanya de configuració.",
   "tour.next": "Següent",
   "tour.finish": "Entesos",
-  "tour.skip": "Ometre",
+  "tour.skip": "Salta",
 
   "party.mode.battle.title": "Batalla d'endevinar",
   "party.mode.battle.description":
@@ -2239,6 +2257,10 @@ const ca: Record<TranslationKey, string> = {
   "validate.tryAgain": "Continua provant.",
 
   "settings.title": "Ajustos",
+  "settings.appearance": "Aspecte",
+  "settings.lightMode": "Mode clar",
+  "settings.themeHint":
+    "Apagat, la interfície va en fosc. El canvi s'aplica en tancar.",
   "settings.sound": "So",
   "settings.music": "Música",
   "settings.sfx": "Efectes",
@@ -2459,14 +2481,16 @@ const ca: Record<TranslationKey, string> = {
     "Només qui va crear el grup en pot canviar el nom.",
   "online.group.settings.notifications": "Avisos del grup",
   "online.group.settings.notificationsHint":
-    "Activa'l per assabentar-te de les novetats d'aquest grup, com l'inici d'una temporada nova. Apagat, el grup deixa d'avisar-te a la llista.",
+    "Avisos al mòbil quan hi ha repte nou, quan s'està acabant el dia i quan comença una temporada. Apagat, aquest grup deixa d'escriure't i de marcar-se a la llista.",
+  "online.group.settings.notificationsBlocked":
+    "El teu telèfon té els avisos de Hexy bloquejats: activa'ls als ajustos del sistema per rebre'ls.",
   "online.group.settings.seasons": "Temporades",
   "online.group.settings.seasonsHint":
     "Quantes en porta el grup, i des de quan.",
   "online.group.settings.membersHint": "Punts i jornades d'aquesta temporada.",
   "online.group.settings.addFriend": "Afegeix {{name}} com a amic",
   "online.group.settings.shareCode": "Comparteix el codi",
-  "online.group.settings.copyCode": "Copiar el codi",
+  "online.group.settings.copyCode": "Copia el codi",
   "online.group.settings.codeCopied": "Codi copiat.",
   "online.group.settings.leaveHint": "Hi pots tornar a entrar amb el codi.",
 
@@ -2618,7 +2642,7 @@ const ca: Record<TranslationKey, string> = {
   "online.friends.you": "Ets tu",
   "online.friends.alreadyFriend": "Ja sou amics",
   "online.friends.requestSent": "Sol·licitud enviada",
-  "online.friends.requestReceived": "T'ha escrit",
+  "online.friends.requestReceived": "T'ha enviat una sol·licitud",
   "online.friends.incoming": "Sol·licituds rebudes",
   "online.friends.incomingHint":
     "Accepta-la per veure-us a la classificació d'amics.",

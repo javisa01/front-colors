@@ -404,7 +404,7 @@ export default function DailyRedirect(): ReactElement {
 //   },
 //   statDivider: {
 //     width: 1,
-//     backgroundColor: Color.border.subtle,
+//     backgroundColor: colors.border.subtle,
 //   },
 //   countdown: {
 //     marginTop: Space.xs,

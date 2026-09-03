@@ -18,7 +18,13 @@ import { Button, IconButton } from "@/design/Button";
 import { ErrorBanner, Loading, Pill } from "@/design/Feedback";
 import { Field, Notice, Toggle } from "@/design/Form";
 import { Card, Screen, SectionHeader } from "@/design/Layout";
-import { Color, Radius, Space, Type } from "@/design/tokens";
+import { useThemedStyles } from "@/design/theme";
+import {
+  Radius,
+  Space,
+  Type,
+  type Palette,
+} from "@/design/tokens";
 import { t } from "@/i18n";
 import {
   GROUP_NAME_MAX,
@@ -29,8 +35,8 @@ import {
 import { relationOf, type Relation } from "@/online/friends";
 import { useSession } from "@/online/session";
 import { useSocial } from "@/online/social";
+import { ensurePushPermission, type PushPermission } from "@/online/push";
 import { selectionTick } from "@/utils/haptics";
-import { getGroupNotifications, setGroupNotifications } from "@/utils/storage";
 
 /** Lo que el botón de copiar se queda diciendo «copiado». */
 const COPIED_MS = 2000;
@@ -58,6 +64,7 @@ const COPIED_MS = 2000;
  * grupo.
  */
 export default function GroupSettingsScreen(): ReactElement {
+  const styles = useThemedStyles(createStyles);
   const { api, user } = useSession();
   const { apply: applySocial } = useSocial();
   const router = useRouter();
@@ -91,6 +98,16 @@ export default function GroupSettingsScreen(): ReactElement {
   const [saving, setSaving] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [notify, setNotify] = useState(true);
+  /** El interruptor, mientras el servidor confirma. */
+  const [savingNotify, setSavingNotify] = useState(false);
+  /**
+   * Si el teléfono deja pasar los avisos.
+   *
+   * Es lo que distingue «este grupo está callado» de «el teléfono está callado
+   * para toda la app»: un interruptor encendido sin permiso del sistema no
+   * avisa de nada, y sin decirlo la pantalla estaría mintiendo.
+   */
+  const [devicePush, setDevicePush] = useState<PushPermission | null>(null);
   /** Id de la persona cuya solicitud de amistad está en vuelo. */
   const [pendingFriend, setPendingFriend] = useState<string | null>(null);
   /** El botón de copiar, mientras dura su acuse de recibo. */
@@ -122,6 +139,9 @@ export default function GroupSettingsScreen(): ReactElement {
         api.groups.seasons(groupId).catch(() => null),
       ]);
       setGroup(detail.group);
+      // El interruptor lo manda el servidor con el grupo: es él quien decide a
+      // quién escribir, así que no hay una segunda verdad en el teléfono.
+      setNotify(detail.group.notificationsEnabled);
       setBoard(leaderboard);
       setFriends(overview);
       setSeasons(history?.seasons ?? null);
@@ -151,10 +171,23 @@ export default function GroupSettingsScreen(): ReactElement {
    */
   useFocusEffect(useCallback(() => () => setNotice(null), []));
 
+  /*
+    El permiso del sistema, una vez por visita.
+
+    `ensurePushPermission` pide el permiso si nunca se preguntó —abrir estos
+    ajustes es justo el momento en que la pregunta tiene sentido, porque se ha
+    venido a decidir sobre avisos— y no vuelve a preguntar si ya se denegó: el
+    sistema no enseña el diálogo dos veces.
+  */
   useEffect(() => {
-    if (!groupId) return;
-    void getGroupNotifications(groupId).then(setNotify);
-  }, [groupId]);
+    let active = true;
+    void ensurePushPermission().then((permission) => {
+      if (active) setDevicePush(permission);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const refresh = useCallback(async () => {
     setRefreshing(true);
@@ -179,12 +212,34 @@ export default function GroupSettingsScreen(): ReactElement {
     }
   }, [api, group, name]);
 
+  /**
+   * Encender o apagar los avisos de este grupo.
+   *
+   * Se mueve el interruptor **antes** de que conteste el servidor: es un
+   * control físico, y un interruptor que tarda medio segundo en moverse se
+   * pulsa dos veces. Si la petición falla, vuelve a donde estaba y el fallo se
+   * cuenta en el banner de arriba, que es donde el resto de la pantalla cuenta
+   * los suyos.
+   */
   const toggleNotify = useCallback(
-    (value: boolean) => {
+    async (value: boolean) => {
+      if (!groupId) return;
+      const previous = notify;
       setNotify(value);
-      if (groupId) void setGroupNotifications(groupId, value);
+      setSavingNotify(true);
+      setError(null);
+      try {
+        const { group: updated } = await api.groups.setNotifications(groupId, value);
+        setGroup(updated);
+        setNotify(updated.notificationsEnabled);
+      } catch (toggleError) {
+        setNotify(previous);
+        setError(describeError(toggleError));
+      } finally {
+        setSavingNotify(false);
+      }
     },
-    [groupId],
+    [api, groupId, notify],
   );
 
   const addFriend = useCallback(
@@ -398,8 +453,23 @@ export default function GroupSettingsScreen(): ReactElement {
           label={t("online.group.settings.notifications")}
           description={t("online.group.settings.notificationsHint")}
           value={notify}
-          onValueChange={toggleNotify}
+          disabled={savingNotify}
+          onValueChange={(value) => void toggleNotify(value)}
         />
+        {/*
+          El aviso de que el teléfono está callado.
+
+          Solo cuando el interruptor está encendido: apagado, el permiso del
+          sistema da igual y el cartel sería ruido. Y solo cuando se ha
+          denegado de verdad —`unsupported` es el emulador, y ahí no hay nada
+          que arreglar—.
+        */}
+        {notify && devicePush === "denied" ? (
+          <Notice
+            message={t("online.group.settings.notificationsBlocked")}
+            style={styles.notifyNotice}
+          />
+        ) : null}
       </Card>
 
       {/* -------------------------- Miembros ---------------------------- */}
@@ -538,6 +608,7 @@ function SeasonRow({
   current: boolean;
   last: boolean;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={[styles.seasonRow, last && styles.seasonRowLast]}>
       <View style={styles.seasonText}>
@@ -586,6 +657,7 @@ function Rosette({
   youId: string | undefined;
   total: number;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   const shown = members.slice(0, ROSETTE_MAX);
   const rest = total - shown.length;
 
@@ -640,6 +712,7 @@ function MemberRow({
   last: boolean;
   onAdd: () => void;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   const tint = playerTint(member.username);
 
   return (
@@ -681,7 +754,8 @@ function MemberRow({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   block: {
     marginBottom: Space.xxl,
   },
@@ -694,7 +768,7 @@ const styles = StyleSheet.create({
     paddingBottom: Space.md,
     marginBottom: Space.md,
     borderBottomWidth: 1,
-    borderBottomColor: Color.border.subtle,
+    borderBottomColor: c.border.subtle,
   },
   seasonRowLast: {
     paddingBottom: 0,
@@ -716,7 +790,7 @@ const styles = StyleSheet.create({
     // El fondo del lienzo detrás de cada círculo: es lo que hace que el de
     // delante recorte al de detrás en vez de transparentarse encima.
     borderRadius: Radius.pill,
-    backgroundColor: Color.surface.canvas,
+    backgroundColor: c.surface.canvas,
     padding: 2,
   },
   rosetteOverlap: {
@@ -730,16 +804,21 @@ const styles = StyleSheet.create({
     borderRadius: Radius.pill,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Color.surface.raised,
+    backgroundColor: c.surface.raised,
     borderWidth: 1,
-    borderColor: Color.border.default,
+    borderColor: c.border.default,
   },
   rosetteRestText: {
-    color: Color.text.muted,
+    color: c.text.muted,
   },
 
   // -- Nombre ---------------------------------------------------------------
   saveButton: {
+    marginTop: Space.lg,
+  },
+  notifyNotice: {
+    // Debajo del interruptor y separado de él: es una condición del teléfono,
+    // no la descripción de lo que hace el control.
     marginTop: Space.lg,
   },
   renameNotice: {
@@ -765,7 +844,7 @@ const styles = StyleSheet.create({
     gap: Space.md,
     paddingVertical: Space.md,
     borderBottomWidth: 1,
-    borderBottomColor: Color.border.subtle,
+    borderBottomColor: c.border.subtle,
   },
   memberRowLast: {
     borderBottomWidth: 0,
@@ -788,12 +867,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     // Teñido, y el único bloque teñido de la pantalla: el código es lo que se
     // viene a buscar aquí, y el color es más barato que un título más grande.
-    backgroundColor: Color.spectrum.teal.surface,
+    backgroundColor: c.spectrum.teal.surface,
     borderWidth: 1,
-    borderColor: Color.spectrum.teal.border,
+    borderColor: c.spectrum.teal.border,
   },
   code: {
-    color: Color.spectrum.teal.icon,
+    color: c.spectrum.teal.icon,
     letterSpacing: 8,
   },
   codeHint: {
@@ -810,4 +889,4 @@ const styles = StyleSheet.create({
     marginTop: Space.sm,
     textAlign: "center",
   },
-});
+  });

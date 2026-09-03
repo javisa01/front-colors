@@ -25,7 +25,13 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { Color, Duration, HAIRLINE, Type } from "@/design/tokens";
+import { useColors, useThemedStyles } from "@/design/theme";
+import {
+  Duration,
+  HAIRLINE,
+  Type,
+  type Palette,
+} from "@/design/tokens";
 import { impact } from "@/utils/haptics";
 import { playTick } from "@/utils/sound";
 
@@ -156,16 +162,17 @@ const DIM_WEDGES = buildWedges(9, 40);
  * el mismo documento y el segundo `hole` ganaría para los dos.
  */
 const Ring = memo(function Ring({ dim }: { dim: boolean }): ReactElement {
+  const colors = useColors();
   const id = dim ? "dial-hole-dim" : "dial-hole-lit";
   return (
     <Svg width="100%" height="100%" viewBox="0 0 100 100">
       <Defs>
         <RadialGradient id={id} cx="50%" cy="50%" r="50%">
-          <Stop offset="0%" stopColor={Color.surface.sunken} stopOpacity="1" />
-          <Stop offset="40%" stopColor={Color.surface.sunken} stopOpacity="1" />
-          <Stop offset="52%" stopColor={Color.surface.sunken} stopOpacity="0" />
-          <Stop offset="82%" stopColor={Color.surface.sunken} stopOpacity="0" />
-          <Stop offset="96%" stopColor={Color.surface.sunken} stopOpacity="1" />
+          <Stop offset="0%" stopColor={colors.surface.sunken} stopOpacity="1" />
+          <Stop offset="40%" stopColor={colors.surface.sunken} stopOpacity="1" />
+          <Stop offset="52%" stopColor={colors.surface.sunken} stopOpacity="0" />
+          <Stop offset="82%" stopColor={colors.surface.sunken} stopOpacity="0" />
+          <Stop offset="96%" stopColor={colors.surface.sunken} stopOpacity="1" />
         </RadialGradient>
       </Defs>
 
@@ -231,6 +238,7 @@ function DialBase({
   onPress,
   accessibilityHint,
 }: DialProps): ReactElement {
+  const styles = useThemedStyles(createStyles);
   /**
    * Dos ángulos, no uno.
    *
@@ -528,7 +536,8 @@ function DialRingBase({
 
 export const DialRing = memo(DialRingBase);
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   wrap: {
     alignItems: "center",
     justifyContent: "center",
@@ -543,16 +552,16 @@ const styles = StyleSheet.create({
   burst: {
     position: "absolute",
     borderWidth: 1,
-    borderColor: Color.accent.default,
+    borderColor: c.accent.default,
   },
   hub: {
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
     paddingHorizontal: 18,
-    backgroundColor: Color.surface.canvas,
+    backgroundColor: c.surface.canvas,
     borderWidth: HAIRLINE,
-    borderColor: Color.border.default,
+    borderColor: c.border.default,
     // La sombra hace de foso: separa el eje del aro sin dibujar un segundo
     // borde, que a este tamaño se leería como dos anillos concéntricos.
     shadowColor: "#000000",
@@ -562,14 +571,14 @@ const styles = StyleSheet.create({
     elevation: 14,
   },
   kicker: {
-    color: Color.accent.text,
+    color: c.accent.text,
     textAlign: "center",
   },
   label: {
     textAlign: "center",
   },
   note: {
-    color: Color.text.muted,
+    color: c.text.muted,
     textAlign: "center",
   },
-});
+  });

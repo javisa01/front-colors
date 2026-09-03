@@ -31,7 +31,14 @@ import {
 } from "@/design/Feedback";
 import { Notice } from "@/design/Form";
 import { Card, Divider, Screen, useIsTablet } from "@/design/Layout";
-import { Color, Radius, SECTION_TONE, Space, Type } from "@/design/tokens";
+import { useColors, useThemedStyles } from "@/design/theme";
+import {
+  Radius,
+  SECTION_TONE,
+  Space,
+  Type,
+  type Palette,
+} from "@/design/tokens";
 // Del hook offline solo se toma el color de arranque de la rueda; ver el
 // comentario de `useDailyChallenge`, que explica por qué el resto no sirve.
 import { INITIAL_HSV } from "@/hooks/useChallenge";
@@ -104,6 +111,7 @@ interface RoundOutcome {
 }
 
 export default function DailyPlayScreen(): ReactElement {
+  const styles = useThemedStyles(createStyles);
   const router = useRouter();
   // Mismo parámetro que la antesala: el reto es de un grupo concreto.
   const { group: groupParam } = useLocalSearchParams<{ group?: string }>();
@@ -572,6 +580,7 @@ function PlayBoard({
   onColorChange,
   onCheck,
 }: PlayBoardProps): ReactElement {
+  const styles = useThemedStyles(createStyles);
   const { width, height } = useWindowDimensions();
   const isTablet = useIsTablet();
   const isCompactHeight = height < 760;
@@ -678,6 +687,7 @@ function MissingAsset({
   round: number;
   size: number;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={[styles.missing, { width: size, height: size }]}>
       <Text style={[Type.bodyStrong, styles.centeredText]}>
@@ -719,6 +729,7 @@ function AttemptResult({
   onRetry: () => void;
   onFinish: () => void;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   const [detail, setDetail] = useState<DailyRoundResult | null>(null);
 
   const improved = result.attempt.score >= result.best;
@@ -855,6 +866,8 @@ function RoundRow({
   last: boolean;
   onPress: () => void;
 }): ReactElement {
+  const colors = useColors();
+  const styles = useThemedStyles(createStyles);
   return (
     // La fila entera abre el detalle: un porcentaje de 40 puntos de ancho no es
     // un objetivo táctil, y aquí no hay ninguna otra acción que confundir.
@@ -897,14 +910,15 @@ function RoundRow({
         </Text>
       </View>
 
-      <Text style={[Type.metricSmall, { color: scoreTone(detail.accuracy) }]}>
+      <Text style={[Type.metricSmall, { color: scoreTone(colors, detail.accuracy) }]}>
         {detail.accuracy}%
       </Text>
     </Pressable>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   centered: {
     justifyContent: "center",
   },
@@ -963,8 +977,8 @@ const styles = StyleSheet.create({
     padding: Space.lg,
     borderRadius: Radius.xl,
     borderWidth: 1,
-    borderColor: Color.border.default,
-    backgroundColor: Color.surface.raised,
+    borderColor: c.border.default,
+    backgroundColor: c.surface.raised,
   },
   resultStats: {
     flexDirection: "row",
@@ -988,7 +1002,7 @@ const styles = StyleSheet.create({
     gap: Space.md,
     paddingVertical: Space.md,
     borderBottomWidth: 1,
-    borderBottomColor: Color.border.subtle,
+    borderBottomColor: c.border.subtle,
   },
   roundRowLast: {
     borderBottomWidth: 0,
@@ -1015,4 +1029,4 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: Space.xxs,
   },
-});
+  });

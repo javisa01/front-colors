@@ -19,13 +19,14 @@ import { SettingsButton } from "@/components/SettingsButton";
 import { Dial, HUB_RATIO } from "@/design/Dial";
 import { Flame } from "@/design/Flame";
 import { Icon } from "@/design/Icon";
+import { useColors, useThemedStyles } from "@/design/theme";
 import {
-  Color,
   Duration,
   HAIRLINE,
   Radius,
   Space,
   Type,
+  type Palette,
 } from "@/design/tokens";
 import { t } from "@/i18n";
 import { selectionTick } from "@/utils/haptics";
@@ -148,6 +149,8 @@ const DIAL_FREE_RATIO = 1.11;
 const VEIL_FADE = 132;
 
 export default function LandingScreen(): ReactElement {
+  const colors = useColors();
+  const styles = useThemedStyles(createStyles);
   const router = useRouter();
   const { width } = useWindowDimensions();
 
@@ -319,8 +322,8 @@ export default function LandingScreen(): ReactElement {
           <LinearGradient
             pointerEvents="none"
             colors={[
-              Color.surface.canvas,
-              Color.surface.canvas,
+              colors.surface.canvas,
+              colors.surface.canvas,
               "transparent",
             ]}
             locations={[0, headingBottom / (headingBottom + veilFade), 1]}
@@ -406,7 +409,7 @@ export default function LandingScreen(): ReactElement {
             accessibilityHint={t("dial.practice.body")}
           >
             <View style={styles.practiceIcon}>
-              <Icon name="palette" size={17} color={Color.spectrum.teal.icon} />
+              <Icon name="palette" size={17} color={colors.spectrum.teal.icon} />
             </View>
 
             <View style={styles.practiceBody}>
@@ -416,7 +419,7 @@ export default function LandingScreen(): ReactElement {
               </Text>
             </View>
 
-            <Icon name="chevronRight" size={18} color={Color.text.faint} />
+            <Icon name="chevronRight" size={18} color={colors.text.faint} />
           </Pressable>
         </View>
       </View>
@@ -424,10 +427,11 @@ export default function LandingScreen(): ReactElement {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: Color.surface.canvas,
+    backgroundColor: c.surface.canvas,
   },
   shell: {
     flex: 1,
@@ -452,7 +456,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   wordmark: {
-    color: Color.text.secondary,
+    color: c.text.secondary,
   },
   streak: {
     flexDirection: "row",
@@ -460,10 +464,10 @@ const styles = StyleSheet.create({
     gap: Space.sm,
   },
   streakText: {
-    color: Color.text.secondary,
+    color: c.text.secondary,
   },
   who: {
-    color: Color.text.muted,
+    color: c.text.muted,
   },
   veil: {
     position: "absolute",
@@ -505,15 +509,15 @@ const styles = StyleSheet.create({
     padding: Space.md,
     borderRadius: Radius.lg,
     borderWidth: HAIRLINE,
-    borderColor: Color.border.default,
+    borderColor: c.border.default,
     // La única superficie de la aplicación que deja ver lo que pasa por
     // debajo, junto con la pastilla de pestañas del online — y por el mismo
     // motivo: aquí, lo de debajo es la rueda.
-    backgroundColor: Color.surface.floating,
+    backgroundColor: c.surface.floating,
   },
   practicePressed: {
-    backgroundColor: Color.surface.interactive,
-    borderColor: Color.border.strong,
+    backgroundColor: c.surface.interactive,
+    borderColor: c.border.strong,
   },
   practiceIcon: {
     width: 34,
@@ -521,15 +525,15 @@ const styles = StyleSheet.create({
     borderRadius: Radius.pill,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Color.spectrum.teal.surface,
+    backgroundColor: c.spectrum.teal.surface,
     borderWidth: HAIRLINE,
-    borderColor: Color.spectrum.teal.border,
+    borderColor: c.spectrum.teal.border,
   },
   practiceBody: {
     flex: 1,
     gap: Space.xxs,
   },
   practiceNote: {
-    color: Color.text.muted,
+    color: c.text.muted,
   },
-});
+  });

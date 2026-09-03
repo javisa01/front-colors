@@ -3,46 +3,62 @@ import {
   memo,
   useContext,
   useMemo,
-  useState,
+  useSyncExternalStore,
   type ReactElement,
   type ReactNode,
 } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, type TextStyle } from "react-native";
 
-import { Color, type Palette } from "@/design/tokens";
+import { Color, Type, type Palette } from "@/design/tokens";
 
 /**
- * El interruptor de tema.
+ * El tema de la aplicación: las dos paletas y el interruptor.
  *
- * ## Qué hay hecho y qué falta
+ * ## Cómo está montado
  *
- * Hecho: existen **dos paletas completas** con la misma forma —la oscura son
- * los tokens de siempre, la clara está aquí abajo—, un proveedor que reparte
- * una de las dos, y `useThemedStyles`, que construye una hoja de estilos por
- * paleta y la memoriza. Cambiar de tema en caliente ya funciona en todo lo que
- * pase por esos dos ganchos.
+ * El modo activo vive en un **almacén de módulo**, no en el estado de ningún
+ * componente: exactamente el mismo patrón que el idioma en `@/i18n`
+ * (`activeLocale` + `setLocale` + `useLocale`). La razón es la misma allí y
+ * aquí: quien cambia el tema es la hoja de ajustes, quien lo lee es el layout
+ * raíz —para la clave de remontado y la barra de estado— y quien lo consume es
+ * cada componente vía contexto; un estado que necesitan tres capas distintas
+ * del árbol no puede ser de ninguna de ellas.
  *
- * Falta: **migrar el resto de las hojas de estilo**. Hoy casi toda la app llama
- * a `StyleSheet.create` en el ámbito del módulo leyendo `Color`, y eso se
- * evalúa una sola vez al importar: por muy bien que cambie la paleta, esos
- * estilos ya están congelados en oscuro. La migración es mecánica y va fichero
- * a fichero —`StyleSheet.create({...})` pasa a `useThemedStyles((c) => ({...}))`
- * y `Color.x` a `c.x`—, así que se puede hacer en tandas sin romper nada: lo ya
- * migrado responde al tema y lo demás se queda en oscuro, que es exactamente lo
- * que se ve hoy.
+ * `ThemeProvider` se limita a observar ese almacén y a repartir la paleta por
+ * contexto. `setThemeMode` es el único escritor.
  *
- * Migrados ya, como prueba de que la infraestructura aguanta: `Button` y la
- * barra de pestañas del modo online, que son los dos sitios donde el cambio de
- * tema se nota más.
+ * ## El cambio se aplica REMONTANDO la app, como el idioma
  *
- * ## Por qué no hay interruptor visible todavía
+ * Cambiar de tema cambia la `key` del navegador raíz (`app/_layout.tsx`), que
+ * vuelve a montar todas las pantallas. Es deliberado y necesario, por dos
+ * cosas que un re-render de contexto no cubre:
  *
- * Porque no se ha pedido uno. `mode` entra por props y su valor por defecto es
- * `"dark"`, así que la app se ve hoy exactamente igual que antes. Cuando toque
- * añadirlo, son tres cosas: guardar la preferencia en `utils/storage`, pasarla
- * como `mode` al proveedor del layout raíz, y llamar a `setMode` desde la hoja
- * de ajustes. Para seguir al sistema en vez de a una preferencia, el gancho es
- * `useColorScheme()` de `react-native` alimentando ese mismo `mode`.
+ *  1. **La tipografía.** `Type` es un objeto de módulo con el color dentro, y
+ *     se usa inline (`style={Type.body}`) en doscientos sitios. Sus colores se
+ *     reescriben en caliente (`applyTypeColors`) sobre los MISMOS objetos que
+ *     todo el mundo referencia, y el remontado es lo que garantiza que cada
+ *     `<Text>` vuelva a leerlos. Migrar los doscientos usos a un gancho sería
+ *     cambiar media app para el mismo resultado.
+ *  2. **El estado visual heredado.** Igual que con el idioma, remontar deja
+ *     cada pantalla recién pintada con la paleta nueva, sin estados intermedios
+ *     mezclando las dos.
+ *
+ * Como el remontado tira la hoja de ajustes con todo lo demás, el interruptor
+ * de los ajustes aplica el tema **al cerrar la hoja**, igual que el idioma y
+ * por la misma razón documentada en `SettingsSheet`.
+ *
+ * ## Qué tiene que hacer una hoja de estilos
+ *
+ * Pasar por `useThemedStyles((c) => StyleSheet.create({...}))` en vez de por un
+ * `StyleSheet.create` en el ámbito del módulo, y leer `c.x` en vez de `Color.x`:
+ * lo del ámbito del módulo se evalúa una sola vez al importar y se queda
+ * congelado en el tema con el que arrancó el proceso. `Color` sigue existiendo
+ * como la paleta oscura estática para lo que no es de interfaz (el color del
+ * canal de notificaciones, por ejemplo).
+ *
+ * Para seguir al sistema en vez de a una preferencia, el gancho sería
+ * `useColorScheme()` de `react-native` alimentando `setThemeMode`; hoy la
+ * preferencia es explícita del jugador y se guarda en el teléfono.
  */
 
 export type ThemeMode = "dark" | "light";
@@ -238,6 +254,95 @@ const PALETTES: Record<ThemeMode, Palette> = {
 };
 
 // ---------------------------------------------------------------------------
+// La tipografía cambia de tinta con el tema
+// ---------------------------------------------------------------------------
+
+/**
+ * Qué tinta de la paleta lleva cada escalón tipográfico.
+ *
+ * Es la misma asignación que los tokens hacen en oscuro (`design/tokens.ts`):
+ * titulares y cifras en tinta primaria, cuerpo en secundaria, metadatos en
+ * apagada. Está duplicada aquí a propósito, como tabla y no como lectura de los
+ * tokens, porque es lo que permite reaplicarla sobre cualquier paleta.
+ */
+const TYPE_INK: Record<keyof typeof Type, "primary" | "secondary" | "muted"> = {
+  display: "primary",
+  title: "primary",
+  heading: "primary",
+  body: "secondary",
+  bodyStrong: "primary",
+  caption: "muted",
+  label: "muted",
+  button: "primary",
+  metricHero: "primary",
+  metric: "primary",
+  metricSmall: "secondary",
+};
+
+/**
+ * Reescribe el color de cada escalón de `Type` **sobre los mismos objetos**.
+ *
+ * Es una mutación deliberada, y la única de todo el sistema de tema. `Type` se
+ * usa inline en doscientos sitios (`style={Type.body}`): esos sitios guardan la
+ * REFERENCIA al objeto, no una copia, y React Native vuelve a leer sus
+ * propiedades cada vez que el componente se pinta. Mutar aquí y remontar la app
+ * (la `key` del layout raíz) actualiza los doscientos de una vez; la
+ * alternativa —un gancho de tipografía— tocaría cada uno de ellos para llegar
+ * exactamente al mismo sitio.
+ *
+ * Se llama desde `setThemeMode`, siempre ANTES de avisar a los observadores:
+ * cuando el remontado repinta, la tinta ya es la del tema nuevo.
+ */
+function applyTypeColors(palette: Palette): void {
+  for (const [token, ink] of Object.entries(TYPE_INK) as [
+    keyof typeof Type,
+    "primary" | "secondary" | "muted",
+  ][]) {
+    (Type[token] as TextStyle).color = palette.text[ink];
+  }
+}
+
+// ---------------------------------------------------------------------------
+// El almacén del modo (el mismo patrón que `activeLocale` en @/i18n)
+// ---------------------------------------------------------------------------
+
+let activeThemeMode: ThemeMode = "dark";
+
+const listeners = new Set<() => void>();
+
+export function getThemeMode(): ThemeMode {
+  return activeThemeMode;
+}
+
+/**
+ * El único escritor del tema. Lo llaman dos sitios: el arranque, con la
+ * preferencia guardada, y la hoja de ajustes al cerrarse.
+ */
+export function setThemeMode(mode: ThemeMode): void {
+  if (mode === activeThemeMode) {
+    return;
+  }
+  activeThemeMode = mode;
+  // La tinta primero, el aviso después: ver `applyTypeColors`.
+  applyTypeColors(PALETTES[mode]);
+  for (const listener of listeners) {
+    listener();
+  }
+}
+
+function subscribe(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+/** El modo activo, como estado de React. Lo usa el layout raíz para la `key`. */
+export function useThemeMode(): ThemeMode {
+  return useSyncExternalStore(subscribe, getThemeMode, getThemeMode);
+}
+
+// ---------------------------------------------------------------------------
 // Proveedor
 // ---------------------------------------------------------------------------
 
@@ -258,21 +363,19 @@ interface ThemeValue {
 const ThemeContext = createContext<ThemeValue>({
   mode: "dark",
   colors: darkPalette,
-  setMode: () => {},
+  setMode: setThemeMode,
 });
 
-function ThemeProviderBase({
-  children,
-  mode: initialMode = "dark",
-}: {
-  children: ReactNode;
-  /** Tema inicial. Cuando exista la preferencia guardada, entra por aquí. */
-  mode?: ThemeMode;
-}): ReactElement {
-  const [mode, setMode] = useState<ThemeMode>(initialMode);
+/**
+ * Reparte por contexto lo que dice el almacén. No tiene estado propio: el modo
+ * es del almacén, y así la hoja de ajustes y el layout raíz —que no se ven
+ * entre sí— hablan del mismo valor sin pasárselo por props.
+ */
+function ThemeProviderBase({ children }: { children: ReactNode }): ReactElement {
+  const mode = useThemeMode();
 
   const value = useMemo<ThemeValue>(
-    () => ({ mode, colors: PALETTES[mode], setMode }),
+    () => ({ mode, colors: PALETTES[mode], setMode: setThemeMode }),
     [mode],
   );
 

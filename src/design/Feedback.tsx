@@ -16,12 +16,13 @@ import Animated, {
 
 import { Button } from "@/design/Button";
 import { Icon, type IconName } from "@/design/Icon";
+import { useColors, useThemedStyles } from "@/design/theme";
 import {
-  Color,
   Duration,
   Radius,
   Space,
   Type,
+  type Palette,
 } from "@/design/tokens";
 import { t } from "@/i18n";
 import { isHit } from "@/utils/colorScore";
@@ -40,37 +41,25 @@ import { isHit } from "@/utils/colorScore";
 
 type Tone = "neutral" | "accent" | "success" | "warning" | "danger";
 
-const TONE_SURFACE: Record<Tone, { backgroundColor: string; borderColor: string }> =
-  {
-    neutral: {
-      backgroundColor: Color.surface.raised,
-      borderColor: Color.border.default,
-    },
-    accent: {
-      backgroundColor: Color.accent.surface,
-      borderColor: Color.accent.border,
-    },
-    success: {
-      backgroundColor: Color.success.surface,
-      borderColor: Color.success.border,
-    },
-    warning: {
-      backgroundColor: Color.warning.surface,
-      borderColor: Color.warning.border,
-    },
-    danger: {
-      backgroundColor: Color.danger.surface,
-      borderColor: Color.danger.border,
-    },
-  };
+/*
+  Funciones de la paleta y no constantes: una constante de módulo se evalúa una
+  vez y se quedaría con los tonos del tema con el que arrancó el proceso.
+*/
+function toneSurface(
+  c: Palette,
+  tone: Tone,
+): { backgroundColor: string; borderColor: string } {
+  const source = tone === "neutral"
+    ? { backgroundColor: c.surface.raised, borderColor: c.border.default }
+    : { backgroundColor: c[tone === "accent" ? "accent" : tone].surface,
+        borderColor: c[tone === "accent" ? "accent" : tone].border };
+  return source;
+}
 
-const TONE_TEXT: Record<Tone, string> = {
-  neutral: Color.text.secondary,
-  accent: Color.accent.text,
-  success: Color.success.text,
-  warning: Color.warning.text,
-  danger: Color.danger.text,
-};
+function toneText(c: Palette, tone: Tone): string {
+  if (tone === "neutral") return c.text.secondary;
+  return c[tone].text;
+}
 
 interface PillProps {
   label: string;
@@ -84,12 +73,14 @@ function PillBase({
   tone = "neutral",
   icon,
 }: PillProps): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   return (
-    <View style={[styles.pill, TONE_SURFACE[tone]]}>
+    <View style={[styles.pill, toneSurface(colors, tone)]}>
       {icon != null ? (
-        <Icon name={icon} size={13} color={TONE_TEXT[tone]} />
+        <Icon name={icon} size={13} color={toneText(colors, tone)} />
       ) : null}
-      <Text style={[Type.label, { color: TONE_TEXT[tone] }]}>{label}</Text>
+      <Text style={[Type.label, { color: toneText(colors, tone) }]}>{label}</Text>
     </View>
   );
 }
@@ -109,10 +100,12 @@ function StatPillBase({
   value: string;
   tone?: Tone;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   return (
-    <View style={[styles.pill, styles.statPill, TONE_SURFACE[tone]]}>
+    <View style={[styles.pill, styles.statPill, toneSurface(colors, tone)]}>
       <Text style={Type.label}>{label}</Text>
-      <Text style={[Type.metricSmall, { color: TONE_TEXT[tone] }]}>
+      <Text style={[Type.metricSmall, { color: toneText(colors, tone) }]}>
         {value}
       </Text>
     </View>
@@ -129,16 +122,20 @@ export const StatPill = memo(StatPillBase);
  * la única excepción a que el color solo signifique estado: aquí la cifra *es*
  * el estado.
  */
-export function scoreTone(score: number): string {
+/*
+ * La paleta entra como parámetro porque esto no es un componente y no puede
+ * llamar a un gancho: quien pinta la cifra ya tiene `useColors()` y la trae.
+ */
+export function scoreTone(c: Palette, score: number): string {
   if (score >= 90) {
-    return Color.success.text;
+    return c.success.text;
   }
   // La línea entre el ámbar y el rojo es exactamente la de «acierto»: el color
   // y el marcador tienen que estar de acuerdo sobre si el intento valió.
   if (isHit(score)) {
-    return Color.warning.text;
+    return c.warning.text;
   }
-  return Color.danger.text;
+  return c.danger.text;
 }
 
 // ---------------------------------------------------------------------------
@@ -162,6 +159,8 @@ function ProgressBarBase({
   value: number;
   tone?: "accent" | "success";
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const progress = useSharedValue(0);
 
   useEffect(() => {
@@ -179,7 +178,7 @@ function ProgressBarBase({
           styles.progressFill,
           {
             backgroundColor:
-              tone === "success" ? Color.success.default : Color.accent.default,
+              tone === "success" ? colors.success.default : colors.accent.default,
           },
           fillStyle,
         ]}
@@ -205,6 +204,7 @@ function StatBase({
   /** Contexto de la cifra: «de 1.240 jugadores». */
   hint?: string;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.stat}>
       <Text style={Type.metric}>{value}</Text>
@@ -234,6 +234,8 @@ function StarRatingBase({
   total?: number;
   size?: number;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   return (
     <View
       style={styles.stars}
@@ -246,7 +248,7 @@ function StarRatingBase({
           name="star"
           size={size}
           filled={index < value}
-          color={index < value ? Color.warning.default : Color.text.faint}
+          color={index < value ? colors.warning.default : colors.text.faint}
         />
       ))}
     </View>
@@ -301,10 +303,12 @@ function ErrorBannerBase({
   retryLabel?: string;
   style?: StyleProp<ViewStyle>;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   return (
     <View style={[styles.banner, style]} accessibilityRole="alert">
       <View style={styles.bannerIcon}>
-        <Icon name="alert" size={20} color={Color.danger.default} />
+        <Icon name="alert" size={20} color={colors.danger.default} />
       </View>
 
       <View style={styles.bannerBody}>
@@ -338,10 +342,12 @@ function EmptyStateBase({
   title: string;
   hint?: string;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   return (
     <View style={styles.empty}>
       <View style={styles.emptyIcon}>
-        <Icon name={icon} size={22} color={Color.text.muted} />
+        <Icon name={icon} size={22} color={colors.text.muted} />
       </View>
       <Text style={[Type.bodyStrong, styles.centered]}>{title}</Text>
       {hint != null ? (
@@ -355,9 +361,11 @@ export const EmptyState = memo(EmptyStateBase);
 
 /** Indicador de carga con rótulo. */
 function LoadingBase({ label }: { label: string }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   return (
     <View style={styles.loading}>
-      <ActivityIndicator color={Color.accent.default} />
+      <ActivityIndicator color={colors.accent.default} />
       <Text style={[Type.caption, styles.loadingLabel]}>{label}</Text>
     </View>
   );
@@ -365,7 +373,8 @@ function LoadingBase({ label }: { label: string }): ReactElement {
 
 export const Loading = memo(LoadingBase);
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   pill: {
     flexDirection: "row",
     alignItems: "center",
@@ -382,9 +391,9 @@ const styles = StyleSheet.create({
   progressTrack: {
     height: 6,
     borderRadius: Radius.pill,
-    backgroundColor: Color.surface.sunken,
+    backgroundColor: c.surface.sunken,
     borderWidth: 1,
-    borderColor: Color.border.subtle,
+    borderColor: c.border.subtle,
     overflow: "hidden",
   },
   progressFill: {
@@ -401,7 +410,7 @@ const styles = StyleSheet.create({
   },
   statHint: {
     marginTop: Space.xxs,
-    color: Color.text.faint,
+    color: c.text.faint,
     textAlign: "center",
   },
   stars: {
@@ -414,11 +423,11 @@ const styles = StyleSheet.create({
     gap: Space.md,
     padding: Space.lg,
     borderRadius: Radius.md,
-    backgroundColor: Color.danger.surface,
+    backgroundColor: c.danger.surface,
     borderWidth: 1,
     // El rojo vivo, no el canto apagado que usan las pastillas. Es la única
     // superficie de la app cuyo trabajo es interrumpir.
-    borderColor: Color.danger.default,
+    borderColor: c.danger.default,
     // El aire va con el componente. Ver la nota de `ErrorBannerBase`.
     marginTop: Space.md,
     marginBottom: Space.lg,
@@ -432,7 +441,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bannerMessage: {
-    color: Color.danger.text,
+    color: c.danger.text,
   },
   bannerAction: {
     marginTop: Space.md,
@@ -449,9 +458,9 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Color.surface.raised,
+    backgroundColor: c.surface.raised,
     borderWidth: 1,
-    borderColor: Color.border.default,
+    borderColor: c.border.default,
     marginBottom: Space.lg,
   },
   emptyHint: {
@@ -469,4 +478,4 @@ const styles = StyleSheet.create({
   loadingLabel: {
     marginTop: Space.md,
   },
-});
+  });

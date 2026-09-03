@@ -20,7 +20,13 @@ import { ColorWheel, WHEEL_SIDE_EXTRA } from "@/components/ColorWheel";
 import { SoftGlow } from "@/design/Ambient";
 import { Button } from "@/design/Button";
 import { RoundRing } from "@/design/RoundRing";
-import { Color, Radius, Space, Type } from "@/design/tokens";
+import { useColors, useThemedStyles } from "@/design/theme";
+import {
+  Radius,
+  Space,
+  Type,
+  type Palette,
+} from "@/design/tokens";
 import { t } from "@/i18n";
 import type { HSVColor } from "@/types/challenge";
 import { hexToHSV, hsvToHex } from "@/utils/color";
@@ -94,6 +100,8 @@ const HALO_SIZE = 170;
 type Phase = "welcome" | "memorize" | "find" | "result";
 
 export default function WelcomeScreen(): ReactElement {
+  const colors = useColors();
+  const styles = useThemedStyles(createStyles);
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -262,7 +270,7 @@ export default function WelcomeScreen(): ReactElement {
     const stepMs = 42;
     for (let i = 1; i <= steps; i += 1) {
       later(() => {
-        setPaint(mixHex(TUTORIAL_COLOR, Color.border.strong, i / steps));
+        setPaint(mixHex(TUTORIAL_COLOR, colors.border.strong, i / steps));
       }, i * stepMs);
     }
 
@@ -289,7 +297,7 @@ export default function WelcomeScreen(): ReactElement {
         ),
       );
     }, steps * stepMs);
-  }, [busy, haloOn, hint, later, ripple, step]);
+  }, [busy, colors.border.strong, haloOn, hint, later, ripple, step]);
 
   // ------------------------------------------------------- la nota
   const check = useCallback(() => {
@@ -461,7 +469,7 @@ export default function WelcomeScreen(): ReactElement {
           pusiste, lo que era. Unos puntos numerados no codificarían nada.
         */}
         <View style={styles.strip}>
-          <Chip color={phase === "memorize" ? null : Color.border.strong} />
+          <Chip color={phase === "memorize" ? null : colors.border.strong} />
           <Chip color={phase === "result" ? mineHex : null} />
           <Chip color={phase === "result" ? TUTORIAL_COLOR : null} />
         </View>
@@ -695,6 +703,7 @@ const CAP_POINTS = (() => {
 })();
 
 function Cap({ size, color }: { size: number; color: string }): ReactElement {
+  const colors = useColors();
   return (
     <Svg width={size} height={size} viewBox="0 0 160 160">
       <Polygon points={CAP_POINTS} fill={color} />
@@ -703,15 +712,16 @@ function Cap({ size, color }: { size: number; color: string }): ReactElement {
         cy={80}
         r={37}
         fill="none"
-        stroke={Color.text.primary}
+        stroke={colors.text.primary}
         strokeWidth={7}
       />
-      <Circle cx={80} cy={80} r={15} fill={Color.surface.canvas} />
+      <Circle cx={80} cy={80} r={15} fill={colors.surface.canvas} />
     </Svg>
   );
 }
 
 function Chip({ color }: { color: string | null }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   return (
     <View
       style={[
@@ -729,6 +739,7 @@ function Swatch({
   color: string;
   label: string;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.swatch}>
       <View style={[styles.swatchFill, { backgroundColor: color }]} />
@@ -759,10 +770,11 @@ function mixHex(from: string, to: string, amount: number): string {
   return `#${mix(r1, r2)}${mix(g1, g2)}${mix(b1, b2)}`.toUpperCase();
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: Color.surface.canvas,
+    backgroundColor: c.surface.canvas,
     paddingHorizontal: Space.xl,
   },
 
@@ -782,9 +794,9 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 8,
     borderRadius: Radius.sm,
-    backgroundColor: Color.surface.sunken,
+    backgroundColor: c.surface.sunken,
     borderWidth: 1,
-    borderColor: Color.border.subtle,
+    borderColor: c.border.subtle,
   },
   legend: {
     flexDirection: "row",
@@ -863,8 +875,8 @@ const styles = StyleSheet.create({
     padding: Space.md,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: Color.border.default,
-    backgroundColor: Color.surface.raised,
+    borderColor: c.border.default,
+    backgroundColor: c.surface.raised,
   },
   swatchFill: {
     height: 44,
@@ -886,7 +898,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     left: 0,
-    backgroundColor: Color.surface.canvas,
+    backgroundColor: c.surface.canvas,
     alignItems: "center",
     justifyContent: "center",
     gap: Space.lg,
@@ -914,7 +926,7 @@ const styles = StyleSheet.create({
     height: BALL + 44,
     borderRadius: (BALL + 44) / 2,
     borderWidth: 1,
-    borderColor: Color.accent.text,
+    borderColor: c.accent.text,
   },
   ball: {
     position: "absolute",
@@ -929,15 +941,15 @@ const styles = StyleSheet.create({
     tercero donde se tocan.
   */
   ballViolet: {
-    backgroundColor: Color.ambient.violet[0],
+    backgroundColor: c.ambient.violet[0],
     opacity: 0.76,
   },
   ballRose: {
-    backgroundColor: Color.ambient.rose[0],
+    backgroundColor: c.ambient.rose[0],
     opacity: 0.76,
   },
   cta: {
     marginTop: Space.md,
     textAlign: "center",
   },
-});
+  });

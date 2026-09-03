@@ -18,13 +18,14 @@ import {
   SectionHeader,
   useIsTablet,
 } from "@/design/Layout";
+import { useColors, useThemedStyles } from "@/design/theme";
 import {
-  Color,
   Duration,
   PARTY_TONE,
   Radius,
   Space,
   Type,
+  type Palette,
 } from "@/design/tokens";
 import { INITIAL_HSV } from "@/hooks/useChallenge";
 import { useParty } from "@/hooks/useParty";
@@ -98,6 +99,8 @@ interface PartyGameProps {
 }
 
 function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
+  const colors = useColors();
+  const styles = useThemedStyles(createStyles);
   const { width, height } = useWindowDimensions();
   const isTablet = useIsTablet();
 
@@ -500,7 +503,7 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
             <Text style={Type.label}>{t("result.kicker")}</Text>
             {/* La cifra lleva un «%» detrás, así que es la precisión lo que
                 tiene que salir aquí, nunca los puntos ya penalizados. */}
-            <Text style={[Type.metricHero, { color: scoreTone(lastAccuracy) }]}>
+            <Text style={[Type.metricHero, { color: scoreTone(colors, lastAccuracy) }]}>
               {lastAccuracy}%
             </Text>
           </Animated.View>
@@ -559,7 +562,7 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
               name={guess.name}
               swatch={guess.guessHex}
               value={`${guess.accuracy}%`}
-              valueTone={scoreTone(guess.accuracy)}
+              valueTone={scoreTone(colors, guess.accuracy)}
               highlight={index === 0}
               last={index === roundGuesses.length - 1}
             />
@@ -686,6 +689,8 @@ function RankRow({
   highlight: boolean;
   last: boolean;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   return (
     <View style={[styles.rankRow, last && styles.rankRowLast]}>
       <View
@@ -694,7 +699,7 @@ function RankRow({
         accessibilityLabel={t("a11y.rank", { position })}
       >
         {highlight ? (
-          <Icon name="trophy" size={16} color={Color.warning.default} />
+          <Icon name="trophy" size={16} color={colors.warning.default} />
         ) : (
           <Text style={Type.metricSmall}>{position}</Text>
         )}
@@ -715,7 +720,8 @@ function RankRow({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   block: {
     marginBottom: Space.lg,
   },
@@ -792,7 +798,7 @@ const styles = StyleSheet.create({
     marginTop: Space.xs,
     // El récord es el único texto en color de la tarjeta: es lo que hay que ver
     // de un vistazo al terminar, por encima de la media de esta partida.
-    color: Color.accent.text,
+    color: c.accent.text,
   },
   correctBlock: {
     flexDirection: "row",
@@ -810,7 +816,7 @@ const styles = StyleSheet.create({
   },
   correctHex: {
     marginTop: Space.xxs,
-    color: Color.text.primary,
+    color: c.text.primary,
   },
   divider: {
     marginVertical: Space.lg,
@@ -821,7 +827,7 @@ const styles = StyleSheet.create({
     gap: Space.md,
     paddingVertical: Space.md,
     borderBottomWidth: 1,
-    borderBottomColor: Color.border.subtle,
+    borderBottomColor: c.border.subtle,
   },
   rankRowLast: {
     borderBottomWidth: 0,
@@ -845,4 +851,4 @@ const styles = StyleSheet.create({
     gap: Space.sm,
     marginTop: Space.lg,
   },
-});
+  });

@@ -21,14 +21,15 @@ import { IconButton } from "@/design/Button";
 import { EmptyState, ErrorBanner, Loading, Pill } from "@/design/Feedback";
 import { Icon } from "@/design/Icon";
 import { Screen } from "@/design/Layout";
+import { useColors, useThemedStyles } from "@/design/theme";
 import {
-  Color,
   DISABLED_OPACITY,
   HIT_SLOP,
   Radius,
   SECTION_TONE,
   Space,
   Type,
+  type Palette,
 } from "@/design/tokens";
 import { useGroupChat } from "@/hooks/useGroupChat";
 import { t } from "@/i18n";
@@ -77,6 +78,8 @@ import { useSession } from "@/online/session";
  * la entrada y el sitio al que lleva son el mismo objeto.
  */
 export default function GroupChatScreen(): ReactElement {
+  const colors = useColors();
+  const styles = useThemedStyles(createStyles);
   const { api, user } = useSession();
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -172,7 +175,9 @@ export default function GroupChatScreen(): ReactElement {
       ) : (
         <MessageBubble row={row} onRetry={retry} onDiscard={discard} />
       ),
-    [discard, retry],
+    // `styles` cambia de identidad al cambiar de tema; sin él en las
+    // dependencias, la fila del separador se quedaría con la hoja anterior.
+    [discard, retry, styles.daySeparator],
   );
 
   const finished = group?.status === "finished";
@@ -243,7 +248,7 @@ export default function GroupChatScreen(): ReactElement {
         */}
         {stale && !error ? (
           <View style={styles.stale}>
-            <Icon name="wifiOff" size={14} color={Color.text.muted} />
+            <Icon name="wifiOff" size={14} color={colors.text.muted} />
             <Text style={[Type.caption, styles.staleText]}>
               {t("online.chat.stale")}
             </Text>
@@ -325,6 +330,8 @@ function MessageBubble({
   onRetry: (id: string) => void;
   onDiscard: (id: string) => void;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const { item, mine, leading, trailing } = row;
   const tint = playerTint(item.author.username);
   const failed = item.state === "failed";
@@ -363,7 +370,7 @@ function MessageBubble({
               // La propia va maciza con tu tono, como tu fila del podio; la
               // ajena se apoya en la superficie de siempre y solo lleva el
               // color de su autor en el canto.
-              backgroundColor: mine ? tint.fill : Color.surface.raised,
+              backgroundColor: mine ? tint.fill : colors.surface.raised,
               borderColor: tint.border,
             },
             // El pico, solo al cerrar la intervención y del lado de quien habla.
@@ -446,6 +453,8 @@ function Composer({
   onSubmit: () => void;
   bottomInset: number;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const trimmed = value.trim();
   const over = trimmed.length - MESSAGE_MAX_LENGTH;
   const canSend = trimmed.length > 0 && over <= 0;
@@ -478,7 +487,7 @@ function Composer({
           value={value}
           onChangeText={onChangeText}
           placeholder={t("online.chat.placeholder")}
-          placeholderTextColor={Color.text.faint}
+          placeholderTextColor={colors.text.faint}
           style={[Type.body, styles.input]}
           multiline
           // Sin tope duro: pasarse tiene que poder verse y corregirse. Lo que
@@ -495,8 +504,8 @@ function Composer({
           size={18}
           color={
             canSend
-              ? Color.spectrum[SECTION_TONE.groups].ink
-              : Color.text.faint
+              ? colors.spectrum[SECTION_TONE.groups].ink
+              : colors.text.faint
           }
           style={[styles.sendButton, canSend && styles.sendButtonReady]}
         />
@@ -505,7 +514,8 @@ function Composer({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   shell: {
     // La conversación tiene que poder ocupar todo el alto disponible, y el
     // relleno inferior de una pantalla normal lo pone aquí el campo de
@@ -527,7 +537,7 @@ const styles = StyleSheet.create({
   },
   eyebrow: {
     marginBottom: Space.xs,
-    color: Color.accent.text,
+    color: c.accent.text,
   },
   headHint: {
     marginTop: Space.xxs,
@@ -542,9 +552,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: Space.md,
     marginBottom: Space.sm,
     borderRadius: Radius.md,
-    backgroundColor: Color.surface.sunken,
+    backgroundColor: c.surface.sunken,
     borderWidth: 1,
-    borderColor: Color.border.subtle,
+    borderColor: c.border.subtle,
   },
   staleText: {
     flex: 1,
@@ -607,7 +617,7 @@ const styles = StyleSheet.create({
     opacity: DISABLED_OPACITY + 0.35,
   },
   bubbleFailed: {
-    borderColor: Color.danger.border,
+    borderColor: c.danger.border,
   },
   author: {
     marginBottom: Space.xxs,
@@ -615,12 +625,12 @@ const styles = StyleSheet.create({
   body: {
     // El cuerpo de un mensaje es el contenido principal de la pantalla, no un
     // texto de apoyo: va en el claro de los títulos, no en el gris del cuerpo.
-    color: Color.text.primary,
+    color: c.text.primary,
   },
   time: {
     marginTop: Space.xxs,
     marginHorizontal: Space.xs,
-    color: Color.text.faint,
+    color: c.text.faint,
   },
   failedRow: {
     flexDirection: "row",
@@ -630,28 +640,28 @@ const styles = StyleSheet.create({
     marginHorizontal: Space.xs,
   },
   failedText: {
-    color: Color.danger.text,
+    color: c.danger.text,
   },
   failedAction: {
-    color: Color.accent.text,
+    color: c.accent.text,
   },
   failedDiscard: {
-    color: Color.text.muted,
+    color: c.text.muted,
   },
 
   // -- Campo de escritura ---------------------------------------------------
   composer: {
     paddingTop: Space.md,
     borderTopWidth: 1,
-    borderTopColor: Color.border.subtle,
+    borderTopColor: c.border.subtle,
   },
   counter: {
     alignSelf: "flex-end",
     marginBottom: Space.xs,
-    color: Color.text.muted,
+    color: c.text.muted,
   },
   counterOver: {
-    color: Color.danger.text,
+    color: c.danger.text,
   },
   inputShell: {
     flexDirection: "row",
@@ -661,16 +671,16 @@ const styles = StyleSheet.create({
     paddingRight: Space.xs,
     paddingVertical: Space.xs,
     borderRadius: Radius.xl,
-    backgroundColor: Color.surface.sunken,
+    backgroundColor: c.surface.sunken,
     borderWidth: 1,
-    borderColor: Color.border.default,
+    borderColor: c.border.default,
   },
   inputShellOver: {
-    borderColor: Color.danger.border,
+    borderColor: c.danger.border,
   },
   input: {
     flex: 1,
-    color: Color.text.primary,
+    color: c.text.primary,
     paddingVertical: Space.sm,
     // Cinco renglones y a partir de ahí el propio campo hace scroll: un mensaje
     // muy largo no puede comerse la conversación que se está escribiendo.
@@ -678,9 +688,9 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     borderRadius: Radius.pill,
-    backgroundColor: Color.surface.interactive,
+    backgroundColor: c.surface.interactive,
   },
   sendButtonReady: {
-    backgroundColor: Color.spectrum[SECTION_TONE.groups].pigment,
+    backgroundColor: c.spectrum[SECTION_TONE.groups].pigment,
   },
-});
+  });

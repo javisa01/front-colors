@@ -12,6 +12,7 @@ import {
 import { ApiClient } from "@/api/client";
 import { createApi, type Api } from "@/api/endpoints";
 import type { PrivateProfile } from "@/api/types";
+import { unregisterPush } from "@/online/push";
 import { clearUser, loadUser, saveUser } from "@/online/sessionStorage";
 import { clearLanding } from "@/utils/storage";
 
@@ -142,13 +143,22 @@ export function SessionProvider({
   }, [api, isLoaded, isSignedIn, userId]);
 
   const logout = useCallback(async () => {
+    /*
+      Primero el teléfono, y antes de cerrar la sesión de Clerk.
+
+      Sin esto, quien sale de su cuenta seguiría recibiendo en ese móvil los
+      avisos de los grupos de los que ya no ve nada. Y va antes que el
+      `signOut` porque la baja es una petición autenticada: después ya no
+      habría token con el que hacerla.
+    */
+    await unregisterPush(api);
     await clearUser();
     // La portada tiene que apagar la rueda al volver. Es la contrapartida de
     // que sea el área online quien le cuenta lo que pasa: si no se borra aquí,
     // la raíz seguiría ofreciendo «Jugar» a quien acaba de salirse.
     await clearLanding();
     await clerk.signOut();
-  }, [clerk]);
+  }, [api, clerk]);
 
   const reloadUser = useCallback(async () => {
     const { user: fresh } = await api.users.me();

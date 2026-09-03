@@ -12,7 +12,10 @@ import Animated, {
 } from "react-native-reanimated";
 import Svg, { Ellipse, Path } from "react-native-svg";
 
-import { Color } from "@/design/tokens";
+import { useColors, useThemedStyles } from "@/design/theme";
+import {
+  type Palette,
+} from "@/design/tokens";
 
 /**
  * La llama de la racha.
@@ -138,6 +141,8 @@ function useFlicker(durationMs: number, enabled: boolean): SharedValue<number> {
 }
 
 function FlameBase({ size = 24, lit }: FlameProps): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const body = useFlicker(BODY_MS, lit);
   const tongue = useFlicker(TONGUE_MS, lit);
   const core = useFlicker(CORE_MS, lit);
@@ -186,8 +191,8 @@ function FlameBase({ size = 24, lit }: FlameProps): ReactElement {
     };
   });
 
-  const outer = lit ? Color.ember.outer : Color.ember.dimOuter;
-  const inner = lit ? Color.ember.inner : Color.ember.dimInner;
+  const outer = lit ? colors.ember.outer : colors.ember.dimOuter;
+  const inner = lit ? colors.ember.inner : colors.ember.dimInner;
 
   return (
     <View style={{ width, height: size }} pointerEvents="none">
@@ -216,7 +221,7 @@ function FlameBase({ size = 24, lit }: FlameProps): ReactElement {
       {lit ? (
         <Animated.View style={[styles.layer, styles.fromBase, coreStyle]}>
           <Svg width={width} height={size} viewBox="0 0 24 30">
-            <Ellipse cx="12" cy="23" rx="2" ry="3.2" fill={Color.ember.core} />
+            <Ellipse cx="12" cy="23" rx="2" ry="3.2" fill={colors.ember.core} />
           </Svg>
         </Animated.View>
       ) : null}
@@ -226,7 +231,8 @@ function FlameBase({ size = 24, lit }: FlameProps): ReactElement {
 
 export const Flame = memo(FlameBase);
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   layer: {
     ...StyleSheet.absoluteFill,
     alignItems: "center",
@@ -235,4 +241,4 @@ const styles = StyleSheet.create({
   fromBase: {
     transformOrigin: "bottom",
   },
-});
+  });

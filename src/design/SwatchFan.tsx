@@ -12,7 +12,13 @@ import Animated, {
   type SharedValue,
 } from "react-native-reanimated";
 
-import { Color, Motion, Radius, type SpectrumTone } from "@/design/tokens";
+import { useColors, useThemedStyles } from "@/design/theme";
+import {
+  Motion,
+  Radius,
+  type Palette,
+  type SpectrumTone,
+} from "@/design/tokens";
 
 /**
  * El abanico de muestras.
@@ -105,6 +111,7 @@ function SwatchFanBase({
    */
   replay?: number;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
   const sway = useSharedValue(0);
 
   useEffect(() => {
@@ -150,6 +157,8 @@ function Chip({
   sway: SharedValue<number>;
   replay: number;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   /** Su sitio en el abanico abierto: de −SPREAD a +SPREAD, repartido. */
   const target = -SPREAD + (index * (SPREAD * 2)) / (CHIPS.length - 1);
 
@@ -187,7 +196,7 @@ function Chip({
     <Animated.View
       style={[
         styles.chip,
-        { backgroundColor: Color.spectrum[tone].pigment },
+        { backgroundColor: colors.spectrum[tone].pigment },
         chipStyle,
       ]}
     >
@@ -198,13 +207,14 @@ function Chip({
         pedirle al ojo que lea algo que no significa nada.
       */}
       <View
-        style={[styles.chipFoot, { backgroundColor: Color.spectrum[tone].ink }]}
+        style={[styles.chipFoot, { backgroundColor: colors.spectrum[tone].ink }]}
       />
     </Animated.View>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   stage: {
     height: CHIP_HEIGHT + 26,
     alignItems: "center",
@@ -224,4 +234,4 @@ const styles = StyleSheet.create({
     // pigmento, no como una segunda muestra de otro color pegada debajo.
     opacity: 0.45,
   },
-});
+  });

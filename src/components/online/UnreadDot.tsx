@@ -1,7 +1,13 @@
 import { memo, type ReactElement } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Color, Radius, Space, Type } from "@/design/tokens";
+import { useThemedStyles } from "@/design/theme";
+import {
+  Radius,
+  Space,
+  Type,
+  type Palette,
+} from "@/design/tokens";
 import { t } from "@/i18n";
 
 /**
@@ -49,6 +55,7 @@ function UnreadDotBase({
    */
   label?: string | null;
 }): ReactElement | null {
+  const styles = useThemedStyles(createStyles);
   if (count <= 0) {
     return null;
   }
@@ -82,16 +89,17 @@ function UnreadDotBase({
 
 export const UnreadDot = memo(UnreadDotBase);
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   dot: {
     width: 10,
     height: 10,
     borderRadius: Radius.pill,
-    backgroundColor: Color.danger.default,
+    backgroundColor: c.danger.default,
     // El aro del lienzo, no un borde propio: separa el punto de la superficie
     // que tenga debajo sin inventarse un color más.
     borderWidth: 2,
-    borderColor: Color.surface.canvas,
+    borderColor: c.surface.canvas,
   },
   badge: {
     width: "auto",
@@ -105,7 +113,7 @@ const styles = StyleSheet.create({
     ...Type.label,
     // Casi negro sobre el rojo, como el resto de las tintas de la paleta: es lo
     // que hace que la cifra parezca impresa en el punto y no pegada encima.
-    color: Color.danger.surface,
+    color: c.danger.surface,
     letterSpacing: 0,
   },
-});
+  });

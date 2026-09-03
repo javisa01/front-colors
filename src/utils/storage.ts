@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import type { ThemeMode } from "@/design/theme";
 import { isLocale, type Locale } from "@/i18n";
 import type { GameMode, PartyMode } from "@/types/challenge";
 
@@ -36,7 +37,7 @@ const KEYS = {
   musicVolume: `${PREFIX}musicVolume`,
   sfxVolume: `${PREFIX}sfxVolume`,
   language: `${PREFIX}language`,
-  groupNotifications: (groupId: string) => `${PREFIX}groupNotify:${groupId}`,
+  theme: `${PREFIX}theme`,
   tutorialSeen: `${PREFIX}tutorialSeen`,
   practiceTourSeen: `${PREFIX}practiceTourSeen`,
   onlineTourSeen: `${PREFIX}onlineTourSeen`,
@@ -244,72 +245,51 @@ export async function setLanguage(locale: Locale): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// Avisos de un grupo
+// Tema
 // ---------------------------------------------------------------------------
 
 /**
- * Si el jugador quiere que un grupo le llame la atención.
+ * El tema elegido, o `null` si nunca se ha tocado.
  *
- * Gobierna **el punto rojo** de ese grupo: en la lista, en el menú y en la
- * pestaña. Apagado, los avisos se siguen creando en el servidor y se siguen
- * leyendo al abrir el grupo —lo que pasó, pasó—; lo que no ocurre es que el
- * grupo interrumpa.
- *
- * Vive en el teléfono y no en el servidor **a propósito, y de momento**: no hay
- * push, así que el servidor no tiene ninguna decisión que tomar con esto. Es
- * una preferencia de esta pantalla, y silenciar un grupo en el móvil no tiene
- * por qué silenciarlo en la tableta. Cuando exista el push de verdad, pasa a
- * `PATCH /groups/:id/members/me` y este par de funciones se queda como caché.
- *
- * Por defecto **encendido**: quien entra en un grupo quiere enterarse de lo que
- * pasa en él.
+ * `null` significa «el de siempre»: la app nació oscura y así se queda mientras
+ * nadie diga lo contrario, igual que el idioma cae al del teléfono. Se valida
+ * el valor leído porque el almacenamiento sobrevive a versiones de la app: un
+ * valor desconocido cae a `null`, no revienta.
  */
-export async function getGroupNotifications(groupId: string): Promise<boolean> {
-  const value = await readJSON<boolean>(KEYS.groupNotifications(groupId));
-  return typeof value === "boolean" ? value : true;
+export async function getThemeMode(): Promise<ThemeMode | null> {
+  const value = await readJSON<string>(KEYS.theme);
+  return value === "light" || value === "dark" ? value : null;
 }
 
-export async function setGroupNotifications(
-  groupId: string,
-  enabled: boolean,
-): Promise<void> {
-  await writeJSON(KEYS.groupNotifications(groupId), enabled);
+export async function setThemeMode(mode: ThemeMode): Promise<void> {
+  await writeJSON(KEYS.theme, mode);
 }
 
-/**
- * Qué grupos tienen los avisos apagados, en una sola lectura.
- *
- * La preferencia se guarda con una clave por grupo, que es lo cómodo para la
- * pantalla de ajustes —lee y escribe una—, pero lo caro para las listas, que
- * necesitan todas a la vez. `multiGet` las trae de una tacada.
- *
- * El resultado se indexa por clave y no por posición: `multiGet` devuelve los
- * pares en el orden pedido en las implementaciones que usamos, pero no es algo
- * que el contrato garantice, y confiar en ello silenciaría el grupo equivocado.
- *
- * Ante cualquier fallo devuelve el conjunto vacío: **nadie silenciado**. Es el
- * fallo bueno; perder un punto rojo es peor que enseñar uno de más.
- */
-export async function getMutedGroups(groupIds: string[]): Promise<Set<string>> {
-  if (groupIds.length === 0) {
-    return new Set();
-  }
+// ---------------------------------------------------------------------------
+// Avisos de un grupo: ya no viven aquí
+// ---------------------------------------------------------------------------
 
-  try {
-    const pairs = await AsyncStorage.multiGet(
-      groupIds.map((id) => KEYS.groupNotifications(id)),
-    );
-    const byKey = new Map(pairs.map(([key, value]) => [key, value]));
+/*
+  Aquí estaban `getGroupNotifications`, `setGroupNotifications` y
+  `getMutedGroups`, y ya no hacen falta.
 
-    return new Set(
-      groupIds.filter(
-        (id) => byKey.get(KEYS.groupNotifications(id)) === "false",
-      ),
-    );
-  } catch {
-    return new Set();
-  }
-}
+  La preferencia vivía en el teléfono porque no había push: el servidor no tenía
+  ninguna decisión que tomar con ella y silenciar un grupo era solo apagar un
+  punto rojo local. Ahora el servidor manda avisos de verdad al teléfono, así
+  que es él quien tiene que saber a quién no escribir, y la preferencia se
+  guarda en `group_notification_prefs` y viaja con cada grupo como
+  `notificationsEnabled`.
+
+  La ganancia no es solo de arquitectura: el interruptor cumple lo que promete
+  en los dos sentidos —ni empujones ni punto rojo— y apagarlo en el móvil lo
+  apaga también en la tableta.
+
+  Las claves `colors:groupNotify:<id>` que quedaran escritas en instalaciones
+  antiguas se vuelven inertes. No se borran a propósito: un barrido de claves al
+  arrancar cuesta más que los pocos bytes que ocupan.
+
+  Ver `GET /api/groups`, `PUT /api/groups/:id/notifications` y `@/online/push`.
+*/
 
 // ---------------------------------------------------------------------------
 // El tutorial de la primera vez

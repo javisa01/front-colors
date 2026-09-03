@@ -74,7 +74,7 @@ export default function GroupsScreen(): ReactElement {
     try {
       const { groups: mine } = await api.groups.list();
       // El punto rojo de un grupo silenciado no se pinta (ajustes del grupo).
-      setGroups(sortGroups(await silenceMutedGroups(mine)));
+      setGroups(sortGroups(silenceMutedGroups(mine)));
     } catch (loadError) {
       setError(describeError(loadError));
     }

@@ -126,6 +126,18 @@ export function createApi(client: ApiClient) {
           method: "POST",
         }),
 
+      /**
+       * Enciende o apaga los avisos de un grupo, **solo para quien lo pide**.
+       *
+       * Es de cualquier miembro, no del `owner`: silenciar un grupo es una
+       * decisión sobre el propio teléfono. Devuelve la ficha entera ya al día.
+       */
+      setNotifications: (groupId: string, enabled: boolean) =>
+        client.request<{ group: GroupDetail }>(
+          `/groups/${groupId}/notifications`,
+          { method: "PUT", body: { enabled } },
+        ),
+
       leave: (groupId: string) =>
         client.request<null>(`/groups/${groupId}/members/me`, {
           method: "DELETE",
@@ -231,6 +243,29 @@ export function createApi(client: ApiClient) {
         client.request<{ unreadCount: number }>("/notifications/read", {
           method: "POST",
           body: ids ? { ids } : {},
+        }),
+    },
+
+    /**
+     * Los avisos que llegan al teléfono con la app cerrada.
+     *
+     * Aquí solo se da de alta y de baja el dispositivo: **el texto lo escribe
+     * el servidor**, porque cuando el teléfono enseña el aviso no hay nadie
+     * ejecutando la app que pudiera traducirlo. Por eso se manda el idioma
+     * junto al token. Ver `@/online/push`.
+     */
+    push: {
+      register: (input: {
+        token: string;
+        platform: "ios" | "android" | "web";
+        locale: string;
+      }) => client.request<null>("/push/tokens", { method: "POST", body: input }),
+
+      /** Al cerrar sesión. Es idempotente: un token que ya no estaba también vale. */
+      unregister: (token: string) =>
+        client.request<null>("/push/tokens", {
+          method: "DELETE",
+          body: { token },
         }),
     },
 

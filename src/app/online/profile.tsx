@@ -14,7 +14,13 @@ import { ErrorBanner, Pill, ProgressBar } from "@/design/Feedback";
 import { Flame } from "@/design/Flame";
 import { Field, InfoRow, Notice, RowActions } from "@/design/Form";
 import { Card, Divider, Screen, SectionHeader, TextLink } from "@/design/Layout";
-import { Color, SECTION_TONE, Space, Type } from "@/design/tokens";
+import { useColors, useThemedStyles } from "@/design/theme";
+import {
+  SECTION_TONE,
+  Space,
+  Type,
+  type Palette,
+} from "@/design/tokens";
 import { t } from "@/i18n";
 import { readDailyXp } from "@/online/attempts";
 import { useSession } from "@/online/session";
@@ -31,6 +37,7 @@ const USERNAME_PATTERN = /^[A-Za-z0-9_.-]+$/;
  * cambiar una línea es más ceremonia de la que el cambio merece.
  */
 export default function ProfileScreen(): ReactElement {
+  const styles = useThemedStyles(createStyles);
   const { user, api, applyUser, logout, reloadUser } = useSession();
   const { apply: applySocial } = useSocial();
   const tabBarSpace = useOnlineTabBarSpace();
@@ -465,6 +472,8 @@ function RequestRow({
   onAccept: () => void;
   onReject: () => void;
 }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   return (
     <View style={[styles.requestRow, last && styles.requestRowLast]}>
       <Avatar username={entry.user.username} size={40} />
@@ -478,7 +487,7 @@ function RequestRow({
         <IconButton
           name="check"
           variant="surface"
-          color={Color.success.text}
+          color={colors.success.text}
           accessibilityLabel={t("online.friends.accept")}
           disabled={busy}
           onPress={onAccept}
@@ -495,7 +504,8 @@ function RequestRow({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   block: {
     marginBottom: Space.xxl,
   },
@@ -506,7 +516,7 @@ const styles = StyleSheet.create({
     paddingBottom: Space.md,
     marginBottom: Space.md,
     borderBottomWidth: 1,
-    borderBottomColor: Color.border.subtle,
+    borderBottomColor: c.border.subtle,
   },
   requestRowLast: {
     paddingBottom: 0,
@@ -562,7 +572,7 @@ const styles = StyleSheet.create({
     gap: Space.xxs,
   },
   streakCount: {
-    color: Color.ember.text,
+    color: c.ember.text,
   },
   dailyText: {
     flex: 1,
@@ -573,4 +583,4 @@ const styles = StyleSheet.create({
   editButton: {
     marginTop: Space.lg,
   },
-});
+  });

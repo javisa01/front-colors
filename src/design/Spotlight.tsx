@@ -28,13 +28,14 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button } from "@/design/Button";
+import { useColors, useThemedStyles } from "@/design/theme";
 import {
-  Color,
   Duration,
   Motion,
   Radius,
   Space,
   Type,
+  type Palette,
   type SpectrumTone,
 } from "@/design/tokens";
 import { selectionTick } from "@/utils/haptics";
@@ -234,6 +235,8 @@ function SpotlightBase({
   skipLabel,
   mode = "modal",
 }: SpotlightProps): ReactElement | null {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const { width: screenW, height: screenH } = useWindowDimensions();
   const insets = useSafeAreaInsets();
 
@@ -376,7 +379,7 @@ function SpotlightBase({
     bottom: screenH - insets.bottom - EDGE,
   });
 
-  const pigment = Color.spectrum[step.tone];
+  const pigment = colors.spectrum[step.tone];
 
   /**
    * Lo que se pinta, igual en los tres modos: la oscuridad con su agujero, el
@@ -397,7 +400,7 @@ function SpotlightBase({
         <Svg width={screenW} height={screenH} style={styles.fill}>
           <AnimatedPath
             animatedProps={pathProps}
-            fill={Color.surface.sunken}
+            fill={colors.surface.sunken}
             fillOpacity={0.9}
             fillRule="evenodd"
           />
@@ -447,8 +450,8 @@ function SpotlightBase({
                 {
                   backgroundColor:
                     position <= index
-                      ? Color.spectrum[entry.tone].pigment
-                      : Color.border.default,
+                      ? colors.spectrum[entry.tone].pigment
+                      : colors.border.default,
                 },
               ]}
             />
@@ -603,7 +606,8 @@ function placeCard({
 
 export const Spotlight = memo(SpotlightBase);
 
-const styles = StyleSheet.create({
+const createStyles = (c: Palette) =>
+  StyleSheet.create({
   fill: {
     position: "absolute",
     top: 0,
@@ -624,9 +628,9 @@ const styles = StyleSheet.create({
     left: EDGE,
     right: EDGE,
     borderRadius: Radius.xl,
-    backgroundColor: Color.surface.elevated,
+    backgroundColor: c.surface.elevated,
     borderWidth: 1,
-    borderColor: Color.border.default,
+    borderColor: c.border.default,
     overflow: "hidden",
     shadowColor: "#000000",
     shadowOpacity: 0.5,
@@ -643,7 +647,7 @@ const styles = StyleSheet.create({
     gap: Space.sm,
   },
   text: {
-    color: Color.text.secondary,
+    color: c.text.secondary,
   },
   strip: {
     flexDirection: "row",
@@ -668,4 +672,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: Space.lg,
     paddingVertical: Space.md,
   },
-});
+  });

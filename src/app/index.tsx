@@ -231,38 +231,35 @@ export default function LandingScreen(): ReactElement {
   /**
    * Qué dice y a dónde va el eje, en un solo sitio.
    *
-   * Encendida, el eje se queda **solo con el verbo**: ni rótulo ni apunte.
-   * Alrededor está la rueda a todo color y arriba el titular dice qué toca
-   * hoy, así que «el color de hoy» y «2 intentos» repetían lo que ya se ve y
-   * lo que ya se ha leído — y lo hacían dentro del único objetivo táctil de la
-   * pantalla, que es donde menos sitio hay para repetir nada.
+   * En los tres estados el eje se queda **solo con el verbo**: ni rótulo
+   * encima ni apunte debajo. Alrededor está la rueda a todo color y arriba el
+   * titular ya dice qué toca, así que un «Empieza aquí» o un «abre a las
+   * 15:00» repetían lo que ya se ve y lo que ya se ha leído — y lo hacían
+   * dentro del único objetivo táctil de la pantalla, que es donde menos sitio
+   * hay para repetir nada.
    *
-   * Apagada sí llevan los dos, y no es una excepción: ahí el eje no es
-   * «jugar», es «esto se enciende así», y eso hay que decirlo.
+   * `Dial` sigue aceptando `kicker` y `note`, y son opcionales: si algún día
+   * un estado necesita decir algo más, el sitio está hecho.
    */
   const dial = useMemo(() => {
     switch (state) {
       case "member":
         return {
-          kicker: undefined,
           label: t("dial.open.action"),
-          note: undefined,
           hint: t("dial.open.hint"),
           href: "/online" as Href,
         };
       case "nogroups":
         return {
-          kicker: t("dial.empty.kicker"),
           label: t("dial.empty.action"),
-          note: t("dial.empty.note"),
           hint: t("dial.empty.hint"),
           href: "/online/groups" as Href,
         };
       case "guest":
+        // «Empezar» y no «Jugar» porque desde aquí todavía no se juega: lleva
+        // a crear la cuenta. «Jugar» es lo que dice cuando ya la hay.
         return {
-          kicker: t("dial.guest.kicker"),
           label: t("dial.guest.action"),
-          note: t("dial.guest.note"),
           hint: t("dial.guest.hint"),
           href: "/online/auth" as Href,
         };
@@ -385,9 +382,7 @@ export default function LandingScreen(): ReactElement {
             <Dial
               size={dialSize}
               lit={state === "member"}
-              kicker={dial.kicker}
               label={dial.label}
-              note={dial.note}
               accessibilityHint={dial.hint}
               onPress={enterDial}
             />

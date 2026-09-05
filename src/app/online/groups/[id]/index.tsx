@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
   Easing,
   ReduceMotion,
+  cancelAnimation,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
@@ -32,6 +33,7 @@ import { Icon } from "@/design/Icon";
 import { GlowBorder } from "@/design/Glow";
 import { Notice } from "@/design/Form";
 import { Card, Screen, SectionHeader } from "@/design/Layout";
+import { useAmbientActive } from "@/design/motion";
 import { RoundRing, type SolvedRound } from "@/design/RoundRing";
 import SVGChallenge from "@/components/SVGChallenge";
 import { useColors, useThemedStyles } from "@/design/theme";
@@ -804,8 +806,16 @@ function SettingsGearBase({ onPress }: { onPress: () => void }): ReactElement {
   const styles = useThemedStyles(createStyles);
   const colors = useColors();
   const pulse = useSharedValue(0);
+  const active = useAmbientActive();
 
   useEffect(() => {
+    // Parado mientras no se ve. Ver `useAmbientActive`.
+    if (!active) {
+      cancelAnimation(pulse);
+      pulse.set(0);
+      return;
+    }
+
     pulse.set(
       withRepeat(
         withTiming(1, { duration: HALO_MS, easing: Easing.out(Easing.quad) }),
@@ -818,7 +828,7 @@ function SettingsGearBase({ onPress }: { onPress: () => void }): ReactElement {
         ReduceMotion.Never,
       ),
     );
-  }, [pulse]);
+  }, [active, pulse]);
 
   const haloStyle = useAnimatedStyle(() => ({
     // Se apaga antes de llegar al final del recorrido: asi el anillo se ha

@@ -8,6 +8,7 @@ import {
   type ViewStyle,
 } from "react-native";
 import Animated, {
+  Easing,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -115,7 +116,7 @@ function usePressScale(pressedScale = 0.97) {
     scale.set(
       withTiming(pressedScale, {
         duration: Duration.instant,
-        easing: (t) => t,
+        easing: Easing.linear,
       }),
     );
   }, [pressedScale, scale]);

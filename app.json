@@ -8,7 +8,9 @@
     "scheme": "colorsapp",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.javisa01.colorsapp",
+      "supportsTablet": false
     },
     "android": {
       "adaptiveIcon": {

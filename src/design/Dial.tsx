@@ -17,6 +17,7 @@ import Svg, {
 import Animated, {
   Easing,
   ReduceMotion,
+  cancelAnimation,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
@@ -25,6 +26,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+import { useAmbientActive } from "@/design/motion";
 import { useColors, useThemedStyles } from "@/design/theme";
 import {
   Duration,
@@ -249,6 +251,7 @@ function DialBase({
    */
   const spin = useSharedValue(0);
   const boost = useSharedValue(0);
+  const active = useAmbientActive();
   /** Opacidad de la capa gris. 1 apagada, 0 encendida. */
   const dim = useSharedValue(lit ? 0 : 1);
   const hubScale = useSharedValue(1);
@@ -275,6 +278,20 @@ function DialBase({
    * definido: Reanimated puede haber pintado ya ese fotograma.
    */
   useEffect(() => {
+    /*
+      Parado mientras no se ve. La portada es la pantalla de abajo del `Stack`,
+      así que sin esto la rueda sigue girando todo el rato que pasas en el
+      Taller o en el modo online. Ver `useAmbientActive`.
+
+      Vuelve a 0 antes de relanzar: en una vuelta completa 0 y 360 son el mismo
+      sitio, así que el salto no se ve.
+    */
+    if (!active) {
+      cancelAnimation(spin);
+      spin.set(0);
+      return;
+    }
+
     spin.set(
       withRepeat(
         withTiming(360, {
@@ -288,7 +305,7 @@ function DialBase({
         ReduceMotion.System,
       ),
     );
-  }, [spin]);
+  }, [active, spin]);
 
   /**
    * Encender y apagar cuando el estado cambia de verdad —al volver de crear el
@@ -489,8 +506,23 @@ function DialRingBase({
 }): ReactElement {
   const spin = useSharedValue(0);
   const land = useSharedValue(0);
+  const active = useAmbientActive();
 
   useEffect(() => {
+    /*
+      Parado mientras no se ve. La portada es la pantalla de abajo del `Stack`,
+      así que sin esto la rueda sigue girando todo el rato que pasas en el
+      Taller o en el modo online. Ver `useAmbientActive`.
+
+      Vuelve a 0 antes de relanzar: en una vuelta completa 0 y 360 son el mismo
+      sitio, así que el salto no se ve.
+    */
+    if (!active) {
+      cancelAnimation(spin);
+      spin.set(0);
+      return;
+    }
+
     spin.set(
       withRepeat(
         withTiming(360, {
@@ -512,7 +544,7 @@ function DialRingBase({
         reduceMotion: ReduceMotion.System,
       }),
     );
-  }, [land, spin]);
+  }, [active, land, spin]);
 
   const ringStyle = useAnimatedStyle(() => ({
     opacity: land.get(),

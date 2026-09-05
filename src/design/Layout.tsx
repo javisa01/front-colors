@@ -18,7 +18,7 @@ import {
   type ViewStyle,
 } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { IconButton, usePressScale } from "@/design/Button";
 import { Icon, type IconName } from "@/design/Icon";
@@ -132,6 +132,20 @@ interface ScreenProps {
   scrollRef?: RefObject<ScrollView | null>;
   children: ReactNode;
   contentStyle?: StyleProp<ViewStyle>;
+  /**
+   * Una capa anclada al fondo de la pantalla, por encima del contenido.
+   *
+   * Para lo que tiene que seguir a la vista aunque el scroll se vaya lejos: en
+   * el ranking, la fila del propio jugador cuando su puesto ya no está en lo
+   * cargado. No es una barra de acciones —para eso está poner el botón dentro
+   * del contenido, que es donde se lee mejor—: es información que deja de
+   * servir en cuanto hay que buscarla.
+   *
+   * Quien lo usa se encarga de su propio hueco inferior; aquí se ancla a cero
+   * porque el `SafeAreaView` de esta pantalla no protege el borde de abajo, y
+   * cuánto hay que subirlo depende de si hay barra de pestañas debajo.
+   */
+  footer?: ReactNode;
 }
 
 function ScreenBase({
@@ -149,6 +163,7 @@ function ScreenBase({
   scrollRef,
   children,
   contentStyle,
+  footer,
 }: ScreenProps): ReactElement {
   const styles = useThemedStyles(createStyles);
   const colors = useColors();
@@ -282,11 +297,41 @@ function ScreenBase({
       ) : (
         body
       )}
+
+      {/*
+        `box-none` para que la capa no intercepte el dedo fuera de lo que
+        pinta: ocupa todo el ancho, y sin esto se comería el scroll a lo largo
+        de una franja del fondo de la pantalla.
+      */}
+      {footer != null ? (
+        <View style={styles.footer} pointerEvents="box-none">
+          {footer}
+        </View>
+      ) : null}
     </SafeAreaView>
   );
 }
 
 export const Screen = memo(ScreenBase);
+
+/**
+ * El hueco de abajo de una pantalla de juego, barra del sistema incluida.
+ *
+ * El `SafeAreaView` de `Screen` protege arriba y a los lados, pero **no abajo**:
+ * ahí flota la barra de pestañas del modo online y una zona segura fija le
+ * habría dejado un hueco muerto debajo. Las pantallas de juego no tienen esa
+ * barra, así que se lo tienen que poner ellas.
+ *
+ * Y lo necesitan más que ninguna otra: su último elemento es el botón de
+ * comprobar, que se pulsa una vez por reto y está pegado al pie. Con solo el
+ * aire de la maqueta, en un Android con los tres botones de navegación queda a
+ * un dedo escaso de «atrás» —y ahí una pulsación de más no es un fallo estético
+ * sino un intento perdido—.
+ */
+export function usePlayBottomSpace(): number {
+  const insets = useSafeAreaInsets();
+  return insets.bottom + Space.xl;
+}
 
 // ---------------------------------------------------------------------------
 // Superficies
@@ -666,6 +711,12 @@ const createStyles = (c: Palette) =>
   backdrop: {
     ...StyleSheet.absoluteFill,
     overflow: "hidden",
+  },
+  footer: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   scroll: {
     flex: 1,

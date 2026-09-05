@@ -18,6 +18,11 @@ import { useSession } from "@/online/session";
 import { INITIAL_HSV } from "@/hooks/useChallenge";
 import type { ChallengeMetadata, HSVColor } from "@/types/challenge";
 import { hsvToHex } from "@/utils/color";
+import {
+  clearDailyRun,
+  loadDailyRun,
+  saveDailyRun,
+} from "@/utils/storage";
 
 /**
  * El reto diario, de principio a fin.
@@ -203,6 +208,25 @@ export function useDailyChallenge(groupId: string | null): UseDailyChallengeResu
         setSubmitError(null);
         setSelectedHSVState(INITIAL_HSV);
       }
+
+      /*
+        Y si había un intento de ESTE reto a medias, se recupera.
+
+        La condición de que no haya nada en memoria es la que hace que esto solo
+        actúe al entrar: `load()` se vuelve a llamar cada vez que la pantalla
+        recupera el foco, y sin ella una recarga a media partida pisaría con lo
+        guardado en disco lo que se acaba de responder.
+
+        Ver `SavedDailyRun` en `utils/storage` para qué agujero cierra esto.
+      */
+      if (answersRef.current.length === 0) {
+        const saved = await loadDailyRun(groupId, today.challenge.id);
+        if (saved && mountedRef.current && saved.answers.length > 0) {
+          answersRef.current = saved.answers;
+          setRoundIndex(saved.roundIndex);
+          setSelectedHSVState(INITIAL_HSV);
+        }
+      }
     } catch (loadError) {
       if (mountedRef.current) {
         setError(describeError(loadError));
@@ -289,8 +313,29 @@ export function useDailyChallenge(groupId: string | null): UseDailyChallengeResu
       setRoundIndex((value) => value + 1);
       setSelectedHSVState(INITIAL_HSV);
     }
+
+    /*
+      Cada respuesta se escribe en el teléfono en cuanto se da. No se espera al
+      final ni se hace en un efecto: lo que se quiere cerrar es justo la salida
+      a mitad, así que lo guardado tiene que ir siempre un paso por delante de
+      irse.
+
+      Sin esperar al `await`: el valor que importa ya está en `answersRef`, y
+      bloquear el paso de ronda por una escritura en disco no compra nada.
+    */
+    const challengeId = challengeIdRef.current;
+    if (challengeId != null && groupId != null) {
+      void saveDailyRun({
+        groupId,
+        challengeId,
+        answers: answersRef.current,
+        roundIndex: hasMore ? roundIndex + 1 : roundIndex,
+        savedAt: Date.now(),
+      });
+    }
+
     return hasMore;
-  }, [currentRound, roundIndex, rounds.length, selectedHSV]);
+  }, [currentRound, groupId, roundIndex, rounds.length, selectedHSV]);
 
   const submit = useCallback(async (): Promise<void> => {
     const challengeId = challengeIdRef.current;
@@ -319,6 +364,9 @@ export function useDailyChallenge(groupId: string | null): UseDailyChallengeResu
         return;
       }
       setResult(submitted);
+      // Enviado: el intento ya lo tiene el servidor y lo guardado sobra. Si el
+      // envío falla NO se borra, que es lo que permite reintentarlo.
+      void clearDailyRun();
       // El servidor ya ha dicho cómo queda la jornada: se refleja sin pedir
       // otra vez `GET /daily`.
       setStatus((previous) =>
@@ -356,6 +404,8 @@ export function useDailyChallenge(groupId: string | null): UseDailyChallengeResu
   }, [api, groupId, reloadUser, user]);
 
   const restart = useCallback((): void => {
+    // Otro intento empieza en blanco, también en disco.
+    void clearDailyRun();
     answersRef.current = [];
     setRoundIndex(0);
     setSelectedHSVState(INITIAL_HSV);

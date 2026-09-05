@@ -30,7 +30,7 @@ import {
   StatPill,
 } from "@/design/Feedback";
 import { Notice } from "@/design/Form";
-import { Card, Divider, Screen, useIsTablet } from "@/design/Layout";
+import { Card, Divider, Screen, useIsTablet, usePlayBottomSpace } from "@/design/Layout";
 import { useColors, useThemedStyles } from "@/design/theme";
 import {
   Radius,
@@ -581,6 +581,7 @@ function PlayBoard({
   onCheck,
 }: PlayBoardProps): ReactElement {
   const styles = useThemedStyles(createStyles);
+  const playBottom = usePlayBottomSpace();
   const { width, height } = useWindowDimensions();
   const isTablet = useIsTablet();
   const isCompactHeight = height < 760;
@@ -612,7 +613,7 @@ function PlayBoard({
           value={t("online.daily.attemptValue", { number: attemptNumber })}
         />
       }
-      contentStyle={styles.playShell}
+      contentStyle={[styles.playShell, { paddingBottom: playBottom }]}
     >
       <ChallengeNavigation currentIndex={roundIndex} total={totalRounds} />
 
@@ -937,6 +938,10 @@ const createStyles = (c: Palette) =>
   block: {
     marginBottom: Space.xxl,
   },
+  /**
+   * `paddingBottom` se completa con la zona segura desde el componente: aquí
+   * solo está el aire mínimo. Ver la nota de `playBottom`.
+   */
   playShell: {
     justifyContent: "space-between",
     paddingBottom: Space.xl,

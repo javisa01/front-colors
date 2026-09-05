@@ -23,6 +23,7 @@ import Svg, {
 import Animated, {
   Easing,
   ReduceMotion,
+  cancelAnimation,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
@@ -30,6 +31,7 @@ import Animated, {
   type SharedValue,
 } from "react-native-reanimated";
 
+import { useAmbientActive } from "@/design/motion";
 import { useColors, useThemedStyles } from "@/design/theme";
 import {
   HAIRLINE,
@@ -90,8 +92,24 @@ const DRIFT_MS = 6400;
  */
 function useAmbientClock(durationMs: number): SharedValue<number> {
   const clock = useSharedValue(0);
+  const active = useAmbientActive();
 
   useEffect(() => {
+    /*
+      Parado mientras no se ve. Ver `useAmbientActive`: la pantalla de la que
+      vienes sigue montada, y sin esto su fondo late para siempre.
+
+      Se vuelve a 0 en vez de dejarlo donde estaba porque `reverse` rebota entre
+      el valor de arranque y el destino: reanudar a media carrera encogería el
+      recorrido en cada pausa. El salto solo ocurre con la pantalla ya fuera de
+      la vista.
+    */
+    if (!active) {
+      cancelAnimation(clock);
+      clock.set(0);
+      return;
+    }
+
     // `reverse: true` en vez de encadenar dos tiempos: la vuelta atrás usa la
     // curva espejada, así que no hay tirón al llegar al extremo del recorrido.
     clock.set(
@@ -106,7 +124,7 @@ function useAmbientClock(durationMs: number): SharedValue<number> {
         ReduceMotion.Never,
       ),
     );
-  }, [clock, durationMs]);
+  }, [active, clock, durationMs]);
 
   return clock;
 }
@@ -1736,8 +1754,16 @@ const SEATS: SeatSpec[] = [
  */
 function useRelayClock(): SharedValue<number> {
   const clock = useSharedValue(0);
+  const active = useAmbientActive();
 
   useEffect(() => {
+    // Parado mientras no se ve. Ver `useAmbientActive`.
+    if (!active) {
+      cancelAnimation(clock);
+      clock.set(0);
+      return;
+    }
+
     clock.set(
       withRepeat(
         withTiming(1, { duration: RELAY_MS, easing: Easing.linear }),
@@ -1749,7 +1775,7 @@ function useRelayClock(): SharedValue<number> {
         ReduceMotion.Never,
       ),
     );
-  }, [clock]);
+  }, [active, clock]);
 
   return clock;
 }

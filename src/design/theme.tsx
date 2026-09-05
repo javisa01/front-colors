@@ -34,11 +34,11 @@ import { Color, Type, type Palette } from "@/design/tokens";
  * cosas que un re-render de contexto no cubre:
  *
  *  1. **La tipografía.** `Type` es un objeto de módulo con el color dentro, y
- *     se usa inline (`style={Type.body}`) en doscientos sitios. Sus colores se
- *     reescriben en caliente (`applyTypeColors`) sobre los MISMOS objetos que
- *     todo el mundo referencia, y el remontado es lo que garantiza que cada
- *     `<Text>` vuelva a leerlos. Migrar los doscientos usos a un gancho sería
- *     cambiar media app para el mismo resultado.
+ *     se usa inline (`style={Type.body}`) en doscientos sitios. `applyTypeColors`
+ *     cuelga de cada clave un escalón nuevo con la tinta del tema, y el
+ *     remontado es lo que garantiza que cada `<Text>` vuelva a leer la clave.
+ *     Migrar los doscientos usos a un gancho sería cambiar media app para el
+ *     mismo resultado.
  *  2. **El estado visual heredado.** Igual que con el idioma, remontar deja
  *     cada pantalla recién pintada con la paleta nueva, sin estados intermedios
  *     mezclando las dos.
@@ -280,25 +280,32 @@ const TYPE_INK: Record<keyof typeof Type, "primary" | "secondary" | "muted"> = {
 };
 
 /**
- * Reescribe el color de cada escalón de `Type` **sobre los mismos objetos**.
+ * Reescribe el color de cada escalón de `Type` **reemplazando el objeto** que
+ * cuelga de cada clave, no tocando el que ya había.
  *
- * Es una mutación deliberada, y la única de todo el sistema de tema. `Type` se
- * usa inline en doscientos sitios (`style={Type.body}`): esos sitios guardan la
- * REFERENCIA al objeto, no una copia, y React Native vuelve a leer sus
- * propiedades cada vez que el componente se pinta. Mutar aquí y remontar la app
- * (la `key` del layout raíz) actualiza los doscientos de una vez; la
- * alternativa —un gancho de tipografía— tocaría cada uno de ellos para llegar
- * exactamente al mismo sitio.
+ * `Type` se usa inline en doscientos sitios (`style={Type.body}`). Esos sitios
+ * leen la propiedad en cada pintado, así que basta con colgar de la clave un
+ * objeto nuevo y remontar la app (la `key` del layout raíz) para actualizar los
+ * doscientos de una vez; la alternativa —un gancho de tipografía— tocaría cada
+ * uno de ellos para llegar exactamente al mismo sitio.
+ *
+ * OJO: lo que NO se puede hacer es mutar el objeto en su sitio
+ * (`Type.body.color = ...`). En cuanto un estilo cruza a nativo, React Native
+ * lo congela en desarrollo (`deepFreezeAndThrowOnMutationInDev`), así que a
+ * partir del primer pintado cualquier escritura revienta con «an object that is
+ * meant to be immutable and has been frozen». Sustituir la referencia esquiva
+ * la congelación porque el objeto nuevo aún no ha cruzado.
  *
  * Se llama desde `setThemeMode`, siempre ANTES de avisar a los observadores:
  * cuando el remontado repinta, la tinta ya es la del tema nuevo.
  */
 function applyTypeColors(palette: Palette): void {
+  const scale = Type as Record<keyof typeof Type, TextStyle>;
   for (const [token, ink] of Object.entries(TYPE_INK) as [
     keyof typeof Type,
     "primary" | "secondary" | "muted",
   ][]) {
-    (Type[token] as TextStyle).color = palette.text[ink];
+    scale[token] = { ...scale[token], color: palette.text[ink] };
   }
 }
 

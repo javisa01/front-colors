@@ -10,12 +10,14 @@ import {
 import Animated, {
   Easing,
   ReduceMotion,
+  cancelAnimation,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
 
+import { useAmbientActive } from "@/design/motion";
 import { useColors, useThemedStyles } from "@/design/theme";
 import {
   Radius,
@@ -100,8 +102,15 @@ function GlowBorderBase({
   const [size, setSize] = useState({ width: 0, height: 0 });
   const spin = useSharedValue(0);
 
+  const active = useAmbientActive();
+
   useEffect(() => {
-    if (still) {
+    // Parado mientras no se ve, igual que los fondos: ver `useAmbientActive`.
+    // Vuelve a 0 antes de relanzar, que en una vuelta completa es el mismo
+    // sitio que 360 y por tanto un salto invisible.
+    if (still || !active) {
+      cancelAnimation(spin);
+      spin.set(0);
       return;
     }
 
@@ -129,7 +138,7 @@ function GlowBorderBase({
         ReduceMotion.Never,
       ),
     );
-  }, [durationMs, spin, still]);
+  }, [active, durationMs, spin, still]);
 
   const spinStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${spin.get() * 360}deg` }],

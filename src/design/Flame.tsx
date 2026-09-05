@@ -12,6 +12,7 @@ import Animated, {
 } from "react-native-reanimated";
 import Svg, { Ellipse, Path } from "react-native-svg";
 
+import { useAmbientActive } from "@/design/motion";
 import { useColors, useThemedStyles } from "@/design/theme";
 import {
   type Palette,
@@ -103,8 +104,13 @@ const RATIO = 24 / 30;
 function useFlicker(durationMs: number, enabled: boolean): SharedValue<number> {
   const clock = useSharedValue(0);
 
+  const active = useAmbientActive();
+
   useEffect(() => {
-    if (!enabled) {
+    // `active` entra aquí y no en una rama aparte porque apagar por no verse y
+    // apagar por no tener racha son lo mismo para la llama: bucle cancelado y
+    // vuelta al reposo. Ver `useAmbientActive`.
+    if (!enabled || !active) {
       // Apagar no es cortar: se cancela el bucle y se vuelve al reposo con una
       // transición corta. Con un `set(0)` seco, la llama se quedaba clavada en
       // mitad del estiramiento el fotograma en que se apagaba.
@@ -135,7 +141,7 @@ function useFlicker(durationMs: number, enabled: boolean): SharedValue<number> {
     return () => {
       cancelAnimation(clock);
     };
-  }, [clock, durationMs, enabled]);
+  }, [active, clock, durationMs, enabled]);
 
   return clock;
 }

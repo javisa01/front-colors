@@ -15,7 +15,7 @@ import { ResultSheet } from "@/components/ResultSheet";
 import SVGChallenge from "@/components/SVGChallenge";
 import { Button } from "@/design/Button";
 import { Loading, Stat, StatPill, StarRating } from "@/design/Feedback";
-import { Card, Divider, Screen, useIsTablet } from "@/design/Layout";
+import { Card, Divider, Screen, useIsTablet, usePlayBottomSpace } from "@/design/Layout";
 import { useThemedStyles } from "@/design/theme";
 import {
   Space,
@@ -175,6 +175,7 @@ interface GamePlayProps {
 
 function GamePlay({ mode, seed, resume }: GamePlayProps): ReactElement {
   const styles = useThemedStyles(createStyles);
+  const playBottom = usePlayBottomSpace();
   const { width, height } = useWindowDimensions();
   const router = useRouter();
   const isTablet = useIsTablet();
@@ -618,7 +619,7 @@ function GamePlay({ mode, seed, resume }: GamePlayProps): ReactElement {
             </View>
           ) : undefined
         }
-        contentStyle={styles.playShell}
+        contentStyle={[styles.playShell, { paddingBottom: playBottom }]}
       >
         {/*
           Sin límite de imágenes, la barra de progreso mentía: marcaba «reto 3
@@ -711,6 +712,10 @@ const createStyles = (c: Palette) =>
   cardAction: {
     marginTop: Space.xl,
   },
+  /**
+   * `paddingBottom` se completa con la zona segura desde el componente: aquí
+   * solo está el aire mínimo. Ver la nota de `playBottom`.
+   */
   playShell: {
     justifyContent: "space-between",
     paddingBottom: Space.xl,

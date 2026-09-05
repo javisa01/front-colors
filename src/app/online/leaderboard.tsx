@@ -1,12 +1,13 @@
+import { LinearGradient } from "expo-linear-gradient";
 import type { ReactElement } from "react";
 import { useOnlineTabBarSpace } from "@/components/online/OnlineTabBar";
 import { AmbientAscent } from "@/design/Ambient";
 import { useCallback, useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 
 import { describeError } from "@/api/errors";
-import type { LeaderboardEntry, LeaderboardResponse } from "@/api/types";
+import type { LeaderboardEntry, LeaderboardResponse, MyRanking } from "@/api/types";
 import { SettingsButton } from "@/components/SettingsButton";
 import { Avatar } from "@/design/Avatar";
 import { Button } from "@/design/Button";
@@ -41,6 +42,7 @@ const PAGE_SIZE = 20;
  */
 export default function LeaderboardScreen(): ReactElement {
   const styles = useThemedStyles(createStyles);
+  const colors = useColors();
   const { api, user } = useSession();
   const tabBarSpace = useOnlineTabBarSpace();
 
@@ -52,6 +54,29 @@ export default function LeaderboardScreen(): ReactElement {
   const [error, setError] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  /**
+   * Mi puesto, preguntado aparte.
+   *
+   * No sale de la lista: con ciento cincuenta jugadores el propio puede estar
+   * en la página siete, y hasta que no se cargan las seis anteriores no
+   * aparece. `/leaderboards/me` lo devuelve de un tiro —posición global, de
+   * amigos y mis cifras—, así que la fila fijada se puede pintar desde el
+   * primer momento.
+   */
+  const [mine, setMine] = useState<MyRanking | null>(null);
+  /**
+   * Lo que ocupa la fila fijada, medido.
+   *
+   * Hace falta porque esa fila **flota** sobre el contenido: sin descontar su
+   * alto del relleno inferior de la lista, lo último que hay —el botón de
+   * cargar más— queda debajo y no se puede pulsar. Pasó, y deja el ranking
+   * inutilizable justo cuando más se necesita, que es cuando hay tanta gente
+   * que tu puesto no cabe en la primera página.
+   *
+   * Se mide en vez de estimarse: el alto depende del tamaño de letra del
+   * sistema y de cuánto mida la zona segura de cada teléfono.
+   */
+  const [pinnedHeight, setPinnedHeight] = useState(0);
 
   const loading = entries === null && error === null;
 
@@ -64,6 +89,18 @@ export default function LeaderboardScreen(): ReactElement {
     [api],
   );
 
+  /**
+   * Mi puesto. Falla en silencio a propósito: es un añadido a la lista, y un
+   * error aquí no puede tapar el ranking, que es lo que se venía a ver.
+   */
+  const loadMine = useCallback(async () => {
+    try {
+      setMine(await api.leaderboards.me());
+    } catch {
+      setMine(null);
+    }
+  }, [api]);
+
   /** Recarga la primera pagina desde un gesto del usuario: refrescar o reintentar. */
   const load = useCallback(
     async (target: Scope) => {
@@ -72,13 +109,14 @@ export default function LeaderboardScreen(): ReactElement {
         setPage(result);
         setEntries(result.entries);
         setError(null);
+        void loadMine();
       } catch (loadError) {
         setError(describeError(loadError));
         setPage(null);
         setEntries([]);
       }
     },
-    [fetchPage],
+    [fetchPage, loadMine],
   );
 
   // La carga inicial va escrita aqui en vez de delegar en `load`: el analisis
@@ -94,6 +132,7 @@ export default function LeaderboardScreen(): ReactElement {
           setPage(result);
           setEntries(result.entries);
           setError(null);
+          void loadMine();
         }
       } catch (loadError) {
         if (active) {
@@ -107,7 +146,7 @@ export default function LeaderboardScreen(): ReactElement {
     return () => {
       active = false;
     };
-  }, [scope, fetchPage]);
+  }, [scope, fetchPage, loadMine]);
 
   const refresh = useCallback(async () => {
     setRefreshing(true);
@@ -134,6 +173,10 @@ export default function LeaderboardScreen(): ReactElement {
     }
   }, [page, loadingMore, fetchPage, scope]);
 
+  const measurePinned = useCallback((event: LayoutChangeEvent) => {
+    setPinnedHeight(event.nativeEvent.layout.height);
+  }, []);
+
   const switchScope = useCallback((next: Scope) => {
     setScope(next);
     setEntries(null);
@@ -141,16 +184,83 @@ export default function LeaderboardScreen(): ReactElement {
     setError(null);
   }, []);
 
+  /**
+   * La fila fijada: mi puesto, anclado abajo, **solo cuando no se ve ya**.
+   *
+   * La condición es «no está en lo cargado», no «no está en la primera
+   * página»: quien va pulsando «cargar más» acaba llegando a su propia fila, y
+   * a partir de ahí la copia de abajo sería la misma fila dos veces en
+   * pantalla. En cuanto aparece de verdad en la lista, esto desaparece.
+   *
+   * `position` puede ser `null` —sin amigos todavía, por ejemplo—: entonces no
+   * hay puesto que enseñar y no se pinta nada. Enseñar un guion en el hueco
+   * sería ocupar sitio para decir que no hay nada que decir.
+   */
+  const myPosition =
+    scope === "global" ? mine?.global.position : mine?.friends.position;
+
+  const alreadyVisible = entries?.some((entry) => entry.userId === user?.id);
+
+  const pinned: LeaderboardEntry | null =
+    mine != null && myPosition != null && !alreadyVisible
+      ? {
+          position: myPosition,
+          userId: mine.user.userId,
+          username: mine.user.username,
+          level: mine.user.level,
+          xp: mine.user.xp,
+        }
+      : null;
+
   return (
     <Screen
       eyebrow={t("online.leaderboard.badge")}
       title={t("online.leaderboard.title")}
       subtitle={t("online.leaderboard.subtitle")}
       backdrop={<AmbientAscent />}
-      contentStyle={{ paddingBottom: tabBarSpace }}
+      /*
+        El hueco de abajo es el de la barra de pestañas, salvo cuando hay fila
+        fijada: entonces manda lo que ella ocupa, que ya incluye ese mismo
+        hueco. Así el botón de cargar más siempre acaba por encima de ella.
+      */
+      contentStyle={{
+        paddingBottom: pinned != null ? Math.max(tabBarSpace, pinnedHeight) : tabBarSpace,
+      }}
       headerAction={<SettingsButton />}
       onRefresh={refresh}
       refreshing={refreshing}
+      footer={
+        pinned != null ? (
+          <View style={styles.pinned} onLayout={measurePinned}>
+            {/*
+              El lienzo se derrama desde abajo y se disuelve por encima de la
+              tarjeta.
+
+              Sin esto quedaban dos objetos flotando con un trozo de lista
+              asomando entre ellos —la tarjeta y la pastilla de pestañas—, y esa
+              franja de nombres a medio tapar se leía como un fallo de pintado.
+              Es el mismo recurso que usa la portada con el velo del titular:
+              atmósfera en vez de una barra opaca, que es justo lo que la barra
+              de pestañas evita a propósito.
+
+              El extremo transparente se escribe con el MISMO color en alfa cero
+              y no con `transparent`: interpolar desde un negro transparente deja
+              una banda gris en Android.
+            */}
+            <LinearGradient
+              colors={[`${colors.surface.canvas}00`, colors.surface.canvas]}
+              locations={[0, 0.55]}
+              style={StyleSheet.absoluteFill}
+              pointerEvents="none"
+            />
+            <View style={[styles.pinnedBody, { paddingBottom: tabBarSpace }]}>
+              <View style={styles.pinnedCard}>
+                <Row entry={pinned} index={0} last isMe pinned />
+              </View>
+            </View>
+          </View>
+        ) : null
+      }
     >
       <SegmentedControl
         options={[
@@ -240,11 +350,17 @@ function Row({
   index,
   last,
   isMe,
+  pinned = false,
 }: {
   entry: LeaderboardEntry;
   index: number;
   last: boolean;
   isMe: boolean;
+  /**
+   * La copia anclada abajo. Entra sin animación: la escalonada de la lista
+   * cuenta que las filas van llegando, y esta no llega — ya estaba.
+   */
+  pinned?: boolean;
 }): ReactElement {
   const styles = useThemedStyles(createStyles);
   const colors = useColors();
@@ -253,7 +369,11 @@ function Row({
 
   return (
     <Animated.View
-      entering={FadeIn.delay(Math.min(index, 12) * 35).duration(Duration.base)}
+      entering={
+        pinned
+          ? undefined
+          : FadeIn.delay(Math.min(index, 12) * 35).duration(Duration.base)
+      }
     >
       <View
         style={[
@@ -352,5 +472,36 @@ const createStyles = (c: Palette) =>
   },
   more: {
     marginTop: Space.lg,
+  },
+  /**
+   * El envoltorio de la fila fijada. Solo pone los márgenes; el fondo lo pinta
+   * `pinnedCard`, porque si lo pintara este, el color llegaría hasta el borde
+   * de la pantalla y se leería como una barra del sistema y no como una fila
+   * del ranking que se ha quedado a la vista.
+   */
+  pinned: {
+    // Sin relleno: lo pone `pinnedBody`. Aquí solo vive el degradado, que tiene
+    // que llegar hasta el borde de la pantalla por los cuatro lados.
+    paddingTop: Space.xl,
+  },
+  pinnedBody: {
+    paddingHorizontal: Space.lg,
+  },
+  pinnedCard: {
+    paddingHorizontal: Space.lg,
+    paddingVertical: Space.sm,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: c.border.default,
+    // Opaco: flota sobre la lista, y con transparencia se leerían los nombres
+    // de debajo cruzando el propio.
+    backgroundColor: c.surface.elevated,
+    // La misma sombra que usa un modal, y por el mismo motivo: decir que esto
+    // está en otro plano y no es la última fila de la lista.
+    shadowColor: "#000000",
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 12,
   },
   });

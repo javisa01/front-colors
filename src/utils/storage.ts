@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import type { ThemeMode } from "@/design/theme";
 import { isLocale, type Locale } from "@/i18n";
+import type { DailyAnswer } from "@/api/types";
 import type { GameMode, PartyMode } from "@/types/challenge";
 
 // All persisted keys live under a single namespace so they are easy to find and
@@ -33,6 +34,7 @@ const KEYS = {
   bestStreak: (mode: GameMode) => `${PREFIX}beststreak:${mode}`,
   teamAverage: (mode: PartyMode) => `${PREFIX}teamaverage:${mode}`,
   progress: `${PREFIX}progress`,
+  dailyRun: `${PREFIX}dailyRun`,
   dailyResult: `${PREFIX}daily`,
   musicVolume: `${PREFIX}musicVolume`,
   sfxVolume: `${PREFIX}sfxVolume`,
@@ -174,6 +176,72 @@ export async function loadProgress(): Promise<SavedProgress | null> {
 export async function clearProgress(): Promise<void> {
   try {
     await AsyncStorage.removeItem(KEYS.progress);
+  } catch {
+    // ignore
+  }
+}
+
+// ---------------------------------------------------------------------------
+// El intento del reto diario, a medias
+// ---------------------------------------------------------------------------
+
+/**
+ * Un intento del reto diario que se ha quedado sin terminar.
+ *
+ * Existe por un agujero concreto: las respuestas del reto viven en memoria y el
+ * intento se manda **entero al final**. Salir de la partida antes de la última
+ * ronda —el botón «atrás» del móvil está a un dedo del de comprobar— no perdía
+ * solo el progreso: como el servidor no se había enterado de nada, el intento
+ * tampoco contaba, así que se podían ver las cinco imágenes, salir al ver que
+ * la cuarta había ido mal y empezar de cero con los dos intentos intactos.
+ *
+ * Guardado aquí, volver a entrar continúa donde se dejó y ese camino se cierra.
+ *
+ * OJO con lo que esto NO es: una defensa de verdad. Vive en el teléfono, así
+ * que quien borre los datos de la aplicación vuelve a empezar. Cerrarlo del
+ * todo pide que el intento lo abra el servidor —un `POST` al empezar y las
+ * rondas contra ese intento—, y eso es un cambio de backend.
+ */
+export interface SavedDailyRun {
+  groupId: string;
+  challengeId: string;
+  answers: DailyAnswer[];
+  /** En qué ronda se quedó, para volver a abrir esa y no la primera. */
+  roundIndex: number;
+  savedAt: number;
+}
+
+export async function saveDailyRun(run: SavedDailyRun): Promise<void> {
+  await writeJSON(KEYS.dailyRun, run);
+}
+
+/**
+ * El intento a medias, **solo si es de este reto y de este grupo**.
+ *
+ * La comprobación va aquí y no en quien llama porque un intento de ayer, o del
+ * mismo día en otro grupo, no es un intento a medias: es basura que haría
+ * empezar con respuestas que no son de estas imágenes.
+ */
+export async function loadDailyRun(
+  groupId: string,
+  challengeId: string,
+): Promise<SavedDailyRun | null> {
+  const run = await readJSON<SavedDailyRun>(KEYS.dailyRun);
+  if (
+    run &&
+    run.groupId === groupId &&
+    run.challengeId === challengeId &&
+    Array.isArray(run.answers) &&
+    typeof run.roundIndex === "number"
+  ) {
+    return run;
+  }
+  return null;
+}
+
+export async function clearDailyRun(): Promise<void> {
+  try {
+    await AsyncStorage.removeItem(KEYS.dailyRun);
   } catch {
     // ignore
   }

@@ -11,13 +11,7 @@ import { playerTint } from "@/design/Avatar";
 import { Button } from "@/design/Button";
 import { Pill, StatPill, scoreTone } from "@/design/Feedback";
 import { Icon } from "@/design/Icon";
-import {
-  Card,
-  Divider,
-  Screen,
-  SectionHeader,
-  useIsTablet,
-} from "@/design/Layout";
+import { Card, Divider, Screen, SectionHeader, useIsTablet, usePlayBottomSpace } from "@/design/Layout";
 import { useColors, useThemedStyles } from "@/design/theme";
 import {
   Duration,
@@ -101,6 +95,7 @@ interface PartyGameProps {
 function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
   const colors = useColors();
   const styles = useThemedStyles(createStyles);
+  const playBottom = usePlayBottomSpace();
   const { width, height } = useWindowDimensions();
   const isTablet = useIsTablet();
 
@@ -433,7 +428,7 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
             )}
           </View>
         }
-        contentStyle={styles.playShell}
+        contentStyle={[styles.playShell, { paddingBottom: playBottom }]}
       >
         <View style={styles.turnRow}>
           <Pill icon="user" label={currentPlayer.name} tone="accent" />
@@ -747,6 +742,10 @@ const createStyles = (c: Palette) =>
   cardAction: {
     marginTop: Space.xl,
   },
+  /**
+   * `paddingBottom` se completa con la zona segura desde el componente: aquí
+   * solo está el aire mínimo. Ver la nota de `playBottom`.
+   */
   playShell: {
     justifyContent: "space-between",
     paddingBottom: Space.xl,

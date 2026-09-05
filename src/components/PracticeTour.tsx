@@ -134,8 +134,16 @@ const TARGETS: TourTarget[] = [
  * no como algo que aparece más tarde.
  */
 const SETTLE_MS = 520;
-/** Lo que se espera tras mover la lista, antes de volver a medir. */
-const SCROLL_MS = 90;
+/**
+ * Lo que se espera tras mover la lista, antes de volver a medir.
+ *
+ * Eran 90 ms. Es tiempo muerto entre pulsar «Siguiente» y ver moverse el foco,
+ * y se nota como lentitud aunque no se pierda ni un fotograma. Con el scroll
+ * sin animar, la lista queda colocada en el fotograma siguiente; 48 ms dejan
+ * tres de margen a 60 Hz. Lo que garantiza que la medida sea buena no es esta
+ * espera sino la segunda llamada a `measure` que viene detrás.
+ */
+const SCROLL_MS = 48;
 
 export function PracticeTour({
   refs,

@@ -3,6 +3,7 @@ import { StyleSheet, View } from "react-native";
 import Animated, {
   Easing,
   ReduceMotion,
+  cancelAnimation,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
@@ -12,6 +13,7 @@ import Animated, {
   type SharedValue,
 } from "react-native-reanimated";
 
+import { useAmbientActive } from "@/design/motion";
 import { useColors, useThemedStyles } from "@/design/theme";
 import {
   Motion,
@@ -113,8 +115,16 @@ function SwatchFanBase({
 }): ReactElement {
   const styles = useThemedStyles(createStyles);
   const sway = useSharedValue(0);
+  const active = useAmbientActive();
 
   useEffect(() => {
+    // Parado mientras no se ve. Ver `useAmbientActive`.
+    if (!active) {
+      cancelAnimation(sway);
+      sway.set(0);
+      return;
+    }
+
     sway.set(
       withRepeat(
         withTiming(1, { duration: SWAY_MS, easing: Easing.inOut(Easing.quad) }),
@@ -127,7 +137,7 @@ function SwatchFanBase({
         ReduceMotion.Never,
       ),
     );
-  }, [sway]);
+  }, [active, sway]);
 
   return (
     <View style={styles.stage} pointerEvents="none">

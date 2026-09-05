@@ -12,10 +12,23 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://back-colors-test.fly.dev",
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_ZnVua3ktc3RhcmZpc2gtODU0NC5jbGVyay5hY2NvdW50cy5kZXYk"
       }
     },
-    "production": {
+    "testflight": {
+      "extends": "preview",
+      "distribution": "store",
       "autoIncrement": true
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://back-colors.fly.dev",
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_ZnVua3ktc3RhcmZpc2gtODU0NC5jbGVyay5hY2NvdW50cy5kZXYk"
+      }
     }
   },
   "submit": {

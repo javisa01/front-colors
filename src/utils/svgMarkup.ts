@@ -124,6 +124,44 @@ function inlineCssColors(svgXml: string): string {
   return result;
 }
 
+/**
+ * Copia al atributo `fill`/`stroke` el valor que ya vivía en el `style` del
+ * mismo elemento.
+ *
+ * En SVG el `style` gana al atributo de presentación, pero `react-native-svg`
+ * hace lo contrario: al montar el nodo mezcla `{ ...style, ...props }`, así que
+ * en `fill="#064a93" style="fill:#00095b"` pinta el PRIMERO. Inkscape genera
+ * justo ese conflicto —deja el atributo original y escribe el color nuevo en el
+ * `style`— y era la razón de que el azul de Ford no cambiara: la sustitución
+ * tocaba el literal del `style`, que es el que el renderer ignoraba.
+ *
+ * Igualando los dos deja de importar cuál gane. Si el elemento solo trae el
+ * `style`, no hay nada que igualar: sin atributo que lo pise, ya se aplica.
+ */
+function applyStylePaintPrecedence(svgXml: string): string {
+  return svgXml.replace(/<[a-zA-Z][^>]*>/g, (tag) => {
+    const style = tag.match(/\sstyle="([^"]*)"/i)?.[1];
+    if (!style) {
+      return tag;
+    }
+
+    let result = tag;
+    for (const property of ["fill", "stroke"] as const) {
+      const value = style
+        .match(new RegExp(`(?:^|;)\\s*${property}\\s*:\\s*([^;]+)`, "i"))?.[1]
+        ?.trim();
+      if (!value) {
+        continue;
+      }
+      result = result.replace(
+        new RegExp(`(\\s${property}=)"[^"]*"`, "i"),
+        `$1"${value}"`,
+      );
+    }
+    return result;
+  });
+}
+
 // Namespaces that only carry editor bookkeeping: Inkscape/Sodipodi document
 // settings and the RDF licensing block. Nothing here draws anything.
 //
@@ -183,7 +221,7 @@ export function sanitizeSvgXml(svgXml: string): string {
     .replace(/\s+preserveAspectRatio="[^"]*"/gi, "")
     .trim();
 
-  return ensureViewBox(inlineCssColors(cleaned));
+  return ensureViewBox(applyStylePaintPrecedence(inlineCssColors(cleaned)));
 }
 
 function colorPattern(source: string): string {

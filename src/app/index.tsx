@@ -330,14 +330,11 @@ export default function LandingScreen(): ReactElement {
 
         <View style={styles.top}>
           <View style={styles.readout}>
-            <Text style={[Type.label, styles.wordmark]}>
-              {t("landing.badge")}
-            </Text>
-
             {/*
               Solo se dice lo que se sabe de verdad. Sin cuenta no hay nada que
-              contar aquí y no se rellena el hueco con una frase de relleno: la
-              marca sola es una cabecera legítima.
+              contar aquí y no se rellena el hueco con una frase de relleno: el
+              nombre ya lo dice el encabezado de abajo, así que esta esquina se
+              queda vacía en vez de repetirlo.
             */}
             {state === "member" && hint.streak > 0 ? (
               <View style={styles.streak}>
@@ -404,7 +401,7 @@ export default function LandingScreen(): ReactElement {
             accessibilityHint={t("dial.practice.body")}
           >
             <View style={styles.practiceIcon}>
-              <Icon name="palette" size={17} color={colors.spectrum.teal.icon} />
+              <Icon name="palette" size={17} color={colors.spectrum.teal.ink} />
             </View>
 
             <View style={styles.practiceBody}>
@@ -414,7 +411,7 @@ export default function LandingScreen(): ReactElement {
               </Text>
             </View>
 
-            <Icon name="chevronRight" size={18} color={colors.text.faint} />
+            <Icon name="chevronRight" size={18} color={colors.spectrum.teal.icon} />
           </Pressable>
         </View>
       </View>
@@ -447,11 +444,7 @@ const createStyles = (c: Palette) =>
     zIndex: 2,
   },
   readout: {
-    gap: Space.sm,
     flexShrink: 1,
-  },
-  wordmark: {
-    color: c.text.secondary,
   },
   streak: {
     flexDirection: "row",
@@ -504,7 +497,10 @@ const createStyles = (c: Palette) =>
     padding: Space.md,
     borderRadius: Radius.lg,
     borderWidth: HAIRLINE,
-    borderColor: c.border.default,
+    // El Taller ya era lo único teal de la portada, pero el color vivía solo
+    // dentro del disco y la tarjeta se leía como un pie de página. Ahora el
+    // teal sale al borde: mismo tamaño, más presencia.
+    borderColor: c.spectrum.teal.border,
     // La única superficie de la aplicación que deja ver lo que pasa por
     // debajo, junto con la pastilla de pestañas del online — y por el mismo
     // motivo: aquí, lo de debajo es la rueda.
@@ -512,7 +508,7 @@ const createStyles = (c: Palette) =>
   },
   practicePressed: {
     backgroundColor: c.surface.interactive,
-    borderColor: c.border.strong,
+    borderColor: c.spectrum.teal.icon,
   },
   practiceIcon: {
     width: 34,
@@ -520,9 +516,9 @@ const createStyles = (c: Palette) =>
     borderRadius: Radius.pill,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: c.spectrum.teal.surface,
-    borderWidth: HAIRLINE,
-    borderColor: c.spectrum.teal.border,
+    // Disco macizo, no pastilla teñida: es el único punto saturado del pie y
+    // lo que hace que el ojo caiga aquí al terminar de recorrer la rueda.
+    backgroundColor: c.spectrum.teal.pigment,
   },
   practiceBody: {
     flex: 1,

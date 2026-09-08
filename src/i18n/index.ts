@@ -60,13 +60,13 @@ const es = {
     "Cinco imágenes nuevas cada día y dos intentos para conseguir la mayor puntuación.",
   "dial.open.action": "Jugar",
   "dial.open.hint": "Abre el reto de hoy",
-  "dial.off.label": "Aún no hay reto",
+  "dial.off.label": "Iromi (色味) — el tono de un color",
   "dial.empty.title": "No estás en\nningún grupo.",
   "dial.empty.body":
     "Crea uno, invita a quien quieras y cada día tendréis cinco imágenes, dos intentos y una clasificación que solo veis vosotros.",
   "dial.empty.action": "Crear\nun grupo",
   "dial.empty.hint": "Abre la pantalla de grupos",
-  "dial.guest.title": "Esto se juega\ncon amigos.",
+  "dial.guest.title": "Juega con\ntus amigos.",
   "dial.guest.body":
     "Cinco imágenes cada día a las 15:00 h, dos intentos, y solo compites con quien invites.",
   "dial.guest.action": "Empezar",
@@ -731,13 +731,13 @@ const en: Record<TranslationKey, string> = {
     "Five new images every day, and two tries to get the highest score.",
   "dial.open.action": "Play",
   "dial.open.hint": "Opens today's challenge",
-  "dial.off.label": "Nothing to play yet",
+  "dial.off.label": "Iromi (色味) — the shade of a color",
   "dial.empty.title": "You're not in\nany group.",
   "dial.empty.body":
     "Create one, invite whoever you want, and every day you get five images, two tries and a ranking only you can see.",
   "dial.empty.action": "Create\na group",
   "dial.empty.hint": "Opens the groups screen",
-  "dial.guest.title": "You play this\nwith friends.",
+  "dial.guest.title": "Play with\nyour friends.",
   "dial.guest.body":
     "Five images a day at 15:00, two tries, and you only compete with the people you invite.",
   "dial.guest.action": "Start",
@@ -1386,13 +1386,13 @@ const fr: Record<TranslationKey, string> = {
     "Cinq nouvelles images chaque jour et deux essais pour faire le meilleur score.",
   "dial.open.action": "Jouer",
   "dial.open.hint": "Ouvre le défi du jour",
-  "dial.off.label": "Pas encore de défi",
+  "dial.off.label": "Iromi (色味) — la nuance d'une couleur",
   "dial.empty.title": "Tu n'es dans\naucun groupe.",
   "dial.empty.body":
     "Crées-en un, invite qui tu veux, et chaque jour vous aurez cinq images, deux essais et un classement que vous seuls voyez.",
   "dial.empty.action": "Créer\nun groupe",
   "dial.empty.hint": "Ouvre l'écran des groupes",
-  "dial.guest.title": "Ça se joue\nentre amis.",
+  "dial.guest.title": "Joue avec\ntes amis.",
   "dial.guest.body":
     "Cinq images par jour à 15h00, deux essais, et tu affrontes uniquement ceux que tu invites.",
   "dial.guest.action": "Commencer",
@@ -2051,13 +2051,13 @@ const ca: Record<TranslationKey, string> = {
     "Cinc imatges noves cada dia i dos intents per aconseguir la màxima puntuació.",
   "dial.open.action": "Jugar",
   "dial.open.hint": "Obre el repte d'avui",
-  "dial.off.label": "Encara no hi ha repte",
+  "dial.off.label": "Iromi (色味) — el to d'un color",
   "dial.empty.title": "No ets a\ncap grup.",
   "dial.empty.body":
     "Crea'n un, convida qui vulguis i cada dia tindreu cinc imatges, dos intents i una classificació que només veieu vosaltres.",
   "dial.empty.action": "Crear\nun grup",
   "dial.empty.hint": "Obre la pantalla de grups",
-  "dial.guest.title": "Això es juga\namb amics.",
+  "dial.guest.title": "Juga amb\nels teus amics.",
   "dial.guest.body":
     "Cinc imatges cada dia a les 15:00 h, dos intents, i només competeixes amb qui convidis.",
   "dial.guest.action": "Començar",

@@ -1,0 +1,2286 @@
+{
+  "flag-ad": {
+    "name": "Bandera de Andorra",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ad.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#D0103A"
+  },
+  "flag-ae": {
+    "name": "Bandera de Emiratos Árabes Unidos",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ae.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#FF0000"
+  },
+  "flag-ag": {
+    "name": "Bandera de Antigua y Barbuda",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ag.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#CE1126"
+  },
+  "flag-ai": {
+    "name": "Bandera de Anguila",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ai.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-al": {
+    "name": "Bandera de Albania",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/al.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-am": {
+    "name": "Bandera de Armenia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/am.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ao": {
+    "name": "Bandera de Angola",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ao.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#FF0000"
+  },
+  "flag-aq": {
+    "name": "Bandera de Antártida",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/aq.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ar": {
+    "name": "Bandera de Argentina",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ar.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#74ACDF"
+  },
+  "flag-as": {
+    "name": "Bandera de Samoa Americana",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/as.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#000066"
+  },
+  "flag-at": {
+    "name": "Bandera de Austria",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/at.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-au": {
+    "name": "Bandera de Australia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/au.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#00008B"
+  },
+  "flag-aw": {
+    "name": "Bandera de Aruba",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/aw.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#3399CC"
+  },
+  "flag-ax": {
+    "name": "Bandera de Islas Aland",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ax.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-az": {
+    "name": "Bandera de Azerbaiyán",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/az.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#3F9C35"
+  },
+  "flag-ba": {
+    "name": "Bandera de Bosnia y Herzegovina",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ba.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-bb": {
+    "name": "Bandera de Barbados",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bb.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-bd": {
+    "name": "Bandera de Bangladés",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bd.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-be": {
+    "name": "Bandera de Bélgica",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/be.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-bf": {
+    "name": "Bandera de Burkina Faso",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bf.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-bg": {
+    "name": "Bandera de Bulgaria",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bg.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-bh": {
+    "name": "Bandera de Baréin",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bh.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-bi": {
+    "name": "Bandera de Burundi",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bi.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-bj": {
+    "name": "Bandera de Benín",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bj.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-bl": {
+    "name": "Bandera de San Bartolomé",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bl.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-bm": {
+    "name": "Bandera de Bermudas",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bm.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#CF142B"
+  },
+  "flag-bo": {
+    "name": "Bandera de Bolivia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bo.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#D52B1E"
+  },
+  "flag-bq": {
+    "name": "Bandera de Caribe neerlandés",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bq.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-br": {
+    "name": "Bandera de Brasil",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/br.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#229E45"
+  },
+  "flag-bs": {
+    "name": "Bandera de Bahamas",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bs.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#08CED6"
+  },
+  "flag-bt": {
+    "name": "Bandera de Bután",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bt.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#FFD520"
+  },
+  "flag-bv": {
+    "name": "Bandera de Isla Bouvet",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bv.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#D72828"
+  },
+  "flag-bw": {
+    "name": "Bandera de Botsuana",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bw.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-by": {
+    "name": "Bandera de Bielorrusia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/by.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#CE1720"
+  },
+  "flag-bz": {
+    "name": "Bandera de Belice",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bz.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#003F87"
+  },
+  "flag-ca": {
+    "name": "Bandera de Canadá",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ca.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-cc": {
+    "name": "Bandera de Islas Cocos",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/cc.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-cd": {
+    "name": "Bandera de República Democrática del Congo",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/cd.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-cf": {
+    "name": "Bandera de República Centroafricana",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/cf.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-cg": {
+    "name": "Bandera de Congo",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/cg.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ch": {
+    "name": "Bandera de Suiza",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ch.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ci": {
+    "name": "Bandera de Côte d’Ivoire",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ci.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ck": {
+    "name": "Bandera de Islas Cook",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ck.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-cl": {
+    "name": "Bandera de Chile",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/cl.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#D52B1E"
+  },
+  "flag-cm": {
+    "name": "Bandera de Camerún",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/cm.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-cn": {
+    "name": "Bandera de China",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/cn.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#EE1C25"
+  },
+  "flag-co": {
+    "name": "Bandera de Colombia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/co.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-cp": {
+    "name": "Bandera de Isla Clipperton",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/cp.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-cr": {
+    "name": "Bandera de Costa Rica",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/cr.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-cu": {
+    "name": "Bandera de Cuba",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/cu.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-cv": {
+    "name": "Bandera de Cabo Verde",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/cv.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#081873"
+  },
+  "flag-cw": {
+    "name": "Bandera de Curazao",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/cw.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-cx": {
+    "name": "Bandera de Isla de Navidad",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/cx.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-cy": {
+    "name": "Bandera de Chipre",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/cy.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-cz": {
+    "name": "Bandera de Chequia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/cz.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-de": {
+    "name": "Bandera de Alemania",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/de.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-dg": {
+    "name": "Bandera de Diego García",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/dg.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#000063"
+  },
+  "flag-dj": {
+    "name": "Bandera de Yibuti",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/dj.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-dk": {
+    "name": "Bandera de Dinamarca",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/dk.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-dm": {
+    "name": "Bandera de Dominica",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/dm.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-do": {
+    "name": "Bandera de República Dominicana",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/do.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-dz": {
+    "name": "Bandera de Argelia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/dz.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ec": {
+    "name": "Bandera de Ecuador",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ec.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ee": {
+    "name": "Bandera de Estonia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ee.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-eg": {
+    "name": "Bandera de Egipto",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/eg.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#CE1126"
+  },
+  "flag-er": {
+    "name": "Bandera de Eritrea",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/er.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-es": {
+    "name": "Bandera de España",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/es.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#AA151B"
+  },
+  "flag-et": {
+    "name": "Bandera de Etiopía",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/et.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#298C08"
+  },
+  "flag-fi": {
+    "name": "Bandera de Finlandia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/fi.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-fj": {
+    "name": "Bandera de Fiyi",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/fj.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#68BFE5"
+  },
+  "flag-fk": {
+    "name": "Bandera de Islas Malvinas",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/fk.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#012169"
+  },
+  "flag-fm": {
+    "name": "Bandera de Micronesia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/fm.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-fo": {
+    "name": "Bandera de Islas Feroe",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/fo.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#D72828"
+  },
+  "flag-fr": {
+    "name": "Bandera de Francia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/fr.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ga": {
+    "name": "Bandera de Gabón",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ga.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-gb": {
+    "name": "Bandera de Reino Unido",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gb.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-gd": {
+    "name": "Bandera de Granada",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gd.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ge": {
+    "name": "Bandera de Georgia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ge.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-gf": {
+    "name": "Bandera de Guayana Francesa",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gf.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-gg": {
+    "name": "Bandera de Guernesey",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gg.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-gh": {
+    "name": "Bandera de Ghana",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gh.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-gi": {
+    "name": "Bandera de Gibraltar",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gi.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-gl": {
+    "name": "Bandera de Groenlandia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gl.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-gm": {
+    "name": "Bandera de Gambia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gm.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#000099"
+  },
+  "flag-gn": {
+    "name": "Bandera de Guinea",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gn.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-gp": {
+    "name": "Bandera de Guadalupe",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gp.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-gq": {
+    "name": "Bandera de Guinea Ecuatorial",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gq.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#E32118"
+  },
+  "flag-gr": {
+    "name": "Bandera de Grecia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gr.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-gs": {
+    "name": "Bandera de Islas Georgia del Sur y Sandwich del Sur",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gs.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#000066"
+  },
+  "flag-gt": {
+    "name": "Bandera de Guatemala",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gt.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#4997D0"
+  },
+  "flag-gu": {
+    "name": "Bandera de Guam",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gu.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#3B5AA3"
+  },
+  "flag-gw": {
+    "name": "Bandera de Guinea-Bisáu",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gw.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-gy": {
+    "name": "Bandera de Guyana",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gy.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#399408"
+  },
+  "flag-hk": {
+    "name": "Bandera de RAE de Hong Kong (China)",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/hk.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-hm": {
+    "name": "Bandera de Islas Heard y McDonald",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/hm.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#00008B"
+  },
+  "flag-hn": {
+    "name": "Bandera de Honduras",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/hn.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-hr": {
+    "name": "Bandera de Croacia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/hr.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ht": {
+    "name": "Bandera de Haití",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ht.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#D21034"
+  },
+  "flag-hu": {
+    "name": "Bandera de Hungría",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/hu.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-id": {
+    "name": "Bandera de Indonesia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/id.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ie": {
+    "name": "Bandera de Irlanda",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ie.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-il": {
+    "name": "Bandera de Israel",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/il.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-im": {
+    "name": "Bandera de Isla de Man",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/im.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#BA0000"
+  },
+  "flag-in": {
+    "name": "Bandera de India",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/in.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#FF9933"
+  },
+  "flag-io": {
+    "name": "Bandera de Territorio Británico del Océano Índico",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/io.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#000063"
+  },
+  "flag-is": {
+    "name": "Bandera de Islandia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/is.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-it": {
+    "name": "Bandera de Italia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/it.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-je": {
+    "name": "Bandera de Jersey",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/je.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#CF142B"
+  },
+  "flag-jm": {
+    "name": "Bandera de Jamaica",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/jm.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-jo": {
+    "name": "Bandera de Jordania",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/jo.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#FF0000"
+  },
+  "flag-jp": {
+    "name": "Bandera de Japón",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/jp.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ke": {
+    "name": "Bandera de Kenia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ke.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-kg": {
+    "name": "Bandera de Kirguistán",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/kg.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-kh": {
+    "name": "Bandera de Camboya",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/kh.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#032EA1"
+  },
+  "flag-ki": {
+    "name": "Bandera de Kiribati",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ki.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#E73E2D"
+  },
+  "flag-km": {
+    "name": "Bandera de Comoras",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/km.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#239E46"
+  },
+  "flag-kn": {
+    "name": "Bandera de San Cristóbal y Nieves",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/kn.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#C70000"
+  },
+  "flag-kp": {
+    "name": "Bandera de Corea del Norte",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/kp.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-kr": {
+    "name": "Bandera de Corea del Sur",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/kr.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-kw": {
+    "name": "Bandera de Kuwait",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/kw.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ky": {
+    "name": "Bandera de Islas Caimán",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ky.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#000066"
+  },
+  "flag-kz": {
+    "name": "Bandera de Kazajistán",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/kz.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#00ABC2"
+  },
+  "flag-la": {
+    "name": "Bandera de Laos",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/la.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#CE1126"
+  },
+  "flag-lb": {
+    "name": "Bandera de Líbano",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/lb.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#EE161F"
+  },
+  "flag-lc": {
+    "name": "Bandera de Santa Lucía",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/lc.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#65CFFF"
+  },
+  "flag-li": {
+    "name": "Bandera de Liechtenstein",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/li.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#CE1126"
+  },
+  "flag-lk": {
+    "name": "Bandera de Sri Lanka",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/lk.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#8D2029"
+  },
+  "flag-lr": {
+    "name": "Bandera de Liberia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/lr.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ls": {
+    "name": "Bandera de Lesoto",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ls.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-lt": {
+    "name": "Bandera de Lituania",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/lt.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-lu": {
+    "name": "Bandera de Luxemburgo",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/lu.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-lv": {
+    "name": "Bandera de Letonia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/lv.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ly": {
+    "name": "Bandera de Libia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ly.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ma": {
+    "name": "Bandera de Marruecos",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ma.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#C1272D"
+  },
+  "flag-mc": {
+    "name": "Bandera de Mónaco",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/mc.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-md": {
+    "name": "Bandera de Moldavia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/md.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#DE2110"
+  },
+  "flag-me": {
+    "name": "Bandera de Montenegro",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/me.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#C40308"
+  },
+  "flag-mf": {
+    "name": "Bandera de San Martín",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/mf.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-mg": {
+    "name": "Bandera de Madagascar",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/mg.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-mh": {
+    "name": "Bandera de Islas Marshall",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/mh.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-mk": {
+    "name": "Bandera de Macedonia del Norte",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/mk.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ml": {
+    "name": "Bandera de Mali",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ml.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-mm": {
+    "name": "Bandera de Myanmar (Birmania)",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/mm.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-mn": {
+    "name": "Bandera de Mongolia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/mn.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-mo": {
+    "name": "Bandera de RAE de Macao (China)",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/mo.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#00785E"
+  },
+  "flag-mp": {
+    "name": "Bandera de Islas Marianas del Norte",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/mp.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#0071BC"
+  },
+  "flag-mq": {
+    "name": "Bandera de Martinica",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/mq.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-mr": {
+    "name": "Bandera de Mauritania",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/mr.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#006233"
+  },
+  "flag-ms": {
+    "name": "Bandera de Montserrat",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ms.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-mt": {
+    "name": "Bandera de Malta",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/mt.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-mu": {
+    "name": "Bandera de Mauricio",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/mu.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-mv": {
+    "name": "Bandera de Maldivas",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/mv.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#D21034"
+  },
+  "flag-mw": {
+    "name": "Bandera de Malaui",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/mw.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-mx": {
+    "name": "Bandera de México",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/mx.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#CE1126"
+  },
+  "flag-my": {
+    "name": "Bandera de Malasia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/my.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-mz": {
+    "name": "Bandera de Mozambique",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/mz.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-na": {
+    "name": "Bandera de Namibia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/na.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#C70000"
+  },
+  "flag-nc": {
+    "name": "Bandera de Nueva Caledonia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/nc.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ne": {
+    "name": "Bandera de Níger",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ne.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-nf": {
+    "name": "Bandera de Isla Norfolk",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/nf.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ng": {
+    "name": "Bandera de Nigeria",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ng.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ni": {
+    "name": "Bandera de Nicaragua",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ni.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#0067C6"
+  },
+  "flag-nl": {
+    "name": "Bandera de Países Bajos",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/nl.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-no": {
+    "name": "Bandera de Noruega",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/no.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#ED2939"
+  },
+  "flag-np": {
+    "name": "Bandera de Nepal",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/np.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-nr": {
+    "name": "Bandera de Nauru",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/nr.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-nu": {
+    "name": "Bandera de Niue",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/nu.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-nz": {
+    "name": "Bandera de Nueva Zelanda",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/nz.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#00247D"
+  },
+  "flag-om": {
+    "name": "Bandera de Omán",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/om.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#EF2D29"
+  },
+  "flag-pa": {
+    "name": "Bandera de Panamá",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/pa.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#0000AB"
+  },
+  "flag-pe": {
+    "name": "Bandera de Perú",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/pe.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-pf": {
+    "name": "Bandera de Polinesia Francesa",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/pf.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#DE2010"
+  },
+  "flag-pg": {
+    "name": "Bandera de Papúa Nueva Guinea",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/pg.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ph": {
+    "name": "Bandera de Filipinas",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ph.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-pk": {
+    "name": "Bandera de Pakistán",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/pk.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-pl": {
+    "name": "Bandera de Polonia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/pl.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-pm": {
+    "name": "Bandera de San Pedro y Miquelón",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/pm.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-pn": {
+    "name": "Bandera de Islas Pitcairn",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/pn.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#00247D"
+  },
+  "flag-pr": {
+    "name": "Bandera de Puerto Rico",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/pr.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-pt": {
+    "name": "Bandera de Portugal",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/pt.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-pw": {
+    "name": "Bandera de Palaos",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/pw.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#4AADD6"
+  },
+  "flag-py": {
+    "name": "Bandera de Paraguay",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/py.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-qa": {
+    "name": "Bandera de Catar",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/qa.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-re": {
+    "name": "Bandera de Reunión",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/re.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ro": {
+    "name": "Bandera de Rumanía",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ro.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-rs": {
+    "name": "Bandera de Serbia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/rs.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#C6363C"
+  },
+  "flag-ru": {
+    "name": "Bandera de Rusia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ru.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-rw": {
+    "name": "Bandera de Ruanda",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/rw.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-sb": {
+    "name": "Bandera de Islas Salomón",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/sb.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-sc": {
+    "name": "Bandera de Seychelles",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/sc.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#D92223"
+  },
+  "flag-sd": {
+    "name": "Bandera de Sudán",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/sd.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-se": {
+    "name": "Bandera de Suecia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/se.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-sg": {
+    "name": "Bandera de Singapur",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/sg.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-sh": {
+    "name": "Bandera de Santa Elena",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/sh.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-si": {
+    "name": "Bandera de Eslovenia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/si.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-sj": {
+    "name": "Bandera de Svalbard y Jan Mayen",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/sj.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#EF2B2D"
+  },
+  "flag-sk": {
+    "name": "Bandera de Eslovaquia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/sk.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#EE1C25"
+  },
+  "flag-sl": {
+    "name": "Bandera de Sierra Leona",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/sl.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-sm": {
+    "name": "Bandera de San Marino",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/sm.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#19B6EF"
+  },
+  "flag-sn": {
+    "name": "Bandera de Senegal",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/sn.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-so": {
+    "name": "Bandera de Somalia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/so.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-sr": {
+    "name": "Bandera de Surinam",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/sr.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#377E3F"
+  },
+  "flag-ss": {
+    "name": "Bandera de Sudán del Sur",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ss.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#0F47AF"
+  },
+  "flag-st": {
+    "name": "Bandera de Santo Tomé y Príncipe",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/st.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#12AD2B"
+  },
+  "flag-sv": {
+    "name": "Bandera de El Salvador",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/sv.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#0F47AF"
+  },
+  "flag-sx": {
+    "name": "Bandera de Sint Maarten",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/sx.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#ED2939"
+  },
+  "flag-sy": {
+    "name": "Bandera de Siria",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/sy.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-sz": {
+    "name": "Bandera de Esuatini",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/sz.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#3E5EB9"
+  },
+  "flag-tc": {
+    "name": "Bandera de Islas Turcas y Caicos",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/tc.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#002868"
+  },
+  "flag-td": {
+    "name": "Bandera de Chad",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/td.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-tf": {
+    "name": "Bandera de Territorios Australes Franceses",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/tf.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-tg": {
+    "name": "Bandera de Togo",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/tg.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-th": {
+    "name": "Bandera de Tailandia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/th.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-tj": {
+    "name": "Bandera de Tayikistán",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/tj.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#006600"
+  },
+  "flag-tk": {
+    "name": "Bandera de Tokelau",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/tk.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-tl": {
+    "name": "Bandera de Timor-Leste",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/tl.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-tm": {
+    "name": "Bandera de Turkmenistán",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/tm.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#00843D"
+  },
+  "flag-tn": {
+    "name": "Bandera de Túnez",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/tn.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-to": {
+    "name": "Bandera de Tonga",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/to.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-tr": {
+    "name": "Bandera de Turquía",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/tr.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-tt": {
+    "name": "Bandera de Trinidad y Tobago",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/tt.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-tv": {
+    "name": "Bandera de Tuvalu",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/tv.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#009FCA"
+  },
+  "flag-tz": {
+    "name": "Bandera de Tanzania",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/tz.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ua": {
+    "name": "Bandera de Ucrania",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ua.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ug": {
+    "name": "Bandera de Uganda",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ug.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#FFE700"
+  },
+  "flag-um": {
+    "name": "Bandera de Islas menores alejadas de EE. UU.",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/um.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#BD3D44"
+  },
+  "flag-us": {
+    "name": "Bandera de Estados Unidos",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/us.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#BD3D44"
+  },
+  "flag-uy": {
+    "name": "Bandera de Uruguay",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/uy.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-uz": {
+    "name": "Bandera de Uzbekistán",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/uz.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#1EB53A"
+  },
+  "flag-va": {
+    "name": "Bandera de Ciudad del Vaticano",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/va.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#FFE000"
+  },
+  "flag-vc": {
+    "name": "Bandera de San Vicente y las Granadinas",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/vc.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#F4F100"
+  },
+  "flag-ve": {
+    "name": "Bandera de Venezuela",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ve.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-vg": {
+    "name": "Bandera de Islas Vírgenes Británicas",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/vg.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#000066"
+  },
+  "flag-vi": {
+    "name": "Bandera de Islas Vírgenes de EE. UU.",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/vi.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#F4C53D"
+  },
+  "flag-vn": {
+    "name": "Bandera de Vietnam",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/vn.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#DA251D"
+  },
+  "flag-vu": {
+    "name": "Bandera de Vanuatu",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/vu.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#009543"
+  },
+  "flag-wf": {
+    "name": "Bandera de Wallis y Futuna",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/wf.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-ws": {
+    "name": "Bandera de Samoa",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ws.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#CE1126"
+  },
+  "flag-ye": {
+    "name": "Bandera de Yemen",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ye.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-yt": {
+    "name": "Bandera de Mayotte",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/yt.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "flag-za": {
+    "name": "Bandera de Sudáfrica",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/za.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#007847"
+  },
+  "flag-zm": {
+    "name": "Bandera de Zambia",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/zm.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#198A00"
+  },
+  "flag-zw": {
+    "name": "Bandera de Zimbabue",
+    "category": "flag",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/zw.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño.",
+    "editableColorHex": "#006400"
+  }
+}

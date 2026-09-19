@@ -1,0 +1,34 @@
+{
+  "id": "flag-bd",
+  "svg": "flag-bd.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-bd\" viewBox=\"0 0 640 480\">\n  <path fill=\"#006a4e\" d=\"M0 0h640v480H0z\"/>\n  <circle cx=\"280\" cy=\"240\" r=\"160\" fill=\"#f42a41\"/>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#006A4E",
+      "hsv": {
+        "h": 164,
+        "s": 100,
+        "v": 42
+      }
+    },
+    {
+      "hex": "#F42A41",
+      "hsv": {
+        "h": 353,
+        "s": 83,
+        "v": 96
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Bangladés",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bd.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

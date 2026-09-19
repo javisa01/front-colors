@@ -1,0 +1,34 @@
+{
+  "id": "flag-th",
+  "svg": "flag-th.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-th\" viewBox=\"0 0 640 480\">\n  <g fill-rule=\"evenodd\">\n    <path fill=\"#f4f5f8\" d=\"M0 0h640v480H0z\"/>\n    <path fill=\"#2d2a4a\" d=\"M0 162.5h640v160H0z\"/>\n    <path fill=\"#a51931\" d=\"M0 0h640v82.5H0zm0 400h640v80H0z\"/>\n  </g>\n</svg>\n",
+  "editableColorIndex": 1,
+  "colors": [
+    {
+      "hex": "#2D2A4A",
+      "hsv": {
+        "h": 246,
+        "s": 43,
+        "v": 29
+      }
+    },
+    {
+      "hex": "#A51931",
+      "hsv": {
+        "h": 350,
+        "s": 85,
+        "v": 65
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Tailandia",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/th.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "light"
+}

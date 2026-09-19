@@ -1,0 +1,26 @@
+{
+  "id": "flag-qa",
+  "svg": "flag-qa.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-qa\" viewBox=\"0 0 640 480\">\n  <path fill=\"#8d1b3d\" d=\"M0 0h640v480H0z\"/>\n  <path fill=\"#fff\" d=\"M0 0v480h158.4l97.8-26.7-97.8-26.6 97.7-26.7-97.7-26.7 97.7-26.6-97.7-26.7 97.8-26.7-97.8-26.6 97.7-26.7-97.7-26.7 97.7-26.6-97.7-26.7 97.8-26.7-97.8-26.6L256.1 80l-97.7-26.7 97.8-26.6L158.3 0z\"/>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#8D1B3D",
+      "hsv": {
+        "h": 342,
+        "s": 81,
+        "v": 55
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Catar",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/qa.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

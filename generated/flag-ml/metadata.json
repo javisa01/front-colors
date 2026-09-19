@@ -1,0 +1,50 @@
+{
+  "id": "flag-ml",
+  "svg": "flag-ml.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-ml\" viewBox=\"0 0 640 480\">\n  <g fill-rule=\"evenodd\">\n    <path fill=\"red\" d=\"M425.8 0H640v480H425.7z\"/>\n    <path fill=\"#009a00\" d=\"M0 0h212.9v480H0z\"/>\n    <path fill=\"#ff0\" d=\"M212.9 0h214v480h-214z\"/>\n  </g>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#FF0000",
+      "hsv": {
+        "h": 0,
+        "s": 100,
+        "v": 100
+      },
+      "svgColor": "red",
+      "svgColors": [
+        "red"
+      ]
+    },
+    {
+      "hex": "#009A00",
+      "hsv": {
+        "h": 120,
+        "s": 100,
+        "v": 60
+      }
+    },
+    {
+      "hex": "#FFFF00",
+      "hsv": {
+        "h": 60,
+        "s": 100,
+        "v": 100
+      },
+      "svgColor": "#ff0",
+      "svgColors": [
+        "#ff0"
+      ]
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Mali",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ml.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

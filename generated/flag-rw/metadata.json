@@ -1,0 +1,50 @@
+{
+  "id": "flag-rw",
+  "svg": "flag-rw.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" id=\"flag-icons-rw\" viewBox=\"0 0 640 480\">\n  <path fill=\"#20603d\" d=\"M0 0h640v480H0z\"/>\n  <path fill=\"#fad201\" d=\"M0 0h640v360H0z\"/>\n  <path fill=\"#00a1de\" d=\"M0 0h640v240H0z\"/>\n  <g transform=\"translate(511 125.4)scale(.66667)\">\n    <g id=\"rw-b\">\n      <path id=\"rw-a\" fill=\"#e5be01\" d=\"M116.1 0 35.7 4.7l76.4 25.4-78.8-16.3L100.6 58l-72-36.2L82 82.1 21.9 28.6l36.2 72-44.3-67.3L30 112 4.7 35.7 0 116.1-1-1z\"/>\n      <use xlink:href=\"#rw-a\" width=\"100%\" height=\"100%\" transform=\"scale(1 -1)\"/>\n    </g>\n    <use xlink:href=\"#rw-b\" width=\"100%\" height=\"100%\" transform=\"scale(-1 1)\"/>\n    <circle r=\"34.3\" fill=\"#e5be01\" stroke=\"#00a1de\" stroke-width=\"3.4\"/>\n  </g>\n</svg>\n",
+  "editableColorIndex": 2,
+  "colors": [
+    {
+      "hex": "#20603D",
+      "hsv": {
+        "h": 147,
+        "s": 67,
+        "v": 38
+      }
+    },
+    {
+      "hex": "#FAD201",
+      "hsv": {
+        "h": 50,
+        "s": 100,
+        "v": 98
+      }
+    },
+    {
+      "hex": "#00A1DE",
+      "hsv": {
+        "h": 196,
+        "s": 100,
+        "v": 87
+      }
+    },
+    {
+      "hex": "#E5BE01",
+      "hsv": {
+        "h": 50,
+        "s": 100,
+        "v": 90
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Ruanda",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/rw.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

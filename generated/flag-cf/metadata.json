@@ -1,0 +1,62 @@
+{
+  "id": "flag-cf",
+  "svg": "flag-cf.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-cf\" viewBox=\"0 0 640 480\">\n  <defs>\n    <clipPath id=\"cf-a\">\n      <path fill-opacity=\".7\" d=\"M-12.4 32h640v480h-640z\"/>\n    </clipPath>\n  </defs>\n  <g fill-rule=\"evenodd\" clip-path=\"url(#cf-a)\" transform=\"translate(12.4 -32)\">\n    <path fill=\"#00f\" d=\"M-52 32h719.3v119H-52z\"/>\n    <path fill=\"#ff0\" d=\"M-52 391.6h719.3V512H-52z\"/>\n    <path fill=\"#009a00\" d=\"M-52 271.3h719.3v120.3H-52z\"/>\n    <path fill=\"#fff\" d=\"M-52 151h719.3v120.3H-52z\"/>\n    <path fill=\"red\" d=\"M247.7 32.5h119.9V512H247.7z\"/>\n    <path fill=\"#ff0\" d=\"m99.3 137.7-31.5-21.8-31.3 22L47.4 101 16.9 78l38.2-1 12.5-36.3L80.3 77l38.1.7L88.2 101\"/>\n  </g>\n</svg>\n",
+  "editableColorIndex": 1,
+  "colors": [
+    {
+      "hex": "#0000FF",
+      "hsv": {
+        "h": 240,
+        "s": 100,
+        "v": 100
+      },
+      "svgColor": "#00f",
+      "svgColors": [
+        "#00f"
+      ]
+    },
+    {
+      "hex": "#FFFF00",
+      "hsv": {
+        "h": 60,
+        "s": 100,
+        "v": 100
+      },
+      "svgColor": "#ff0",
+      "svgColors": [
+        "#ff0"
+      ]
+    },
+    {
+      "hex": "#009A00",
+      "hsv": {
+        "h": 120,
+        "s": 100,
+        "v": 60
+      }
+    },
+    {
+      "hex": "#FF0000",
+      "hsv": {
+        "h": 0,
+        "s": 100,
+        "v": 100
+      },
+      "svgColor": "red",
+      "svgColors": [
+        "red"
+      ]
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de República Centroafricana",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/cf.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

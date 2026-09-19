@@ -1,0 +1,26 @@
+{
+  "id": "flag-hn",
+  "svg": "flag-hn.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" id=\"flag-icons-hn\" viewBox=\"0 0 640 480\">\n  <path fill=\"#18c3df\" d=\"M0 0h640v480H0z\"/>\n  <path fill=\"#fff\" d=\"M0 160h640v160H0z\"/>\n  <g id=\"hn-c\" fill=\"#18c3df\" transform=\"translate(320 240)scale(26.66665)\">\n    <g id=\"hn-b\">\n      <path id=\"hn-a\" d=\"m-.3 0 .5.1L0-1z\"/>\n      <use xlink:href=\"#hn-a\" width=\"100%\" height=\"100%\" transform=\"scale(-1 1)\"/>\n    </g>\n    <use xlink:href=\"#hn-b\" width=\"100%\" height=\"100%\" transform=\"rotate(72)\"/>\n    <use xlink:href=\"#hn-b\" width=\"100%\" height=\"100%\" transform=\"rotate(-72)\"/>\n    <use xlink:href=\"#hn-b\" width=\"100%\" height=\"100%\" transform=\"rotate(144)\"/>\n    <use xlink:href=\"#hn-b\" width=\"100%\" height=\"100%\" transform=\"rotate(-144)\"/>\n  </g>\n  <use xlink:href=\"#hn-c\" width=\"100%\" height=\"100%\" transform=\"translate(133.3 -42.7)\"/>\n  <use xlink:href=\"#hn-c\" width=\"100%\" height=\"100%\" transform=\"translate(133.3 37.3)\"/>\n  <use xlink:href=\"#hn-c\" width=\"100%\" height=\"100%\" transform=\"translate(-133.3 -42.7)\"/>\n  <use xlink:href=\"#hn-c\" width=\"100%\" height=\"100%\" transform=\"translate(-133.3 37.3)\"/>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#18C3DF",
+      "hsv": {
+        "h": 188,
+        "s": 89,
+        "v": 87
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Honduras",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/hn.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

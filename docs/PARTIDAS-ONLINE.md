@@ -390,11 +390,11 @@ solo con logs.
 
 ### 8.1 Desajuste real en el catálogo de assets
 
-Los 137 `id` coinciden entre los dos repos, pero **10 assets tienen distinto
+Los 111 `id` del backend coinciden con el front, pero **8 assets tienen distinto
 `editableColorIndex`**:
 
-- 9 (`amazon`, `barbie`, `cocacola`, `google`, `javascript`, `kfc`, `react`,
-  `spotify`, `starbucks`) **no tienen el campo** en
+- 7 (`amazon`, `cocacola`, `google`, `javascript`, `kfc`, `react`,
+  `spotify`) **no tienen el campo** en
   `front-colors/generated/challenges.json`. El backend los normaliza a `0`.
 - **`fanta` tiene `editableColorIndex: 3` en el front, pero solo 3 colores**
   (índices válidos 0-2). Está fuera de rango: `challenge.colors[3]` es

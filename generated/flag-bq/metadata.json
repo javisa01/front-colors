@@ -1,0 +1,34 @@
+{
+  "id": "flag-bq",
+  "svg": "flag-bq.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-bq\" viewBox=\"0 0 640 480\">\n  <path fill=\"#21468b\" d=\"M0 0h640v480H0z\"/>\n  <path fill=\"#fff\" d=\"M0 0h640v320H0z\"/>\n  <path fill=\"#ae1c28\" d=\"M0 0h640v160H0z\"/>\n</svg>\n",
+  "editableColorIndex": 1,
+  "colors": [
+    {
+      "hex": "#21468B",
+      "hsv": {
+        "h": 219,
+        "s": 76,
+        "v": 55
+      }
+    },
+    {
+      "hex": "#AE1C28",
+      "hsv": {
+        "h": 355,
+        "s": 84,
+        "v": 68
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Caribe neerlandés",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bq.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

@@ -15,6 +15,13 @@ import type { ChallengeMetadata } from "@/types/challenge";
 import { getChallengeBackgroundTheme } from "@/utils/color";
 import { replaceColorInSvg } from "@/utils/svgMarkup";
 
+/**
+ * Fracción del lado de la tarjeta que se deja libre alrededor de una bandera.
+ * 7 % a cada lado: suficiente para que se lea como una imagen dentro de un
+ * marco y no como un fondo de pantalla, sin encogerla hasta perder detalle.
+ */
+const FLAG_INSET = 0.07;
+
 interface SVGChallengeProps {
   challenge: ChallengeMetadata;
   editableColor: string;
@@ -82,6 +89,23 @@ function SVGChallenge({
     [challenge],
   );
 
+  /**
+   * Margen lateral extra para las banderas.
+   *
+   * Un logo es una forma suelta y trae su propio aire alrededor. Una bandera es
+   * un rectángulo macizo de 4:3 que, dentro de una tarjeta cuadrada, toca los
+   * dos cantos de lado a lado: parece que se sale, y el borde redondeado de la
+   * tarjeta le corta las esquinas. El hueco arriba y abajo que deja la relación
+   * de aspecto no pasa nada porque exista — el problema es solo horizontal —,
+   * pero el `padding` va a los cuatro lados igualmente: recortar solo a los
+   * lados descentraría el dibujo respecto a la tarjeta.
+   *
+   * Proporcional al tamaño y no un valor fijo de la escala de espaciado porque
+   * la tarjeta cambia de lado entre teléfono y tableta, y un margen fijo se
+   * vería generoso en una y ridículo en la otra.
+   */
+  const inset = challenge.category === "flag" ? Math.round(size * FLAG_INSET) : 0;
+
   return (
     <View style={styles.container}>
       <Animated.View
@@ -90,6 +114,7 @@ function SVGChallenge({
           {
             width: size,
             height: size,
+            padding: inset,
             backgroundColor: backgroundTheme.background,
             borderColor: backgroundTheme.border,
           },

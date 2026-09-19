@@ -1,0 +1,42 @@
+{
+  "id": "flag-lt",
+  "svg": "flag-lt.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-lt\" viewBox=\"0 0 640 480\">\n  <g fill-rule=\"evenodd\" stroke-width=\"1pt\" transform=\"scale(.64143 .96773)\">\n    <rect width=\"1063\" height=\"708.7\" fill=\"#006a44\" rx=\"0\" ry=\"0\" transform=\"scale(.93865 .69686)\"/>\n    <rect width=\"1063\" height=\"236.2\" y=\"475.6\" fill=\"#c1272d\" rx=\"0\" ry=\"0\" transform=\"scale(.93865 .69686)\"/>\n    <path fill=\"#fdb913\" d=\"M0 0h997.8v164.6H0z\"/>\n  </g>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#006A44",
+      "hsv": {
+        "h": 158,
+        "s": 100,
+        "v": 42
+      }
+    },
+    {
+      "hex": "#C1272D",
+      "hsv": {
+        "h": 358,
+        "s": 80,
+        "v": 76
+      }
+    },
+    {
+      "hex": "#FDB913",
+      "hsv": {
+        "h": 43,
+        "s": 92,
+        "v": 99
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Lituania",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/lt.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

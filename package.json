@@ -48,6 +48,7 @@
     "react-native-worklets": "0.10.0"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "@types/color-convert": "^2.0.4",
     "@types/node": "^26.1.1",
     "@types/react": "~19.2.2",
@@ -63,6 +64,8 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "generate": "tsx tools/generateMetadata.ts",
+    "import:flags": "tsx tools/importFlags.ts",
+    "measure:assets": "tsx tools/measureAssets.ts",
     "check-logos": "tsx tools/checkLogos.ts",
     "preview-logos": "tsx tools/previewLogos.ts",
     "test": "tsx --test tests/color.test.ts tests/colorScore.test.ts tests/hsvGeometry.test.ts"

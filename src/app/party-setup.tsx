@@ -29,6 +29,7 @@ const VALID_MODES: PartyMode[] = [
   "battle-timed",
   "coop",
   "coop-timed",
+  "flags-battle",
 ];
 
 /** Atajos a los tamaños de grupo habituales; el resto se llega con el contador. */

@@ -19,12 +19,49 @@ export interface ChallengeColor {
   svgColors?: string[];
 }
 
+/**
+ * De dónde salió el SVG y bajo qué licencia. Lo escribe `npm run generate` a
+ * partir de `assets/sources.json`. No lo usa el juego: existe para poder
+ * acreditar el origen de cada imagen si una tienda lo reclama. Opcional porque
+ * los assets heredados del catálogo de logos no lo tienen.
+ */
+export interface ChallengeSource {
+  name: string;
+  source: string;
+  license: string;
+  licenseUrl: string;
+  author: string;
+  note?: string;
+}
+
+/**
+ * Familias de imagen del catálogo.
+ *
+ * `flag` son las banderas importadas con `npm run import:flags`; el resto del
+ * catálogo —los logos heredados— no lleva categoría, y ese hueco es
+ * deliberado: es lo que permite que los modos de siempre sigan siendo de logos
+ * sin tener que etiquetar 126 assets viejos uno a uno.
+ */
+export type ChallengeCategory = "flag";
+
 export interface ChallengeMetadata {
   id: string;
   svg: string;
   svgXml: string;
   editableColorIndex?: number;
   colors: ChallengeColor[];
+  category?: ChallengeCategory;
+  /**
+   * Fondo de la tarjeta, ya decidido en tiempo de compilación por
+   * `npm run measure:assets` midiendo el área real de blanco y de negro.
+   *
+   * Cuando falta, `getChallengeBackgroundTheme` lo deduce contando literales de
+   * color en el SVG. Esa heurística se equivoca con las banderas: Corea del Sur
+   * es blanca en un 80 % con unos trigramas negros, y como «hay negro» pedía
+   * tarjeta clara — bandera blanca sobre papel blanco.
+   */
+  background?: "dark" | "light";
+  source?: ChallengeSource;
 }
 
 export interface ChallengeManifestEntry {
@@ -38,8 +75,9 @@ export interface ChallengeManifestEntry {
  * - `timed`: beat the clock, keep a streak going.
  * - `daily`: one deterministic challenge per calendar day.
  * - `multicolor`: rebuild every color of a single multi-color logo.
+ * - `flags`: como `quick` pero con siete banderas en vez de logos.
  */
-export type GameMode = "quick" | "timed" | "daily" | "multicolor";
+export type GameMode = "quick" | "timed" | "daily" | "multicolor" | "flags";
 
 /**
  * A single thing the player has to guess. For single-color modes each challenge
@@ -66,8 +104,14 @@ export interface ChallengeStep {
  * - `coop`: each player guesses a few images; all percentages are added into a
  *   single shared team score.
  * - `coop-timed`: one minute per player, everything summed into a team score.
+ * - `flags-battle`: `battle` con banderas en vez de logos.
  */
-export type PartyMode = "battle" | "battle-timed" | "coop" | "coop-timed";
+export type PartyMode =
+  | "battle"
+  | "battle-timed"
+  | "coop"
+  | "coop-timed"
+  | "flags-battle";
 
 export interface PartyPlayer {
   id: number;

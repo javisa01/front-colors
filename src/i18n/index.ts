@@ -135,6 +135,9 @@ const es = {
   "party.mode.coop-timed.title": "Colaborativo contrarreloj",
   "party.mode.coop-timed.description":
     "20-30 s por jugador según cuántos seáis; sumad todo en equipo.",
+  "party.mode.flags-battle.title": "Batalla de banderas",
+  "party.mode.flags-battle.description":
+    "5 banderas por turnos. Gana quien más se acerque.",
 
   "party.setup.title": "Configura la partida",
   "party.setup.playersLabel": "Número de jugadores",
@@ -193,6 +196,9 @@ const es = {
   "mode.multicolor.title": "Multicolor",
   "mode.multicolor.description":
     "Reconstruye todos los colores de un mismo logo, uno a uno.",
+  "mode.flags.title": "Banderas",
+  "mode.flags.description":
+    "Siete banderas del mundo. Sabes el color: acierta el tono exacto.",
 
   "game.check": "Comprobar",
   "game.empty.title": "No hay retos disponibles.",
@@ -802,6 +808,9 @@ const en: Record<TranslationKey, string> = {
   "party.mode.coop-timed.title": "Timed cooperative",
   "party.mode.coop-timed.description":
     "20-30 s per player depending on group size; add it all up as a team.",
+  "party.mode.flags-battle.title": "Flag battle",
+  "party.mode.flags-battle.description":
+    "5 flags taken in turns. Closest guesses win.",
 
   "party.setup.title": "Set up the match",
   "party.setup.playersLabel": "Number of players",
@@ -859,6 +868,9 @@ const en: Record<TranslationKey, string> = {
   "mode.multicolor.title": "Multicolor",
   "mode.multicolor.description":
     "Rebuild every color of a single logo, one by one.",
+  "mode.flags.title": "Flags",
+  "mode.flags.description":
+    "Seven flags of the world. You know the color: nail the exact shade.",
 
   "game.check": "Check",
   "game.empty.title": "No challenges available.",
@@ -1459,6 +1471,9 @@ const fr: Record<TranslationKey, string> = {
   "party.mode.coop-timed.title": "Coopératif contre la montre",
   "party.mode.coop-timed.description":
     "20-30 s par joueur selon le nombre ; cumulez tout en équipe.",
+  "party.mode.flags-battle.title": "Bataille de drapeaux",
+  "party.mode.flags-battle.description":
+    "5 drapeaux à tour de rôle. Le plus proche gagne.",
 
   "party.setup.title": "Configure la partie",
   "party.setup.playersLabel": "Nombre de joueurs",
@@ -1517,6 +1532,9 @@ const fr: Record<TranslationKey, string> = {
   "mode.multicolor.title": "Multicolore",
   "mode.multicolor.description":
     "Reconstitue toutes les couleurs d'un même logo, une par une.",
+  "mode.flags.title": "Drapeaux",
+  "mode.flags.description":
+    "Sept drapeaux du monde. Tu connais la couleur : trouve la nuance exacte.",
 
   "game.check": "Vérifier",
   "game.empty.title": "Aucun défi disponible.",
@@ -2124,6 +2142,9 @@ const ca: Record<TranslationKey, string> = {
   "party.mode.coop-timed.title": "Col·laboratiu contrarellotge",
   "party.mode.coop-timed.description":
     "20-30 s per jugador segons quants sigueu; sumeu-ho tot en equip.",
+  "party.mode.flags-battle.title": "Batalla de banderes",
+  "party.mode.flags-battle.description":
+    "5 banderes per torns. Guanya qui més s'hi acosti.",
 
   "party.setup.title": "Configura la partida",
   "party.setup.playersLabel": "Nombre de jugadors",
@@ -2182,6 +2203,9 @@ const ca: Record<TranslationKey, string> = {
   "mode.multicolor.title": "Multicolor",
   "mode.multicolor.description":
     "Reconstrueix tots els colors d'un mateix logotip, un a un.",
+  "mode.flags.title": "Banderes",
+  "mode.flags.description":
+    "Set banderes del món. Saps el color: encerta el to exacte.",
 
   "game.check": "Comprova",
   "game.empty.title": "No hi ha reptes disponibles.",

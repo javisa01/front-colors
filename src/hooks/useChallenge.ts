@@ -1,14 +1,15 @@
 import { useCallback, useMemo, useState } from "react";
 
 import type {
+  ChallengeCategory,
   ChallengeMetadata,
   ChallengeStep,
   GameMode,
   HSVColor,
 } from "@/types/challenge";
+import { allPlayable, catalogFor } from "@/utils/catalog";
 import { hexToHSV, hsvToHex } from "@/utils/color";
 import type { SavedProgress } from "@/utils/storage";
-import challengeCatalog from "../../generated/challenges.json";
 
 const INITIAL_COLOR = "#878787";
 
@@ -22,9 +23,24 @@ const INITIAL_COLOR = "#878787";
  */
 export const INITIAL_HSV: HSVColor = hexToHSV(INITIAL_COLOR);
 
-// DEV: Set this to an array of logo IDs to force only those logos to appear in
-// any game mode. Leave as null (or empty) for normal random behavior.
-// Example: ["spotify", "google", "2xko"]
+/**
+ * DEV: lista de ids que sustituye al catálogo en **todos** los modos. `null`
+ * para jugar normal.
+ *
+ * Pisa el reparto por familia de `CATEGORY_BY_MODE` en vez de filtrar dentro de
+ * él, y esa es la diferencia que lo hace útil: si filtrase dentro, poner aquí
+ * banderas dejaría «Juego rápido» —que reparte logos— con cero retos y la
+ * pantalla de «no hay retos disponibles».
+ *
+ * Para volver a revisar todas las banderas de una tanda:
+ *
+ *   const DEV_ONLY_LOGOS = allPlayable()
+ *     .filter((item) => item.category === "flag")
+ *     .map((item) => item.id);
+ *
+ * Derivado del catálogo y no con los ids escritos a mano: una lista copiada se
+ * queda vieja en cuanto se importe la bandera siguiente.
+ */
 const DEV_ONLY_LOGOS: string[] | null = null;
 
 /**
@@ -44,6 +60,9 @@ const COUNT_BY_MODE: Record<GameMode, number> = {
   timed: UNLIMITED,
   daily: 3,
   multicolor: 2,
+  // Siete y no cinco: una bandera se reconoce de un vistazo, así que el modo
+  // corre más que el de logos y con cinco se acababa antes de coger el ritmo.
+  flags: 7,
 };
 
 // Multicolor only makes sense for logos with more than two colors, but a logo
@@ -74,18 +93,30 @@ export interface UseChallengeResult {
   resetSelection: () => void;
 }
 
-function getCatalog(): ChallengeMetadata[] {
-  const all = (challengeCatalog as ChallengeMetadata[]).filter(
-    (item) => item?.id && Array.isArray(item?.colors) && item.colors.length > 0,
-  );
+/**
+ * Familia de imagen de cada modo. `null` es «los logos de siempre», no «todo»:
+ * ver la nota de `utils/catalog`.
+ */
+const CATEGORY_BY_MODE: Record<GameMode, ChallengeCategory | null> = {
+  quick: null,
+  timed: null,
+  daily: null,
+  multicolor: null,
+  flags: "flag",
+};
+
+function getCatalog(mode: GameMode): ChallengeMetadata[] {
   if (DEV_ONLY_LOGOS && DEV_ONLY_LOGOS.length > 0) {
-    return all.filter((item) => DEV_ONLY_LOGOS.includes(item.id));
+    return allPlayable().filter((item) => DEV_ONLY_LOGOS.includes(item.id));
   }
-  return all;
+  return catalogFor(CATEGORY_BY_MODE[mode]);
 }
 
-function loadChallengeMetadata(challengeId: string): ChallengeMetadata | null {
-  const metadata = getCatalog().find((item) => item.id === challengeId);
+function loadChallengeMetadata(
+  mode: GameMode,
+  challengeId: string,
+): ChallengeMetadata | null {
+  const metadata = getCatalog(mode).find((item) => item.id === challengeId);
   if (!metadata) {
     return null;
   }
@@ -120,7 +151,7 @@ function shuffle<T>(items: readonly T[], random: () => number): T[] {
 }
 
 function pickChallengeIds(mode: GameMode, seed?: number): string[] {
-  const catalog = getCatalog();
+  const catalog = getCatalog(mode);
   const random = seed != null ? mulberry32(seed) : () => Math.random();
 
   if (mode === "multicolor") {
@@ -148,7 +179,7 @@ function buildSteps(
   const steps: ChallengeStep[] = [];
 
   for (const id of challengeIds) {
-    const challenge = loadChallengeMetadata(id);
+    const challenge = loadChallengeMetadata(mode, id);
     if (!challenge) {
       continue;
     }

@@ -1,0 +1,42 @@
+{
+  "id": "flag-td",
+  "svg": "flag-td.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-td\" viewBox=\"0 0 640 480\">\n  <g fill-rule=\"evenodd\">\n    <path fill=\"#002664\" d=\"M0 0h214v480H0z\"/>\n    <path fill=\"#c60c30\" d=\"M426 0h214v480H426z\"/>\n    <path fill=\"#fecb00\" d=\"M214 0h212v480H214z\"/>\n  </g>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#002664",
+      "hsv": {
+        "h": 217,
+        "s": 100,
+        "v": 39
+      }
+    },
+    {
+      "hex": "#C60C30",
+      "hsv": {
+        "h": 348,
+        "s": 94,
+        "v": 78
+      }
+    },
+    {
+      "hex": "#FECB00",
+      "hsv": {
+        "h": 48,
+        "s": 100,
+        "v": 100
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Chad",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/td.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "light"
+}

@@ -1,0 +1,54 @@
+{
+  "id": "flag-gm",
+  "svg": "flag-gm.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-gm\" viewBox=\"0 0 640 480\">\n  <defs>\n    <clipPath id=\"gm-a\">\n      <path fill-opacity=\".7\" d=\"M0-48h640v480H0z\"/>\n    </clipPath>\n  </defs>\n  <g fill-rule=\"evenodd\" stroke-width=\"1pt\" clip-path=\"url(#gm-a)\" transform=\"translate(0 48)\">\n    <path fill=\"red\" d=\"M0-128h640V85.3H0z\"/>\n    <path fill=\"#fff\" d=\"M0 85.3h640V121H0z\"/>\n    <path fill=\"#009\" d=\"M0 120.9h640V263H0z\"/>\n    <path fill=\"#fff\" d=\"M0 263.1h640v35.6H0z\"/>\n    <path fill=\"#090\" d=\"M0 298.7h640V512H0z\"/>\n  </g>\n</svg>\n",
+  "editableColorIndex": 1,
+  "colors": [
+    {
+      "hex": "#FF0000",
+      "hsv": {
+        "h": 0,
+        "s": 100,
+        "v": 100
+      },
+      "svgColor": "red",
+      "svgColors": [
+        "red"
+      ]
+    },
+    {
+      "hex": "#000099",
+      "hsv": {
+        "h": 240,
+        "s": 100,
+        "v": 60
+      },
+      "svgColor": "#009",
+      "svgColors": [
+        "#009"
+      ]
+    },
+    {
+      "hex": "#009900",
+      "hsv": {
+        "h": 120,
+        "s": 100,
+        "v": 60
+      },
+      "svgColor": "#090",
+      "svgColors": [
+        "#090"
+      ]
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Gambia",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gm.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "light"
+}

@@ -1,0 +1,34 @@
+{
+  "id": "flag-bs",
+  "svg": "flag-bs.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-bs\" viewBox=\"0 0 640 480\">\n  <defs>\n    <clipPath id=\"bs-a\">\n      <path fill-opacity=\".7\" d=\"M-12 0h640v480H-12z\"/>\n    </clipPath>\n  </defs>\n  <g fill-rule=\"evenodd\" clip-path=\"url(#bs-a)\" transform=\"translate(12)\">\n    <path fill=\"#fff\" d=\"M968.5 480h-979V1.8h979z\"/>\n    <path fill=\"#ffe900\" d=\"M968.5 344.5h-979V143.3h979z\"/>\n    <path fill=\"#08ced6\" d=\"M968.5 480h-979V320.6h979zm0-318.7h-979V2h979z\"/>\n    <path fill=\"#000001\" d=\"M-11 0c2.3 0 391.8 236.8 391.8 236.8L-12 479.2z\"/>\n  </g>\n</svg>\n",
+  "editableColorIndex": 1,
+  "colors": [
+    {
+      "hex": "#FFE900",
+      "hsv": {
+        "h": 55,
+        "s": 100,
+        "v": 100
+      }
+    },
+    {
+      "hex": "#08CED6",
+      "hsv": {
+        "h": 182,
+        "s": 96,
+        "v": 84
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Bahamas",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bs.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "light"
+}

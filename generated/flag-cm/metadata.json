@@ -1,0 +1,42 @@
+{
+  "id": "flag-cm",
+  "svg": "flag-cm.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" id=\"flag-icons-cm\" viewBox=\"0 0 640 480\">\n  <path fill=\"#007a5e\" d=\"M0 0h213.3v480H0z\"/>\n  <path fill=\"#ce1126\" d=\"M213.3 0h213.4v480H213.3z\"/>\n  <path fill=\"#fcd116\" d=\"M426.7 0H640v480H426.7z\"/>\n  <g fill=\"#fcd116\" transform=\"translate(320 240)scale(7.1111)\">\n    <g id=\"cm-b\">\n      <path id=\"cm-a\" d=\"M0-8-2.5-.4 1.3.9z\"/>\n      <use xlink:href=\"#cm-a\" width=\"100%\" height=\"100%\" transform=\"scale(-1 1)\"/>\n    </g>\n    <use xlink:href=\"#cm-b\" width=\"100%\" height=\"100%\" transform=\"rotate(72)\"/>\n    <use xlink:href=\"#cm-b\" width=\"100%\" height=\"100%\" transform=\"rotate(144)\"/>\n    <use xlink:href=\"#cm-b\" width=\"100%\" height=\"100%\" transform=\"rotate(-144)\"/>\n    <use xlink:href=\"#cm-b\" width=\"100%\" height=\"100%\" transform=\"rotate(-72)\"/>\n  </g>\n</svg>\n",
+  "editableColorIndex": 2,
+  "colors": [
+    {
+      "hex": "#007A5E",
+      "hsv": {
+        "h": 166,
+        "s": 100,
+        "v": 48
+      }
+    },
+    {
+      "hex": "#CE1126",
+      "hsv": {
+        "h": 353,
+        "s": 92,
+        "v": 81
+      }
+    },
+    {
+      "hex": "#FCD116",
+      "hsv": {
+        "h": 49,
+        "s": 91,
+        "v": 99
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Camerún",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/cm.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

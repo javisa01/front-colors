@@ -1,0 +1,42 @@
+{
+  "id": "flag-cd",
+  "svg": "flag-cd.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-cd\" viewBox=\"0 0 640 480\">\n  <path fill=\"#007fff\" d=\"M0 0h640v480H0z\"/>\n  <path fill=\"#f7d618\" d=\"M28.8 96H96l20.8-67.2L137.6 96h67.2l-54.4 41.6 20.8 67.2-54.4-41.6-54.4 41.6 20.8-67.2zM600 0 0 360v120h40l600-360V0z\"/>\n  <path fill=\"#ce1021\" d=\"M640 0 0 384v96L640 96z\"/>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#007FFF",
+      "hsv": {
+        "h": 210,
+        "s": 100,
+        "v": 100
+      }
+    },
+    {
+      "hex": "#F7D618",
+      "hsv": {
+        "h": 51,
+        "s": 90,
+        "v": 97
+      }
+    },
+    {
+      "hex": "#CE1021",
+      "hsv": {
+        "h": 355,
+        "s": 92,
+        "v": 81
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de República Democrática del Congo",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/cd.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

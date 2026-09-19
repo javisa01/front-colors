@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useReducer } from "react";
 
 import type { ChallengeStep, PartyConfig } from "@/types/challenge";
 import { countHits, trailingStreak } from "@/utils/colorScore";
+import { isSharedDeckMode } from "@/utils/party";
 
 /**
  * Phases of a party run:
@@ -115,7 +116,7 @@ function makeReducer(config: PartyConfig) {
           };
         }
 
-        if (config.mode === "battle") {
+        if (isSharedDeckMode(config.mode)) {
           const isLastPlayer = state.playerIndex >= playerCount - 1;
           return {
             ...state,
@@ -138,7 +139,7 @@ function makeReducer(config: PartyConfig) {
 
       case "PROCEED": {
         if (state.phase === "guessResult") {
-          if (config.mode === "battle") {
+          if (isSharedDeckMode(config.mode)) {
             return {
               ...state,
               phase: "handoff",
@@ -207,6 +208,7 @@ function selectCurrentStep(
 ): ChallengeStep | null {
   switch (config.mode) {
     case "battle":
+    case "flags-battle":
       return config.sharedSteps[state.slot] ?? null;
     case "coop":
       return config.perPlayerSteps[state.playerIndex]?.[state.slot] ?? null;

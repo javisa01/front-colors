@@ -1,0 +1,42 @@
+{
+  "id": "flag-bj",
+  "svg": "flag-bj.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-bj\" viewBox=\"0 0 640 480\">\n  <defs>\n    <clipPath id=\"bj-a\">\n      <path fill=\"gray\" d=\"M67.6-154h666v666h-666z\"/>\n    </clipPath>\n  </defs>\n  <g clip-path=\"url(#bj-a)\" transform=\"matrix(.961 0 0 .7207 -65 111)\">\n    <g fill-rule=\"evenodd\" stroke-width=\"1pt\">\n      <path fill=\"#319400\" d=\"M0-154h333v666H0z\"/>\n      <path fill=\"#ffd600\" d=\"M333-154h666v333H333z\"/>\n      <path fill=\"#de2110\" d=\"M333 179h666v333H333z\"/>\n    </g>\n  </g>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#319400",
+      "hsv": {
+        "h": 100,
+        "s": 100,
+        "v": 58
+      }
+    },
+    {
+      "hex": "#FFD600",
+      "hsv": {
+        "h": 50,
+        "s": 100,
+        "v": 100
+      }
+    },
+    {
+      "hex": "#DE2110",
+      "hsv": {
+        "h": 5,
+        "s": 93,
+        "v": 87
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Benín",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/bj.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

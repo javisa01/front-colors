@@ -1,0 +1,42 @@
+{
+  "id": "flag-gy",
+  "svg": "flag-gy.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-gy\" viewBox=\"0 0 640 480\">\n  <g fill-rule=\"evenodd\">\n    <path fill=\"#399408\" d=\"M2.4 0H640v480H2.4z\"/>\n    <path fill=\"#fff\" d=\"M.2 0c-.9 0 619.6 241.5 619.6 241.5L0 479.8z\"/>\n    <path fill=\"#ffde08\" d=\"M.3 20.2c3.4 0 559 217.9 555.9 220L1.9 463.2.3 20.3z\"/>\n    <path fill=\"#000001\" d=\"M1.9.8c1.8 0 290.9 240.9 290.9 240.9L1.8 477z\"/>\n    <path fill=\"#de2110\" d=\"M.3 33.9c1.6-15 260.9 208.4 260.9 208.4L.2 451.7V33.9z\"/>\n  </g>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#399408",
+      "hsv": {
+        "h": 99,
+        "s": 95,
+        "v": 58
+      }
+    },
+    {
+      "hex": "#FFDE08",
+      "hsv": {
+        "h": 52,
+        "s": 97,
+        "v": 100
+      }
+    },
+    {
+      "hex": "#DE2110",
+      "hsv": {
+        "h": 5,
+        "s": 93,
+        "v": 87
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Guyana",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gy.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

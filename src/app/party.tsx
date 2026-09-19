@@ -33,7 +33,11 @@ import {
   scoreTimedGuess,
 } from "@/utils/colorScore";
 import { feedbackForScore } from "@/utils/haptics";
-import { buildPartyConfig, getPartyConfig } from "@/utils/party";
+import {
+  buildPartyConfig,
+  getPartyConfig,
+  isSharedDeckMode,
+} from "@/utils/party";
 import { playGameOver, playScoreSound } from "@/utils/sound";
 import {
   submitTeamAverageRecord,
@@ -362,7 +366,7 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
           </View>
 
           <View style={styles.handoffMeta}>
-            {config.mode === "battle" ? (
+            {isSharedDeckMode(config.mode) ? (
               <Pill
                 label={t("party.handoff.image", {
                   current: slot + 1,
@@ -419,10 +423,9 @@ function PartyGame({ config, onExit, onReplay }: PartyGameProps): ReactElement {
               <Pill
                 label={t("party.play.image", {
                   current: slot + 1,
-                  total:
-                    config.mode === "battle"
-                      ? config.sharedSteps.length
-                      : config.imagesPerPlayer,
+                  total: isSharedDeckMode(config.mode)
+                    ? config.sharedSteps.length
+                    : config.imagesPerPlayer,
                 })}
               />
             )}

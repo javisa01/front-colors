@@ -189,6 +189,18 @@ export const lightPalette: Palette = {
       pigmentPressed: "#485907",
       ink: "#FFFFFF",
     },
+    // El de los dos modos de banderas. En claro el cian se oscurece bastante
+    // más que en oscuro: a plena saturación sobre papel no llega al contraste
+    // que sí alcanzan el azul y el verde azulado de al lado, y quedaría como el
+    // único tono flojo de la escala.
+    cyan: {
+      surface: "#E4F5FA",
+      border: "#B2DFEE",
+      icon: "#0D6A85",
+      pigment: "#0D6A85",
+      pigmentPressed: "#0A566C",
+      ink: "#FFFFFF",
+    },
   },
   /*
     En claro el mismo cálculo con la luminosidad invertida: papel muy claro

@@ -1,0 +1,42 @@
+{
+  "id": "flag-ro",
+  "svg": "flag-ro.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-ro\" viewBox=\"0 0 640 480\">\n  <g fill-rule=\"evenodd\" stroke-width=\"1pt\">\n    <path fill=\"#00319c\" d=\"M0 0h213.3v480H0z\"/>\n    <path fill=\"#ffde00\" d=\"M213.3 0h213.4v480H213.3z\"/>\n    <path fill=\"#de2110\" d=\"M426.7 0H640v480H426.7z\"/>\n  </g>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#00319C",
+      "hsv": {
+        "h": 221,
+        "s": 100,
+        "v": 61
+      }
+    },
+    {
+      "hex": "#FFDE00",
+      "hsv": {
+        "h": 52,
+        "s": 100,
+        "v": 100
+      }
+    },
+    {
+      "hex": "#DE2110",
+      "hsv": {
+        "h": 5,
+        "s": 93,
+        "v": 87
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Rumanía",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ro.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

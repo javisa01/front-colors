@@ -900,7 +900,7 @@ function RoundRow({
       </View>
 
       <View style={styles.roundText}>
-        {/* El identificador del logo era el nombre de la marca —«lacoste»—, es
+        {/* El identificador del logo era el nombre de la marca —«spotify»—, es
             decir media respuesta escrita en la fila del desglose. La ronda ya
             la identifica igual de bien y no cuenta nada. */}
         <Text style={Type.bodyStrong} numberOfLines={1}>

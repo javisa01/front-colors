@@ -25,7 +25,6 @@
 29/08:
 Haz estos cambios antes de continuar con la fase 6, en front y back:
 - Evitar que se pueda enviar 2 veces un resultado (clicar 2 veces rapido al boton de comprobar)
-- logo lacoste le cambia el color de la boca, no del cuerpo cocodrilo
 - Añadir fondo en pantalla Entrar en tu cuenta y pantallas configurar y turno del jugador X
 - Añadir fondos diferentes en las pantallas que no tienen en el modo online (excepto las de jugar). Fondos tambien minimalistas, diferentes a los de la pantalla principal, parecido a las de resultado del modo offline.  Que los fondos tengan concordancia, por ejemplo lo que esté bajo la ruta /online/groups sea el mismo, pero lo que este bajo /online diferente a /online/groups
 - Cambiar backend para que coincida con el front minimo 8 caracteres en registro de la contraseña

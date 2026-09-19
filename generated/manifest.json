@@ -1,9 +1,5 @@
 [
   {
-    "id": "2xko",
-    "colors": 1
-  },
-  {
     "id": "7eleven",
     "colors": 3
   },
@@ -44,20 +40,12 @@
     "colors": 1
   },
   {
-    "id": "angeles-lakers",
-    "colors": 2
-  },
-  {
     "id": "apple",
     "colors": 6
   },
   {
     "id": "arduino",
     "colors": 1
-  },
-  {
-    "id": "arsenal",
-    "colors": 4
   },
   {
     "id": "atari",
@@ -70,14 +58,6 @@
   {
     "id": "axa",
     "colors": 2
-  },
-  {
-    "id": "barbie",
-    "colors": 1
-  },
-  {
-    "id": "barca",
-    "colors": 5
   },
   {
     "id": "bbva",
@@ -96,10 +76,6 @@
     "colors": 2
   },
   {
-    "id": "boca-juniors",
-    "colors": 2
-  },
-  {
     "id": "bosch",
     "colors": 1
   },
@@ -114,10 +90,6 @@
   {
     "id": "canon",
     "colors": 1
-  },
-  {
-    "id": "capcom",
-    "colors": 2
   },
   {
     "id": "caterpillar",
@@ -140,10 +112,6 @@
     "colors": 1
   },
   {
-    "id": "dc",
-    "colors": 1
-  },
-  {
     "id": "deliveroo",
     "colors": 1
   },
@@ -158,10 +126,6 @@
   {
     "id": "dhl",
     "colors": 2
-  },
-  {
-    "id": "disney",
-    "colors": 1
   },
   {
     "id": "dji",
@@ -208,10 +172,6 @@
     "colors": 2
   },
   {
-    "id": "ferrari",
-    "colors": 3
-  },
-  {
     "id": "figma",
     "colors": 5
   },
@@ -222,6 +182,978 @@
   {
     "id": "firebase",
     "colors": 2
+  },
+  {
+    "id": "flag-ad",
+    "colors": 7
+  },
+  {
+    "id": "flag-ae",
+    "colors": 2
+  },
+  {
+    "id": "flag-ag",
+    "colors": 3
+  },
+  {
+    "id": "flag-ai",
+    "colors": 5
+  },
+  {
+    "id": "flag-al",
+    "colors": 1
+  },
+  {
+    "id": "flag-am",
+    "colors": 3
+  },
+  {
+    "id": "flag-ao",
+    "colors": 2
+  },
+  {
+    "id": "flag-aq",
+    "colors": 1
+  },
+  {
+    "id": "flag-ar",
+    "colors": 3
+  },
+  {
+    "id": "flag-as",
+    "colors": 6
+  },
+  {
+    "id": "flag-at",
+    "colors": 1
+  },
+  {
+    "id": "flag-au",
+    "colors": 2
+  },
+  {
+    "id": "flag-aw",
+    "colors": 12
+  },
+  {
+    "id": "flag-ax",
+    "colors": 3
+  },
+  {
+    "id": "flag-az",
+    "colors": 3
+  },
+  {
+    "id": "flag-ba",
+    "colors": 2
+  },
+  {
+    "id": "flag-bb",
+    "colors": 2
+  },
+  {
+    "id": "flag-bd",
+    "colors": 2
+  },
+  {
+    "id": "flag-be",
+    "colors": 2
+  },
+  {
+    "id": "flag-bf",
+    "colors": 3
+  },
+  {
+    "id": "flag-bg",
+    "colors": 2
+  },
+  {
+    "id": "flag-bh",
+    "colors": 1
+  },
+  {
+    "id": "flag-bi",
+    "colors": 2
+  },
+  {
+    "id": "flag-bj",
+    "colors": 3
+  },
+  {
+    "id": "flag-bl",
+    "colors": 2
+  },
+  {
+    "id": "flag-bm",
+    "colors": 9
+  },
+  {
+    "id": "flag-bo",
+    "colors": 21
+  },
+  {
+    "id": "flag-bq",
+    "colors": 2
+  },
+  {
+    "id": "flag-br",
+    "colors": 4
+  },
+  {
+    "id": "flag-bs",
+    "colors": 2
+  },
+  {
+    "id": "flag-bt",
+    "colors": 2
+  },
+  {
+    "id": "flag-bv",
+    "colors": 2
+  },
+  {
+    "id": "flag-bw",
+    "colors": 1
+  },
+  {
+    "id": "flag-by",
+    "colors": 2
+  },
+  {
+    "id": "flag-bz",
+    "colors": 22
+  },
+  {
+    "id": "flag-ca",
+    "colors": 1
+  },
+  {
+    "id": "flag-cc",
+    "colors": 4
+  },
+  {
+    "id": "flag-cd",
+    "colors": 3
+  },
+  {
+    "id": "flag-cf",
+    "colors": 4
+  },
+  {
+    "id": "flag-cg",
+    "colors": 3
+  },
+  {
+    "id": "flag-ch",
+    "colors": 1
+  },
+  {
+    "id": "flag-ci",
+    "colors": 2
+  },
+  {
+    "id": "flag-ck",
+    "colors": 2
+  },
+  {
+    "id": "flag-cl",
+    "colors": 2
+  },
+  {
+    "id": "flag-cm",
+    "colors": 3
+  },
+  {
+    "id": "flag-cn",
+    "colors": 2
+  },
+  {
+    "id": "flag-co",
+    "colors": 3
+  },
+  {
+    "id": "flag-cp",
+    "colors": 2
+  },
+  {
+    "id": "flag-cr",
+    "colors": 2
+  },
+  {
+    "id": "flag-cu",
+    "colors": 2
+  },
+  {
+    "id": "flag-cv",
+    "colors": 3
+  },
+  {
+    "id": "flag-cw",
+    "colors": 2
+  },
+  {
+    "id": "flag-cx",
+    "colors": 3
+  },
+  {
+    "id": "flag-cy",
+    "colors": 2
+  },
+  {
+    "id": "flag-cz",
+    "colors": 2
+  },
+  {
+    "id": "flag-de",
+    "colors": 2
+  },
+  {
+    "id": "flag-dg",
+    "colors": 7
+  },
+  {
+    "id": "flag-dj",
+    "colors": 3
+  },
+  {
+    "id": "flag-dk",
+    "colors": 1
+  },
+  {
+    "id": "flag-dm",
+    "colors": 10
+  },
+  {
+    "id": "flag-do",
+    "colors": 10
+  },
+  {
+    "id": "flag-dz",
+    "colors": 2
+  },
+  {
+    "id": "flag-ec",
+    "colors": 14
+  },
+  {
+    "id": "flag-ee",
+    "colors": 1
+  },
+  {
+    "id": "flag-eg",
+    "colors": 2
+  },
+  {
+    "id": "flag-er",
+    "colors": 4
+  },
+  {
+    "id": "flag-es",
+    "colors": 9
+  },
+  {
+    "id": "flag-et",
+    "colors": 4
+  },
+  {
+    "id": "flag-fi",
+    "colors": 1
+  },
+  {
+    "id": "flag-fj",
+    "colors": 7
+  },
+  {
+    "id": "flag-fk",
+    "colors": 10
+  },
+  {
+    "id": "flag-fm",
+    "colors": 1
+  },
+  {
+    "id": "flag-fo",
+    "colors": 2
+  },
+  {
+    "id": "flag-fr",
+    "colors": 2
+  },
+  {
+    "id": "flag-ga",
+    "colors": 3
+  },
+  {
+    "id": "flag-gb",
+    "colors": 2
+  },
+  {
+    "id": "flag-gd",
+    "colors": 3
+  },
+  {
+    "id": "flag-ge",
+    "colors": 1
+  },
+  {
+    "id": "flag-gf",
+    "colors": 2
+  },
+  {
+    "id": "flag-gg",
+    "colors": 2
+  },
+  {
+    "id": "flag-gh",
+    "colors": 3
+  },
+  {
+    "id": "flag-gi",
+    "colors": 2
+  },
+  {
+    "id": "flag-gl",
+    "colors": 1
+  },
+  {
+    "id": "flag-gm",
+    "colors": 3
+  },
+  {
+    "id": "flag-gn",
+    "colors": 3
+  },
+  {
+    "id": "flag-gp",
+    "colors": 2
+  },
+  {
+    "id": "flag-gq",
+    "colors": 7
+  },
+  {
+    "id": "flag-gr",
+    "colors": 1
+  },
+  {
+    "id": "flag-gs",
+    "colors": 18
+  },
+  {
+    "id": "flag-gt",
+    "colors": 19
+  },
+  {
+    "id": "flag-gu",
+    "colors": 9
+  },
+  {
+    "id": "flag-gw",
+    "colors": 3
+  },
+  {
+    "id": "flag-gy",
+    "colors": 3
+  },
+  {
+    "id": "flag-hk",
+    "colors": 1
+  },
+  {
+    "id": "flag-hm",
+    "colors": 2
+  },
+  {
+    "id": "flag-hn",
+    "colors": 1
+  },
+  {
+    "id": "flag-hr",
+    "colors": 4
+  },
+  {
+    "id": "flag-ht",
+    "colors": 7
+  },
+  {
+    "id": "flag-hu",
+    "colors": 2
+  },
+  {
+    "id": "flag-id",
+    "colors": 1
+  },
+  {
+    "id": "flag-ie",
+    "colors": 2
+  },
+  {
+    "id": "flag-il",
+    "colors": 1
+  },
+  {
+    "id": "flag-im",
+    "colors": 2
+  },
+  {
+    "id": "flag-in",
+    "colors": 3
+  },
+  {
+    "id": "flag-io",
+    "colors": 7
+  },
+  {
+    "id": "flag-is",
+    "colors": 2
+  },
+  {
+    "id": "flag-it",
+    "colors": 2
+  },
+  {
+    "id": "flag-je",
+    "colors": 9
+  },
+  {
+    "id": "flag-jm",
+    "colors": 2
+  },
+  {
+    "id": "flag-jo",
+    "colors": 2
+  },
+  {
+    "id": "flag-jp",
+    "colors": 1
+  },
+  {
+    "id": "flag-ke",
+    "colors": 2
+  },
+  {
+    "id": "flag-kg",
+    "colors": 2
+  },
+  {
+    "id": "flag-kh",
+    "colors": 2
+  },
+  {
+    "id": "flag-ki",
+    "colors": 4
+  },
+  {
+    "id": "flag-km",
+    "colors": 4
+  },
+  {
+    "id": "flag-kn",
+    "colors": 3
+  },
+  {
+    "id": "flag-kp",
+    "colors": 2
+  },
+  {
+    "id": "flag-kr",
+    "colors": 2
+  },
+  {
+    "id": "flag-kw",
+    "colors": 2
+  },
+  {
+    "id": "flag-ky",
+    "colors": 10
+  },
+  {
+    "id": "flag-kz",
+    "colors": 2
+  },
+  {
+    "id": "flag-la",
+    "colors": 2
+  },
+  {
+    "id": "flag-lb",
+    "colors": 2
+  },
+  {
+    "id": "flag-lc",
+    "colors": 2
+  },
+  {
+    "id": "flag-li",
+    "colors": 3
+  },
+  {
+    "id": "flag-lk",
+    "colors": 4
+  },
+  {
+    "id": "flag-lr",
+    "colors": 2
+  },
+  {
+    "id": "flag-ls",
+    "colors": 2
+  },
+  {
+    "id": "flag-lt",
+    "colors": 3
+  },
+  {
+    "id": "flag-lu",
+    "colors": 2
+  },
+  {
+    "id": "flag-lv",
+    "colors": 1
+  },
+  {
+    "id": "flag-ly",
+    "colors": 2
+  },
+  {
+    "id": "flag-ma",
+    "colors": 2
+  },
+  {
+    "id": "flag-mc",
+    "colors": 1
+  },
+  {
+    "id": "flag-md",
+    "colors": 10
+  },
+  {
+    "id": "flag-me",
+    "colors": 6
+  },
+  {
+    "id": "flag-mf",
+    "colors": 2
+  },
+  {
+    "id": "flag-mg",
+    "colors": 2
+  },
+  {
+    "id": "flag-mh",
+    "colors": 2
+  },
+  {
+    "id": "flag-mk",
+    "colors": 2
+  },
+  {
+    "id": "flag-ml",
+    "colors": 3
+  },
+  {
+    "id": "flag-mm",
+    "colors": 3
+  },
+  {
+    "id": "flag-mn",
+    "colors": 3
+  },
+  {
+    "id": "flag-mo",
+    "colors": 2
+  },
+  {
+    "id": "flag-mp",
+    "colors": 9
+  },
+  {
+    "id": "flag-mq",
+    "colors": 3
+  },
+  {
+    "id": "flag-mr",
+    "colors": 3
+  },
+  {
+    "id": "flag-ms",
+    "colors": 9
+  },
+  {
+    "id": "flag-mt",
+    "colors": 1
+  },
+  {
+    "id": "flag-mu",
+    "colors": 4
+  },
+  {
+    "id": "flag-mv",
+    "colors": 2
+  },
+  {
+    "id": "flag-mw",
+    "colors": 2
+  },
+  {
+    "id": "flag-mx",
+    "colors": 37
+  },
+  {
+    "id": "flag-my",
+    "colors": 3
+  },
+  {
+    "id": "flag-mz",
+    "colors": 3
+  },
+  {
+    "id": "flag-na",
+    "colors": 4
+  },
+  {
+    "id": "flag-nc",
+    "colors": 4
+  },
+  {
+    "id": "flag-ne",
+    "colors": 2
+  },
+  {
+    "id": "flag-nf",
+    "colors": 1
+  },
+  {
+    "id": "flag-ng",
+    "colors": 1
+  },
+  {
+    "id": "flag-ni",
+    "colors": 19
+  },
+  {
+    "id": "flag-nl",
+    "colors": 2
+  },
+  {
+    "id": "flag-no",
+    "colors": 2
+  },
+  {
+    "id": "flag-np",
+    "colors": 2
+  },
+  {
+    "id": "flag-nr",
+    "colors": 2
+  },
+  {
+    "id": "flag-nu",
+    "colors": 3
+  },
+  {
+    "id": "flag-nz",
+    "colors": 3
+  },
+  {
+    "id": "flag-om",
+    "colors": 3
+  },
+  {
+    "id": "flag-pa",
+    "colors": 2
+  },
+  {
+    "id": "flag-pe",
+    "colors": 1
+  },
+  {
+    "id": "flag-pf",
+    "colors": 4
+  },
+  {
+    "id": "flag-pg",
+    "colors": 2
+  },
+  {
+    "id": "flag-ph",
+    "colors": 3
+  },
+  {
+    "id": "flag-pk",
+    "colors": 1
+  },
+  {
+    "id": "flag-pl",
+    "colors": 1
+  },
+  {
+    "id": "flag-pm",
+    "colors": 2
+  },
+  {
+    "id": "flag-pn",
+    "colors": 8
+  },
+  {
+    "id": "flag-pr",
+    "colors": 2
+  },
+  {
+    "id": "flag-pt",
+    "colors": 4
+  },
+  {
+    "id": "flag-pw",
+    "colors": 2
+  },
+  {
+    "id": "flag-py",
+    "colors": 4
+  },
+  {
+    "id": "flag-qa",
+    "colors": 1
+  },
+  {
+    "id": "flag-re",
+    "colors": 2
+  },
+  {
+    "id": "flag-ro",
+    "colors": 3
+  },
+  {
+    "id": "flag-rs",
+    "colors": 4
+  },
+  {
+    "id": "flag-ru",
+    "colors": 2
+  },
+  {
+    "id": "flag-rw",
+    "colors": 4
+  },
+  {
+    "id": "flag-sb",
+    "colors": 3
+  },
+  {
+    "id": "flag-sc",
+    "colors": 4
+  },
+  {
+    "id": "flag-sd",
+    "colors": 2
+  },
+  {
+    "id": "flag-se",
+    "colors": 2
+  },
+  {
+    "id": "flag-sg",
+    "colors": 1
+  },
+  {
+    "id": "flag-sh",
+    "colors": 2
+  },
+  {
+    "id": "flag-si",
+    "colors": 3
+  },
+  {
+    "id": "flag-sj",
+    "colors": 2
+  },
+  {
+    "id": "flag-sk",
+    "colors": 2
+  },
+  {
+    "id": "flag-sl",
+    "colors": 2
+  },
+  {
+    "id": "flag-sm",
+    "colors": 17
+  },
+  {
+    "id": "flag-sn",
+    "colors": 3
+  },
+  {
+    "id": "flag-so",
+    "colors": 1
+  },
+  {
+    "id": "flag-sr",
+    "colors": 3
+  },
+  {
+    "id": "flag-ss",
+    "colors": 4
+  },
+  {
+    "id": "flag-st",
+    "colors": 3
+  },
+  {
+    "id": "flag-sv",
+    "colors": 53
+  },
+  {
+    "id": "flag-sx",
+    "colors": 8
+  },
+  {
+    "id": "flag-sy",
+    "colors": 2
+  },
+  {
+    "id": "flag-sz",
+    "colors": 4
+  },
+  {
+    "id": "flag-tc",
+    "colors": 8
+  },
+  {
+    "id": "flag-td",
+    "colors": 3
+  },
+  {
+    "id": "flag-tf",
+    "colors": 2
+  },
+  {
+    "id": "flag-tg",
+    "colors": 3
+  },
+  {
+    "id": "flag-th",
+    "colors": 2
+  },
+  {
+    "id": "flag-tj",
+    "colors": 3
+  },
+  {
+    "id": "flag-tk",
+    "colors": 2
+  },
+  {
+    "id": "flag-tl",
+    "colors": 2
+  },
+  {
+    "id": "flag-tm",
+    "colors": 3
+  },
+  {
+    "id": "flag-tn",
+    "colors": 1
+  },
+  {
+    "id": "flag-to",
+    "colors": 1
+  },
+  {
+    "id": "flag-tr",
+    "colors": 1
+  },
+  {
+    "id": "flag-tt",
+    "colors": 1
+  },
+  {
+    "id": "flag-tv",
+    "colors": 4
+  },
+  {
+    "id": "flag-tz",
+    "colors": 3
+  },
+  {
+    "id": "flag-ua",
+    "colors": 2
+  },
+  {
+    "id": "flag-ug",
+    "colors": 2
+  },
+  {
+    "id": "flag-um",
+    "colors": 2
+  },
+  {
+    "id": "flag-us",
+    "colors": 2
+  },
+  {
+    "id": "flag-uy",
+    "colors": 2
+  },
+  {
+    "id": "flag-uz",
+    "colors": 3
+  },
+  {
+    "id": "flag-va",
+    "colors": 3
+  },
+  {
+    "id": "flag-vc",
+    "colors": 3
+  },
+  {
+    "id": "flag-ve",
+    "colors": 3
+  },
+  {
+    "id": "flag-vg",
+    "colors": 7
+  },
+  {
+    "id": "flag-vi",
+    "colors": 5
+  },
+  {
+    "id": "flag-vn",
+    "colors": 2
+  },
+  {
+    "id": "flag-vu",
+    "colors": 3
+  },
+  {
+    "id": "flag-wf",
+    "colors": 2
+  },
+  {
+    "id": "flag-ws",
+    "colors": 2
+  },
+  {
+    "id": "flag-ye",
+    "colors": 1
+  },
+  {
+    "id": "flag-yt",
+    "colors": 2
+  },
+  {
+    "id": "flag-za",
+    "colors": 4
+  },
+  {
+    "id": "flag-zm",
+    "colors": 3
+  },
+  {
+    "id": "flag-zw",
+    "colors": 3
   },
   {
     "id": "foodpanda",
@@ -242,10 +1174,6 @@
   {
     "id": "google",
     "colors": 4
-  },
-  {
-    "id": "harley",
-    "colors": 1
   },
   {
     "id": "heineken",
@@ -288,18 +1216,6 @@
     "colors": 1
   },
   {
-    "id": "lacoste",
-    "colors": 2
-  },
-  {
-    "id": "laliga",
-    "colors": 8
-  },
-  {
-    "id": "lego",
-    "colors": 2
-  },
-  {
     "id": "lenovo",
     "colors": 1
   },
@@ -320,15 +1236,7 @@
     "colors": 1
   },
   {
-    "id": "lol",
-    "colors": 1
-  },
-  {
     "id": "lufthansa",
-    "colors": 1
-  },
-  {
-    "id": "marvel",
     "colors": 1
   },
   {
@@ -376,10 +1284,6 @@
     "colors": 1
   },
   {
-    "id": "olimpiadas",
-    "colors": 4
-  },
-  {
     "id": "onenote",
     "colors": 1
   },
@@ -408,15 +1312,7 @@
     "colors": 4
   },
   {
-    "id": "pokemon",
-    "colors": 1
-  },
-  {
     "id": "powerpoint",
-    "colors": 1
-  },
-  {
-    "id": "premier-league",
     "colors": 1
   },
   {
@@ -448,20 +1344,8 @@
     "colors": 2
   },
   {
-    "id": "riot",
-    "colors": 1
-  },
-  {
     "id": "rituals",
     "colors": 1
-  },
-  {
-    "id": "rockstar",
-    "colors": 1
-  },
-  {
-    "id": "rolex",
-    "colors": 2
   },
   {
     "id": "sabadell",
@@ -480,10 +1364,6 @@
     "colors": 1
   },
   {
-    "id": "sega",
-    "colors": 1
-  },
-  {
     "id": "snapchat",
     "colors": 1
   },
@@ -496,10 +1376,6 @@
     "colors": 1
   },
   {
-    "id": "spongebob",
-    "colors": 26
-  },
-  {
     "id": "spotify",
     "colors": 1
   },
@@ -508,19 +1384,11 @@
     "colors": 1
   },
   {
-    "id": "starbucks",
-    "colors": 1
-  },
-  {
     "id": "strava",
     "colors": 1
   },
   {
     "id": "subway",
-    "colors": 2
-  },
-  {
-    "id": "superman",
     "colors": 2
   },
   {
@@ -548,10 +1416,6 @@
     "colors": 1
   },
   {
-    "id": "toysRus",
-    "colors": 4
-  },
-  {
     "id": "twitter",
     "colors": 1
   },
@@ -562,10 +1426,6 @@
   {
     "id": "ups",
     "colors": 2
-  },
-  {
-    "id": "valorant",
-    "colors": 1
   },
   {
     "id": "viber",
@@ -584,15 +1444,7 @@
     "colors": 1
   },
   {
-    "id": "wb",
-    "colors": 2
-  },
-  {
     "id": "whatsapp",
-    "colors": 1
-  },
-  {
-    "id": "wizards-of-the-coast",
     "colors": 1
   },
   {

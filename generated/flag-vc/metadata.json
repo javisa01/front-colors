@@ -1,0 +1,42 @@
+{
+  "id": "flag-vc",
+  "svg": "flag-vc.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-vc\" viewBox=\"0 0 640 480\">\n  <g fill-rule=\"evenodd\">\n    <path fill=\"#f4f100\" d=\"M0 0h640v480H0z\"/>\n    <path fill=\"#199a00\" d=\"M490 0h150v480H490z\"/>\n    <path fill=\"#0058aa\" d=\"M0 0h150v480H0z\"/>\n    <path fill=\"#199a00\" d=\"m259.3 130-46.4 71.3 44.7 74.4 43.8-73.7zm121.2 0-46.3 71.3 44.7 74.4 43.8-73.7zm-61.2 97.3-46.4 71.4 44.8 74.4 43.8-73.7-42.2-72z\"/>\n  </g>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#F4F100",
+      "hsv": {
+        "h": 59,
+        "s": 100,
+        "v": 96
+      }
+    },
+    {
+      "hex": "#199A00",
+      "hsv": {
+        "h": 110,
+        "s": 100,
+        "v": 60
+      }
+    },
+    {
+      "hex": "#0058AA",
+      "hsv": {
+        "h": 209,
+        "s": 100,
+        "v": 67
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de San Vicente y las Granadinas",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/vc.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

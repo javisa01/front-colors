@@ -245,6 +245,24 @@ const spectrum = {
     pigmentPressed: "#94B23C",
     ink: "#1A2006",
   },
+  // El noveno, y el único que llevan dos modos a la vez: los dos de banderas,
+  // el de solitario y el de grupo. La regla de arriba —un tono por modo, sin
+  // repetir— se escribió contra repeticiones *arbitrarias*, que era lo que
+  // hacía leer dos filas sin relación como la misma puesta dos veces. Aquí la
+  // repetición dice algo: son el mismo juego en dos formatos, y que compartan
+  // color es la forma más barata de contarlo.
+  //
+  // Cian y no azul: el azul ya es «Contrarreloj» y el verde azulado
+  // «Colaborativo contrarreloj», así que este se empuja hacia el turquesa
+  // limpio para que no se confunda con ninguno de los dos a media luz.
+  cyan: {
+    surface: "#07222B",
+    border: "#114A5C",
+    icon: "#6FD0EE",
+    pigment: "#51C4E6",
+    pigmentPressed: "#3EADCD",
+    ink: "#03202A",
+  },
 } as const;
 
 export type SpectrumTone = keyof typeof spectrum;
@@ -458,6 +476,9 @@ export const PARTY_TONE = {
   "battle-timed": "orange",
   coop: "green",
   "coop-timed": "teal",
+  // Cian, el mismo que lleva el modo de banderas en solitario. Ver la nota del
+  // pigmento en `spectrum`.
+  "flags-battle": "cyan",
 } as const satisfies Record<string, SpectrumTone>;
 
 export type GroupTone = keyof typeof groupTint;

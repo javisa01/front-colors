@@ -1,0 +1,50 @@
+{
+  "id": "flag-ss",
+  "svg": "flag-ss.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-ss\" viewBox=\"0 0 640 480\">\n  <path fill=\"#078930\" d=\"M0 336h640v144H0z\"/>\n  <path fill=\"#fff\" d=\"M0 144h640v192H0z\"/>\n  <path fill=\"#000001\" d=\"M0 0h640v144H0z\"/>\n  <path fill=\"#da121a\" d=\"M0 168h640v144H0z\"/>\n  <path fill=\"#0f47af\" d=\"m0 0 415.7 240L0 480z\"/>\n  <path fill=\"#fcdd09\" d=\"M200.7 194.8 61.7 240l139 45.1L114.9 167v146z\"/>\n</svg>\n",
+  "editableColorIndex": 2,
+  "colors": [
+    {
+      "hex": "#078930",
+      "hsv": {
+        "h": 139,
+        "s": 95,
+        "v": 54
+      }
+    },
+    {
+      "hex": "#DA121A",
+      "hsv": {
+        "h": 358,
+        "s": 92,
+        "v": 85
+      }
+    },
+    {
+      "hex": "#0F47AF",
+      "hsv": {
+        "h": 219,
+        "s": 91,
+        "v": 69
+      }
+    },
+    {
+      "hex": "#FCDD09",
+      "hsv": {
+        "h": 52,
+        "s": 96,
+        "v": 99
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Sudán del Sur",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ss.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "light"
+}

@@ -1,0 +1,42 @@
+{
+  "id": "flag-sr",
+  "svg": "flag-sr.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-sr\" viewBox=\"0 0 640 480\">\n  <path fill=\"#377e3f\" d=\"M.1 0h640v480H.1z\"/>\n  <path fill=\"#fff\" d=\"M.1 96h640v288H.1z\"/>\n  <path fill=\"#b40a2d\" d=\"M.1 144h640v192H.1z\"/>\n  <path fill=\"#ecc81d\" d=\"m320 153.2 56.4 173.6-147.7-107.3h182.6L263.6 326.8z\"/>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#377E3F",
+      "hsv": {
+        "h": 127,
+        "s": 56,
+        "v": 49
+      }
+    },
+    {
+      "hex": "#B40A2D",
+      "hsv": {
+        "h": 348,
+        "s": 94,
+        "v": 71
+      }
+    },
+    {
+      "hex": "#ECC81D",
+      "hsv": {
+        "h": 50,
+        "s": 88,
+        "v": 93
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Surinam",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/sr.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

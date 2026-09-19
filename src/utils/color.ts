@@ -231,6 +231,13 @@ function replaceColorLiteral(
 export function getChallengeBackgroundTheme(
   challenge: ChallengeMetadata,
 ): SvgBackgroundTheme {
+  // Si el asset trae la decisión medida, manda ella. La heurística de abajo
+  // cuenta literales de color y no sabe cuánta superficie ocupa cada uno, que
+  // es lo que de verdad decide si una imagen se ve sobre papel o sobre carbón.
+  if (challenge.background) {
+    return challenge.background === "light" ? LIGHT_THEME : DARK_THEME;
+  }
+
   if (!challenge.svgXml) {
     return DARK_THEME;
   }

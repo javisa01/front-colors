@@ -1,0 +1,34 @@
+{
+  "id": "flag-gg",
+  "svg": "flag-gg.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" id=\"flag-icons-gg\" viewBox=\"0 0 640 480\">\n  <path fill=\"#fff\" d=\"M0 0h640v480H0z\"/>\n  <path fill=\"#e8112d\" d=\"M256 0h128v480H256z\"/>\n  <path fill=\"#e8112d\" d=\"M0 176h640v128H0z\"/>\n  <path id=\"gg-a\" fill=\"#f9dd16\" d=\"m110 286.7 23.3-23.4h210v-46.6h-210L110 193.3z\"/>\n  <use xlink:href=\"#gg-a\" width=\"36\" height=\"24\" transform=\"rotate(90 320 240)\"/>\n  <use xlink:href=\"#gg-a\" width=\"36\" height=\"24\" transform=\"rotate(-90 320 240)\"/>\n  <use xlink:href=\"#gg-a\" width=\"36\" height=\"24\" transform=\"rotate(180 320 240)\"/>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#E8112D",
+      "hsv": {
+        "h": 352,
+        "s": 93,
+        "v": 91
+      }
+    },
+    {
+      "hex": "#F9DD16",
+      "hsv": {
+        "h": 53,
+        "s": 91,
+        "v": 98
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Guernesey",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/gg.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

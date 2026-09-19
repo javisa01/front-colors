@@ -1,0 +1,34 @@
+{
+  "id": "flag-nl",
+  "svg": "flag-nl.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-nl\" viewBox=\"0 0 640 480\">\n  <path fill=\"#ae1c28\" d=\"M0 0h640v160H0z\"/>\n  <path fill=\"#fff\" d=\"M0 160h640v160H0z\"/>\n  <path fill=\"#21468b\" d=\"M0 320h640v160H0z\"/>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#AE1C28",
+      "hsv": {
+        "h": 355,
+        "s": 84,
+        "v": 68
+      }
+    },
+    {
+      "hex": "#21468B",
+      "hsv": {
+        "h": 219,
+        "s": 76,
+        "v": 55
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Países Bajos",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/nl.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

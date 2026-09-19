@@ -44,6 +44,61 @@ interface CollectedColor {
 const LOGO_DIR = path.join(process.cwd(), "assets", "logos");
 const OUTPUT_DIR = path.join(process.cwd(), "generated");
 
+// Procedencia y licencia de cada asset, indexada por id. La escriben los
+// importadores (`tools/importFlags.ts`) y se copia tal cual al metadata: sin
+// ella no se puede demostrar de dónde salió un SVG, que es justo el agujero que
+// dejó el catálogo de logos heredado. Es opcional: un SVG sin entrada aquí se
+// procesa igual, solo que sin `source`.
+const SOURCES_PATH = path.join(process.cwd(), "assets", "sources.json");
+
+interface AssetSource {
+  name: string;
+  source: string;
+  license: string;
+  licenseUrl: string;
+  author: string;
+  note?: string;
+  // Familia del asset (`flag`, y lo que venga después). Sale del metadata como
+  // campo de primer nivel, no dentro de `source`: no es procedencia sino
+  // clasificación, y de ella dependen los modos de juego por categoría y el
+  // margen extra que necesitan las banderas al pintarse.
+  category?: string;
+  // Fuerza qué color es el jugable, por hex en vez de por índice: el índice
+  // depende del orden en que aparezcan las formas y cambia al regenerar.
+  // Hace falta cuando la heurística de `pickPrimaryIndex` acierta la forma más
+  // repetida pero no la más visible — el chakra de la bandera de India son
+  // veintitantas piezas azules diminutas y gana por número al naranja del
+  // tercio superior.
+  editableColorHex?: string;
+}
+
+function readSources(): Record<string, AssetSource> {
+  if (!fs.existsSync(SOURCES_PATH)) {
+    return {};
+  }
+  try {
+    return JSON.parse(fs.readFileSync(SOURCES_PATH, "utf8"));
+  } catch {
+    console.warn("⚠️  assets/sources.json ilegible — se genera sin procedencia.");
+    return {};
+  }
+}
+
+const assetSources = readSources();
+
+/**
+ * Se queda con lo que de verdad acredita el origen. `category` y
+ * `editableColorHex` viven en el mismo fichero por comodidad —una entrada por
+ * asset— pero son clasificación y configuración, no procedencia, y copiarlas
+ * dentro de `source` haría creer que forman parte de la licencia.
+ */
+function toProvenance(
+  entry: AssetSource,
+): Omit<AssetSource, "category" | "editableColorHex"> {
+  const { category: _category, editableColorHex: _hex, ...provenance } = entry;
+  return provenance;
+}
+
 // Two colors closer than this (Euclidean distance in RGB) are treated as the
 // same paint. Keeps outlines/placeholders from inflating the color count while
 // staying far below the gap between distinct brand colors.
@@ -438,6 +493,7 @@ interface ProcessResult {
   id: string;
   colors: number;
   primaryHex: string | null;
+  hasSource: boolean;
 }
 
 function processSVG(file: string): ProcessResult {
@@ -465,10 +521,25 @@ function processSVG(file: string): ProcessResult {
     (color) => convert.rgb.hsv(color.rgb)[1] > GREY_S_THRESHOLD,
   );
   const colorList = withColor.length > 0 ? withColor : visible;
-  const editableColorIndex = pickPrimaryIndex(colorList);
   const colors: OutputColor[] = colorList.map(toOutputColor);
 
   const name = path.basename(file, ".svg");
+  const source = assetSources[name];
+
+  let editableColorIndex = pickPrimaryIndex(colorList);
+  if (source?.editableColorHex) {
+    const wanted = source.editableColorHex.toUpperCase();
+    const forced = colors.findIndex((color) => color.hex.toUpperCase() === wanted);
+    if (forced >= 0) {
+      editableColorIndex = forced;
+    } else {
+      console.warn(
+        `⚠️  ${name}: editableColorHex ${wanted} no está entre los colores ` +
+          `detectados (${colors.map((c) => c.hex).join(", ")}). Se ignora.`,
+      );
+    }
+  }
+
   const outputFolder = path.join(OUTPUT_DIR, name);
   fs.mkdirSync(outputFolder, { recursive: true });
 
@@ -481,6 +552,8 @@ function processSVG(file: string): ProcessResult {
         svgXml: xml,
         editableColorIndex,
         colors,
+        ...(source?.category ? { category: source.category } : {}),
+        ...(source ? { source: toProvenance(source) } : {}),
       },
       null,
       2,
@@ -491,6 +564,7 @@ function processSVG(file: string): ProcessResult {
     id: name,
     colors: colors.length,
     primaryHex: colors[editableColorIndex]?.hex ?? null,
+    hasSource: source != null,
   };
 }
 
@@ -572,5 +646,17 @@ if (empty.length > 0) {
   );
   for (const item of empty) {
     console.log(`  - ${item.id}.svg`);
+  }
+}
+
+const noSource = manifest.filter((item) => !item.hasSource);
+
+if (noSource.length > 0) {
+  console.log(
+    `\n${noSource.length} sin procedencia en assets/sources.json. Sin ella no se\n` +
+      "puede acreditar el origen del asset si una tienda lo reclama:",
+  );
+  for (const item of noSource) {
+    console.log(`  - ${item.id}`);
   }
 }

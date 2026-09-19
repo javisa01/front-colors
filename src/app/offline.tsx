@@ -48,6 +48,12 @@ const SOLO_MODES: ModeCard<GameMode>[] = [
   // «Colaborativo contrarreloj», y como cada uno cierra su bloque quedaban a la
   // misma altura y se leían como una fila repetida.
   { id: "multicolor", icon: "palette", tone: "lime" },
+  // Cian y globo terráqueo, los mismos que «Batalla de banderas» en el bloque
+  // de abajo. Es la única pareja de la pantalla que repite color e icono a
+  // propósito: son el mismo juego en dos formatos, y los dos cierran su bloque,
+  // así que quedan a la misma altura y se leen como lo que son. Ver la nota del
+  // pigmento `cyan` en `design/tokens`.
+  { id: "flags", icon: "globe", tone: "cyan" },
 ];
 
 /*
@@ -62,6 +68,7 @@ const PARTY_MODES: ModeCard<PartyMode>[] = [
   { id: "battle-timed", icon: "flame", tone: PARTY_TONE["battle-timed"] },
   { id: "coop", icon: "users", tone: PARTY_TONE.coop },
   { id: "coop-timed", icon: "hourglass", tone: PARTY_TONE["coop-timed"] },
+  { id: "flags-battle", icon: "globe", tone: PARTY_TONE["flags-battle"] },
 ];
 
 /**

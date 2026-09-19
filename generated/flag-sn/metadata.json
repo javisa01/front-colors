@@ -1,0 +1,46 @@
+{
+  "id": "flag-sn",
+  "svg": "flag-sn.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-sn\" viewBox=\"0 0 640 480\">\n  <g fill-rule=\"evenodd\" stroke-width=\"1pt\">\n    <path fill=\"#0b7226\" d=\"M0 0h213.3v480H0z\"/>\n    <path fill=\"#ff0\" d=\"M213.3 0h213.3v480H213.3z\"/>\n    <path fill=\"#bc0000\" d=\"M426.6 0H640v480H426.6z\"/>\n  </g>\n  <path fill=\"#0b7226\" d=\"M342 218.8h71.8l-56.6 43.6 20.7 69.3-56.6-43.6-56.6 41.6 20.7-67.3-56.6-43.6h69.8l22.7-71.3z\"/>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#0B7226",
+      "hsv": {
+        "h": 136,
+        "s": 90,
+        "v": 45
+      }
+    },
+    {
+      "hex": "#FFFF00",
+      "hsv": {
+        "h": 60,
+        "s": 100,
+        "v": 100
+      },
+      "svgColor": "#ff0",
+      "svgColors": [
+        "#ff0"
+      ]
+    },
+    {
+      "hex": "#BC0000",
+      "hsv": {
+        "h": 0,
+        "s": 100,
+        "v": 74
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Senegal",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/sn.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

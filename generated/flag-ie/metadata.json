@@ -1,0 +1,34 @@
+{
+  "id": "flag-ie",
+  "svg": "flag-ie.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-ie\" viewBox=\"0 0 640 480\">\n  <g fill-rule=\"evenodd\" stroke-width=\"1pt\">\n    <path fill=\"#fff\" d=\"M0 0h640v480H0z\"/>\n    <path fill=\"#009A49\" d=\"M0 0h213.3v480H0z\"/>\n    <path fill=\"#FF7900\" d=\"M426.7 0H640v480H426.7z\"/>\n  </g>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#009A49",
+      "hsv": {
+        "h": 148,
+        "s": 100,
+        "v": 60
+      }
+    },
+    {
+      "hex": "#FF7900",
+      "hsv": {
+        "h": 28,
+        "s": 100,
+        "v": 100
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Irlanda",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ie.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

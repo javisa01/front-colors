@@ -1,0 +1,34 @@
+{
+  "id": "flag-se",
+  "svg": "flag-se.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-se\" viewBox=\"0 0 640 480\">\n  <path fill=\"#005293\" d=\"M0 0h640v480H0z\"/>\n  <path fill=\"#fecb00\" d=\"M176 0v192H0v96h176v192h96V288h368v-96H272V0z\"/>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#005293",
+      "hsv": {
+        "h": 207,
+        "s": 100,
+        "v": 58
+      }
+    },
+    {
+      "hex": "#FECB00",
+      "hsv": {
+        "h": 48,
+        "s": 100,
+        "v": 100
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Suecia",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/se.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

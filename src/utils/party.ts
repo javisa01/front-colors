@@ -1,11 +1,12 @@
 import type {
+  ChallengeCategory,
   ChallengeMetadata,
   ChallengeStep,
   PartyConfig,
   PartyMode,
   PartyPlayer,
 } from "@/types/challenge";
-import challengeCatalog from "../../generated/challenges.json";
+import { catalogFor } from "@/utils/catalog";
 
 export const MIN_PLAYERS = 2;
 export const MAX_PLAYERS = 99;
@@ -27,10 +28,20 @@ export const COOP_TURN_SECONDS_MIN = 20;
 // the end it simply wraps around.
 const TIMED_DECK_SIZE = 60;
 
-function getCatalog(): ChallengeMetadata[] {
-  return (challengeCatalog as ChallengeMetadata[]).filter(
-    (item) => item?.id && Array.isArray(item?.colors) && item.colors.length > 0,
-  );
+/**
+ * Familia de imagen de cada modo en grupo. `null` es «los logos de siempre», no
+ * «todo»: ver la nota de `utils/catalog`.
+ */
+const CATEGORY_BY_MODE: Record<PartyMode, ChallengeCategory | null> = {
+  battle: null,
+  "battle-timed": null,
+  coop: null,
+  "coop-timed": null,
+  "flags-battle": "flag",
+};
+
+function getCatalog(mode: PartyMode): ChallengeMetadata[] {
+  return catalogFor(CATEGORY_BY_MODE[mode]);
 }
 
 function toSingleColorStep(challenge: ChallengeMetadata): ChallengeStep | null {
@@ -53,8 +64,8 @@ function toSingleColorStep(challenge: ChallengeMetadata): ChallengeStep | null {
   };
 }
 
-function allSteps(): ChallengeStep[] {
-  return getCatalog()
+function allSteps(mode: PartyMode): ChallengeStep[] {
+  return getCatalog(mode)
     .map(toSingleColorStep)
     .filter((step): step is ChallengeStep => step != null);
 }
@@ -70,8 +81,8 @@ function shuffle<T>(items: readonly T[]): T[] {
 
 // Distinct images where possible; if the catalog is smaller than `count` the
 // shuffled list is repeated so a run can always be assembled.
-function pickUniqueSteps(count: number): ChallengeStep[] {
-  const steps = shuffle(allSteps());
+function pickUniqueSteps(mode: PartyMode, count: number): ChallengeStep[] {
+  const steps = shuffle(allSteps(mode));
   if (steps.length === 0) {
     return [];
   }
@@ -84,8 +95,8 @@ function pickUniqueSteps(count: number): ChallengeStep[] {
 
 // Random images with repetition allowed (used by coop and the timed decks; the
 // brief explicitly allows an image to come up more than once).
-function pickStepsAllowRepeat(count: number): ChallengeStep[] {
-  const steps = allSteps();
+function pickStepsAllowRepeat(mode: PartyMode, count: number): ChallengeStep[] {
+  const steps = allSteps(mode);
   if (steps.length === 0) {
     return [];
   }
@@ -118,6 +129,20 @@ export function coopImagesPerPlayer(players: number): number {
 
 export function isCooperativeMode(mode: PartyMode): boolean {
   return mode === "coop" || mode === "coop-timed";
+}
+
+/**
+ * Modos que reparten las MISMAS imágenes a todo el mundo y se juegan por
+ * turnos: «Batalla de adivinar» y su versión con banderas.
+ *
+ * Existe como función y no como comparación suelta con `"battle"` porque esa
+ * comparación estaba escrita en cinco sitios —el reparto de imágenes, el
+ * marcador por imagen, la cabecera de la ronda y dos ramas del reductor—, y
+ * añadir un modo con la misma forma obligaba a acertar los cinco. Quien añada
+ * el tercero solo toca esto.
+ */
+export function isSharedDeckMode(mode: PartyMode): boolean {
+  return mode === "battle" || mode === "flags-battle";
 }
 
 export function isTimedMode(mode: PartyMode): boolean {
@@ -159,12 +184,14 @@ export function buildPartyConfig(
   let deck: ChallengeStep[] = [];
   let perPlayerSteps: ChallengeStep[][] = [];
 
-  if (mode === "battle") {
-    sharedSteps = pickUniqueSteps(BATTLE_IMAGES);
+  if (isSharedDeckMode(mode)) {
+    sharedSteps = pickUniqueSteps(mode, BATTLE_IMAGES);
   } else if (timed) {
-    deck = pickStepsAllowRepeat(TIMED_DECK_SIZE);
+    deck = pickStepsAllowRepeat(mode, TIMED_DECK_SIZE);
   } else if (mode === "coop") {
-    perPlayerSteps = players.map(() => pickStepsAllowRepeat(imagesPerPlayer));
+    perPlayerSteps = players.map(() =>
+      pickStepsAllowRepeat(mode, imagesPerPlayer),
+    );
   }
 
   return {

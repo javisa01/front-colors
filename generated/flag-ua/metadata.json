@@ -1,0 +1,38 @@
+{
+  "id": "flag-ua",
+  "svg": "flag-ua.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-ua\" viewBox=\"0 0 640 480\">\n  <g fill-rule=\"evenodd\" stroke-width=\"1pt\">\n    <path fill=\"#0057b8\" d=\"M0 0h640v240H0z\"/>\n    <path fill=\"gold\" d=\"M0 240h640v240H0z\"/>\n  </g>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#0057B8",
+      "hsv": {
+        "h": 212,
+        "s": 100,
+        "v": 72
+      }
+    },
+    {
+      "hex": "#FFD700",
+      "hsv": {
+        "h": 51,
+        "s": 100,
+        "v": 100
+      },
+      "svgColor": "gold",
+      "svgColors": [
+        "gold"
+      ]
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Ucrania",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/ua.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

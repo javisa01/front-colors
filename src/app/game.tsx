@@ -50,7 +50,13 @@ import {
   type SavedProgress,
 } from "@/utils/storage";
 
-const VALID_MODES: GameMode[] = ["quick", "timed", "daily", "multicolor"];
+const VALID_MODES: GameMode[] = [
+  "quick",
+  "timed",
+  "daily",
+  "multicolor",
+  "flags",
+];
 const TIMED_SECONDS = 30;
 
 /**

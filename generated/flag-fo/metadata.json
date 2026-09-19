@@ -1,0 +1,34 @@
+{
+  "id": "flag-fo",
+  "svg": "flag-fo.svg",
+  "svgXml": "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"flag-icons-fo\" viewBox=\"0 0 640 480\">\n  <defs>\n    <clipPath id=\"fo-a\">\n      <path fill-opacity=\".7\" d=\"M-78 32h640v480H-78z\"/>\n    </clipPath>\n  </defs>\n  <g fill-rule=\"evenodd\" stroke-width=\"0\" clip-path=\"url(#fo-a)\" transform=\"translate(78 -32)\">\n    <path fill=\"#fff\" d=\"M-78 32h663.9v480H-78z\"/>\n    <path fill=\"#003897\" d=\"M-76 218.7h185.9V32H216v186.7h371.8v106.6H216V512H109.9V325.3h-186z\"/>\n    <path fill=\"#d72828\" d=\"M-76 245.3h212.4V32h53.1v213.3H588v53.4H189.5V512h-53V298.7H-76z\"/>\n  </g>\n</svg>\n",
+  "editableColorIndex": 1,
+  "colors": [
+    {
+      "hex": "#003897",
+      "hsv": {
+        "h": 218,
+        "s": 100,
+        "v": 59
+      }
+    },
+    {
+      "hex": "#D72828",
+      "hsv": {
+        "h": 0,
+        "s": 81,
+        "v": 84
+      }
+    }
+  ],
+  "category": "flag",
+  "source": {
+    "name": "Bandera de Islas Feroe",
+    "source": "https://github.com/lipis/flag-icons/blob/main/flags/4x3/fo.svg",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/lipis/flag-icons/blob/main/LICENSE",
+    "author": "Panayiotis Lipiridis — flag-icons",
+    "note": "Emblema estatal: el MIT cubre la vectorización, no el diseño."
+  },
+  "background": "dark"
+}

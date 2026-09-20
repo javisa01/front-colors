@@ -12,8 +12,16 @@
     "colors": 1
   },
   {
+    "id": "adobe",
+    "colors": 1
+  },
+  {
     "id": "adobe-premiere",
     "colors": 2
+  },
+  {
+    "id": "air_japan",
+    "colors": 1
   },
   {
     "id": "airbnb",
@@ -22,6 +30,10 @@
   {
     "id": "aircairo",
     "colors": 2
+  },
+  {
+    "id": "aldi",
+    "colors": 3
   },
   {
     "id": "allianz",
@@ -68,7 +80,15 @@
     "colors": 1
   },
   {
+    "id": "bing",
+    "colors": 1
+  },
+  {
     "id": "bitcoin",
+    "colors": 1
+  },
+  {
+    "id": "bluetooth",
     "colors": 1
   },
   {
@@ -112,6 +132,14 @@
     "colors": 1
   },
   {
+    "id": "cockta",
+    "colors": 3
+  },
+  {
+    "id": "dc_comics",
+    "colors": 1
+  },
+  {
     "id": "deliveroo",
     "colors": 1
   },
@@ -126,6 +154,14 @@
   {
     "id": "dhl",
     "colors": 2
+  },
+  {
+    "id": "disney_channel",
+    "colors": 1
+  },
+  {
+    "id": "disney_plus",
+    "colors": 1
   },
   {
     "id": "dji",
@@ -1164,6 +1200,10 @@
     "colors": 1
   },
   {
+    "id": "galatasaray",
+    "colors": 2
+  },
+  {
     "id": "git",
     "colors": 2
   },
@@ -1176,6 +1216,14 @@
     "colors": 4
   },
   {
+    "id": "google_sheets",
+    "colors": 3
+  },
+  {
+    "id": "grido",
+    "colors": 3
+  },
+  {
     "id": "heineken",
     "colors": 2
   },
@@ -1185,6 +1233,10 @@
   },
   {
     "id": "hyundai",
+    "colors": 1
+  },
+  {
+    "id": "intel",
     "colors": 1
   },
   {
@@ -1204,6 +1256,10 @@
     "colors": 1
   },
   {
+    "id": "kenzo",
+    "colors": 2
+  },
+  {
     "id": "kfc",
     "colors": 1
   },
@@ -1214,6 +1270,10 @@
   {
     "id": "klm",
     "colors": 1
+  },
+  {
+    "id": "kodak",
+    "colors": 2
   },
   {
     "id": "lenovo",
@@ -1232,7 +1292,15 @@
     "colors": 3
   },
   {
+    "id": "lime",
+    "colors": 1
+  },
+  {
     "id": "linkedin",
+    "colors": 1
+  },
+  {
+    "id": "louis_vuitton",
     "colors": 1
   },
   {
@@ -1248,6 +1316,10 @@
     "colors": 2
   },
   {
+    "id": "mg",
+    "colors": 1
+  },
+  {
     "id": "microsoft",
     "colors": 5
   },
@@ -1256,11 +1328,19 @@
     "colors": 1
   },
   {
+    "id": "mlb",
+    "colors": 2
+  },
+  {
     "id": "motul",
     "colors": 1
   },
   {
     "id": "movistar",
+    "colors": 2
+  },
+  {
+    "id": "mundial_78",
     "colors": 2
   },
   {
@@ -1272,7 +1352,27 @@
     "colors": 2
   },
   {
+    "id": "nickelodeon",
+    "colors": 1
+  },
+  {
     "id": "nikon",
+    "colors": 1
+  },
+  {
+    "id": "nintendo_3ds",
+    "colors": 1
+  },
+  {
+    "id": "nivea",
+    "colors": 1
+  },
+  {
+    "id": "nordkalk",
+    "colors": 2
+  },
+  {
+    "id": "nv_energy",
     "colors": 1
   },
   {
@@ -1316,12 +1416,20 @@
     "colors": 1
   },
   {
+    "id": "procter_gamble",
+    "colors": 1
+  },
+  {
     "id": "python",
     "colors": 2
   },
   {
     "id": "qatar",
     "colors": 2
+  },
+  {
+    "id": "rai",
+    "colors": 1
   },
   {
     "id": "react",
@@ -1348,6 +1456,10 @@
     "colors": 1
   },
   {
+    "id": "riyadh_air",
+    "colors": 1
+  },
+  {
     "id": "sabadell",
     "colors": 1
   },
@@ -1364,12 +1476,20 @@
     "colors": 1
   },
   {
+    "id": "shopify",
+    "colors": 2
+  },
+  {
     "id": "snapchat",
     "colors": 1
   },
   {
     "id": "snickers",
     "colors": 3
+  },
+  {
+    "id": "sony_interactive",
+    "colors": 1
   },
   {
     "id": "soundclound",
@@ -1432,6 +1552,10 @@
     "colors": 1
   },
   {
+    "id": "viettel",
+    "colors": 1
+  },
+  {
     "id": "visa",
     "colors": 1
   },
@@ -1442,6 +1566,10 @@
   {
     "id": "volkswagen",
     "colors": 1
+  },
+  {
+    "id": "walmart",
+    "colors": 2
   },
   {
     "id": "whatsapp",

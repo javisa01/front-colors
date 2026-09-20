@@ -41,7 +41,52 @@ export const INITIAL_HSV: HSVColor = hexToHSV(INITIAL_COLOR);
  * Derivado del catálogo y no con los ids escritos a mano: una lista copiada se
  * queda vieja en cuanto se importe la bandera siguiente.
  */
-const DEV_ONLY_LOGOS: string[] | null = null;
+/*
+  TANDA EN REVISIÓN: los 32 logos importados el 2026-09-20.
+
+  Mientras esta lista no sea `null`, TODOS los modos reparten solo estos y el
+  catálogo de verdad no sale por ningún lado. **Hay que devolverla a `null`
+  antes de publicar nada**: es una lista de desarrollo, no una configuración.
+
+  Los cinco marcados abajo cambiaron de color jugable al medirlos por área con
+  `npm run measure:assets`, así que son los que más conviene mirar: la
+  heurística del generador los había resuelto por número de formas y en dos
+  de ellos el color elegido no se veía en pantalla.
+*/
+const DEV_ONLY_LOGOS: string[] | null = [
+  "adobe",
+  "air_japan",
+  "aldi",
+  "bing",
+  "bluetooth",
+  "cockta", // ← área: amarillo 37 % → rojo 60 %
+  "dc_comics",
+  "disney_channel",
+  "disney_plus",
+  "galatasaray",
+  "google_sheets", // ← área: gris 0 % → verde 94 %
+  "grido", // ← área: amarillo 23 % → azul 75 %
+  "intel",
+  "kenzo", // ← área: verde 1 % → rojo 99 %
+  "kodak", // ← área: rojo 46 % → amarillo 54 %
+  "lime",
+  "louis_vuitton",
+  "mg",
+  "mlb",
+  "mundial_78",
+  "nickelodeon",
+  "nintendo_3ds",
+  "nivea",
+  "nordkalk",
+  "nv_energy",
+  "procter_gamble",
+  "rai",
+  "riyadh_air",
+  "shopify",
+  "sony_interactive",
+  "viettel",
+  "walmart",
+];
 
 /**
  * El contrarreloj no tiene lista: la partida la termina el cronómetro.
@@ -107,9 +152,62 @@ const CATEGORY_BY_MODE: Record<GameMode, ChallengeCategory | null> = {
 
 function getCatalog(mode: GameMode): ChallengeMetadata[] {
   if (DEV_ONLY_LOGOS && DEV_ONLY_LOGOS.length > 0) {
-    return allPlayable().filter((item) => DEV_ONLY_LOGOS.includes(item.id));
+    const only = allPlayable().filter((item) => DEV_ONLY_LOGOS.includes(item.id));
+
+    /*
+      Un id de la lista que no esté en el catálogo no rompe nada ruidosamente:
+      se cae del filtro y el modo reparte menos retos, o ninguno. Con ninguno la
+      pantalla se queda vacía **sin decir por qué**, y el motivo casi nunca está
+      en esta lista — está en que el bundle todavía lleva el `challenges.json`
+      anterior, porque Metro cachea los JSON y un logo recién generado no entra
+      con un refresco en caliente. Se arregla reiniciando con `--clear`.
+
+      Solo en desarrollo, que es lo único donde esta lista debería existir.
+    */
+    if (__DEV__ && only.length < DEV_ONLY_LOGOS.length) {
+      const faltan = DEV_ONLY_LOGOS.filter(
+        (id) => !only.some((item) => item.id === id),
+      );
+      console.warn(
+        `[DEV_ONLY_LOGOS] ${faltan.length} de ${DEV_ONLY_LOGOS.length} ids no ` +
+          `están en el catálogo: ${faltan.join(", ")}.
+` +
+          (only.length === 0
+            ? "No queda ningún reto que repartir, así que el juego saldrá vacío. " +
+              "Si acabas de generarlos, reinicia Metro con `npx expo start --clear`."
+            : "Revisa que estén escritos igual que en generated/challenges.json."),
+      );
+    }
+
+    return only;
   }
   return catalogFor(CATEGORY_BY_MODE[mode]);
+}
+
+/**
+ * Si una partida guardada se puede retomar **con el catálogo de ahora**.
+ *
+ * Una partida guardada es una lista de ids, y los ids pueden dejar de existir
+ * entre una sesión y la siguiente: al retirar un logo del catálogo, al cambiar
+ * uno de nombre, y sobre todo al encender `DEV_ONLY_LOGOS`, que deja fuera al
+ * resto de golpe.
+ *
+ * Cuando eso pasa, retomar era peor que no retomar: `buildSteps` resuelve cada
+ * id contra el catálogo y descarta los que no encuentra, así que la partida se
+ * rehidrataba con **cero pasos** y la pantalla se quedaba en blanco sin decir
+ * por qué. Y es un silencio caro: el modo que más se juega es el que guarda
+ * progreso, así que el fallo aparecía justo al abrir el juego.
+ *
+ * Se exige que estén **todos**, no la mayoría: una partida a la que le faltan
+ * dos de cinco ya no es la que se dejó a medias, y sus puntuaciones guardadas
+ * no cuadrarían con los pasos que quedan.
+ */
+export function canResume(saved: SavedProgress, mode: GameMode): boolean {
+  if (saved.challengeIds.length === 0) {
+    return false;
+  }
+  const available = new Set(getCatalog(mode).map((item) => item.id));
+  return saved.challengeIds.every((id) => available.has(id));
 }
 
 function loadChallengeMetadata(

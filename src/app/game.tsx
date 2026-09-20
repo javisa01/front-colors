@@ -22,7 +22,7 @@ import {
   Type,
   type Palette,
 } from "@/design/tokens";
-import { INITIAL_HSV, useChallenge } from "@/hooks/useChallenge";
+import { canResume, INITIAL_HSV, useChallenge } from "@/hooks/useChallenge";
 import { t, type TranslationKey } from "@/i18n";
 import type { GameMode, HSVColor } from "@/types/challenge";
 import {
@@ -115,10 +115,20 @@ export default function GameScreen(): ReactElement {
 
       const saved = await loadProgress();
       if (active) {
-        // Ver `handleCheck`: el contrarreloj no persiste, así que tampoco
-        // rehidrata. Una partida guardada de otro modo no le sirve.
+        /*
+          Ver `handleCheck`: el contrarreloj no persiste, así que tampoco
+          rehidrata. Una partida guardada de otro modo no le sirve.
+
+          Y `canResume` descarta además la que ya no se puede jugar porque sus
+          logos han dejado de estar en el catálogo. Se decide aquí y no dentro
+          del hook para que `resume` y `scores` cuenten lo mismo: si el hook
+          rechazara la lista por su cuenta, esta pantalla arrancaría una partida
+          nueva con las puntuaciones de la vieja puestas.
+        */
         setResume(
-          saved && saved.mode === mode && mode !== "timed" ? saved : null,
+          saved && saved.mode === mode && mode !== "timed" && canResume(saved, mode)
+            ? saved
+            : null,
         );
         setReady(true);
       }

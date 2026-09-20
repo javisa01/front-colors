@@ -12,6 +12,7 @@ import type {
   GroupMember,
   GroupSeason,
 } from "@/api/types";
+import { DeckNote } from "@/components/online/GroupDeck";
 import { AmbientMesh } from "@/design/Ambient";
 import { Avatar, playerTint } from "@/design/Avatar";
 import { Button, IconButton } from "@/design/Button";
@@ -445,6 +446,23 @@ export default function GroupSettingsScreen(): ReactElement {
           </Text>
         </Card>
       )}
+
+      {/* --------------------------- La baraja --------------------------- */}
+      {/*
+        Aquí se dice a qué juega el grupo, y que eso ya no se toca.
+
+        Va justo debajo del nombre porque son las dos cosas que identifican al
+        grupo, y en ese orden se leen: una se puede cambiar —si eres el dueño—
+        y la otra no. Que estén juntas es lo que hace evidente la diferencia
+        sin tener que anunciarla.
+
+        No es el selector desactivado: un control apagado invita a intentarlo,
+        que es el mismo motivo por el que a quien no puede renombrar el grupo
+        se le enseña el nombre como texto y no como un campo muerto.
+      */}
+      <Card style={styles.block}>
+        <DeckNote flagsOnly={group.flagsOnly} />
+      </Card>
 
       {/* --------------------------- Avisos ----------------------------- */}
       <Card style={styles.block}>

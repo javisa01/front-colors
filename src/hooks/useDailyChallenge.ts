@@ -447,6 +447,16 @@ export function useDailyChallenge(groupId: string | null): UseDailyChallengeResu
  * enseñan: durante la partida no hay ninguna cuenta atrás —el reto diario es
  * asíncrono y no tiene cronómetro— y un `setState` por segundo repintaría el
  * tablero para nada.
+ *
+ * ## Se llama desde el componente que ENSEÑA la cifra, no desde la pantalla
+ *
+ * Un `setState` por segundo repinta todo lo que cuelga del componente que lo
+ * tiene. Puesto en la ficha del grupo, eso eran mil líneas de pantalla —el
+ * anillo del reto, el SVG de la primera ronda, la clasificación entera— sesenta
+ * veces por minuto para cambiar dos dígitos, y el hilo de JS se quedaba sin
+ * hueco justo donde hay animaciones corriendo. Quien quiera la cifra que monte
+ * un componente que no contenga nada más; quien solo necesite saber si la
+ * jornada cerró tiene `useExpiry`, que no tiene reloj.
  */
 export function useCountdown(
   target: string | null,
@@ -473,3 +483,76 @@ export function useCountdown(
 
   return { remainingMs, expired };
 }
+
+/**
+ * Si un instante ISO ya pasó, sin contar los segundos por el camino.
+ *
+ * Es `useCountdown` sin el reloj: en vez de despertarse cada segundo para
+ * recalcular un valor que casi nunca se mira, programa **un solo** aviso para
+ * el instante exacto del corte. Entre el momento de abrir la pantalla y el
+ * cierre de la jornada hay cero renders; en el corte, uno.
+ *
+ * Es lo que necesita casi todo el que preguntaba por `expired`: decidir si el
+ * botón de jugar sigue vivo es una decisión que cambia una vez al día, no
+ * ochenta y seis mil.
+ *
+ * El `setTimeout` se acota a `MAX_TIMEOUT_MS` porque los temporizadores de
+ * JavaScript guardan el retardo en 32 bits con signo: un plazo mayor desborda y
+ * se dispara **de inmediato**, que es exactamente el fallo contrario al que
+ * esto evita. Con el tope, un plazo largo se recorre a saltos de 24 días.
+ */
+const MAX_TIMEOUT_MS = 2_147_483_647;
+
+export function useExpiry(target: string | null, enabled = true): boolean {
+  const targetMs = useMemo(
+    () => (target ? new Date(target).getTime() : Number.NaN),
+    [target],
+  );
+
+  const running = enabled && !Number.isNaN(targetMs);
+
+  /*
+    La hora se mira SIEMPRE desde el temporizador, nunca al pintar.
+
+    Un `Date.now()` en el cuerpo del componente devuelve algo distinto en cada
+    render sin que haya cambiado ningún estado, así que el resultado depende de
+    cuándo le toque repintarse a React y no de la hora que es — y un `setState`
+    en el cuerpo del efecto, que era la otra salida, encadena renders. El primer
+    aviso se programa a cero milisegundos: se dispara en cuanto React suelta el
+    hilo, ya fuera del render, y ahí sí se puede leer el reloj.
+
+    La contrapartida es un fotograma —el primero— en el que una jornada ya
+    cerrada se lee como abierta. No importa: quien manda sobre eso es el
+    servidor (`serverClosed`), y esto solo adelanta el aviso mientras la
+    pantalla está abierta.
+  */
+  const [reached, setReached] = useState(false);
+
+  useEffect(() => {
+    if (!running) {
+      return;
+    }
+
+    let id: ReturnType<typeof setTimeout> | null = null;
+
+    const wake = (): void => {
+      const remaining = targetMs - Date.now();
+      if (remaining <= 0) {
+        setReached(true);
+        return;
+      }
+      // Todavía no. Importa además cuando el reto cambia por el de mañana: sin
+      // esto, el `true` del anterior se quedaría puesto sobre la ventana nueva.
+      setReached(false);
+      id = setTimeout(wake, Math.min(remaining, MAX_TIMEOUT_MS));
+    };
+
+    id = setTimeout(wake, 0);
+    return () => {
+      if (id != null) clearTimeout(id);
+    };
+  }, [running, targetMs]);
+
+  return running && reached;
+}
+

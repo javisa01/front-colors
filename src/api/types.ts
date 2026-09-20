@@ -146,6 +146,19 @@ export interface GroupSummary {
   ownerUserId: string;
   createdAt: string;
   status: GroupStatus;
+  /**
+   * La baraja del grupo: `true` reparte **solo banderas** en el reto diario,
+   * `false` los logos de siempre.
+   *
+   * Se elige al crear el grupo y no se puede cambiar después — ni el `owner`
+   * puede—, porque la clasificación de una temporada suma las jornadas jugadas
+   * dentro de su ventana y cambiar de baraja a mitad sumaría dos juegos
+   * distintos en la misma columna. Por eso `rename` no lo lleva.
+   *
+   * Viaja en el resumen y no solo en la ficha porque la lista de grupos lo
+   * enseña: es lo que distingue dos filas que por lo demás dicen lo mismo.
+   */
+  flagsOnly: boolean;
   memberCount: number;
   /** Papel de quien consulta. Solo el `owner` puede renovar. */
   role: GroupRole;

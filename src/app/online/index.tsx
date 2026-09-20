@@ -11,6 +11,7 @@ import type {
   GroupSummary,
 } from "@/api/types";
 import { ChallengeWall, type WallItem } from "@/components/online/ChallengeWall";
+import { DeckBadge, groupVoice } from "@/components/online/GroupDeck";
 import { DevFirstRunPanel } from "@/components/online/DevFirstRunPanel";
 import { useOnlineTabBarSpace } from "@/components/online/OnlineTabBar";
 import { useTour, useTourAnchor } from "@/components/online/OnlineTour";
@@ -511,12 +512,14 @@ export default function OnlineHubScreen(): ReactElement {
                 tone="teal"
                 title={group.name}
                 description={`${membersLabel(group.memberCount)} · ${seasonLabel(group)}`}
-                badge={<UnreadDot count={group.unreadCount} />}
-                accessibilityLabel={
-                  group.unreadCount > 0
-                    ? `${group.name}. ${t("online.groups.unread")}`
-                    : group.name
+                badge={
+                  <View style={styles.rowBadges}>
+                    <UnreadDot count={group.unreadCount} />
+                    {/* El globo, sin palabra. Ver `GroupDeck`. */}
+                    <DeckBadge flagsOnly={group.flagsOnly} compact />
+                  </View>
                 }
+                accessibilityLabel={groupVoice(group)}
                 onPress={() =>
                   router.push({
                     pathname: "/online/groups/[id]",
@@ -542,12 +545,13 @@ export default function OnlineHubScreen(): ReactElement {
                       ? t("online.hub.group.played", { score: status.bestScore })
                       : undefined
                   }
-                  badge={<UnreadDot count={group.unreadCount} />}
-                  accessibilityLabel={
-                    group.unreadCount > 0
-                      ? `${group.name}. ${t("online.groups.unread")}`
-                      : group.name
+                  badge={
+                    <View style={styles.rowBadges}>
+                      <UnreadDot count={group.unreadCount} />
+                      <DeckBadge flagsOnly={group.flagsOnly} compact />
+                    </View>
                   }
+                  accessibilityLabel={groupVoice(group)}
                   onPress={() =>
                     router.push({
                       pathname: "/online/groups/[id]",
@@ -835,5 +839,11 @@ const styles = StyleSheet.create({
   },
   tail: {
     gap: Space.md,
+  },
+  /** El punto de avisos y el globo de la baraja, juntos en el galón. */
+  rowBadges: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Space.xs,
   },
 });

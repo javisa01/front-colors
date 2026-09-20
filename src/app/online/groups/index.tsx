@@ -6,6 +6,7 @@ import { StyleSheet, View } from "react-native";
 import { describeError } from "@/api/errors";
 import type { GroupSummary } from "@/api/types";
 import { SettingsButton } from "@/components/SettingsButton";
+import { DeckBadge, DeckPicker, groupVoice } from "@/components/online/GroupDeck";
 import { DevTimePanel } from "@/components/online/DevTimePanel";
 import { useOnlineTabBarSpace } from "@/components/online/OnlineTabBar";
 import { UnreadDot } from "@/components/online/UnreadDot";
@@ -64,6 +65,12 @@ export default function GroupsScreen(): ReactElement {
     params.action === "join" ? "join" : "create",
   );
   const [name, setName] = useState("");
+  /**
+   * La baraja del grupo que se está creando. Arranca en logos porque es lo que
+   * juega todo el mundo: un formulario que empieza en la opción rara convierte
+   * en trabajo el caso normal.
+   */
+  const [flagsOnly, setFlagsOnly] = useState(false);
   const [code, setCode] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -117,10 +124,13 @@ export default function GroupsScreen(): ReactElement {
     try {
       const { group } =
         action === "create"
-          ? await api.groups.create({ name: trimmedName })
+          ? await api.groups.create({ name: trimmedName, flagsOnly })
           : await api.groups.join(cleanCode);
 
       setName("");
+      // La baraja vuelve a logos con el formulario: el siguiente grupo empieza
+      // igual que empezó este, no heredando una elección que ya se gastó.
+      setFlagsOnly(false);
       setCode("");
       setNotice(
         t(action === "create" ? "online.groups.created" : "online.groups.joined"),
@@ -133,7 +143,7 @@ export default function GroupsScreen(): ReactElement {
     } finally {
       setBusy(false);
     }
-  }, [action, api, cleanCode, trimmedName, load, router]);
+  }, [action, api, cleanCode, flagsOnly, trimmedName, load, router]);
 
   /*
     Lo que se pinta. Se vacía aquí y no en `groups` para que el simulador no
@@ -212,6 +222,22 @@ export default function GroupsScreen(): ReactElement {
               style={styles.field}
             />
           )}
+
+          {/*
+            La baraja, solo al crear.
+
+            Va después del nombre y no antes porque el nombre es lo que se
+            viene a escribir; y va dentro del formulario y no en una tarjeta
+            aparte porque es parte de lo que se está creando, no un ajuste
+            del grupo — de hecho no se puede volver a tocar. Ver `GroupDeck`.
+          */}
+          {action === "create" ? (
+            <DeckPicker
+              value={flagsOnly}
+              onChange={setFlagsOnly}
+              disabled={busy}
+            />
+          ) : null}
 
           {formError ? <ErrorBanner message={formError} /> : null}
           {notice ? <Notice message={notice} /> : null}
@@ -309,6 +335,14 @@ function GroupRow({
             de la temporada como la única palabra de la fila.
           */}
           <UnreadDot count={group.unreadCount} />
+          {/*
+            El globo de las banderas, sin la palabra: por lo mismo que el punto
+            rojo no pone «Novedades». Aquí ya hay una etiqueta —el estado de la
+            temporada— y añadir una segunda obligaría a leer dos para saber dos
+            cosas que se pueden ver. La palabra se oye igual, y se lee entera
+            en la ficha del grupo.
+          */}
+          <DeckBadge flagsOnly={group.flagsOnly} compact />
           <Pill
             label={t(
               finished
@@ -319,12 +353,8 @@ function GroupRow({
           />
         </View>
       }
-      // El punto no se oye: lo que significa entra por aquí.
-      accessibilityLabel={
-        group.unreadCount > 0
-          ? `${group.name}. ${t("online.groups.unread")}`
-          : group.name
-      }
+      // Ni el punto ni el globo se oyen: lo que significan entra por aquí.
+      accessibilityLabel={groupVoice(group)}
       onPress={onPress}
       enterDelay={Math.min(index, 12) * 35}
     />

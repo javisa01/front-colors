@@ -81,7 +81,12 @@ export function createApi(client: ApiClient) {
       /** Mis grupos, con su estado ya derivado y sus avisos sin leer. */
       list: () => client.request<{ groups: GroupSummary[] }>("/groups"),
 
-      create: (input: { name: string }) =>
+      /**
+       * Crear un grupo. `flagsOnly` fija su baraja y es el **único** sitio
+       * donde se elige: `rename` solo renombra, y el servidor ignora el campo
+       * si llega por ahí. Ver `GroupSummary.flagsOnly`.
+       */
+      create: (input: { name: string; flagsOnly: boolean }) =>
         client.request<{ group: GroupDetail }>("/groups", {
           method: "POST",
           body: input,

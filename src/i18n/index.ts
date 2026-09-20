@@ -426,6 +426,22 @@ const es = {
   "online.groups.unreadOneA11y": "Tiene 1 aviso sin leer",
   "online.groups.unreadA11y": "Tiene {{count}} avisos sin leer",
 
+  /*
+    La baraja del grupo. «Banderas» es la palabra corta a propósito: sale en
+    una pastilla que comparte fila con el estado de la temporada, y «Solo
+    banderas» obligaba a la fila a elegir entre partir la etiqueta en dos
+    líneas o comerse el nombre del grupo. Lo de «solo» ya lo dice la pista.
+  */
+  "online.groups.deck.label": "Qué se juega",
+  "online.groups.deck.hint": "Se elige ahora. Después ya no cambia.",
+  "online.groups.deck.logos": "Logos",
+  "online.groups.deck.logosHint": "Marcas y sus colores, como siempre.",
+  "online.groups.deck.flags": "Banderas",
+  "online.groups.deck.flagsHint": "Banderas del mundo, ni un logo.",
+  "online.groups.deck.flagsShort": "Banderas",
+  "online.groups.deck.fixed":
+    "Se eligió al crear el grupo y ya no cambia: una temporada no puede sumar puntos de dos juegos distintos.",
+
   "online.group.loading": "Cargando el grupo...",
   "online.group.badge": "Grupo",
   "online.group.season": "Temporada {{season}}",
@@ -1090,6 +1106,15 @@ const en: Record<TranslationKey, string> = {
   "online.groups.unread": "New",
   "online.groups.unreadOneA11y": "Has 1 unread alert",
   "online.groups.unreadA11y": "Has {{count}} unread alerts",
+  "online.groups.deck.label": "What you play",
+  "online.groups.deck.hint": "Pick it now. It can't change later.",
+  "online.groups.deck.logos": "Logos",
+  "online.groups.deck.logosHint": "Brands and their colors, as always.",
+  "online.groups.deck.flags": "Flags",
+  "online.groups.deck.flagsHint": "World flags, no logos.",
+  "online.groups.deck.flagsShort": "Flags",
+  "online.groups.deck.fixed":
+    "Set when the group was created, and fixed since: a season can't add up scores from two different games.",
 
   "online.group.loading": "Loading the group...",
   "online.group.badge": "Group",
@@ -1756,6 +1781,15 @@ const fr: Record<TranslationKey, string> = {
   "online.groups.unread": "Nouveau",
   "online.groups.unreadOneA11y": "A 1 alerte non lue",
   "online.groups.unreadA11y": "A {{count}} alertes non lues",
+  "online.groups.deck.label": "Ce qu'on joue",
+  "online.groups.deck.hint": "Ça se choisit maintenant. Ensuite, c'est définitif.",
+  "online.groups.deck.logos": "Logos",
+  "online.groups.deck.logosHint": "Les marques, comme toujours.",
+  "online.groups.deck.flags": "Drapeaux",
+  "online.groups.deck.flagsHint": "Les drapeaux du monde, sans logo.",
+  "online.groups.deck.flagsShort": "Drapeaux",
+  "online.groups.deck.fixed":
+    "Choisi à la création du groupe et définitif : une saison ne peut pas additionner les points de deux jeux différents.",
 
   "online.group.loading": "Chargement du groupe...",
   "online.group.badge": "Groupe",
@@ -2431,6 +2465,15 @@ const ca: Record<TranslationKey, string> = {
   "online.groups.unread": "Novetats",
   "online.groups.unreadOneA11y": "Té 1 avís sense llegir",
   "online.groups.unreadA11y": "Té {{count}} avisos sense llegir",
+  "online.groups.deck.label": "Què es juga",
+  "online.groups.deck.hint": "Es tria ara. Després ja no canvia.",
+  "online.groups.deck.logos": "Logos",
+  "online.groups.deck.logosHint": "Marques i els seus colors, com sempre.",
+  "online.groups.deck.flags": "Banderes",
+  "online.groups.deck.flagsHint": "Banderes del món, ni un logo.",
+  "online.groups.deck.flagsShort": "Banderes",
+  "online.groups.deck.fixed":
+    "Es va triar en crear el grup i ja no canvia: una temporada no pot sumar punts de dos jocs diferents.",
 
   "online.group.loading": "Carregant el grup...",
   "online.group.badge": "Grup",

@@ -2,6 +2,7 @@ import { memo, type ReactElement } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import type { DailyGroupStatus, GroupSummary } from "@/api/types";
+import { Icon } from "@/design/Icon";
 import { RoundRing, type SolvedRound } from "@/design/RoundRing";
 import { useColors, useThemedStyles } from "@/design/theme";
 import {
@@ -223,7 +224,11 @@ function Tile({
         pressed && styles.pressed,
       ]}
       accessibilityRole="button"
-      accessibilityLabel={group.name}
+      accessibilityLabel={
+        group.flagsOnly
+          ? `${group.name}. ${t("online.groups.deck.flagsShort")}`
+          : group.name
+      }
       accessibilityHint={t("online.hub.tileOpenHint")}
     >
       {/*
@@ -243,6 +248,23 @@ function Tile({
       >
         {group.name.slice(0, 1).toUpperCase()}
       </Text>
+
+      {/*
+        El globo de la baraja, en los grupos de banderas y solo en ellos.
+
+        Va en la esquina de arriba, enfrente del monograma, y **en el pigmento
+        del grupo** —no en el cian que lleva en el resto de la app—: la regla de
+        esta baldosa es que sea de un color, y una pastilla cian sobre un lienzo
+        carmín serían dos. Lo que hace reconocible la señal aquí es la forma,
+        que es el mismo globo que en todas partes; el color lo pone la baldosa.
+
+        Lo que significa se oye en `accessibilityLabel`, abajo.
+      */}
+      {group.flagsOnly ? (
+        <View style={styles.deck} pointerEvents="none">
+          <Icon name="globe" size={wide ? 18 : 16} color={skin.mark} />
+        </View>
+      ) : null}
 
       <RoundRing
         size={size}
@@ -322,6 +344,16 @@ const wallStyles = (colors: Palette) => ({
   },
   tileHalf: {
     flex: 1,
+  },
+  /*
+    Arriba a la izquierda, con el mismo aire que el relleno de la baldosa: es
+    una marca de esquina, no un elemento de la columna centrada, así que no
+    entra en el flujo ni desplaza al dial ni un punto.
+  */
+  deck: {
+    position: "absolute" as const,
+    top: Space.md,
+    left: Space.md,
   },
   monogram: {
     position: "absolute" as const,

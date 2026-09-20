@@ -4,8 +4,10 @@ import { memo, useCallback, useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
   Easing,
+  Extrapolation,
   ReduceMotion,
   cancelAnimation,
+  interpolate,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
@@ -22,6 +24,7 @@ import type {
   GroupLeaderboardEntry,
 } from "@/api/types";
 import { SettingsButton } from "@/components/SettingsButton";
+import { DeckBadge } from "@/components/online/GroupDeck";
 import { DevTimePanel } from "@/components/online/DevTimePanel";
 import { UnreadDot } from "@/components/online/UnreadDot";
 import { AmbientMesh } from "@/design/Ambient";
@@ -47,7 +50,7 @@ import {
   Type,
   type Palette,
 } from "@/design/tokens";
-import { useCountdown, useDailyChallenge } from "@/hooks/useDailyChallenge";
+import { useCountdown, useDailyChallenge, useExpiry } from "@/hooks/useDailyChallenge";
 import { t } from "@/i18n";
 import { previewOf } from "@/online/chat";
 import { relationOf } from "@/online/friends";
@@ -326,6 +329,22 @@ export default function GroupDetailScreen(): ReactElement {
    */
   useFocusEffect(useCallback(() => () => setNotice(null), []));
 
+  /**
+   * Abrir los ajustes, en una referencia estable.
+   *
+   * La tuerca esta memoizada porque tiene un bucle corriendo dentro y no debe
+   * repintarse con la pantalla; escrita en linea, la funcion era nueva en cada
+   * render y la memoizacion no servia de nada. Es la clase de detalle que no se
+   * nota hasta que hay una animacion al otro lado.
+   */
+  const openSettings = useCallback(() => {
+    if (!groupId) return;
+    router.push({
+      pathname: "/online/groups/[id]/edit",
+      params: { id: groupId },
+    });
+  }, [groupId, router]);
+
   const refresh = useCallback(async () => {
     setRefreshing(true);
     await load();
@@ -357,14 +376,20 @@ export default function GroupDetailScreen(): ReactElement {
   }, [api, consumeGroupNotices, group, reloadDaily]);
 
   /**
-   * La cuenta atrás solo corre si el reloj del teléfono está de acuerdo con la
-   * ventana del reto. Con el viaje en el tiempo del backend (5.5) no lo está, y
-   * más vale no enseñar nada que enseñar una cifra inventada.
+   * Si la jornada ya cerró mientras la pantalla está abierta.
+   *
+   * Solo cuenta si el reloj del teléfono está de acuerdo con la ventana del
+   * reto: con el viaje en el tiempo del backend (5.5) no lo está, y cerrar el
+   * botón de jugar por una hora inventada sería peor que no adelantar nada.
+   *
+   * **La cifra de la cuenta atrás no se pide aquí.** La pinta `<ClosesIn/>`,
+   * que es un componente con una sola línea de texto dentro: el reloj que la
+   * mueve repinta esa línea y nada más. Pedirla aquí repintaba la pantalla
+   * entera —el anillo, el SVG del reto, la clasificación— una vez por segundo,
+   * y ese era el trabajo que le faltaba al hilo de JS para mover con soltura lo
+   * que sí está animado.
    */
-  const { remainingMs, expired } = useCountdown(
-    daily?.closesAt ?? null,
-    clockTrusted,
-  );
+  const expired = useExpiry(daily?.closesAt ?? null, clockTrusted);
 
   /**
    * La jornada la manda el reto, no el reloj del teléfono: con el viaje en el
@@ -447,16 +472,7 @@ export default function GroupDetailScreen(): ReactElement {
         season: group.currentSeason.seasonNumber,
       })}
       title={group.name}
-      titleAction={
-        <SettingsGear
-          onPress={() =>
-            router.push({
-              pathname: "/online/groups/[id]/edit",
-              params: { id: group.id },
-            })
-          }
-        />
-      }
+      titleAction={<SettingsGear onPress={openSettings} />}
       backTo="/online/groups"
       /*
         A la lista de grupos, siempre.
@@ -496,14 +512,19 @@ export default function GroupDetailScreen(): ReactElement {
       {/*
         ------------------------- La cinta ---------------------------
 
-        Lo que queda de temporada y cuánta gente hay, en dos pastillas de 11
-        puntos.
+        Lo que queda de temporada, cuánta gente hay y —solo si el grupo es de
+        banderas— a qué juega, en pastillas de 11 puntos.
 
         Eran dos `Stat` con la cifra a 20 puntos dentro de su propia tarjeta, y
         con eso «5 miembros» pesaba en pantalla lo mismo que la puntuación de la
         clasificación. Son datos de contexto —dicen dónde estás, no qué hacer—,
         así que van en el tamaño de un dato de contexto y en una sola línea. El
         número de temporada no repite aquí: ya está en el kicker del título.
+
+        Esta es la cinta que sí enseña la palabra «Banderas» entera, y la única
+        con sitio para ella: en las listas la pastilla va sin texto, y aquí es
+        donde se aprende qué significa ese globo. Va la última porque no
+        cambia nunca — lo que se mira a diario es lo que queda de temporada.
       */}
       <View style={styles.ribbon}>
         <Pill
@@ -518,6 +539,7 @@ export default function GroupDetailScreen(): ReactElement {
           tone={finished ? "neutral" : remaining <= 1 ? "warning" : "accent"}
         />
         <Pill icon="users" label={membersLabel(group.memberCount)} />
+        <DeckBadge flagsOnly={group.flagsOnly} />
       </View>
 
       {/* ------------------------ Fin de temporada ---------------------- */}
@@ -585,11 +607,7 @@ export default function GroupDetailScreen(): ReactElement {
               ) : null}
 
               {clockTrusted && !closed ? (
-                <Text style={[Type.metricSmall, styles.countdown]}>
-                  {t("online.group.daily.closesIn", {
-                    time: formatCountdown(remainingMs),
-                  })}
-                </Text>
+                <ClosesIn closesAt={daily?.closesAt ?? null} />
               ) : null}
             </View>
           </View>
@@ -770,6 +788,31 @@ export default function GroupDetailScreen(): ReactElement {
 }
 
 // ---------------------------------------------------------------------------
+// La cuenta atrás
+// ---------------------------------------------------------------------------
+
+/**
+ * Lo que queda de jornada, en una línea y en su propio componente.
+ *
+ * Es un componente y no una línea más de la pantalla por una sola razón: el
+ * reloj que lo mueve repinta a quien lo tiene. Aquí dentro no hay nada más que
+ * un `Text`, así que el segundo que pasa cuesta un `Text`; en la pantalla,
+ * costaba la pantalla.
+ */
+function ClosesInBase({ closesAt }: { closesAt: string | null }): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const { remainingMs } = useCountdown(closesAt);
+
+  return (
+    <Text style={[Type.metricSmall, styles.countdown]}>
+      {t("online.group.daily.closesIn", { time: formatCountdown(remainingMs) })}
+    </Text>
+  );
+}
+
+const ClosesIn = memo(ClosesInBase);
+
+// ---------------------------------------------------------------------------
 // La tuerca de ajustes
 // ---------------------------------------------------------------------------
 
@@ -801,6 +844,23 @@ const HALO_MS = 2600;
  * principal — y la principal aqui es jugar, no los ajustes. El anillo es otra
  * cosa: no es un borde permanente, es un pulso que aparece y desaparece, asi
  * que no compite por ser «lo que hay que mirar», solo dice «esto se toca».
+ *
+ * ## Por que el ciclo no se ve saltar
+ *
+ * Este pulso era un parpadeo. La opacidad salia de `0.55 * (1 - pulso)`, que
+ * al reiniciarse el bucle **encendia el anillo de golpe** a media opacidad y
+ * en el tamano de la tuerca: no es que la animacion fuese a tirones, es que
+ * cada ciclo empezaba con un corte. Y el resto del recorrido tampoco ayudaba
+ * —la curva `out` gasta la opacidad en el primer tercio y deja mas de un
+ * segundo de anillo invisible expandiendose—, asi que lo unico que se veia era
+ * el corte, cada dos segundos y medio.
+ *
+ * Ahora la opacidad la interpola una rampa con **los dos extremos a cero**: el
+ * anillo nace apagado sobre el borde de la tuerca, sube, se desvanece mientras
+ * se abre y llega al final del recorrido invisible. Da igual donde empalme el
+ * bucle, porque en los dos lados del empalme no hay nada que ver. El muelle de
+ * la escala se queda en la forma —la curva sigue frenando hacia fuera— y el
+ * reloj que lo mueve es lineal, que es lo que la rampa espera.
  */
 function SettingsGearBase({ onPress }: { onPress: () => void }): ReactElement {
   const styles = useThemedStyles(createStyles);
@@ -818,7 +878,11 @@ function SettingsGearBase({ onPress }: { onPress: () => void }): ReactElement {
 
     pulse.set(
       withRepeat(
-        withTiming(1, { duration: HALO_MS, easing: Easing.out(Easing.quad) }),
+        // Lineal: el reloj del ciclo, no su forma. La forma la ponen la rampa
+        // de opacidad y la curva de la escala, abajo, y tenerlas separadas es
+        // lo que permite que la opacidad valga cero en los dos extremos sin
+        // tener que pelearse con la curva del temporizador.
+        withTiming(1, { duration: HALO_MS, easing: Easing.linear }),
         -1,
         false,
         undefined,
@@ -830,12 +894,30 @@ function SettingsGearBase({ onPress }: { onPress: () => void }): ReactElement {
     );
   }, [active, pulse]);
 
-  const haloStyle = useAnimatedStyle(() => ({
-    // Se apaga antes de llegar al final del recorrido: asi el anillo se ha
-    // desvanecido del todo cuando el ciclo salta a cero y no se ve el corte.
-    opacity: 0.55 * (1 - pulse.get()),
-    transform: [{ scale: 1 + pulse.get() * 0.35 }],
-  }));
+  const haloStyle = useAnimatedStyle(() => {
+    const progress = pulse.get();
+
+    return {
+      /*
+        Enciende deprisa, se apaga despacio y termina en cero. El tramo largo
+        del final es el que hace que el pulso se lea como una respiracion y no
+        como un destello: el anillo sigue ahi, cada vez mas tenue, hasta que el
+        ciclo se cierra sobre su propia nada.
+      */
+      opacity: interpolate(
+        progress,
+        [0, 0.12, 0.45, 1],
+        [0, 0.5, 0.26, 0],
+        Extrapolation.CLAMP,
+      ),
+      /*
+        La misma frenada que tenia antes la animacion entera, ahora solo en el
+        tamano: sale rapido del borde de la tuerca y se abre cada vez mas
+        despacio, como algo que se expande al aire.
+      */
+      transform: [{ scale: 1 + (1 - (1 - progress) ** 2) * 0.32 }],
+    };
+  });
 
   return (
     <View style={styles.gearWrap}>

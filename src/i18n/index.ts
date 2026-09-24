@@ -270,6 +270,9 @@ const es = {
   "settings.themeHint":
     "Apagado, la interfaz va en oscuro. El cambio se aplica al cerrar.",
   "settings.language": "Idioma",
+  "settings.legal": "Legal",
+  "settings.privacy": "Privacidad",
+  "settings.terms": "Términos de uso",
   "settings.languageHint":
     "Se usa el del dispositivo hasta que elijas otro. El cambio se aplica al cerrar.",
 
@@ -974,6 +977,9 @@ const en: Record<TranslationKey, string> = {
   "settings.themeHint":
     "When off, the interface stays dark. The change applies when you close.",
   "settings.language": "Language",
+  "settings.legal": "Legal",
+  "settings.privacy": "Privacy",
+  "settings.terms": "Terms of use",
   "settings.languageHint":
     "Your device language is used until you pick another. The change applies when you close.",
 
@@ -1662,6 +1668,9 @@ const fr: Record<TranslationKey, string> = {
   "settings.themeHint":
     "Désactivé, l'interface reste sombre. Le changement s'applique à la fermeture.",
   "settings.language": "Langue",
+  "settings.legal": "Mentions légales",
+  "settings.privacy": "Confidentialité",
+  "settings.terms": "Conditions d'utilisation",
   "settings.languageHint":
     "Celle de l'appareil est utilisée jusqu'à ce que tu en choisisses une autre. Le changement s'applique à la fermeture.",
 
@@ -2357,6 +2366,9 @@ const ca: Record<TranslationKey, string> = {
   "settings.music": "Música",
   "settings.sfx": "Efectes",
   "settings.language": "Idioma",
+  "settings.legal": "Legal",
+  "settings.privacy": "Privacitat",
+  "settings.terms": "Condicions d'ús",
   "settings.languageHint":
     "S'usa el del dispositiu fins que en triïs un altre. El canvi s'aplica en tancar.",
 

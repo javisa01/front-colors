@@ -1,4 +1,5 @@
 import Slider from "@react-native-community/slider";
+import { useRouter } from "expo-router";
 import {
   memo,
   useCallback,
@@ -188,6 +189,7 @@ function SettingsSheetInner({
   visible,
   onClose,
 }: SettingsSheetProps): ReactElement {
+  const router = useRouter();
   const styles = useThemedStyles(createStyles);
   const [music, setMusic] = useState(getMusicVolume);
   const [sfx, setSfx] = useState(getSfxVolume);
@@ -298,6 +300,21 @@ function SettingsSheetInner({
     onClose();
   }, [music, sfx, language, theme, onClose]);
 
+  /**
+   * Abre un documento legal, cerrando antes la hoja.
+   *
+   * El orden importa: `handleClose` aplica el idioma y el tema que estuvieran
+   * pendientes, y esos dos remontan el árbol entero. Navegando primero, la
+   * pantalla recién abierta se montaría para desaparecer un fotograma después.
+   */
+  const abrirLegal = useCallback(
+    (ruta: "/legal/privacidad" | "/legal/terminos") => {
+      handleClose();
+      router.push(ruta);
+    },
+    [handleClose, router],
+  );
+
   return (
     <Sheet
       visible={visible}
@@ -352,7 +369,55 @@ function SettingsSheetInner({
       <Text style={[Type.caption, styles.hint]}>
         {t("settings.languageHint")}
       </Text>
+
+      {/*
+        Lo legal, al final y sin adornos. Nadie abre los ajustes para leer la
+        privacidad, pero las dos tiendas exigen que se pueda llegar a ella desde
+        dentro de la aplicación, y este es el único sitio que existe en todas
+        las pantallas.
+      */}
+      <Text style={[Type.label, styles.section, styles.legalSection]}>
+        {t("settings.legal")}
+      </Text>
+
+      <LegalRow
+        icon="lock"
+        label={t("settings.privacy")}
+        onPress={() => abrirLegal("/legal/privacidad")}
+      />
+      <LegalRow
+        icon="edit"
+        label={t("settings.terms")}
+        onPress={() => abrirLegal("/legal/terminos")}
+      />
     </Sheet>
+  );
+}
+
+/** Una fila que lleva a un documento legal. Solo texto, icono y flecha. */
+function LegalRow({
+  icon,
+  label,
+  onPress,
+}: {
+  icon: IconName;
+  label: string;
+  onPress: () => void;
+}): ReactElement {
+  const styles = useThemedStyles(createStyles);
+  const colors = useColors();
+
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.legalRow, pressed && styles.legalRowPressed]}
+      accessibilityRole="link"
+      accessibilityLabel={label}
+    >
+      <Icon name={icon} size={17} color={colors.text.muted} />
+      <Text style={[Type.body, styles.legalLabel]}>{label}</Text>
+      <Icon name="chevronRight" size={16} color={colors.text.faint} />
+    </Pressable>
   );
 }
 
@@ -360,6 +425,26 @@ export const SettingsSheet = memo(SettingsSheetInner);
 
 const createStyles = (c: Palette) =>
   StyleSheet.create({
+    /*
+      Este rótulo sí necesita margen arriba, y los otros tres no: encima tiene
+      la pista del idioma, que es texto pequeño pegado al bloque anterior. Sin
+      esto, «Legal» parecía el pie de la pista y no el título de una sección.
+    */
+    legalSection: {
+      marginTop: Space.xl,
+    },
+    legalRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: Space.md,
+      paddingVertical: Space.md,
+    },
+    legalRowPressed: {
+      opacity: 0.6,
+    },
+    legalLabel: {
+      flex: 1,
+    },
   section: {
     marginBottom: Space.md,
   },

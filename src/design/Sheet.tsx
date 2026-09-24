@@ -9,6 +9,7 @@ import {
 import {
   Modal,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   useWindowDimensions,
@@ -171,6 +172,14 @@ function SheetBase({
         <Animated.View
           style={[
             styles.panel,
+            /*
+              El techo, en proporción a la pantalla y no en píxeles: lo que hay
+              que dejar ver es el fondo, y cuánto es eso depende del alto que
+              haya. Abajo se deja menos porque la hoja nace pegada a ese borde y
+              el velo de arriba ya dice que hay algo detrás; en el centro se deja
+              más, que es lo que la separa de una pantalla completa.
+            */
+            { maxHeight: height * (placement === "bottom" ? 0.9 : 0.85) },
             placement === "bottom"
               ? [styles.panelBottom, { paddingBottom: insets.bottom + Space.xl }]
               : styles.panelCenter,
@@ -198,7 +207,36 @@ function SheetBase({
             </View>
           ) : null}
 
-          {children}
+          {/*
+            El contenido va en un carril que se desplaza, y la cabecera no.
+
+            Una hoja crece con lo que lleva dentro, y hay pantallas donde no
+            cabe: los ajustes tienen sonido, aspecto, idioma y lo legal, y en un
+            teléfono pequeño —o con la letra del sistema agrandada— el último
+            bloque se quedaba fuera sin ninguna señal de que estaba ahí.
+
+            El `flexShrink` es lo que hace que esto no rompa las hojas cortas:
+            sin él, el carril reclamaría toda la altura disponible y un modal de
+            dos líneas se estiraría hasta abajo. Con él, la hoja sigue midiendo
+            lo que mide su contenido y solo se desplaza cuando se pasa del techo.
+
+            El título y la X se quedan fuera a propósito: son el ancla de la
+            hoja, y perderlos al desplazar deja al lector sin saber qué está
+            leyendo ni por dónde se sale.
+          */}
+          <ScrollView
+            style={styles.scroll}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator
+            // Sin esto, con el teclado abierto el primer toque en un botón solo
+            // cierra el teclado: hay que tocar dos veces para confirmar.
+            keyboardShouldPersistTaps="handled"
+            // El rebote delata que no hay más contenido, pero en una hoja que no
+            // se desplaza parece que se ha soltado del sitio.
+            bounces={false}
+          >
+            {children}
+          </ScrollView>
         </Animated.View>
       </View>
     </Modal>
@@ -229,6 +267,17 @@ const createStyles = (c: Palette) =>
     backgroundColor: c.surface.elevated,
     borderWidth: 1,
     borderColor: c.border.default,
+  },
+  /*
+    `flexShrink` y no `flex`: ver la nota del `ScrollView`. `flexGrow: 0` en el
+    contenido es la otra mitad de lo mismo, para que un contenido corto no se
+    reparta el alto sobrante.
+  */
+  scroll: {
+    flexShrink: 1,
+  },
+  scrollContent: {
+    flexGrow: 0,
   },
   panelCenter: {
     maxWidth: 400,

@@ -266,23 +266,36 @@ export default function LandingScreen(): ReactElement {
     }
   }, [state]);
 
+  /**
+   * El titular. El rótulo de encima es el mismo en los tres estados y por eso
+   * vive fuera del `switch`: es el nombre de lo que hace el juego —mirar el
+   * tono de un color—, no un aviso de estado.
+   *
+   * Con grupos anunciaba la hora a la que abre el reto. Se ha quitado porque
+   * era lo único de la portada que caducaba: quien ya juega se sabe la hora, y
+   * a quien no ha entrado todavía le da una condición antes que un motivo. La
+   * hora sigue estando donde hace falta —en el propio reto y en la ayuda del
+   * grupo—, que es donde significa algo.
+   */
   const heading = useMemo(() => {
+    const label = t("dial.label");
+
     switch (state) {
       case "member":
         return {
-          label: t("dial.open.label"),
+          label,
           title: t("dial.open.title"),
           body: t("dial.open.body"),
         };
       case "nogroups":
         return {
-          label: t("dial.off.label"),
+          label,
           title: t("dial.empty.title"),
           body: t("dial.empty.body"),
         };
       case "guest":
         return {
-          label: t("dial.off.label"),
+          label,
           title: t("dial.guest.title"),
           body: t("dial.guest.body"),
         };
@@ -314,6 +327,13 @@ export default function LandingScreen(): ReactElement {
           escalón de `zIndex`—, y no se pinta hasta que hay medida: con alto
           cero sería una banda de un píxel sobre el titular durante el primer
           fotograma. Ver `VEIL_FADE`.
+
+          El extremo se escribe con el MISMO color del lienzo en alfa cero y no
+          con `transparent`, que es `rgba(0,0,0,0)`: al interpolar hacia él el
+          degradado pasa por negro y deja una banda gris sobre la rueda. En
+          oscuro no se notaba porque el lienzo ya es casi negro; en claro se veía
+          un rectángulo gris colgando del titular. Mismo recurso que el borde
+          inferior de `online/leaderboard`.
         */}
         {headingBottom > 0 && veilFade > 0 ? (
           <LinearGradient
@@ -321,7 +341,7 @@ export default function LandingScreen(): ReactElement {
             colors={[
               colors.surface.canvas,
               colors.surface.canvas,
-              "transparent",
+              `${colors.surface.canvas}00`,
             ]}
             locations={[0, headingBottom / (headingBottom + veilFade), 1]}
             style={[styles.veil, { height: headingBottom + veilFade }]}
@@ -397,7 +417,9 @@ export default function LandingScreen(): ReactElement {
               pressed && styles.practicePressed,
             ]}
             accessibilityRole="button"
-            accessibilityLabel={t("dial.practice.title")}
+            accessibilityLabel={`${t("dial.practice.title")}. ${t(
+              "dial.practice.offline",
+            )}`}
             accessibilityHint={t("dial.practice.body")}
           >
             <View style={styles.practiceIcon}>
@@ -405,7 +427,38 @@ export default function LandingScreen(): ReactElement {
             </View>
 
             <View style={styles.practiceBody}>
-              <Text style={Type.bodyStrong}>{t("dial.practice.title")}</Text>
+              <View style={styles.practiceHead}>
+                <Text
+                  style={[Type.bodyStrong, styles.practiceName]}
+                  numberOfLines={1}
+                >
+                  {t("dial.practice.title")}
+                </Text>
+
+                {/*
+                  Lo que el Taller tiene y el resto de la portada no: se juega
+                  con el avión encendido. Estaba dentro de la frase de abajo
+                  —«Practica sin conexión · solo o en grupo»— y ahí era una
+                  condición más, leída al mismo peso que con cuántos se juega.
+                  Sacado a distintivo es una propiedad de la cosa, que es lo
+                  que de verdad es.
+
+                  El `wifiOff` gris del chat avisa de que la red se ha caído;
+                  este va en teal porque dice lo contrario: aquí no hace falta.
+                  Mismo icono, dos registros, y el color es lo que los separa.
+                */}
+                <View style={styles.practiceBadge}>
+                  <Icon
+                    name="wifiOff"
+                    size={11}
+                    color={colors.spectrum.teal.icon}
+                  />
+                  <Text style={[Type.label, styles.practiceBadgeText]}>
+                    {t("dial.practice.offline")}
+                  </Text>
+                </View>
+              </View>
+
               <Text style={[Type.caption, styles.practiceNote]}>
                 {t("dial.practice.body")}
               </Text>
@@ -516,13 +569,45 @@ const createStyles = (c: Palette) =>
     borderRadius: Radius.pill,
     alignItems: "center",
     justifyContent: "center",
-    // Disco macizo, no pastilla teñida: es el único punto saturado del pie y
-    // lo que hace que el ojo caiga aquí al terminar de recorrer la rueda.
+    // Disco macizo, no pastilla teñida: es el punto más saturado del pie y lo
+    // que hace que el ojo caiga aquí al terminar de recorrer la rueda. El
+    // distintivo de al lado es del mismo teal pero lavado, así que el orden de
+    // lectura sale solo: primero el disco, luego lo que dice.
     backgroundColor: c.spectrum.teal.pigment,
   },
   practiceBody: {
     flex: 1,
     gap: Space.xxs,
+  },
+  /**
+   * El nombre y su distintivo, en la misma línea.
+   *
+   * El nombre encoge y el distintivo no: en francés —«L'Atelier» y «Hors
+   * ligne»— los dos juntos llegan al chevron, y de los dos el que se puede
+   * recortar es el nombre, que ya está dicho por el disco de la paleta.
+   */
+  practiceHead: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Space.sm,
+  },
+  practiceName: {
+    flexShrink: 1,
+  },
+  practiceBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Space.xs,
+    // Aire mínimo: la pastilla acompaña al nombre, no compite con él.
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: Radius.sm,
+    borderWidth: HAIRLINE,
+    borderColor: c.spectrum.teal.border,
+    backgroundColor: c.spectrum.teal.surface,
+  },
+  practiceBadgeText: {
+    color: c.spectrum.teal.icon,
   },
   practiceNote: {
     color: c.text.muted,

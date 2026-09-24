@@ -1,0 +1,24 @@
+{
+  "id": "fire-extinguisher",
+  "svg": "fire-extinguisher.svg",
+  "svgXml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n   xmlns:cc=\"http://creativecommons.org/ns#\"\n   xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:sodipodi=\"http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd\"\n   xmlns:inkscape=\"http://www.inkscape.org/namespaces/inkscape\"\n   height=\"200\"\n   width=\"200\"\n   version=\"1.0\"\n   id=\"svg22\"\n   sodipodi:docname=\"ISO_7010_F001.svg\"\n   inkscape:version=\"1.0.2-2 (e86c870879, 2021-01-15)\">\n  <defs\n     id=\"defs26\" />\n  <sodipodi:namedview\n     pagecolor=\"#ffffff\"\n     bordercolor=\"#666666\"\n     borderopacity=\"1\"\n     objecttolerance=\"10\"\n     gridtolerance=\"10\"\n     guidetolerance=\"10\"\n     inkscape:pageopacity=\"0\"\n     inkscape:pageshadow=\"2\"\n     inkscape:window-width=\"1920\"\n     inkscape:window-height=\"1001\"\n     id=\"namedview24\"\n     showgrid=\"false\"\n     inkscape:zoom=\"3.7186616\"\n     inkscape:cx=\"100\"\n     inkscape:cy=\"100\"\n     inkscape:window-x=\"-9\"\n     inkscape:window-y=\"-9\"\n     inkscape:window-maximized=\"1\"\n     inkscape:current-layer=\"svg22\" />\n  <metadata\n     id=\"metadata2\">\n    <rdf:RDF>\n      <cc:Work\n         rdf:about=\"\">\n        <dc:format>image/svg+xml</dc:format>\n        <dc:type\n           rdf:resource=\"http://purl.org/dc/dcmitype/StillImage\" />\n        <dc:title />\n      </cc:Work>\n    </rdf:RDF>\n  </metadata>\n  <path\n     d=\"m5.4189,5.423,189.16,0,0,189.15-189.16,0,0-189.15z\"\n     fill-rule=\"evenodd\"\n     fill=\"#9B2423\"\n     id=\"path6\" />\n  <path\n     d=\"m50,50,0-12-5,0c-16.763,17.711-15,11-15.935,25.799l-6.388,0.02405c0.323-24.823-1.677-17.823,21.782-38.958l8.541,0.135v-5h16v6c4.5631,0.1005,8.964,0.60059,13,2v9c-3.0449,0.87653-6.8647,1.3052-11,2l-0.208,10.963c10.633,3.325,17.309,7.857,17.208,19.037l-1,111h-54v-111c1.982-15.259,9.445-18.737,17-19z\"\n     fill=\"#ffffff\"\n     id=\"path8\" />\n  <path\n     d=\"M140.84,85.974c-6.68-14.582-5.84-27.467-15.84-33.587,22.31-2.387,22.11,14.733,34.2,34.732,6.1612,10.209,9.2957,12.113,19.261,19.134-10.883,1.1136-23.49,2.7543-37.621-20.278z\"\n     fill=\"#ffffff\"\n     id=\"path10\" />\n  <path\n     d=\"m178.22,148.83c-10.099,8.9642-25.395,7.8304-35.73,0.12286-9.0844-9.1994-13.227-19.521-28.507-22.043,24.088-14.798,35.883,7.0306,42.401,12.638,8.5275,6.854,14.675,6.4324,21.836,9.2819z\"\n     fill=\"#ffffff\"\n     id=\"path12\" />\n  <path\n     d=\"m178.54,116.43,0,22.555c-33.72-6.9045-47.46-29.05-47.786-53.98,18.753,20.208,21.384,26.81,47.786,31.426z\"\n     fill=\"#ffffff\"\n     id=\"path14\" />\n  <path\n     d=\"m178.4,180.29c-28.332,0.93009-42.124-5.7542-47.35-30.64,22.613,15.749,29.453,12.343,46.581,10.089,0.73556,6.7642,0.76879,13.754,0.76879,20.551z\"\n     fill=\"#ffffff\"\n     id=\"path16\" />\n  <path\n     d=\"m177.52,73.365,0.75669,21.609c-20.65-11.003-28.25-32.075-21.28-51.974,7.0102,16.483,7.1352,23.157,20.522,30.365z\"\n     fill=\"#ffffff\"\n     id=\"path18\" />\n  <rect\n     style=\"enable-background:accumulate;color:#000000;\"\n     height=\"25\"\n     width=\"40\"\n     y=\"80\"\n     x=\"40\"\n     fill=\"#9B2423\"\n     id=\"rect20\" />\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#9B2423",
+      "hsv": {
+        "h": 0,
+        "s": 77,
+        "v": 61
+      }
+    }
+  ],
+  "source": {
+    "name": "Señal de extintor (ISO 7010 F001)",
+    "source": "https://commons.wikimedia.org/wiki/File:ISO_7010_F001.svg",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "author": "MaxxL",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  }
+}

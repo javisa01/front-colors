@@ -489,6 +489,19 @@ function toOutputColor(color: CollectedColor): OutputColor {
   return output;
 }
 
+// `SvgXml` de react-native-svg no decodifica referencias de carácter numéricas:
+// lo que venga como `&#9;` llega literal al parser nativo. Dentro de un atributo
+// geométrico (`points`, `d`...) eso es un token basura que rompe el render
+// —Walmart traía un tabulador al final de su `points` y tumbaba la app al pintar
+// el logo—. Los exportadores de Illustrator los sueltan al partir atributos
+// largos en varias líneas, así que los normalizamos a espacio de verdad antes de
+// guardar el markup.
+const WHITESPACE_ENTITY = /&#(?:0*(?:9|10|13|32)|[xX]0*(?:9|A|a|D|d|20));/g;
+
+function sanitizeSvgXml(xml: string): string {
+  return xml.replace(WHITESPACE_ENTITY, " ");
+}
+
 interface ProcessResult {
   id: string;
   colors: number;
@@ -498,7 +511,7 @@ interface ProcessResult {
 
 function processSVG(file: string): ProcessResult {
   const fullPath = path.join(LOGO_DIR, file);
-  const xml = fs.readFileSync(fullPath, "utf8");
+  const xml = sanitizeSvgXml(fs.readFileSync(fullPath, "utf8"));
 
   const classes = parseStyleClasses(xml);
   const parsed = parser.parse(xml);

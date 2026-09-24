@@ -1,0 +1,24 @@
+{
+  "id": "defibrillator",
+  "svg": "defibrillator.svg",
+  "svgXml": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg width=\"400px\" height=\"400px\" version=\"1.1\" viewBox=\"0 0 200 200\" xmlns=\"http://www.w3.org/2000/svg\">\n <rect width=\"200\" height=\"200\" style=\"fill:#ffffff\"/>\n <rect x=\"5\" y=\"5\" width=\"190\" height=\"190\" style=\"fill:#237F52\"/>\n <path d=\"m132.73 36.116h47.168v15.723h-47.168zm15.723-15.723h15.723v47.168h-15.723z\" style=\"fill:#ffffff\"/>\n <path d=\"m56.258 65.861c-18.603 0.19378-35.268 18.7-30.23 43.116 3.7787 18.7 23.641 42.922 58.231 66.37 34.59-23.544 54.452-47.767 58.231-66.37 5.0383-24.513-11.53-42.922-30.23-43.116-9.5921-0.19378-21.607 4.9414-28.001 17.15-6.3948-12.208-18.409-17.343-28.001-17.15zm42.922 14.824-16.278 33.427h20.638l-36.14 42.05 13.952-32.943h-20.056z\" style=\"fill:#ffffff\"/>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#237F52",
+      "hsv": {
+        "h": 151,
+        "s": 72,
+        "v": 50
+      }
+    }
+  ],
+  "source": {
+    "name": "Señal de desfibrilador (ISO 7010 E010)",
+    "source": "https://commons.wikimedia.org/wiki/File:ISO_7010_E010.svg",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "author": "M!dgard",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  }
+}

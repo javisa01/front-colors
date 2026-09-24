@@ -402,8 +402,13 @@ export default function AuthScreen(): ReactElement {
               style={{ marginBottom: -ringSize * RING_HIDDEN }}
             />
           </View>
+          {/*
+            Alfa cero sobre el propio lienzo, no `transparent`: interpolar hacia
+            `rgba(0,0,0,0)` mete una banda gris en el degradado. Mismo caso que
+            el velo de la portada.
+          */}
           <LinearGradient
-            colors={[colors.surface.canvas, "transparent"]}
+            colors={[colors.surface.canvas, `${colors.surface.canvas}00`]}
             locations={[0, 0.62]}
             style={styles.scrim}
             pointerEvents="none"

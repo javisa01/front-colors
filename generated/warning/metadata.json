@@ -1,0 +1,24 @@
+{
+  "id": "warning",
+  "svg": "warning.svg",
+  "svgXml": "<svg viewBox=\"0 0 600 524\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"m300 16 284 492h-568z\" fill=\"#F9A800\" stroke-linejoin=\"round\" stroke=\"#000\" stroke-width=\"32\"/><path d=\"m337 192a37 37 0 0 0-74 0l11 143a26 26 0 0 0 52 0m12 85a38 38 0 1 1 0-1\"/></svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#F9A800",
+      "hsv": {
+        "h": 40,
+        "s": 100,
+        "v": 98
+      }
+    }
+  ],
+  "source": {
+    "name": "Señal de peligro general (ISO 7010 W001)",
+    "source": "https://commons.wikimedia.org/wiki/File:ISO_7010_W001.svg",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "author": "Maxxl2",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  }
+}

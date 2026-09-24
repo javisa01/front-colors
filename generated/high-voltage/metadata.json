@@ -1,0 +1,24 @@
+{
+  "id": "high-voltage",
+  "svg": "high-voltage.svg",
+  "svgXml": "<svg viewBox=\"0 0 600 524\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"m300 16 284 492h-568z\" fill=\"#F9A800\" stroke-width=\"32\" stroke=\"#000\" stroke-linejoin=\"round\"/><path d=\"m278 164-50 177 77-41-19 119-16-22 15 72 41-61-23 14 45-164-80 43 59-137\"/></svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#F9A800",
+      "hsv": {
+        "h": 40,
+        "s": 100,
+        "v": 98
+      }
+    }
+  ],
+  "source": {
+    "name": "Señal de riesgo eléctrico (ISO 7010 W012)",
+    "source": "https://commons.wikimedia.org/wiki/File:ISO_7010_W012.svg",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "author": "MaxxL",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  }
+}

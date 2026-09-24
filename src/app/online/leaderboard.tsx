@@ -26,6 +26,7 @@ import {
 } from "@/design/tokens";
 import { t } from "@/i18n";
 import { useSession } from "@/online/session";
+import { playerName } from "@/online/playerName";
 
 type Scope = "global" | "friends";
 
@@ -402,14 +403,14 @@ function Row({
           )}
         </View>
 
-        <Avatar username={entry.username} size={40} />
+        <Avatar username={playerName(entry.username)} size={40} />
 
         <View style={styles.rowText}>
           <Text
             style={[Type.bodyStrong, isMe && styles.nameMe]}
             numberOfLines={1}
           >
-            {entry.username}
+            {playerName(entry.username)}
             {isMe ? ` · ${t("online.leaderboard.you")}` : ""}
           </Text>
           <Text style={Type.caption}>

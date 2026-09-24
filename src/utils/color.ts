@@ -8,6 +8,34 @@ export function hueDistance(a: number, b: number): number {
   return Math.min(diff, 360 - diff);
 }
 
+/**
+ * Si un color del logo es sombra, contorno o gris de relleno en vez de un color
+ * de marca. Dicho de otra manera: si **no se puede adivinar**.
+ *
+ * El caso que lo motiva es Cockta, que tiene rojo, amarillo y un `#231F20` que
+ * es el contorno negro de las letras. En un modo que pide reconstruir *todos*
+ * los colores del logo, ese tercero no es una jugada: el jugador no tiene que
+ * mirar el logo ni recordar nada, solo bajar el brillo a cero, y da igual el
+ * tono que deje puesto porque a esa oscuridad no se distingue ninguno. Lo mismo
+ * con el gris del «Microsoft» de la marca de las cuatro ventanas.
+ *
+ * Dos condiciones, y ninguna sobra:
+ *
+ *  - **Oscuro y poco saturado.** Oscuro a secas no vale: el marrón de UPS
+ *    (`v` 19, `s` 88) o el azul marino de Lufthansa (`v` 24, `s` 84) son
+ *    colores de marca de pleno derecho y tienen tono que acertar.
+ *  - **Gris, esté donde esté.** Un `#918F90` no se adivina ni a plena luz,
+ *    porque no hay tono que buscar.
+ *
+ * El generador ya descarta el negro puro, el blanco y los grises al construir
+ * el catálogo (`tools/generateMetadata.ts`), pero con umbrales más estrechos
+ * —`v` ≤ 12 y `s` ≤ 8—, y por ahí se colaban estos. Esto no rehace el catálogo:
+ * decide, al repartir, qué colores cuentan.
+ */
+export function isUnguessableColor(hsv: HSVColor): boolean {
+  return (hsv.v <= 28 && hsv.s <= 45) || hsv.s <= 12;
+}
+
 export function hexToHSV(hex: string): HSVColor {
   const rgb = convert.hex.rgb(hex.replace("#", ""));
   const [h, s, v] = convert.rgb.hsv(rgb);

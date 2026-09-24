@@ -6,6 +6,7 @@ import {
   hsvToHex,
   hsvToLab,
   hueDistance,
+  isUnguessableColor,
   normalizeHex,
   relativeLuminance,
 } from "../src/utils/color";
@@ -56,4 +57,18 @@ test("hsvToLab returns three finite numbers with L in 0..100", () => {
   const [l, a, b] = hsvToLab({ h: 0, s: 100, v: 100 });
   assert.ok(Number.isFinite(l) && Number.isFinite(a) && Number.isFinite(b));
   assert.ok(l >= 0 && l <= 100);
+});
+
+test("isUnguessableColor descarta sombras y grises, no colores oscuros de marca", () => {
+  // Contornos y rellenos reales del catálogo: nadie puede adivinar su tono.
+  assert.ok(isUnguessableColor(hexToHSV("#231F20"))); // contorno de Cockta
+  assert.ok(isUnguessableColor(hexToHSV("#211E1E"))); // contorno de Snickers
+  assert.ok(isUnguessableColor(hexToHSV("#263238"))); // sombra de Google Sheets
+  assert.ok(isUnguessableColor(hexToHSV("#737373"))); // gris del «Microsoft»
+  assert.ok(isUnguessableColor(hexToHSV("#918F90"))); // gris de LG
+
+  // Colores de marca que son oscuros pero tienen tono: estos sí se juegan.
+  assert.ok(!isUnguessableColor(hexToHSV("#301506"))); // marrón de UPS
+  assert.ok(!isUnguessableColor(hexToHSV("#0A1D3D"))); // azul de Lufthansa
+  assert.ok(!isUnguessableColor(hexToHSV("#147350"))); // verde de 7-Eleven
 });

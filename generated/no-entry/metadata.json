@@ -1,0 +1,24 @@
+{
+  "id": "no-entry",
+  "svg": "no-entry.svg",
+  "svgXml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"61mm\" height=\"61mm\" viewBox=\"0 0 61 61\">\n  <g paint-order=\"stroke fill markers\" transform=\"translate(0 -236)\">\n    <circle cx=\"30.5\" cy=\"266.5\" r=\"30\" fill=\"#dc0a14\"/>\n    <path fill=\"#fff\" d=\"M4.5 262h52v9h-52z\"/>\n  </g>\n</svg>",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#DC0A14",
+      "hsv": {
+        "h": 357,
+        "s": 95,
+        "v": 86
+      }
+    }
+  ],
+  "source": {
+    "name": "Señal de dirección prohibida (Convención de Viena C1a)",
+    "source": "https://commons.wikimedia.org/wiki/File:Vienna_Convention_road_sign_C1a-V1.svg",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "author": "United Nations",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  }
+}

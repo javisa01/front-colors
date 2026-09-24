@@ -45,22 +45,25 @@ const es = {
   "a11y.brightness": "Brillo",
   "a11y.selectedColor": "Color seleccionado",
 
-  "landing.badge": "Hexy",
+  "landing.badge": "Iromi",
 
   // --- La portada: el dial ----------------------------------------------
   // La rueda de color ES la portada y se entra por su eje. Lo que cambia
   // entre estados no es el adorno: sin grupo no hay reto que jugar, así que
   // la rueda está literalmente apagada hasta que hay con quién.
+  //
+  // `dial.label` es el rótulo de la portada y no cambia nunca: es el nombre de
+  // lo que hace el juego, no un aviso. Antes con grupos anunciaba la hora del
+  // reto, y esa frase ya la dice el propio reto cuando se abre.
   "dial.streak": "{{count}} jornadas seguidas",
   "dial.streakOne": "1 jornada seguida",
   "dial.noGroups": "{{name}} · sin grupos",
-  "dial.open.label": "Nuevo reto cada día a las 15:00 h",
+  "dial.label": "Iromi (色味) — el tono de un color",
   "dial.open.title": "Gira, mira,\ny acierta el color.",
   "dial.open.body":
     "Cinco imágenes nuevas cada día y dos intentos para conseguir la mayor puntuación.",
   "dial.open.action": "Jugar",
   "dial.open.hint": "Abre el reto de hoy",
-  "dial.off.label": "Iromi (色味) — el tono de un color",
   "dial.empty.title": "No estás en\nningún grupo.",
   "dial.empty.body":
     "Crea uno, invita a quien quieras y cada día tendréis cinco imágenes, dos intentos y una clasificación que solo veis vosotros.",
@@ -72,11 +75,12 @@ const es = {
   "dial.guest.action": "Empezar",
   "dial.guest.hint": "Abre el acceso a tu cuenta",
   "dial.practice.title": "El Taller",
-  "dial.practice.body": "Practica sin conexión · solo o en grupo",
+  "dial.practice.body": "Solo o en grupo",
+  "dial.practice.offline": "Sin conexión",
 
   // --- Bienvenida y tutorial de la primera vez ---------------------------
   "welcome.greeting": "Te damos la bienvenida a",
-  "welcome.name": "Hexy",
+  "welcome.name": "Iromi",
   "welcome.cta": "Toca los círculos para continuar",
   "welcome.continue": "Continuar",
   "tutorial.memorize": "Memoriza el color",
@@ -115,10 +119,10 @@ const es = {
     "Cada fila es un modo distinto: debajo del nombre te dice de qué va y cómo se juega. Tu récord aparecerá a la derecha.",
   "tour.party.title": "Un móvil, varias personas",
   "tour.party.body":
-    "Aquí no hace falta que haya nadie más conectado: le das el móvil al siguiente y juega cada uno el suyo. Hasta 99 personas en un mismo dispositivo.",
+    "Le pasas el móvil al siguiente y cada uno juega su turno. No hace falta que haya nadie más conectado.",
   "tour.settings.title": "Música, efectos e idioma",
   "tour.settings.body":
-    "Puedes configurar el volumen de música y efectos de sonido, y cambiar de idioma en esta pestaña de configuración.",
+    "Aquí ajustas el volumen de la música y de los efectos, y cambias el idioma.",
   "tour.next": "Siguiente",
   "tour.finish": "Entendido",
   "tour.skip": "Saltar",
@@ -236,9 +240,9 @@ const es = {
   "summary.hitsOf": "de {{rounds}} intentos",
   "summary.home": "Volver al inicio",
   "summary.shareText":
-    "🎨 Hexy — {{mode}}\nPuntuación: {{total}}/{{max}} ({{average}}%)\n{{stars}}",
+    "🎨 Iromi — {{mode}}\nPuntuación: {{total}}/{{max}} ({{average}}%)\n{{stars}}",
   "summary.shareTimed":
-    "🎨 Hexy — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} aciertos ({{average}}%)\n{{stars}}",
+    "🎨 Iromi — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} aciertos ({{average}}%)\n{{stars}}",
 
   "daily.done.title": "Reto diario completado",
   "daily.done.subtitle": "Vuelve mañana para un color nuevo.",
@@ -274,7 +278,7 @@ const es = {
   "online.level": "Nivel {{level}}",
   "online.xp": "{{xp}} XP",
 
-  "online.auth.badge": "Hexy",
+  "online.auth.badge": "Iromi",
   "online.auth.title": "Entra en tu cuenta",
   "online.auth.titleRegister": "Crea tu cuenta",
   "online.auth.subtitle":
@@ -308,7 +312,7 @@ const es = {
   "online.auth.apple": "Continuar con Apple",
   "online.auth.connecting": "Conectando...",
   "online.auth.unavailable":
-    "Hexy no está configurado en esta versión de la app. El Taller funciona igual.",
+    "Iromi no está configurado en esta versión de la app. El Taller funciona igual.",
   "online.auth.verify.title": "Confirma tu email",
   "online.auth.verify.subtitle":
     "Te hemos enviado un código de 6 dígitos a {{email}}.",
@@ -352,9 +356,9 @@ const es = {
   // Seis pasos: la barra, sus cuatro pestañas en orden de urgencia, y el
   // botón de crear grupo. Los botones nunca dicen «Siguiente»: dicen lo que
   // van a hacer, porque lo que hacen es navegar.
-  "online.tour.bar.title": "Lo más importante",
+  "online.tour.bar.title": "La barra de abajo",
   "online.tour.bar.body":
-    "En esta sección está todo lo que necesitas: el reto de cada día, tus grupos, el ranking y la gestión de tu cuenta. ¡Echemos un vistazo!",
+    "Una pestaña para cada cosa: el reto de cada día, tus grupos, el ranking y tu cuenta.",
   "online.tour.bar.action": "Vamos",
   "online.tour.groups.title": "Empieza por Grupos",
   "online.tour.groups.body":
@@ -377,7 +381,7 @@ const es = {
     "Crea un grupo, invita a quien quieras y mañana a las 15:00 tendréis el mismo reto.",
   "online.tour.create.action": "Crear un grupo",
   "online.hub.tour": "Ver cómo funciona",
-  "dev.firstRunTitle": "Primera vez en Hexy",
+  "dev.firstRunTitle": "Primera vez en Iromi",
   "dev.firstRunHint":
     "Solo en desarrollo. Finge que acabas de registrarte y no tienes ningún grupo.",
   "dev.firstRunButton": "Simular primera vez y ver el recorrido",
@@ -450,7 +454,7 @@ const es = {
   "online.group.codeTitle": "Código de invitación",
   "online.group.codeHint": "Quien lo tenga puede entrar en el grupo.",
   "online.group.shareMessage":
-    "Entra en mi grupo «{{name}}» de Hexy con el código {{code}}",
+    "Entra en mi grupo «{{name}}» de Iromi con el código {{code}}",
   "online.group.finishedTitle": "Esta temporada ha terminado",
   "online.group.finishedOwner":
     "La clasificación queda congelada. Puedes reiniciarla cuando quieras: los puntos vuelven a cero, pero tu XP y tu nivel no se pierden.",
@@ -501,7 +505,7 @@ const es = {
   "online.group.settings.notificationsHint":
     "Avisos en el móvil cuando hay reto nuevo, cuando se está acabando el día y cuando empieza una temporada. Apagado, este grupo deja de escribirte y de marcarse en la lista.",
   "online.group.settings.notificationsBlocked":
-    "Tu teléfono tiene los avisos de Hexy bloqueados: actívalos en los ajustes del sistema para recibirlos.",
+    "Tu teléfono tiene los avisos de Iromi bloqueados: actívalos en los ajustes del sistema para recibirlos.",
   "online.group.settings.seasons": "Temporadas",
   "online.group.settings.seasonsHint":
     "Cuántas lleva el grupo, y desde cuándo.",
@@ -649,6 +653,22 @@ const es = {
     "Al salir se borra la sesión de este dispositivo. El Taller no se ve afectado.",
   "online.profile.logout": "Cerrar sesión",
 
+  // --- Dar de baja la cuenta ---------------------------------------------
+  "online.profile.danger": "Eliminar la cuenta",
+  "online.profile.dangerHint":
+    "Se borra tu perfil y no se puede deshacer.",
+  "online.profile.delete": "Eliminar mi cuenta",
+  "online.delete.title": "¿Eliminar tu cuenta?",
+  "online.delete.body":
+    "Se borran tu nombre, tu correo y tu experiencia. Lo que escribiste en los chats y tus puntuaciones de temporadas pasadas se quedan, pero sin tu nombre: aparecerán como «Cuenta eliminada».",
+  "online.delete.groups":
+    "Los grupos que creaste pasan a la persona que lleve más tiempo dentro. Si no queda nadie, se borran.",
+  "online.delete.confirmLabel": "Escribe {{username}} para confirmar",
+  "online.delete.confirm": "Eliminar para siempre",
+  "online.delete.cancel": "Mejor no",
+  "online.delete.error": "No hemos podido eliminar la cuenta. Inténtalo otra vez.",
+  "common.deletedAccount": "Cuenta eliminada",
+
   "online.friends.badge": "Amigos",
   "online.friends.title": "Tus amigos",
   "online.friends.subtitle": "Busca jugadores por su nombre y añádelos.",
@@ -742,18 +762,17 @@ const en: Record<TranslationKey, string> = {
   "a11y.brightness": "Brightness",
   "a11y.selectedColor": "Selected color",
 
-  "landing.badge": "Hexy",
+  "landing.badge": "Iromi",
 
   "dial.streak": "{{count}} days in a row",
   "dial.streakOne": "1 day in a row",
   "dial.noGroups": "{{name}} · no groups yet",
-  "dial.open.label": "New challenge every day at 15:00",
+  "dial.label": "Iromi (色味) — the shade of a color",
   "dial.open.title": "Spin, look,\nand match the color.",
   "dial.open.body":
     "Five new images every day, and two tries to get the highest score.",
   "dial.open.action": "Play",
   "dial.open.hint": "Opens today's challenge",
-  "dial.off.label": "Iromi (色味) — the shade of a color",
   "dial.empty.title": "You're not in\nany group.",
   "dial.empty.body":
     "Create one, invite whoever you want, and every day you get five images, two tries and a ranking only you can see.",
@@ -765,11 +784,12 @@ const en: Record<TranslationKey, string> = {
   "dial.guest.action": "Start",
   "dial.guest.hint": "Opens account access",
   "dial.practice.title": "The Studio",
-  "dial.practice.body": "Practice offline · solo or in a group",
+  "dial.practice.body": "Solo or in a group",
+  "dial.practice.offline": "Offline",
 
   // --- Bienvenida y tutorial de la primera vez ---------------------------
   "welcome.greeting": "Welcome to",
-  "welcome.name": "Hexy",
+  "welcome.name": "Iromi",
   "welcome.cta": "Tap the circles to continue",
   "welcome.continue": "Continue",
   "tutorial.memorize": "Memorize the color",
@@ -805,10 +825,10 @@ const en: Record<TranslationKey, string> = {
     "Each row is a different mode: under the name it tells you what it is and how to play it. Your record will show up on the right.",
   "tour.party.title": "One phone, several people",
   "tour.party.body":
-    "Nobody else needs to be online here: hand the phone to the next player and everyone plays their own. Up to 99 people on the same device.",
+    "Pass the phone to the next player and each person takes their turn. Nobody else needs to be online.",
   "tour.settings.title": "Music, effects and language",
   "tour.settings.body":
-    "You can set the music and sound effects volume, and change the language, in this settings panel.",
+    "Set the music and effects volume here, and change the language.",
   "tour.next": "Next",
   "tour.finish": "Got it",
   "tour.skip": "Skip",
@@ -924,9 +944,9 @@ const en: Record<TranslationKey, string> = {
   "summary.hitsOf": "of {{rounds}} guesses",
   "summary.home": "Back to home",
   "summary.shareText":
-    "🎨 Hexy — {{mode}}\nScore: {{total}}/{{max}} ({{average}}%)\n{{stars}}",
+    "🎨 Iromi — {{mode}}\nScore: {{total}}/{{max}} ({{average}}%)\n{{stars}}",
   "summary.shareTimed":
-    "🎨 Hexy — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} hits ({{average}}%)\n{{stars}}",
+    "🎨 Iromi — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} hits ({{average}}%)\n{{stars}}",
 
   "daily.done.title": "Daily challenge complete",
   "daily.done.subtitle": "Come back tomorrow for a new color.",
@@ -962,7 +982,7 @@ const en: Record<TranslationKey, string> = {
   "online.level": "Level {{level}}",
   "online.xp": "{{xp}} XP",
 
-  "online.auth.badge": "Hexy",
+  "online.auth.badge": "Iromi",
   "online.auth.title": "Sign in",
   "online.auth.titleRegister": "Create your account",
   "online.auth.subtitle":
@@ -996,7 +1016,7 @@ const en: Record<TranslationKey, string> = {
   "online.auth.apple": "Continue with Apple",
   "online.auth.connecting": "Connecting...",
   "online.auth.unavailable":
-    "Hexy isn't configured in this build. The Studio works as usual.",
+    "Iromi isn't configured in this build. The Studio works as usual.",
   "online.auth.verify.title": "Confirm your email",
   "online.auth.verify.subtitle": "We sent a 6-digit code to {{email}}.",
   "online.auth.verify.code": "Verification code",
@@ -1034,9 +1054,9 @@ const en: Record<TranslationKey, string> = {
   "online.tabs.ranking": "Ranking",
   "online.tabs.profile": "Profile",
 
-  "online.tour.bar.title": "What matters most",
+  "online.tour.bar.title": "The bar at the bottom",
   "online.tour.bar.body":
-    "This section holds everything you need: the daily challenge, your groups, the ranking and your account settings. Let's take a look!",
+    "One tab each: the daily challenge, your groups, the ranking and your account.",
   "online.tour.bar.action": "Let's go",
   "online.tour.groups.title": "Start with Groups",
   "online.tour.groups.body":
@@ -1059,7 +1079,7 @@ const en: Record<TranslationKey, string> = {
     "Create a group, invite whoever you like, and tomorrow at 15:00 you all get the same challenge.",
   "online.tour.create.action": "Create a group",
   "online.hub.tour": "See how it works",
-  "dev.firstRunTitle": "First time in Hexy",
+  "dev.firstRunTitle": "First time in Iromi",
   "dev.firstRunHint":
     "Development only. Pretends you just signed up and have no groups.",
   "dev.firstRunButton": "Simulate first run and replay the tour",
@@ -1124,7 +1144,7 @@ const en: Record<TranslationKey, string> = {
   "online.group.codeTitle": "Invite code",
   "online.group.codeHint": "Anyone with it can join the group.",
   "online.group.shareMessage":
-    "Join my Hexy group \"{{name}}\" with the code {{code}}",
+    "Join my Iromi group \"{{name}}\" with the code {{code}}",
   "online.group.finishedTitle": "This season has ended",
   "online.group.finishedOwner":
     "The ranking is frozen. You can restart it whenever you want: points go back to zero, but your XP and level stay as they are.",
@@ -1174,7 +1194,7 @@ const en: Record<TranslationKey, string> = {
   "online.group.settings.notificationsHint":
     "Phone alerts when there's a new challenge, when the day is running out and when a season begins. When off, this group stops notifying you and getting flagged in the list.",
   "online.group.settings.notificationsBlocked":
-    "Your phone has Hexy's notifications blocked: turn them on in your system settings to get them.",
+    "Your phone has Iromi's notifications blocked: turn them on in your system settings to get them.",
   "online.group.settings.seasons": "Seasons",
   "online.group.settings.seasonsHint":
     "How many the group has played, and since when.",
@@ -1322,6 +1342,21 @@ const en: Record<TranslationKey, string> = {
     "Signing out clears the session on this device. The Studio is unaffected.",
   "online.profile.logout": "Sign out",
 
+  // --- Dar de baja la cuenta ---------------------------------------------
+  "online.profile.danger": "Delete account",
+  "online.profile.dangerHint": "Your profile is erased and this cannot be undone.",
+  "online.profile.delete": "Delete my account",
+  "online.delete.title": "Delete your account?",
+  "online.delete.body":
+    "Your name, email and experience are erased. What you wrote in chats and your scores from past seasons stay, but without your name: they will show as “Deleted account”.",
+  "online.delete.groups":
+    "Groups you created pass to whoever has been in them longest. If nobody is left, they are deleted.",
+  "online.delete.confirmLabel": "Type {{username}} to confirm",
+  "online.delete.confirm": "Delete forever",
+  "online.delete.cancel": "Never mind",
+  "online.delete.error": "We could not delete the account. Try again.",
+  "common.deletedAccount": "Deleted account",
+
   "online.friends.badge": "Friends",
   "online.friends.title": "Your friends",
   "online.friends.subtitle": "Search players by name and add them.",
@@ -1412,18 +1447,17 @@ const fr: Record<TranslationKey, string> = {
   "a11y.brightness": "Luminosité",
   "a11y.selectedColor": "Couleur sélectionnée",
 
-  "landing.badge": "Hexy",
+  "landing.badge": "Iromi",
 
   "dial.streak": "{{count}} jours d'affilée",
   "dial.streakOne": "1 jour d'affilée",
   "dial.noGroups": "{{name}} · aucun groupe",
-  "dial.open.label": "Nouveau défi chaque jour à 15h00",
+  "dial.label": "Iromi (色味) — la nuance d'une couleur",
   "dial.open.title": "Tourne, regarde,\net trouve la couleur.",
   "dial.open.body":
     "Cinq nouvelles images chaque jour et deux essais pour faire le meilleur score.",
   "dial.open.action": "Jouer",
   "dial.open.hint": "Ouvre le défi du jour",
-  "dial.off.label": "Iromi (色味) — la nuance d'une couleur",
   "dial.empty.title": "Tu n'es dans\naucun groupe.",
   "dial.empty.body":
     "Crées-en un, invite qui tu veux, et chaque jour vous aurez cinq images, deux essais et un classement que vous seuls voyez.",
@@ -1435,11 +1469,12 @@ const fr: Record<TranslationKey, string> = {
   "dial.guest.action": "Commencer",
   "dial.guest.hint": "Ouvre l'accès à ton compte",
   "dial.practice.title": "L'Atelier",
-  "dial.practice.body": "Entraîne-toi hors ligne · seul ou en groupe",
+  "dial.practice.body": "Seul ou en groupe",
+  "dial.practice.offline": "Hors ligne",
 
   // --- Bienvenida y tutorial de la primera vez ---------------------------
   "welcome.greeting": "Bienvenue sur",
-  "welcome.name": "Hexy",
+  "welcome.name": "Iromi",
   "welcome.cta": "Touche les cercles pour continuer",
   "welcome.continue": "Continuer",
   "tutorial.memorize": "Mémorise la couleur",
@@ -1476,10 +1511,10 @@ const fr: Record<TranslationKey, string> = {
     "Chaque ligne est un mode différent : sous le nom, on t'explique de quoi il s'agit et comment y jouer. Ton record apparaîtra à droite.",
   "tour.party.title": "Un téléphone, plusieurs personnes",
   "tour.party.body":
-    "Ici personne d'autre n'a besoin d'être connecté : tu donnes le téléphone au suivant et chacun joue le sien. Jusqu'à 99 personnes sur un même appareil.",
+    "Tu passes le téléphone au suivant et chacun joue son tour. Personne d'autre n'a besoin d'être connecté.",
   "tour.settings.title": "Musique, effets et langue",
   "tour.settings.body":
-    "Tu peux régler le volume de la musique et des effets sonores, et changer de langue, dans ce panneau de réglages.",
+    "Ici tu règles le volume de la musique et des effets, et tu changes de langue.",
   "tour.next": "Suivant",
   "tour.finish": "C'est compris",
   "tour.skip": "Passer",
@@ -1597,9 +1632,9 @@ const fr: Record<TranslationKey, string> = {
   "summary.hitsOf": "sur {{rounds}} essais",
   "summary.home": "Retour à l'accueil",
   "summary.shareText":
-    "🎨 Hexy — {{mode}}\nScore : {{total}}/{{max}} ({{average}}%)\n{{stars}}",
+    "🎨 Iromi — {{mode}}\nScore : {{total}}/{{max}} ({{average}}%)\n{{stars}}",
   "summary.shareTimed":
-    "🎨 Hexy — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} réussites ({{average}}%)\n{{stars}}",
+    "🎨 Iromi — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} réussites ({{average}}%)\n{{stars}}",
 
   "daily.done.title": "Défi quotidien terminé",
   "daily.done.subtitle": "Reviens demain pour une nouvelle couleur.",
@@ -1635,7 +1670,7 @@ const fr: Record<TranslationKey, string> = {
   "online.level": "Niveau {{level}}",
   "online.xp": "{{xp}} XP",
 
-  "online.auth.badge": "Hexy",
+  "online.auth.badge": "Iromi",
   "online.auth.title": "Connexion",
   "online.auth.titleRegister": "Crée ton compte",
   "online.auth.subtitle":
@@ -1669,7 +1704,7 @@ const fr: Record<TranslationKey, string> = {
   "online.auth.apple": "Continuer avec Apple",
   "online.auth.connecting": "Connexion...",
   "online.auth.unavailable":
-    "Hexy n'est pas configuré dans cette version. L'Atelier fonctionne normalement.",
+    "Iromi n'est pas configuré dans cette version. L'Atelier fonctionne normalement.",
   "online.auth.verify.title": "Confirme ton email",
   "online.auth.verify.subtitle":
     "Nous avons envoyé un code à 6 chiffres à {{email}}.",
@@ -1709,9 +1744,9 @@ const fr: Record<TranslationKey, string> = {
   "online.tabs.ranking": "Classement",
   "online.tabs.profile": "Profil",
 
-  "online.tour.bar.title": "L'essentiel",
+  "online.tour.bar.title": "La barre du bas",
   "online.tour.bar.body":
-    "Cette section contient tout ce qu'il te faut : le défi de chaque jour, tes groupes, le classement et la gestion de ton compte. Allons y jeter un œil !",
+    "Un onglet pour chaque chose : le défi du jour, tes groupes, le classement et ton compte.",
   "online.tour.bar.action": "C'est parti",
   "online.tour.groups.title": "Commence par Groupes",
   "online.tour.groups.body":
@@ -1734,7 +1769,7 @@ const fr: Record<TranslationKey, string> = {
     "Crée un groupe, invite qui tu veux, et demain à 15h00 vous aurez tous le même défi.",
   "online.tour.create.action": "Créer un groupe",
   "online.hub.tour": "Voir comment ça marche",
-  "dev.firstRunTitle": "Première fois sur Hexy",
+  "dev.firstRunTitle": "Première fois sur Iromi",
   "dev.firstRunHint":
     "Développement uniquement. Fait comme si tu venais de t'inscrire, sans aucun groupe.",
   "dev.firstRunButton": "Simuler la première fois et revoir le parcours",
@@ -1799,7 +1834,7 @@ const fr: Record<TranslationKey, string> = {
   "online.group.codeTitle": "Code d'invitation",
   "online.group.codeHint": "Quiconque l'a peut rejoindre le groupe.",
   "online.group.shareMessage":
-    "Rejoins mon groupe Hexy « {{name}} » avec le code {{code}}",
+    "Rejoins mon groupe Iromi « {{name}} » avec le code {{code}}",
   "online.group.finishedTitle": "Cette saison est terminée",
   "online.group.finishedOwner":
     "Le classement est figé. Tu peux le relancer quand tu veux : les points repartent à zéro, mais ton XP et ton niveau ne disparaissent pas.",
@@ -1850,7 +1885,7 @@ const fr: Record<TranslationKey, string> = {
   "online.group.settings.notificationsHint":
     "Alertes sur ton téléphone quand un nouveau défi arrive, quand la journée se termine et quand une saison commence. Désactivé, ce groupe ne t'écrit plus et ne se signale plus dans la liste.",
   "online.group.settings.notificationsBlocked":
-    "Ton téléphone bloque les notifications de Hexy : active-les dans les réglages du système pour les recevoir.",
+    "Ton téléphone bloque les notifications de Iromi : active-les dans les réglages du système pour les recevoir.",
   "online.group.settings.seasons": "Saisons",
   "online.group.settings.seasonsHint":
     "Combien le groupe en a jouées, et depuis quand.",
@@ -2001,6 +2036,21 @@ const fr: Record<TranslationKey, string> = {
     "La déconnexion efface la session de cet appareil. L'Atelier n'est pas touché.",
   "online.profile.logout": "Se déconnecter",
 
+  // --- Dar de baja la cuenta ---------------------------------------------
+  "online.profile.danger": "Supprimer le compte",
+  "online.profile.dangerHint": "Ton profil est effacé et c’est irréversible.",
+  "online.profile.delete": "Supprimer mon compte",
+  "online.delete.title": "Supprimer ton compte ?",
+  "online.delete.body":
+    "Ton nom, ton e-mail et ton expérience sont effacés. Ce que tu as écrit dans les chats et tes scores des saisons passées restent, mais sans ton nom : ils apparaîtront comme « Compte supprimé ».",
+  "online.delete.groups":
+    "Les groupes que tu as créés passent à la personne qui y est depuis le plus longtemps. S’il ne reste personne, ils sont supprimés.",
+  "online.delete.confirmLabel": "Écris {{username}} pour confirmer",
+  "online.delete.confirm": "Supprimer définitivement",
+  "online.delete.cancel": "Plutôt pas",
+  "online.delete.error": "Nous n’avons pas pu supprimer le compte. Réessaie.",
+  "common.deletedAccount": "Compte supprimé",
+
   "online.friends.badge": "Amis",
   "online.friends.title": "Tes amis",
   "online.friends.subtitle": "Cherche des joueurs par leur nom et ajoute-les.",
@@ -2092,18 +2142,17 @@ const ca: Record<TranslationKey, string> = {
   "a11y.brightness": "Brillantor",
   "a11y.selectedColor": "Color seleccionat",
 
-  "landing.badge": "Hexy",
+  "landing.badge": "Iromi",
 
   "dial.streak": "{{count}} jornades seguides",
   "dial.streakOne": "1 jornada seguida",
   "dial.noGroups": "{{name}} · sense grups",
-  "dial.open.label": "Nou repte cada dia a les 15:00 h",
+  "dial.label": "Iromi (色味) — el to d'un color",
   "dial.open.title": "Gira, mira,\ni encerta el color.",
   "dial.open.body":
     "Cinc imatges noves cada dia i dos intents per aconseguir la màxima puntuació.",
   "dial.open.action": "Jugar",
   "dial.open.hint": "Obre el repte d'avui",
-  "dial.off.label": "Iromi (色味) — el to d'un color",
   "dial.empty.title": "No ets a\ncap grup.",
   "dial.empty.body":
     "Crea'n un, convida qui vulguis i cada dia tindreu cinc imatges, dos intents i una classificació que només veieu vosaltres.",
@@ -2115,11 +2164,12 @@ const ca: Record<TranslationKey, string> = {
   "dial.guest.action": "Començar",
   "dial.guest.hint": "Obre l'accés al teu compte",
   "dial.practice.title": "El Taller",
-  "dial.practice.body": "Practica sense connexió · sol o en grup",
+  "dial.practice.body": "Sol o en grup",
+  "dial.practice.offline": "Sense connexió",
 
   // --- Bienvenida y tutorial de la primera vez ---------------------------
   "welcome.greeting": "Et donem la benvinguda a",
-  "welcome.name": "Hexy",
+  "welcome.name": "Iromi",
   "welcome.cta": "Toca els cercles per continuar",
   "welcome.continue": "Continua",
   "tutorial.memorize": "Memoritza el color",
@@ -2156,10 +2206,10 @@ const ca: Record<TranslationKey, string> = {
     "Cada fila és un mode diferent: sota el nom t'explica de què va i com s'hi juga. El teu rècord apareixerà a la dreta.",
   "tour.party.title": "Un mòbil, diverses persones",
   "tour.party.body":
-    "Aquí no cal que hi hagi ningú més connectat: dones el mòbil al següent i cadascú juga el seu. Fins a 99 persones en un mateix dispositiu.",
+    "Passes el mòbil al següent i cadascú juga el seu torn. No cal que hi hagi ningú més connectat.",
   "tour.settings.title": "Música, efectes i idioma",
   "tour.settings.body":
-    "Pots configurar el volum de la música i dels efectes de so, i canviar d'idioma, en aquesta pestanya de configuració.",
+    "Aquí ajustes el volum de la música i dels efectes, i canvies l'idioma.",
   "tour.next": "Següent",
   "tour.finish": "Entesos",
   "tour.skip": "Salta",
@@ -2277,9 +2327,9 @@ const ca: Record<TranslationKey, string> = {
   "summary.hitsOf": "de {{rounds}} intents",
   "summary.home": "Torna a l'inici",
   "summary.shareText":
-    "🎨 Hexy — {{mode}}\nPuntuació: {{total}}/{{max}} ({{average}}%)\n{{stars}}",
+    "🎨 Iromi — {{mode}}\nPuntuació: {{total}}/{{max}} ({{average}}%)\n{{stars}}",
   "summary.shareTimed":
-    "🎨 Hexy — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} encerts ({{average}}%)\n{{stars}}",
+    "🎨 Iromi — {{mode}}\n{{score}} pts · {{hits}}/{{rounds}} encerts ({{average}}%)\n{{stars}}",
 
   "daily.done.title": "Repte diari completat",
   "daily.done.subtitle": "Torna demà per a un color nou.",
@@ -2315,7 +2365,7 @@ const ca: Record<TranslationKey, string> = {
   "online.level": "Nivell {{level}}",
   "online.xp": "{{xp}} XP",
 
-  "online.auth.badge": "Hexy",
+  "online.auth.badge": "Iromi",
   "online.auth.title": "Entra al teu compte",
   "online.auth.titleRegister": "Crea el teu compte",
   "online.auth.subtitle":
@@ -2349,7 +2399,7 @@ const ca: Record<TranslationKey, string> = {
   "online.auth.apple": "Continua amb Apple",
   "online.auth.connecting": "Connectant...",
   "online.auth.unavailable":
-    "Hexy no està configurat en aquesta versió de l'app. El Taller funciona igual.",
+    "Iromi no està configurat en aquesta versió de l'app. El Taller funciona igual.",
   "online.auth.verify.title": "Confirma el teu email",
   "online.auth.verify.subtitle":
     "T'hem enviat un codi de 6 dígits a {{email}}.",
@@ -2390,9 +2440,9 @@ const ca: Record<TranslationKey, string> = {
   "online.tabs.ranking": "Rànquing",
   "online.tabs.profile": "Perfil",
 
-  "online.tour.bar.title": "El més important",
+  "online.tour.bar.title": "La barra de baix",
   "online.tour.bar.body":
-    "En aquesta secció hi ha tot el que necessites: el repte de cada dia, els teus grups, el rànquing i la gestió del teu compte. Fem-hi una ullada!",
+    "Una pestanya per a cada cosa: el repte de cada dia, els teus grups, el rànquing i el teu compte.",
   "online.tour.bar.action": "Som-hi",
   "online.tour.groups.title": "Comença pels Grups",
   "online.tour.groups.body":
@@ -2415,7 +2465,7 @@ const ca: Record<TranslationKey, string> = {
     "Crea un grup, convida qui vulguis i demà a les 15:00 tindreu el mateix repte.",
   "online.tour.create.action": "Crea un grup",
   "online.hub.tour": "Mira com funciona",
-  "dev.firstRunTitle": "Primera vegada a Hexy",
+  "dev.firstRunTitle": "Primera vegada a Iromi",
   "dev.firstRunHint":
     "Només en desenvolupament. Fa veure que t'acabes de registrar i no tens cap grup.",
   "dev.firstRunButton": "Simula la primera vegada i mira el recorregut",
@@ -2483,7 +2533,7 @@ const ca: Record<TranslationKey, string> = {
   "online.group.codeTitle": "Codi d'invitació",
   "online.group.codeHint": "Qui el tingui pot entrar al grup.",
   "online.group.shareMessage":
-    "Entra al meu grup «{{name}}» de Hexy amb el codi {{code}}",
+    "Entra al meu grup «{{name}}» de Iromi amb el codi {{code}}",
   "online.group.finishedTitle": "Aquesta temporada s'ha acabat",
   "online.group.finishedOwner":
     "La classificació queda congelada. La pots reiniciar quan vulguis: els punts tornen a zero, però el teu XP i el teu nivell no es perden.",
@@ -2534,7 +2584,7 @@ const ca: Record<TranslationKey, string> = {
   "online.group.settings.notificationsHint":
     "Avisos al mòbil quan hi ha repte nou, quan s'està acabant el dia i quan comença una temporada. Apagat, aquest grup deixa d'escriure't i de marcar-se a la llista.",
   "online.group.settings.notificationsBlocked":
-    "El teu telèfon té els avisos de Hexy bloquejats: activa'ls als ajustos del sistema per rebre'ls.",
+    "El teu telèfon té els avisos de Iromi bloquejats: activa'ls als ajustos del sistema per rebre'ls.",
   "online.group.settings.seasons": "Temporades",
   "online.group.settings.seasonsHint":
     "Quantes en porta el grup, i des de quan.",
@@ -2680,6 +2730,21 @@ const ca: Record<TranslationKey, string> = {
   "online.profile.sessionHint":
     "En sortir s'esborra la sessió d'aquest dispositiu. El Taller no es veu afectat.",
   "online.profile.logout": "Tanca la sessió",
+
+  // --- Dar de baja la cuenta ---------------------------------------------
+  "online.profile.danger": "Elimina el compte",
+  "online.profile.dangerHint": "S’esborra el teu perfil i no es pot desfer.",
+  "online.profile.delete": "Elimina el meu compte",
+  "online.delete.title": "Vols eliminar el teu compte?",
+  "online.delete.body":
+    "S’esborren el teu nom, el teu correu i la teva experiència. El que vas escriure als xats i les teves puntuacions de temporades passades es queden, però sense el teu nom: apareixeran com a «Compte eliminat».",
+  "online.delete.groups":
+    "Els grups que vas crear passen a la persona que hi porta més temps. Si no queda ningú, s’esborren.",
+  "online.delete.confirmLabel": "Escriu {{username}} per confirmar",
+  "online.delete.confirm": "Elimina per sempre",
+  "online.delete.cancel": "Millor no",
+  "online.delete.error": "No hem pogut eliminar el compte. Torna-ho a provar.",
+  "common.deletedAccount": "Compte eliminat",
 
   "online.friends.badge": "Amics",
   "online.friends.title": "Els teus amics",

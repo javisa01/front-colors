@@ -156,10 +156,11 @@ Esto es tan importante como lo anterior: mete ruido y gasta cuota.
 
 ## 5. Trampas del entorno
 
-- **`DEV_ONLY_LOGOS` está puesto a `["fanta"]`** en
-  `front-colors/src/hooks/useChallenge.ts:28` (en git es `null`). Restringe el
-  catálogo entero a fanta y deja los modos de un color sin retos. **Es
-  deliberado: no lo revierta nadie sin preguntar.**
+- **`DEV_ONLY_LOGOS` tiene la tanda en revisión** en
+  `front-colors/src/hooks/useChallenge.ts` (en git es `null`): los 32 logos del
+  2026-09-20 más los 10 del 2026-09-23. Restringe el catálogo entero a esos y
+  deja fuera al resto en todos los modos. **Es deliberado: no lo revierta nadie
+  sin preguntar**, y hay que devolverlo a `null` antes de publicar.
 - **`fanta` tiene `editableColorIndex: 3` con solo 3 colores.** El backend lo
   recorta a 0; el dato del front sigue mal. Detalle en
   `GRUPOS-RETO-DIARIO.md` § 9.

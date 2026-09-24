@@ -207,6 +207,143 @@ function stripEditorMetadata(svgXml: string): string {
   return result;
 }
 
+const GRADIENT_REGEX =
+  /<(linearGradient|radialGradient)\b([^>]*?)(?:\/>|>([\s\S]*?)<\/\1>)/g;
+
+function readAttr(attrs: string, name: string): string | undefined {
+  return attrs.match(new RegExp(`\\b${name}="([^"]*)"`))?.[1];
+}
+
+/**
+ * Copia dentro del gradiente las `<stop>` del gradiente al que apunta con `href`.
+ *
+ * En SVG un gradiente puede heredar sus paradas de otro
+ * (`<linearGradient href="#otro" x1="…"/>`), y es lo que escribe Inkscape al
+ * reutilizar un degradado. Pero `extractGradient` de react-native-svg construye
+ * las paradas SOLO con los hijos del propio elemento —`href` no aparece ni en
+ * `LinearGradient`, ni en `RadialGradient`, ni en el extractor—, así que el
+ * gradiente se queda con cero paradas y la forma no se pinta. Eso es lo que se
+ * comía la solapa de color de Outlook, Word, PowerPoint y Access, y lo que
+ * dejaba en negro las figuras del escudo de varias banderas.
+ *
+ * Se copian solo las paradas: la geometría (`x1`, `cx`, `gradientTransform`…)
+ * la traen ya todos los gradientes del catálogo en su propio elemento.
+ */
+function inlineGradientStops(svgXml: string): string {
+  const porId = new Map<string, { stops: string; href?: string }>();
+  for (const [, , attrs, inner = ""] of svgXml.matchAll(GRADIENT_REGEX)) {
+    const id = readAttr(attrs, "id");
+    if (!id) {
+      continue;
+    }
+    porId.set(id, {
+      stops: /<stop\b/.test(inner) ? inner : "",
+      href: readAttr(attrs, "href")?.replace(/^#/, ""),
+    });
+  }
+
+  // Un gradiente puede apuntar a otro que a su vez hereda. `vistos` corta el
+  // ciclo de un SVG mal hecho en vez de desbordar la pila.
+  const stopsDe = (id: string, vistos = new Set<string>()): string => {
+    if (vistos.has(id)) {
+      return "";
+    }
+    vistos.add(id);
+    const entrada = porId.get(id);
+    if (!entrada) {
+      return "";
+    }
+    return entrada.stops || (entrada.href ? stopsDe(entrada.href, vistos) : "");
+  };
+
+  return svgXml.replace(
+    GRADIENT_REGEX,
+    (completo, tag: string, attrs: string, inner?: string) => {
+      const href = readAttr(attrs, "href");
+      if (!href?.startsWith("#") || /<stop\b/.test(inner ?? "")) {
+        return completo;
+      }
+      const stops = stopsDe(href.slice(1));
+      if (!stops) {
+        return completo;
+      }
+      const sinHref = attrs.replace(/\s*\bhref="[^"]*"/, "");
+      return `<${tag}${sinHref}>${stops}</${tag}>`;
+    },
+  );
+}
+
+/**
+ * Convierte `<use href="#s"/>` + `<symbol id="s">` en un `<g>` con el contenido
+ * dentro.
+ *
+ * `react-native-svg` monta `<symbol>` sobre un componente nativo que se coloca a
+ * partir del `viewBox`, así que un símbolo sin él —como el de SoundCloud, que
+ * mete el logo entero dentro— no pinta nada y el reto sale en blanco.
+ *
+ * Un `<use>` que apunte a cualquier otra cosa se deja como está: funciona, y lo
+ * usan sesenta y tantos logos del catálogo. Los símbolos CON `viewBox` también
+ * se dejan, porque ahí el `<use>` además escala y eso no se arregla envolviendo
+ * el contenido en un grupo.
+ */
+function flattenSymbols(svgXml: string): string {
+  const simbolos = new Map<string, string>();
+  for (const [, attrs, inner] of svgXml.matchAll(
+    /<symbol\b([^>]*)>([\s\S]*?)<\/symbol>/g,
+  )) {
+    const id = readAttr(attrs, "id");
+    if (id && !/\bviewBox=/i.test(attrs)) {
+      simbolos.set(id, inner);
+    }
+  }
+  if (simbolos.size === 0) {
+    return svgXml;
+  }
+
+  const aplanados = new Set<string>();
+  let resultado = svgXml.replace(
+    /<use\b([^>]*?)(?:\/>|>[\s\S]*?<\/use>)/g,
+    (completo, attrs: string) => {
+      const id = readAttr(attrs, "href")?.replace(/^#/, "");
+      const inner = id !== undefined ? simbolos.get(id) : undefined;
+      if (id === undefined || inner === undefined) {
+        return completo;
+      }
+      aplanados.add(id);
+
+      const x = readAttr(attrs, "x");
+      const y = readAttr(attrs, "y");
+      // El `<use>` traslada DESPUÉS de aplicar su propio `transform`.
+      const transform = [
+        readAttr(attrs, "transform"),
+        x !== undefined || y !== undefined
+          ? `translate(${x ?? 0},${y ?? 0})`
+          : undefined,
+      ]
+        .filter(Boolean)
+        .join(" ");
+
+      // `width`/`height` solo pintan algo con `viewBox`, que aquí no hay. El
+      // resto de atributos (fill, opacity, class…) los hereda el grupo.
+      const heredados = attrs.replace(
+        /\s*\b(?:href|x|y|width|height|id|transform)="[^"]*"/g,
+        "",
+      );
+      return `<g${heredados}${transform ? ` transform="${transform}"` : ""}>${inner}</g>`;
+    },
+  );
+
+  for (const id of aplanados) {
+    resultado = resultado.replace(
+      new RegExp(
+        `<symbol\\b[^>]*\\bid="${escapeRegExp(id)}"[^>]*>[\\s\\S]*?</symbol>`,
+      ),
+      "",
+    );
+  }
+  return resultado;
+}
+
 export function sanitizeSvgXml(svgXml: string): string {
   const cleaned = stripEditorMetadata(svgXml)
     .replace(/^<\?xml[^>]*\?>/i, "")
@@ -221,7 +358,12 @@ export function sanitizeSvgXml(svgXml: string): string {
     .replace(/\s+preserveAspectRatio="[^"]*"/gi, "")
     .trim();
 
-  return ensureViewBox(applyStylePaintPrecedence(inlineCssColors(cleaned)));
+  // Las referencias (`href` entre gradientes, `<use>` a un `<symbol>`) se
+  // resuelven antes que los colores: así el inlinado de CSS ve ya las formas
+  // reales y no las que estaban escondidas detrás de una referencia.
+  const resuelto = flattenSymbols(inlineGradientStops(cleaned));
+
+  return ensureViewBox(applyStylePaintPrecedence(inlineCssColors(resuelto)));
 }
 
 function colorPattern(source: string): string {

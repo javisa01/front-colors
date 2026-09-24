@@ -53,6 +53,7 @@ import {
 import { useCountdown, useDailyChallenge, useExpiry } from "@/hooks/useDailyChallenge";
 import { t } from "@/i18n";
 import { previewOf } from "@/online/chat";
+import { playerName } from "@/online/playerName";
 import { relationOf } from "@/online/friends";
 import { readSeenMessage } from "@/online/chatSeen";
 import { formatCountdown } from "@/online/daily";
@@ -921,8 +922,28 @@ function SettingsGearBase({ onPress }: { onPress: () => void }): ReactElement {
 
   return (
     <View style={styles.gearWrap}>
+      {/*
+        A textura de hardware, y es lo único que hace falta para que el pulso
+        sea fluido.
+
+        El anillo es una vista **con borde redondeado**, y sin esto Android
+        vuelve a trazar ese borde —un `drawRoundRect` con grosor— en cada
+        fotograma, porque la escala cambia el tamaño al que hay que dibujarlo.
+        Con la textura, el anillo se rasteriza **una vez** y lo que se anima
+        pasa a ser lo que la GPU hace gratis: estirar una imagen y bajarle el
+        alfa. Es exactamente el caso para el que existe esta propiedad —una
+        vista que solo se transforma y se desvanece— y por eso no se pone en
+        cualquier sitio: cuesta la memoria de la textura, que aquí son 44×44
+        puntos.
+
+        Lo que se paga a cambio: el borde de punto y medio se estira con la
+        imagen, así que al final del recorrido está un pelo más suave que si se
+        redibujara. En un anillo que para entonces ya casi no se ve, ese pelo
+        no se distingue; el tirón sí se distinguía.
+      */}
       <Animated.View
         pointerEvents="none"
+        renderToHardwareTextureAndroid
         style={[styles.gearHalo, haloStyle]}
       />
       <IconButton
@@ -1061,7 +1082,8 @@ function StandingRow({
   const styles = useThemedStyles(createStyles);
   const colors = useColors();
   const medal = entry.playedDays > 0 ? medalFor(colors, entry.position) : null;
-  const tint = playerTint(entry.username);
+  const nombre = playerName(entry.username);
+  const tint = playerTint(nombre);
 
   return (
     <View
@@ -1097,12 +1119,12 @@ function StandingRow({
         </Text>
       </View>
 
-      <Avatar username={entry.username} size={36} />
+      <Avatar username={nombre} size={36} />
 
       <View style={styles.standingBody}>
         <View style={styles.standingName}>
           <Text style={Type.bodyStrong} numberOfLines={1}>
-            {entry.username}
+            {nombre}
           </Text>
           {you ? <Pill label={t("online.group.you")} tone="accent" /> : null}
         </View>
@@ -1131,7 +1153,7 @@ function StandingRow({
           hitSlop={HIT_SLOP}
           accessibilityRole="button"
           accessibilityLabel={t("online.group.settings.addFriend", {
-            name: entry.username,
+            name: nombre,
           })}
           accessibilityState={{ disabled: busy }}
           style={({ pressed }) => [

@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import type { ReactElement } from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Share,
   StyleSheet,
@@ -18,13 +18,15 @@ import { Loading, Stat, StatPill, StarRating } from "@/design/Feedback";
 import { Card, Divider, Screen, useIsTablet, usePlayBottomSpace } from "@/design/Layout";
 import { useThemedStyles } from "@/design/theme";
 import {
+  HAIRLINE,
+  Radius,
   Space,
   Type,
   type Palette,
 } from "@/design/tokens";
 import { canResume, INITIAL_HSV, useChallenge } from "@/hooks/useChallenge";
 import { t, type TranslationKey } from "@/i18n";
-import type { GameMode, HSVColor } from "@/types/challenge";
+import type { ChallengeStep, GameMode, HSVColor } from "@/types/challenge";
 import {
   calculateColorScore,
   countHits,
@@ -183,6 +185,74 @@ function DailyDoneScreen({ result }: { result: DailyResult }): ReactElement {
   );
 }
 
+/** Lo que mide de alto la tira. Cabe bajo las estrellas sin empujar nada. */
+const STRIP_HEIGHT = 56;
+
+/**
+ * La partida entera, en columnas: una por ronda, **pintada con el color que
+ * tocaba adivinar**, y llena hasta donde lo acertaste.
+ *
+ * ## Por qué está
+ *
+ * El cierre daba una media y un total y no enseñaba **ni uno de los colores
+ * que se acaban de jugar**. Son cinco imágenes miradas de cerca y el resumen
+ * las resolvía en dos cifras: correcto, y olvidable. Aquí están las cinco, en
+ * el orden en que salieron, y se ve de un vistazo cuál se escapó.
+ *
+ * ## Por qué se llena en vez de medir
+ *
+ * La columna entera va teñida del color que tocaba, lavado, y el relleno de
+ * abajo lo lleva a pleno: la barra se satura **en la medida en que
+ * reconstruiste ese color**, que es literalmente lo que pide el juego. Un
+ * 100 % es la columna entera de ese tono; un 30 %, un dedo de color vivo sobre
+ * su propio fantasma. Es la misma idea del anillo de rondas del reto
+ * diario —ver `RoundRing`—, puesta en fila porque aquí las rondas no rodean
+ * ningún logo: son la partida.
+ *
+ * ## De dónde salen los datos
+ *
+ * De lo que ya había: `scores` lleva la precisión de cada ronda y `steps` el
+ * color que tocaba. No hace falta guardar nada nuevo, y por eso una partida
+ * retomada también se pinta entera.
+ */
+function RunStripBase({
+  steps,
+  scores,
+}: {
+  steps: ChallengeStep[];
+  scores: readonly number[];
+}): ReactElement {
+  const styles = useThemedStyles(createStyles);
+
+  return (
+    <View style={styles.strip} importantForAccessibility="no-hide-descendants">
+      {scores.map((score, index) => {
+        const hex = steps[index]?.target.hex;
+        return (
+          <View
+            key={index}
+            style={[
+              styles.stripTrack,
+              // El carril también lleva el color, lavado: la columna entera
+              // dice qué color tocaba y el relleno, cuánto lo cogiste.
+              hex != null ? { backgroundColor: `${hex}2E` } : null,
+            ]}
+          >
+            <View
+              style={[
+                styles.stripFill,
+                { height: `${score}%`, backgroundColor: hex ?? "transparent" },
+              ]}
+            />
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+const RunStrip = memo(RunStripBase);
+
 interface GamePlayProps {
   mode: GameMode;
   seed?: number;
@@ -197,6 +267,7 @@ function GamePlay({ mode, seed, resume }: GamePlayProps): ReactElement {
   const isTablet = useIsTablet();
 
   const {
+    steps,
     currentStep,
     currentStepIndex,
     totalSteps,
@@ -503,6 +574,13 @@ function GamePlay({ mode, seed, resume }: GamePlayProps): ReactElement {
             </View>
           </View>
 
+          {/*
+            La tira va aquí y no bajo las cifras: es lo que de verdad cuenta
+            qué partida ha sido esta, y las cifras son su resumen. Ver
+            `RunStrip`.
+          */}
+          {scores.length > 0 ? <RunStrip steps={steps} scores={scores} /> : null}
+
           <Divider style={styles.summaryDivider} />
 
           {/*
@@ -794,6 +872,47 @@ const createStyles = (c: Palette) =>
   },
   summaryDivider: {
     marginVertical: Space.xl,
+  },
+  /*
+    La tira. Las columnas se reparten el ancho, así que una partida de tres
+    rondas sale de columnas anchas y una de veinte, de un código de barras:
+    las dos dicen lo mismo y ninguna se sale de la tarjeta.
+  */
+  strip: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 3,
+    height: STRIP_HEIGHT,
+    marginTop: Space.xl,
+  },
+  stripTrack: {
+    flex: 1,
+    height: "100%",
+    borderRadius: Radius.sm,
+    overflow: "hidden",
+    justifyContent: "flex-end",
+    /*
+      El gris solo se ve si falta el color de la ronda, que es un caso que no
+      debería darse. El carril normal va teñido del color del reto: ver la
+      nota en el cuerpo de `RunStrip`. Un carril gris era honesto y salía
+      triste —con una partida floja, tres columnas grises con una raya de
+      color al pie—, y lo que cuenta esta tira es de qué color fue la partida.
+    */
+    backgroundColor: c.surface.interactive,
+    /*
+      Y el contorno, porque el tinte solo no basta para dibujar la columna.
+      Medido sobre los 434 colores jugables del catálogo: lavados al 18 %
+      sobre la tarjeta oscura, 248 se quedan por debajo de 1,15 de contraste
+      —los azules marinos como el de Lufthansa desaparecen del todo— y subir
+      el lavado no los salva, porque un azul oscuro sobre fondo oscuro sigue
+      siendo oscuro. El contorno no depende del color: la columna se ve
+      siempre, y el tinte aporta cuando puede.
+    */
+    borderWidth: HAIRLINE,
+    borderColor: c.border.default,
+  },
+  stripFill: {
+    width: "100%",
   },
   summaryStats: {
     flexDirection: "row",

@@ -40,6 +40,7 @@ import {
   type ChatRow,
 } from "@/online/chat";
 import { markSeenMessage } from "@/online/chatSeen";
+import { playerName } from "@/online/playerName";
 import { membersLabel } from "@/online/groups";
 import { useSession } from "@/online/session";
 
@@ -333,7 +334,8 @@ function MessageBubble({
   const styles = useThemedStyles(createStyles);
   const colors = useColors();
   const { item, mine, leading, trailing } = row;
-  const tint = playerTint(item.author.username);
+  const nombre = playerName(item.author.username);
+  const tint = playerTint(nombre);
   const failed = item.state === "failed";
   const pending = item.state === "pending";
   const time = formatMessageTime(item.createdAt);
@@ -348,7 +350,7 @@ function MessageBubble({
       */}
       {!mine ? (
         leading ? (
-          <Avatar username={item.author.username} size={28} />
+          <Avatar username={nombre} size={28} />
         ) : (
           <View style={styles.avatarGap} />
         )
@@ -358,7 +360,7 @@ function MessageBubble({
         style={[styles.stack, mine ? styles.stackMine : styles.stackTheirs]}
         accessible
         accessibilityLabel={t("online.chat.messageA11y", {
-          name: item.author.username,
+          name: nombre,
           time,
           body: item.body,
         })}
@@ -381,7 +383,7 @@ function MessageBubble({
         >
           {!mine && leading ? (
             <Text style={[Type.caption, styles.author, { color: tint.text }]}>
-              {item.author.username}
+              {nombre}
             </Text>
           ) : null}
           <Text style={[Type.body, styles.body]}>{item.body}</Text>

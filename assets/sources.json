@@ -2292,10 +2292,122 @@
   "grido": {
     "editableColorHex": "#004493"
   },
-  "kenzo": {
-    "editableColorHex": "#E52629"
-  },
   "kodak": {
     "editableColorHex": "#FAB617"
+  },
+  "drive": {
+    "editableColorHex": "#FFBA00"
+  },
+  "warning": {
+    "name": "Señal de peligro general (ISO 7010 W001)",
+    "source": "https://commons.wikimedia.org/wiki/File:ISO_7010_W001.svg",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "author": "Maxxl2",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  },
+  "radiation": {
+    "name": "Señal de radiación ionizante (ISO 7010 W003)",
+    "source": "https://commons.wikimedia.org/wiki/File:ISO_7010_W003.svg",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "author": "MaxxL",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  },
+  "biohazard": {
+    "name": "Señal de peligro biológico (ISO 7010 W009)",
+    "source": "https://commons.wikimedia.org/wiki/File:ISO_7010_W009.svg",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "author": "MaxxL",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  },
+  "high-voltage": {
+    "name": "Señal de riesgo eléctrico (ISO 7010 W012)",
+    "source": "https://commons.wikimedia.org/wiki/File:ISO_7010_W012.svg",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "author": "MaxxL",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  },
+  "emergency-exit": {
+    "name": "Señal de salida de emergencia (ISO 7010 E001)",
+    "source": "https://commons.wikimedia.org/wiki/File:ISO_7010_E001.svg",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "author": "MaxxL",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  },
+  "first-aid": {
+    "name": "Señal de primeros auxilios (ISO 7010 E003)",
+    "source": "https://commons.wikimedia.org/wiki/File:ISO_7010_E003.svg",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "author": "This vector image was created with Inkscape by MaxxL, and then manually edited by AnonMoos. The SVG code is valid. This ",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  },
+  "defibrillator": {
+    "name": "Señal de desfibrilador (ISO 7010 E010)",
+    "source": "https://commons.wikimedia.org/wiki/File:ISO_7010_E010.svg",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "author": "M!dgard",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  },
+  "fire-extinguisher": {
+    "name": "Señal de extintor (ISO 7010 F001)",
+    "source": "https://commons.wikimedia.org/wiki/File:ISO_7010_F001.svg",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "author": "MaxxL",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  },
+  "recycling": {
+    "name": "Símbolo universal de reciclaje (anillo de Möbius)",
+    "source": "https://commons.wikimedia.org/wiki/File:Recycle001.svg",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "author": "Users Cbuckley, Jpowell on en.wikipedia",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  },
+  "accessibility": {
+    "name": "Símbolo internacional de accesibilidad",
+    "source": "https://commons.wikimedia.org/wiki/File:Handicapped_Accessible_sign.svg",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "author": "Ltljltlj (talk · contribs)",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  },
+  "information": {
+    "name": "Símbolo de información",
+    "source": "https://commons.wikimedia.org/wiki/File:Information_icon_(slanted,_monochromatic_dark_blue).svg",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "author": "Karl432",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  },
+  "stop": {
+    "name": "Señal de stop",
+    "source": "https://commons.wikimedia.org/wiki/File:Stop_sign.svg",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "author": "Desconocido",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  },
+  "no-entry": {
+    "name": "Señal de dirección prohibida (Convención de Viena C1a)",
+    "source": "https://commons.wikimedia.org/wiki/File:Vienna_Convention_road_sign_C1a-V1.svg",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "author": "United Nations",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  },
+  "parking": {
+    "name": "Señal de aparcamiento (StVO 314)",
+    "source": "https://commons.wikimedia.org/wiki/File:Zeichen_314_-_Parken,_StVO_2017.svg",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "author": "Nach den amtlichen Vorgaben digital umgesetzt durch: Mediatus",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
   }
 }

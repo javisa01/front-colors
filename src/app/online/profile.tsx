@@ -14,6 +14,7 @@ import { ErrorBanner, Pill, ProgressBar } from "@/design/Feedback";
 import { Flame } from "@/design/Flame";
 import { Field, InfoRow, Notice, RowActions } from "@/design/Form";
 import { Card, Divider, Screen, SectionHeader, TextLink } from "@/design/Layout";
+import { Sheet } from "@/design/Sheet";
 import { useColors, useThemedStyles } from "@/design/theme";
 import {
   SECTION_TONE,
@@ -50,6 +51,10 @@ export default function ProfileScreen(): ReactElement {
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleteText, setDeleteText] = useState("");
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   /**
    * Amigos y solicitudes.
@@ -220,6 +225,35 @@ export default function ProfileScreen(): ReactElement {
     // manda a `/online/auth`.
     await logout();
   }, [logout]);
+
+  const openDelete = useCallback(() => {
+    setDeleteText("");
+    setDeleteError(null);
+    setConfirmingDelete(true);
+  }, []);
+
+  /**
+   * La baja, y el cierre de sesión que viene detrás.
+   *
+   * `logout()` se llama pase lo que pase con el servidor: si la cuenta se
+   * borró, el token que queda en el teléfono ya no vale para nada y dejarlo
+   * puesto solo sirve para que la siguiente pantalla falle de una forma más
+   * rara. La guarda del layout se encarga de llevar a la pantalla de acceso.
+   */
+  const confirmDelete = useCallback(async () => {
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await api.users.deleteMe();
+      setConfirmingDelete(false);
+      await logout();
+    } catch (error) {
+      setDeleteError(
+        error instanceof ApiError ? describeError(error) : t("online.delete.error"),
+      );
+      setDeleting(false);
+    }
+  }, [api, logout]);
 
   if (!user) {
     return (
@@ -447,6 +481,73 @@ export default function ProfileScreen(): ReactElement {
         onPress={signOut}
         loading={signingOut}
       />
+
+      {/*
+        La baja va debajo de cerrar sesión y separada por su propio encabezado:
+        son las dos formas de salir, y la de abajo no tiene vuelta. El botón es
+        `ghost` y no `danger` a propósito —el rojo ya lo lleva el de arriba, y
+        dos botones rojos seguidos se leen como el mismo—: lo que avisa aquí no
+        es el color, es el modal que sale después.
+      */}
+      <SectionHeader
+        title={t("online.profile.danger")}
+        hint={t("online.profile.dangerHint")}
+      />
+
+      <Button
+        label={t("online.profile.delete")}
+        icon="trash"
+        variant="ghost"
+        onPress={openDelete}
+        style={styles.deleteButton}
+      />
+
+      <Sheet
+        visible={confirmingDelete}
+        onClose={() => setConfirmingDelete(false)}
+        title={t("online.delete.title")}
+      >
+        <Text style={[Type.body, styles.deleteBody]}>{t("online.delete.body")}</Text>
+        <Text style={[Type.caption, styles.deleteGroups]}>
+          {t("online.delete.groups")}
+        </Text>
+
+        {/*
+          Escribir el nombre y no un «¿seguro?».
+          
+          Un sí/no se acepta sin leer, y esto no se puede deshacer. Teclear el
+          propio nombre obliga a mirar la pantalla una vez más, que es justo el
+          segundo que hace falta para arrepentirse.
+        */}
+        <Field
+          label={t("online.delete.confirmLabel", { username: user.username })}
+          value={deleteText}
+          onChangeText={setDeleteText}
+          autoCapitalize="none"
+          autoComplete="off"
+          returnKeyType="done"
+          error={deleteError ?? undefined}
+        />
+
+        <RowActions>
+          <Button
+            label={t("online.delete.cancel")}
+            variant="ghost"
+            size="md"
+            onPress={() => setConfirmingDelete(false)}
+            disabled={deleting}
+          />
+          <Button
+            label={t("online.delete.confirm")}
+            icon="trash"
+            variant="danger"
+            size="md"
+            onPress={confirmDelete}
+            loading={deleting}
+            disabled={deleteText.trim() !== user.username}
+          />
+        </RowActions>
+      </Sheet>
     </Screen>
   );
 }
@@ -579,6 +680,17 @@ const createStyles = (c: Palette) =>
   },
   actions: {
     gap: Space.sm,
+  },
+  deleteButton: {
+    // Sin el margen, el botón se pega al texto del encabezado y los dos se
+    // leen como una sola pieza.
+    marginTop: Space.sm,
+  },
+  deleteBody: {
+    marginBottom: Space.md,
+  },
+  deleteGroups: {
+    marginBottom: Space.lg,
   },
   editButton: {
     marginTop: Space.lg,

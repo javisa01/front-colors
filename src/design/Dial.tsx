@@ -273,6 +273,42 @@ function DialBase({
   const hub = Math.round(size * HUB_RATIO);
 
   /**
+   * Cuántas líneas tiene la acción, y ni una más.
+   *
+   * El eje es redondo y su tamaño sale de la pantalla: en un móvil estrecho el
+   * aro encoge, el eje con él, y «Empezar» se partía dejando la última letra
+   * sola en una segunda línea. Un salto de línea que no ha pedido nadie dentro
+   * de un círculo no se lee como texto ajustado: se lee como roto.
+   *
+   * Así que las líneas las decide la traducción con sus `\n` —«Crear\nun
+   * grupo» son dos a propósito— y nada más las cambia.
+   */
+  const labelLines = label.split("\n").length;
+
+  /**
+   * El aire a los lados del texto, proporcional al eje y no fijo.
+   *
+   * Eran 18 píxeles constantes, que en un eje grande son un respiro y en uno
+   * pequeño se comen más de un tercio del ancho útil justo cuando menos sobra.
+   * Con el mínimo, un eje de 120 conserva 96 de texto: suficiente para que el
+   * rótulo casi nunca tenga que asomarse fuera.
+   */
+  const labelPad = Math.max(12, Math.round(hub * 0.1));
+
+  /**
+   * Y si aun así no cabe, que se salga del eje.
+   *
+   * El verbo es lo único que dice a dónde lleva el toque, así que recortarlo
+   * —«Empez…»— es peor que verlo asomar sobre el aro: ahí abajo hay color, no
+   * texto, y una palabra encima se sigue leyendo entera. Este sangrado le da
+   * al rótulo el ancho completo de la rueda en vez del hueco del eje, que es
+   * lo que le metía los puntos suspensivos.
+   *
+   * Solo al rótulo: el cintillo y el apunte se quedan dentro del eje.
+   */
+  const labelBleed = Math.round((size - hub) / 2) + labelPad;
+
+  /**
    * El bucle se lanza una sola vez, al montar. Va aquí y no en el cuerpo del
    * componente porque escribir en un valor animado durante el render no está
    * definido: Reanimated puede haber pintado ya ese fotograma.
@@ -454,7 +490,12 @@ function DialBase({
           onPressOut={pressOut}
           style={[
             styles.hub,
-            { width: hub, height: hub, borderRadius: hub / 2 },
+            {
+              width: hub,
+              height: hub,
+              borderRadius: hub / 2,
+              paddingHorizontal: labelPad,
+            },
           ]}
           accessibilityRole="button"
           accessibilityLabel={
@@ -467,7 +508,17 @@ function DialBase({
           {kicker != null ? (
             <Text style={[Type.label, styles.kicker]}>{kicker}</Text>
           ) : null}
-          <Text style={[Type.title, styles.label]}>{label}</Text>
+          <Text
+            style={[
+              Type.title,
+              styles.label,
+              { marginHorizontal: -labelBleed },
+            ]}
+            numberOfLines={labelLines}
+            ellipsizeMode="clip"
+          >
+            {label}
+          </Text>
           {note != null ? (
             <Text style={[Type.metricSmall, styles.note]}>{note}</Text>
           ) : null}
@@ -590,7 +641,6 @@ const createStyles = (c: Palette) =>
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
-    paddingHorizontal: 18,
     backgroundColor: c.surface.canvas,
     borderWidth: HAIRLINE,
     borderColor: c.border.default,

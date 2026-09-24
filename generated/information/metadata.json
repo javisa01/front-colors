@@ -1,0 +1,24 @@
+{
+  "id": "information",
+  "svg": "information.svg",
+  "svgXml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n   xmlns:cc=\"http://creativecommons.org/ns#\"\n   xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:sodipodi=\"http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd\"\n   xmlns:inkscape=\"http://www.inkscape.org/namespaces/inkscape\"\n   version=\"1.0\"\n   width=\"100\"\n   height=\"100\"\n   id=\"svg2\"\n   inkscape:version=\"0.91 r13725\"\n   sodipodi:docname=\"i4.svg\">\n  <defs\n     id=\"defs18\" />\n  <sodipodi:namedview\n     pagecolor=\"#ffffff\"\n     bordercolor=\"#666666\"\n     borderopacity=\"1\"\n     objecttolerance=\"10\"\n     gridtolerance=\"10\"\n     guidetolerance=\"10\"\n     inkscape:pageopacity=\"0\"\n     inkscape:pageshadow=\"2\"\n     inkscape:window-width=\"2250\"\n     inkscape:window-height=\"1289\"\n     id=\"namedview16\"\n     showgrid=\"false\"\n     fit-margin-top=\"0\"\n     fit-margin-left=\"0\"\n     fit-margin-right=\"0\"\n     fit-margin-bottom=\"0\"\n     inkscape:zoom=\"2.1152767\"\n     inkscape:cx=\"-3.1767115\"\n     inkscape:cy=\"21.547571\"\n     inkscape:window-x=\"1723\"\n     inkscape:window-y=\"683\"\n     inkscape:window-maximized=\"0\"\n     inkscape:current-layer=\"svg2\"\n     inkscape:showpageshadow=\"false\" />\n  <metadata\n     id=\"metadata4\">\n    <rdf:RDF>\n      <cc:Work\n         rdf:about=\"\">\n        <dc:format>image/svg+xml</dc:format>\n        <dc:type\n           rdf:resource=\"http://purl.org/dc/dcmitype/StillImage\" />\n        <dc:title></dc:title>\n      </cc:Work>\n    </rdf:RDF>\n  </metadata>\n  <path\n     d=\"M 50,0 C 36.191544,0 24.407432,4.8814862 14.644459,14.644459 4.8814862,24.407431 0,36.191544 0,50 0,63.805253 4.8814862,75.592569 14.644459,85.355541 24.407432,95.118514 36.191544,100 50,100 63.805253,100 75.592569,95.118514 85.355541,85.355541 95.118514,75.592569 100,63.805253 100,50 100,36.191544 95.118514,24.407431 85.355541,14.644459 75.592569,4.8814862 63.805253,0 50,0 Z\"\n     id=\"path0\"\n     inkscape:connector-curvature=\"0\"\n     style=\"fill:#0B0080;fill-rule:evenodd;stroke:none\" />\n  <path\n     d=\"m 61.547085,87.213325 -29.846252,0 c -1.838565,0 -3.311979,-0.618194 -4.423446,-1.854581 -1.079436,-1.319666 -1.428571,-2.860346 -1.047406,-4.628443 0.352339,-1.595131 1.245997,-2.966047 2.674568,-4.106342 1.460602,-1.127482 3.05253,-1.691224 4.775784,-1.691224 l 8.734786,0 6.598334,-30.675848 -7.927611,0 c -1.848174,0 -3.327994,-0.640615 -4.433055,-1.921845 -1.076234,-1.313261 -1.422166,-2.831519 -1.037797,-4.561179 0.352339,-1.630365 1.23959,-3.014094 2.661756,-4.147982 1.457399,-1.172326 3.055733,-1.758488 4.7918,-1.758488 l 14.923126,0 c 1.877002,0 3.340807,0.663036 4.38501,1.985906 1.108264,1.287636 1.470211,2.818706 1.085842,4.599616 l -7.860346,36.47982 7.8123,0 c 1.848174,0 3.315182,0.6246 4.394619,1.877002 1.185137,1.255606 1.582319,2.789879 1.191544,4.599616 -0.352339,1.643177 -1.271621,3.036515 -2.754645,4.180013 -1.457399,1.082639 -3.023703,1.623959 -4.698911,1.623959 z\"\n     id=\"path1\"\n     inkscape:connector-curvature=\"0\"\n     style=\"fill:#ffffff;fill-rule:evenodd;stroke:none\" />\n  <path\n     d=\"m 57.991672,8.3087764 5.131326,0 c 1.86419,0 3.318386,0.6374119 4.362588,1.9090326 1.127483,1.252402 1.495836,2.777066 1.108264,4.577194 l -0.874439,3.888533 c -0.352339,1.627162 -1.258809,3.026906 -2.722614,4.202435 -1.418962,1.133888 -2.998078,1.704035 -4.730942,1.704035 l -5.246637,0 c -1.918641,0 -3.404868,-0.672645 -4.465086,-2.014734 -1.057015,-1.342088 -1.390135,-2.84433 -0.999359,-4.503523 l 0.98975,-3.984625 c 0.349135,-1.627162 1.245996,-2.991672 2.680973,-4.0935301 1.454197,-1.1242794 3.042922,-1.6848175 4.766176,-1.6848175 z\"\n     id=\"path2\"\n     inkscape:connector-curvature=\"0\"\n     style=\"fill:#ffffff;fill-rule:evenodd;stroke:none\" />\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#0B0080",
+      "hsv": {
+        "h": 245,
+        "s": 100,
+        "v": 50
+      }
+    }
+  ],
+  "source": {
+    "name": "Símbolo de información",
+    "source": "https://commons.wikimedia.org/wiki/File:Information_icon_(slanted,_monochromatic_dark_blue).svg",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "author": "Karl432",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  }
+}

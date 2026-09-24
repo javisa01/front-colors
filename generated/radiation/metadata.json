@@ -1,0 +1,24 @@
+{
+  "id": "radiation",
+  "svg": "radiation.svg",
+  "svgXml": "<svg viewBox=\"0 0 600 524\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"m300 16 284 492h-568z\" fill=\"#F9A800\" stroke=\"#000\" stroke-linejoin=\"round\" stroke-width=\"32\"/><path d=\"m367 230a150 150 0 0 1 67 116h-268a150 150 0 0 1 67-116l134 232a150 150 0 0 1-134 0\"/><circle cx=\"300\" cy=\"346\" r=\"36\" stroke=\"#F9A800\" stroke-width=\"12\"/></svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#F9A800",
+      "hsv": {
+        "h": 40,
+        "s": 100,
+        "v": 98
+      }
+    }
+  ],
+  "source": {
+    "name": "Señal de radiación ionizante (ISO 7010 W003)",
+    "source": "https://commons.wikimedia.org/wiki/File:ISO_7010_W003.svg",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "author": "MaxxL",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  }
+}

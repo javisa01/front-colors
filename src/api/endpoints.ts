@@ -44,6 +44,12 @@ export function createApi(client: ApiClient) {
           body: input,
         }),
 
+      /**
+       * La baja de la cuenta. No lleva identificador: el servidor la saca del
+       * token, y así no hay forma de pedir la baja de otro.
+       */
+      deleteMe: () => client.request<void>("/me", { method: "DELETE" }),
+
       getById: (id: string) =>
         client.request<{ user: UserProfile }>(`/users/${id}`),
 

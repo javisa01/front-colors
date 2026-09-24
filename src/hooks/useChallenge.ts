@@ -8,7 +8,7 @@ import type {
   HSVColor,
 } from "@/types/challenge";
 import { allPlayable, catalogFor } from "@/utils/catalog";
-import { hexToHSV, hsvToHex } from "@/utils/color";
+import { hexToHSV, hsvToHex, isUnguessableColor } from "@/utils/color";
 import type { SavedProgress } from "@/utils/storage";
 
 const INITIAL_COLOR = "#878787";
@@ -42,50 +42,46 @@ export const INITIAL_HSV: HSVColor = hexToHSV(INITIAL_COLOR);
  * queda vieja en cuanto se importe la bandera siguiente.
  */
 /*
-  TANDA EN REVISIÓN: los 32 logos importados el 2026-09-20.
+  TANDA EN REVISIÓN: los logos importados el 2026-09-20 y el 2026-09-23 —eran 32
+  y 10, quedan 31 tras retirar los once de riesgo legal del 2026-09-23, ver el
+  apartado 1.bis de `PRODUCCION-PENDIENTE.md`— más los símbolos universales
+  de `assets/icons/`, que se quedaron en 14 de los 40 importados.
 
   Mientras esta lista no sea `null`, TODOS los modos reparten solo estos y el
   catálogo de verdad no sale por ningún lado. **Hay que devolverla a `null`
   antes de publicar nada**: es una lista de desarrollo, no una configuración.
 
-  Los cinco marcados abajo cambiaron de color jugable al medirlos por área con
+  Los marcados abajo cambiaron de color jugable al medirlos por área con
   `npm run measure:assets`, así que son los que más conviene mirar: la
-  heurística del generador los había resuelto por número de formas y en dos
+  heurística del generador los había resuelto por número de formas y en varios
   de ellos el color elegido no se veía en pantalla.
 */
 const DEV_ONLY_LOGOS: string[] | null = [
-  "adobe",
-  "air_japan",
-  "aldi",
-  "bing",
-  "bluetooth",
-  "cockta", // ← área: amarillo 37 % → rojo 60 %
-  "dc_comics",
-  "disney_channel",
-  "disney_plus",
-  "galatasaray",
-  "google_sheets", // ← área: gris 0 % → verde 94 %
-  "grido", // ← área: amarillo 23 % → azul 75 %
-  "intel",
-  "kenzo", // ← área: verde 1 % → rojo 99 %
-  "kodak", // ← área: rojo 46 % → amarillo 54 %
-  "lime",
-  "louis_vuitton",
-  "mg",
-  "mlb",
-  "mundial_78",
-  "nickelodeon",
-  "nintendo_3ds",
-  "nivea",
-  "nordkalk",
-  "nv_energy",
-  "procter_gamble",
-  "rai",
-  "riyadh_air",
-  "shopify",
-  "sony_interactive",
-  "viettel",
-  "walmart",
+  // Los cinco que estaban rotos y ya se pintan igual que en el navegador.
+  // "soundclound",
+  // "outlook",
+  // "access",
+  // "word",
+  // "powerpoint",
+
+  // Los dos que siguen saliendo distintos. La causa está confirmada en los dos
+  // —probada apagándola y volviendo a mirar— y en los dos es de
+  // `react-native-svg`, no del SVG:
+  //
+  // - `flag-lk`: la melena del león sale casi negra. El contorno se dibuja con
+  //   un `<use … stroke="#000" stroke-width="5.6">` DEBAJO del grupo amarillo,
+  //   y react-native-svg le cuela ese trazo también a la copia de arriba, que
+  //   es su hermana y no su hija. Poniéndole `stroke="none"` al
+  //   `<g id="lk-b">` queda idéntico al navegador.
+  //
+  // - `google_sheets`: no se pinta la esquina doblada, el triángulo verde
+  //   claro. El export de Sketch envuelve cada forma en un `<mask>` cuyo
+  //   contenido es un `<use>` a un `<path>` de `<defs>`; esa máscara se queda
+  //   vacía, y en vez de no recortar nada borra la forma entera. Quitando los
+  //   `mask="url(#…)"` —que en este SVG recortan por la silueta de la propia
+  //   forma, o sea que no hacen nada— vuelve a salir bien.
+  "flag-lk",
+  "google_sheets",
 ];
 
 /**
@@ -114,7 +110,45 @@ const COUNT_BY_MODE: Record<GameMode, number> = {
 // with dozens of colors would be exhausting, so we cap the range to keep a run
 // playable.
 const MULTICOLOR_MIN_COLORS = 3;
-const MULTICOLOR_MAX_COLORS = 5;
+// Seis y no cinco: Drive tiene seis pinturas y es justo la clase de logo que
+// el modo busca, pero se quedaba fuera por una. Sus seis no son seis colores
+// de marca —el azul y el verde vienen cada uno en dos tonos, que son las caras
+// sombreadas del triángulo—, así que dos de los seis pasos se aciertan casi
+// solos al venir después de su pareja. Aun así entra: un paso fácil dentro de
+// un logo que sí es multicolor es mejor trato que dejar el logo fuera. Si
+// algún día hay que afinar esto, lo que toca es contar por tono y no por
+// pintura; con seis pinturas Drive contaría cuatro colores.
+const MULTICOLOR_MAX_COLORS = 6;
+
+/**
+ * Los colores de un logo que **sí** se pueden adivinar, con su posición
+ * original.
+ *
+ * El índice hay que conservarlo porque es lo que le dice a `SVGChallenge` qué
+ * pintura del dibujo tiene que sustituir: filtrar la lista y perder el índice
+ * repintaría el color equivocado.
+ *
+ * Cockta es el ejemplo: rojo, amarillo y el contorno negro de las letras. Con
+ * el contorno dentro, el modo pedía tres colores y el tercero se acertaba
+ * bajando el brillo a cero sin mirar el logo. Sin él son dos, y como el modo
+ * empieza en tres, Cockta deja de repartirse en multicolor — que es lo
+ * correcto: no es un logo multicolor, es uno de dos colores con contorno.
+ * Ver `isUnguessableColor`.
+ */
+function guessableColors(
+  challenge: ChallengeMetadata,
+): { index: number; color: ChallengeMetadata["colors"][number] }[] {
+  const guessable = challenge.colors
+    .map((color, index) => ({ index, color }))
+    .filter(({ color }) => !isUnguessableColor(color.hsv));
+
+  // Un logo entero en grises no se queda sin nada que jugar: mejor un reto malo
+  // que un reto vacío. Es el mismo criterio que usa el generador al construir
+  // el catálogo.
+  return guessable.length > 0
+    ? guessable
+    : challenge.colors.map((color, index) => ({ index, color }));
+}
 
 export interface UseChallengeOptions {
   mode: GameMode;
@@ -253,11 +287,10 @@ function pickChallengeIds(mode: GameMode, seed?: number): string[] {
   const random = seed != null ? mulberry32(seed) : () => Math.random();
 
   if (mode === "multicolor") {
-    const multi = catalog.filter(
-      (item) =>
-        item.colors.length >= MULTICOLOR_MIN_COLORS &&
-        item.colors.length <= MULTICOLOR_MAX_COLORS,
-    );
+    const multi = catalog.filter((item) => {
+      const count = guessableColors(item).length;
+      return count >= MULTICOLOR_MIN_COLORS && count <= MULTICOLOR_MAX_COLORS;
+    });
     return shuffle(multi, random)
       .slice(0, COUNT_BY_MODE.multicolor)
       .map((item) => item.id);
@@ -283,13 +316,14 @@ function buildSteps(
     }
 
     if (mode === "multicolor") {
-      challenge.colors.forEach((target, colorIndex) => {
+      const guessable = guessableColors(challenge);
+      guessable.forEach(({ index: colorIndex, color: target }, position) => {
         steps.push({
           challenge,
           colorIndex,
           target,
-          colorPosition: colorIndex + 1,
-          colorCount: challenge.colors.length,
+          colorPosition: position + 1,
+          colorCount: guessable.length,
         });
       });
       continue;

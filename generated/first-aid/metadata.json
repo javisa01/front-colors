@@ -1,0 +1,24 @@
+{
+  "id": "first-aid",
+  "svg": "first-aid.svg",
+  "svgXml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns=\"http://www.w3.org/2000/svg\" height=\"400px\" width=\"400px\" viewBox=\"0 0 200 200\" version=\"1.1\">\n\t<g style=\"stroke:none; fill-rule:nonzero;\"> \n\t\t<rect style=\"fill:#ffffff;\" y=\"0\" x=\"0\" height=\"200\" width=\"200\" />\n\t\t<rect style=\"fill:#237F52;\" y=\"5\" x=\"5\" height=\"190\" width=\"190\" />\n\t\t<rect style=\"fill:#ffffff;\" x=\"75\" y=\"25\" width=\"50\" height=\"150\" /> \n\t\t<rect style=\"fill:#ffffff;\" x=\"25\" y=\"75\" width=\"150\" height=\"50\" /> \n\t</g>\n</svg>\n",
+  "editableColorIndex": 0,
+  "colors": [
+    {
+      "hex": "#237F52",
+      "hsv": {
+        "h": 151,
+        "s": 72,
+        "v": 50
+      }
+    }
+  ],
+  "source": {
+    "name": "Señal de primeros auxilios (ISO 7010 E003)",
+    "source": "https://commons.wikimedia.org/wiki/File:ISO_7010_E003.svg",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+    "author": "This vector image was created with Inkscape by MaxxL, and then manually edited by AnonMoos. The SVG code is valid. This ",
+    "note": "Símbolo normalizado: la licencia cubre este dibujo concreto, no el derecho a señalizar con él."
+  }
+}

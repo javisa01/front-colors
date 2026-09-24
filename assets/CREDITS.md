@@ -65,6 +65,21 @@ web. Es la única obligación del MIT.
 
 ---
 
+## Símbolos universales — `assets/icons/`
+
+**40 símbolos** normalizados: señalización de seguridad ISO 7010, pictogramas
+GHS de sustancias peligrosas, reciclaje, accesibilidad y señales de tráfico.
+Todos `PUBLIC DOMAIN` o `CC0`, con la licencia comprobada archivo a archivo en
+Wikimedia Commons antes de descargarlos. Ninguno exige atribución, pero el autor
+está registrado igualmente en `assets/sources.json`.
+
+La tabla completa —color, fuente, URL, licencia y restricciones de cada uno—
+está en `assets/icons/README.md`, junto con la lista de los que **no** se
+descargaron por ser marca registrada (Bluetooth, Wi-Fi, USB, NFC) y la nota
+sobre la Cruz Roja, que está protegida por los Convenios de Ginebra.
+
+---
+
 ## Logos de marcas (catálogo heredado)
 
 Los SVG anteriores a la importación de banderas **no tienen procedencia

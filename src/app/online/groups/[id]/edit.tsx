@@ -27,6 +27,7 @@ import {
   type Palette,
 } from "@/design/tokens";
 import { t } from "@/i18n";
+import { playerName } from "@/online/playerName";
 import {
   GROUP_NAME_MAX,
   GROUP_NAME_MIN,
@@ -687,7 +688,7 @@ function Rosette({
           style={[styles.rosetteSlot, index > 0 && styles.rosetteOverlap]}
         >
           <Avatar
-            username={member.username}
+            username={playerName(member.username)}
             size={52}
             shape="round"
             letters={2}
@@ -731,16 +732,17 @@ function MemberRow({
   onAdd: () => void;
 }): ReactElement {
   const styles = useThemedStyles(createStyles);
-  const tint = playerTint(member.username);
+  const nombre = playerName(member.username);
+  const tint = playerTint(nombre);
 
   return (
     <View style={[styles.memberRow, last && styles.memberRowLast]}>
-      <Avatar username={member.username} size={40} shape="round" letters={2} />
+      <Avatar username={nombre} size={40} shape="round" letters={2} />
 
       <View style={styles.memberBody}>
         <View style={styles.memberName}>
           <Text style={Type.bodyStrong} numberOfLines={1}>
-            {member.username}
+            {nombre}
           </Text>
           {relation === "you" ? (
             <Pill label={t("online.group.you")} tone="accent" />
@@ -758,7 +760,7 @@ function MemberRow({
           variant="surface"
           color={tint.text}
           accessibilityLabel={t("online.group.settings.addFriend", {
-            name: member.username,
+            name: nombre,
           })}
           disabled={busy}
           onPress={onAdd}

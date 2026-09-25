@@ -40,9 +40,17 @@ export interface LegalDoc {
  */
 export const SOPORTE = "hola@karakuristudios.com";
 
-/** El responsable del tratamiento. También marcador, y también obligatorio. */
-const RESPONSABLE = "[nombre o razón social]";
-const RESPONSABLE_ID = "[NIF/CIF]";
+/**
+ * Quién responde por los datos, tal y como debe identificarse ante la AEPD.
+ *
+ * El RGPD pide identidad y una vía de contacto, y eso es lo que hay aquí. La
+ * LSSI sí exige además el NIF, pero solo a quien presta el servicio como
+ * actividad económica: mientras Iromi sea gratis y sin publicidad, no aplica.
+ *
+ * TODO: poner el NIF —aquí y en los cuatro bloques «Quién responde»— el día
+ * que la app cobre algo o lleve anuncios.
+ */
+const RESPONSABLE = "Javi Sanz";
 
 const es: { privacy: LegalDoc; terms: LegalDoc } = {
   privacy: {
@@ -52,7 +60,7 @@ const es: { privacy: LegalDoc; terms: LegalDoc } = {
       {
         title: "Quién responde",
         paragraphs: [
-          `El responsable del tratamiento es ${RESPONSABLE}, con ${RESPONSABLE_ID}. Para cualquier cosa relacionada con tus datos, escribe a ${SOPORTE}.`,
+          `El responsable del tratamiento es ${RESPONSABLE}. Para cualquier cosa relacionada con tus datos, escribe a ${SOPORTE}.`,
         ],
       },
       {
@@ -196,7 +204,7 @@ const en: typeof es = {
       {
         title: "Who is responsible",
         paragraphs: [
-          `The data controller is ${RESPONSABLE}, ${RESPONSABLE_ID}. For anything about your data, write to ${SOPORTE}.`,
+          `The data controller is ${RESPONSABLE}. For anything about your data, write to ${SOPORTE}.`,
         ],
       },
       {
@@ -340,7 +348,7 @@ const fr: typeof es = {
       {
         title: "Qui est responsable",
         paragraphs: [
-          `Le responsable du traitement est ${RESPONSABLE}, ${RESPONSABLE_ID}. Pour tout ce qui concerne tes données, écris à ${SOPORTE}.`,
+          `Le responsable du traitement est ${RESPONSABLE}. Pour tout ce qui concerne tes données, écris à ${SOPORTE}.`,
         ],
       },
       {
@@ -484,7 +492,7 @@ const ca: typeof es = {
       {
         title: "Qui respon",
         paragraphs: [
-          `El responsable del tractament és ${RESPONSABLE}, amb ${RESPONSABLE_ID}. Per a qualsevol cosa relacionada amb les teves dades, escriu a ${SOPORTE}.`,
+          `El responsable del tractament és ${RESPONSABLE}. Per a qualsevol cosa relacionada amb les teves dades, escriu a ${SOPORTE}.`,
         ],
       },
       {

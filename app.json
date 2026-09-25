@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.javisa01.colorsapp",
+      "bundleIdentifier": "com.karakuristudios.iromi",
       "supportsTablet": false
     },
     "android": {
@@ -26,7 +26,7 @@
         "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
         "android.permission.POST_NOTIFICATIONS"
       ],
-      "package": "com.javisa01.colorsapp"
+      "package": "com.karakuristudios.iromi"
     },
     "web": {
       "output": "static",

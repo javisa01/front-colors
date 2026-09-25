@@ -25,7 +25,9 @@ import type {
 } from "@/api/types";
 import { SettingsButton } from "@/components/SettingsButton";
 import { DeckBadge } from "@/components/online/GroupDeck";
-import { DevTimePanel } from "@/components/online/DevTimePanel";
+// DEV_ONLY: descomenta esto y su bloque para viajar en el tiempo (terminar la
+// temporada del grupo o cruzar el corte del reto sin esperar).
+// import { DevTimePanel } from "@/components/online/DevTimePanel";
 import { UnreadDot } from "@/components/online/UnreadDot";
 import { AmbientMesh } from "@/design/Ambient";
 import { Avatar, playerTint } from "@/design/Avatar";
@@ -783,7 +785,8 @@ export default function GroupDetailScreen(): ReactElement {
         temporada sin mover el reloj global, que es lo más cómodo para ver el
         estado «terminado» sin arrastrar también las jornadas del reto diario.
       */}
-      <DevTimePanel groupId={group.id} onChanged={load} />
+      {/* DEV_ONLY: descomenta esto (y su import) para viajar en el tiempo. */}
+      {/* <DevTimePanel groupId={group.id} onChanged={load} /> */}
     </Screen>
   );
 }

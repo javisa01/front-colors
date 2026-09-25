@@ -7,7 +7,9 @@ import { describeError } from "@/api/errors";
 import type { GroupSummary } from "@/api/types";
 import { SettingsButton } from "@/components/SettingsButton";
 import { DeckBadge, DeckPicker, groupVoice } from "@/components/online/GroupDeck";
-import { DevTimePanel } from "@/components/online/DevTimePanel";
+// DEV_ONLY: descomenta esto y su bloque para viajar en el tiempo (adelantar el
+// reloj del servidor y cruzar el corte de las 15:00 sin esperar).
+// import { DevTimePanel } from "@/components/online/DevTimePanel";
 import { useOnlineTabBarSpace } from "@/components/online/OnlineTabBar";
 import { UnreadDot } from "@/components/online/UnreadDot";
 import { AmbientBands } from "@/design/Ambient";
@@ -27,7 +29,9 @@ import {
   silenceMutedGroups,
   sortGroups,
 } from "@/online/groups";
-import { useFirstRunMock } from "@/online/devFirstRun";
+// DEV_ONLY: descomenta esto y sus dos usos para simular que no tienes ningún
+// grupo y ver el recorrido de la primera vez.
+// import { useFirstRunMock } from "@/online/devFirstRun";
 import { useSession } from "@/online/session";
 
 /**
@@ -55,7 +59,7 @@ export default function GroupsScreen(): ReactElement {
    * de verdad, la simulación se rompería justo donde hay que mirarla. Fuera de
    * desarrollo siempre es `false`. Ver `online/devFirstRun`.
    */
-  const firstRunMock = useFirstRunMock();
+  // DEV_ONLY: const firstRunMock = useFirstRunMock();
 
   const [groups, setGroups] = useState<GroupSummary[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -150,7 +154,9 @@ export default function GroupsScreen(): ReactElement {
     toque nada de lo que se guarda ni de lo que se ha pedido: apagarlo devuelve
     la lista sin volver a preguntar al servidor.
   */
-  const shown = firstRunMock ? [] : groups;
+  const shown = groups;
+  // DEV_ONLY: la misma línea con el simulador de primera vez.
+  // const shown = firstRunMock ? [] : groups;
 
   return (
     <Screen
@@ -294,11 +300,9 @@ export default function GroupsScreen(): ReactElement {
         </View>
       )}
 
-      {/*
-        Panel de desarrollo: mueve el reloj del backend para no esperar 10 días
-        reales. Devuelve `null` fuera de `__DEV__`.
-      */}
-      <DevTimePanel onChanged={load} />
+      {/* DEV_ONLY: descomenta esto (y su import) para mover el reloj del
+          servidor y no esperar los 10 días reales de una temporada. */}
+      {/* <DevTimePanel onChanged={load} /> */}
     </Screen>
   );
 }

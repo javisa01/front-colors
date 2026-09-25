@@ -12,8 +12,9 @@ export function hueDistance(a: number, b: number): number {
  * Si un color del logo es sombra, contorno o gris de relleno en vez de un color
  * de marca. Dicho de otra manera: si **no se puede adivinar**.
  *
- * El caso que lo motiva es Cockta, que tiene rojo, amarillo y un `#231F20` que
- * es el contorno negro de las letras. En un modo que pide reconstruir *todos*
+ * El caso que lo motivó fue Cockta —retirado del catálogo el 2026-09-24 por su
+ * licencia, pero el ejemplo sigue explicando la regla—, que tenía rojo,
+ * amarillo y un `#231F20` que era el contorno negro de las letras. En un modo que pide reconstruir *todos*
  * los colores del logo, ese tercero no es una jugada: el jugador no tiene que
  * mirar el logo ni recordar nada, solo bajar el brillo a cero, y da igual el
  * tono que deje puesto porque a esa oscuridad no se distingue ninguno. Lo mismo

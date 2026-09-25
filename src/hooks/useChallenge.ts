@@ -56,33 +56,45 @@ export const INITIAL_HSV: HSVColor = hexToHSV(INITIAL_COLOR);
   heurística del generador los había resuelto por número de formas y en varios
   de ellos el color elegido no se veía en pantalla.
 */
-const DEV_ONLY_LOGOS: string[] | null = [
-  // Los cinco que estaban rotos y ya se pintan igual que en el navegador.
-  // "soundclound",
-  // "outlook",
-  // "access",
-  // "word",
-  // "powerpoint",
+/*
+  DEV_ONLY: la lista está apagada. Descomenta el bloque de abajo —y comenta el
+  `null`— para que TODOS los modos repartan solo esos logos y poder revisarlos
+  de uno en uno. Con `null`, el juego reparte el catálogo entero, que es lo que
+  tiene que estar publicado.
 
-  // Los dos que siguen saliendo distintos. La causa está confirmada en los dos
-  // —probada apagándola y volviendo a mirar— y en los dos es de
-  // `react-native-svg`, no del SVG:
-  //
-  // - `flag-lk`: la melena del león sale casi negra. El contorno se dibuja con
-  //   un `<use … stroke="#000" stroke-width="5.6">` DEBAJO del grupo amarillo,
-  //   y react-native-svg le cuela ese trazo también a la copia de arriba, que
-  //   es su hermana y no su hija. Poniéndole `stroke="none"` al
-  //   `<g id="lk-b">` queda idéntico al navegador.
-  //
-  // - `google_sheets`: no se pinta la esquina doblada, el triángulo verde
-  //   claro. El export de Sketch envuelve cada forma en un `<mask>` cuyo
-  //   contenido es un `<use>` a un `<path>` de `<defs>`; esa máscara se queda
-  //   vacía, y en vez de no recortar nada borra la forma entera. Quitando los
-  //   `mask="url(#…)"` —que en este SVG recortan por la silueta de la propia
-  //   forma, o sea que no hacen nada— vuelve a salir bien.
-  "flag-lk",
-  "google_sheets",
-];
+  Lo que había dentro se conserva tal cual para no perder la tanda que quedó a
+  medias: son los logos importados el 2026-09-20 y el 2026-09-23 más los 40
+  símbolos universales, estos últimos ya comentados uno a uno.
+*/
+const DEV_ONLY_LOGOS: string[] | null = null;
+
+// const DEV_ONLY_LOGOS: string[] | null = [
+//   // Los cinco que estaban rotos y ya se pintan igual que en el navegador.
+//   // "soundcloud",
+//   // "outlook",
+//   // "access",
+//   // "word",
+//   // "powerpoint",
+//
+//   // Los dos que siguen saliendo distintos. La causa está confirmada en los dos
+//   // —probada apagándola y volviendo a mirar— y en los dos es de
+//   // `react-native-svg`, no del SVG:
+//   //
+//   // - `flag-lk`: la melena del león sale casi negra. El contorno se dibuja con
+//   //   un `<use … stroke="#000" stroke-width="5.6">` DEBAJO del grupo amarillo,
+//   //   y react-native-svg le cuela ese trazo también a la copia de arriba, que
+//   //   es su hermana y no su hija. Poniéndole `stroke="none"` al
+//   //   `<g id="lk-b">` queda idéntico al navegador.
+//   //
+//   // - `google_sheets`: no se pinta la esquina doblada, el triángulo verde
+//   //   claro. El export de Sketch envuelve cada forma en un `<mask>` cuyo
+//   //   contenido es un `<use>` a un `<path>` de `<defs>`; esa máscara se queda
+//   //   vacía, y en vez de no recortar nada borra la forma entera. Quitando los
+//   //   `mask="url(#…)"` —que en este SVG recortan por la silueta de la propia
+//   //   forma, o sea que no hacen nada— vuelve a salir bien.
+//   "flag-lk",
+//   "google_sheets",
+// ];
 
 /**
  * El contrarreloj no tiene lista: la partida la termina el cronómetro.
@@ -128,11 +140,13 @@ const MULTICOLOR_MAX_COLORS = 6;
  * pintura del dibujo tiene que sustituir: filtrar la lista y perder el índice
  * repintaría el color equivocado.
  *
- * Cockta es el ejemplo: rojo, amarillo y el contorno negro de las letras. Con
- * el contorno dentro, el modo pedía tres colores y el tercero se acertaba
- * bajando el brillo a cero sin mirar el logo. Sin él son dos, y como el modo
- * empieza en tres, Cockta deja de repartirse en multicolor — que es lo
- * correcto: no es un logo multicolor, es uno de dos colores con contorno.
+ * Cockta fue el ejemplo que lo motivó: rojo, amarillo y el contorno negro de
+ * las letras. Con el contorno dentro, el modo pedía tres colores y el tercero
+ * se acertaba bajando el brillo a cero sin mirar el logo. Sin él eran dos, y
+ * como el modo empieza en tres, dejaba de repartirse en multicolor — que es lo
+ * correcto: no era un logo multicolor, era uno de dos colores con contorno.
+ * (Ese logo se retiró del catálogo el 2026-09-24 por su licencia; la regla que
+ * nació con él sigue valiendo para los demás.)
  * Ver `isUnguessableColor`.
  */
 function guessableColors(

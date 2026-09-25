@@ -12,7 +12,9 @@ import type {
 } from "@/api/types";
 import { ChallengeWall, type WallItem } from "@/components/online/ChallengeWall";
 import { DeckBadge, groupVoice } from "@/components/online/GroupDeck";
-import { DevFirstRunPanel } from "@/components/online/DevFirstRunPanel";
+// DEV_ONLY: descomenta esto y su bloque para tener el interruptor que finge
+// que acabas de registrarte y no tienes grupos.
+// import { DevFirstRunPanel } from "@/components/online/DevFirstRunPanel";
 import { useOnlineTabBarSpace } from "@/components/online/OnlineTabBar";
 import { useTour, useTourAnchor } from "@/components/online/OnlineTour";
 import { UnreadDot } from "@/components/online/UnreadDot";
@@ -31,7 +33,9 @@ import {
   silenceMutedGroups,
   sortGroups,
 } from "@/online/groups";
-import { useFirstRunMock } from "@/online/devFirstRun";
+// DEV_ONLY: descomenta esto y sus dos usos para que el simulador de primera
+// vez vacíe de verdad la lista de grupos de esta pantalla.
+// import { useFirstRunMock } from "@/online/devFirstRun";
 import { useSession } from "@/online/session";
 import { setLanding } from "@/utils/storage";
 import { readAttempt, type StoredRound } from "@/online/attempts";
@@ -150,8 +154,7 @@ export default function OnlineHubScreen(): ReactElement {
    * le explicaría la barra a quien lleva un año jugando.
    */
   const { start: startTour, startOnce } = useTour();
-  /** Simulador de primera vez. Fuera de desarrollo siempre es `false`. */
-  const firstRunMock = useFirstRunMock();
+  // DEV_ONLY: const firstRunMock = useFirstRunMock();
 
   const [groups, setGroups] = useState<GroupSummary[] | null>(null);
   const [daily, setDaily] = useState<DailyOverview | null>(null);
@@ -325,7 +328,9 @@ export default function OnlineHubScreen(): ReactElement {
     que se guarda para la portada, y falsearlo dejaría la rueda apagada al
     apagar el simulador. Ver `online/devFirstRun`.
   */
-  const ordered = firstRunMock ? [] : groups ? sortGroups(groups) : null;
+  const ordered = groups ? sortGroups(groups) : null;
+  // DEV_ONLY: la misma línea con el simulador de primera vez.
+  // const ordered = firstRunMock ? [] : groups ? sortGroups(groups) : null;
 
   /**
    * La primera vez, y solo entonces: sesión abierta y ningún grupo.
@@ -594,8 +599,9 @@ export default function OnlineHubScreen(): ReactElement {
 
       <TextLink label={t("online.hub.tour")} onPress={startTour} />
 
-      {/* Simulador de primera vez. Devuelve `null` fuera de `__DEV__`. */}
-      <DevFirstRunPanel />
+      {/* DEV_ONLY: descomenta esto (y su import) para el interruptor que finge
+          una cuenta recién creada y sin grupos. */}
+      {/* <DevFirstRunPanel /> */}
     </Screen>
   );
 }

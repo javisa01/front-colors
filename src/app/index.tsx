@@ -14,7 +14,10 @@ import {
 import Animated, { FadeIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { DevTutorialCard } from "@/components/DevTutorialCard";
+// DEV_ONLY: descomenta esto y su bloque (busca DEV_ONLY en este archivo) para
+// tener los botones de volver a ver el tutorial de la portada y el recorrido
+// del Taller.
+// import { DevTutorialCard } from "@/components/DevTutorialCard";
 import { SettingsButton } from "@/components/SettingsButton";
 import { Dial, HUB_RATIO } from "@/design/Dial";
 import { Flame } from "@/design/Flame";
@@ -407,8 +410,9 @@ export default function LandingScreen(): ReactElement {
         </View>
 
         <View style={styles.footer}>
-          {/* Solo en desarrollo. Ver `components/DevTutorialCard`. */}
-          <DevTutorialCard />
+          {/* DEV_ONLY: descomenta esto (y su import) para volver a lanzar los
+              tutoriales sin tener que borrar los datos de la aplicación. */}
+          {/* <DevTutorialCard /> */}
 
           <Pressable
             onPress={enterPractice}

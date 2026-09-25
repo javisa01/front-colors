@@ -21,8 +21,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [
-        "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS",
+          "android.permission.MODIFY_AUDIO_SETTINGS",
         "android.permission.FOREGROUND_SERVICE",
         "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
         "android.permission.POST_NOTIFICATIONS"
@@ -44,7 +43,15 @@
         }
       ],
       "expo-localization",
+      [
       "expo-audio",
+      {
+        "_recordAudioAndroid": "El juego NO graba nada: solo reproduce música y efectos. El plugin añade RECORD_AUDIO por defecto, y un permiso de micrófono que no se usa es motivo de rechazo en Google Play y obliga a declararlo en el formulario de seguridad de datos.",
+        "recordAudioAndroid": false,
+        "_microphonePermission": "Lo mismo en iOS: sin esto, el plugin escribe NSMicrophoneUsageDescription en el Info.plist y Apple pregunta para qué.",
+        "microphonePermission": false
+      }
+    ],
       [
         "expo-notifications",
         {

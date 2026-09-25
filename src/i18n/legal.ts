@@ -38,7 +38,7 @@ export interface LegalDoc {
  * la dirección por la que se piden las bajas y se ejercen los derechos del
  * RGPD. Ver `web-colors/src/legal/LegalLayout.tsx`, que tiene la otra copia.
  */
-export const SOPORTE = "hola@iromi.app";
+export const SOPORTE = "hola@karakuristudios.com";
 
 /** El responsable del tratamiento. También marcador, y también obligatorio. */
 const RESPONSABLE = "[nombre o razón social]";
